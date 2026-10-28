@@ -1,0 +1,646 @@
+<!-- ドキュメントタイプをHTML5として宣言 -->
+<!DOCTYPE html>
+<!-- 言語設定を日本語に指定 -->
+<html lang="ja">
+<!-- ヘッダーメタ情報エリアの開始 -->
+<head>
+    <!-- 文字エンコーディングをUTF-8に設定 -->
+    <meta charset="UTF-8">
+    <!-- スマホやタブレットに対応するレスポンシブビューポート設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO用のページ説明文を設定 -->
+    <meta name="description" content="MANEKIN FASHION - 研ぎ澄まされたシンプルを日常に。20代〜30代に向けたモダンで洗練されたアパレルブランドのECサイト。">
+    <!-- ページのタイトルを設定 -->
+    <title>MANEKIN FASHION | 公式オンラインストア</title>
+    <!-- Google Fontsの事前接続設定 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Fonts静的リソースの事前接続設定 -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- モダンなタイポグラフィを提供するGoogle Fonts（InterとNoto Sans JP）の読み込み -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- サイト共通のスタイルシートを読み込み -->
+    <link rel="stylesheet" href="css/style.css">
+<!-- ヘッダーメタ情報エリアの終了 -->
+</head>
+<!-- ページ本体ボディの開始 -->
+<body>
+
+    <!-- グローバルサイトヘッダーの開始 -->
+    <header class="site-header" id="site-header">
+        <!-- ヘッダー内部のコンテナラッパー -->
+        <div class="header-container">
+            <!-- ブランドロゴエリア（クリックでトップページへ遷移） -->
+            <a href="#home" class="brand-logo" id="brand-logo" aria-label="MANEKIN FASHION トップへ">
+                <!-- ロゴテキスト表示 -->
+                <span class="logo-text">MANEKIN</span>
+                <!-- サブロゴテキスト表示 -->
+                <span class="logo-subtext">FASHION</span>
+            </a>
+
+            <!-- デスクトップ用ナビゲーションメニューの開始 -->
+            <nav class="desktop-nav" aria-label="メインナビゲーション">
+                <!-- ナビゲーションリスト -->
+                <ul class="nav-list">
+                    <!-- HOMEリンク項目 -->
+                    <li class="nav-item">
+                        <a href="#home" class="nav-link active" data-nav="home">HOME</a>
+                    </li>
+                    <!-- ITEM（商品一覧）リンク項目 -->
+                    <li class="nav-item">
+                        <a href="#items" class="nav-link" data-nav="items">ITEM</a>
+                    </li>
+                    <!-- NEW ITEM（新着商品）リンク項目 -->
+                    <li class="nav-item">
+                        <a href="#new-items" class="nav-link" data-nav="new-items">NEW ITEM</a>
+                    </li>
+                    <!-- FAVORITE（お気に入り一覧）リンク項目 -->
+                    <li class="nav-item">
+                        <a href="#favorites" class="nav-link" data-nav="favorites">
+                            FAVORITE
+                            <!-- お気に入り件数を表示するバッジ -->
+                            <span class="nav-badge" id="nav-fav-badge">0</span>
+                        </a>
+                    </li>
+                    <!-- MANEKIN機能リンク項目（クリックで「開発中」モーダルを表示） -->
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" class="nav-link nav-manekin-btn" id="manekin-menu-btn">
+                            MANEKIN
+                            <!-- 先端的な機能であることを示すミニタグ -->
+                            <span class="nav-tag">AI</span>
+                        </a>
+                    </li>
+                    <!-- ログインまたはマイページリンク項目（JSで動的切り替え） -->
+                    <li class="nav-item" id="nav-auth-container">
+                        <!-- 未ログイン時はLOGINリンク -->
+                        <a href="#login" class="nav-link" id="nav-auth-link" data-nav="login">LOGIN</a>
+                    </li>
+                    <!-- マイページリンク項目（常設アクセス用） -->
+                    <li class="nav-item" id="nav-mypage-container">
+                        <a href="#mypage" class="nav-link" data-nav="mypage">MYPAGE</a>
+                    </li>
+                </ul>
+            <!-- デスクトップナビゲーション終了 -->
+            </nav>
+
+            <!-- ヘッダー右側のユーザーツールアイコン群 -->
+            <div class="header-tools">
+                <!-- お気に入りクイックアイコンボタン -->
+                <a href="#favorites" class="tool-icon-btn" aria-label="お気に入り一覧を表示">
+                    <!-- ハートアイコンSVG -->
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <!-- アイコン上の件数バッジ -->
+                    <span class="icon-badge" id="icon-fav-badge">0</span>
+                </a>
+                <!-- アカウントクイックアイコンボタン -->
+                <a href="#mypage" class="tool-icon-btn" aria-label="マイページを表示">
+                    <!-- ユーザーアイコンSVG -->
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+                <!-- モバイル用ハンバーガーメニューボタン -->
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開閉する">
+                    <!-- ハンバーガーの3本線アイコン -->
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
+        </div>
+    <!-- グローバルサイトヘッダーの終了 -->
+    </header>
+
+    <!-- モバイル用スライドインナビゲーションメニューの開始 -->
+    <div class="mobile-menu-drawer" id="mobile-menu-drawer">
+        <!-- ドロワー内部のコンテナ -->
+        <div class="drawer-content">
+            <!-- 閉じるボタン -->
+            <button class="drawer-close-btn" id="drawer-close-btn" aria-label="メニューを閉じる">×</button>
+            <!-- モバイル用ナビリスト -->
+            <ul class="mobile-nav-list">
+                <li><a href="#home" class="mobile-nav-link" data-mobile-nav="home">HOME</a></li>
+                <li><a href="#items" class="mobile-nav-link" data-mobile-nav="items">ITEM (商品一覧)</a></li>
+                <li><a href="#new-items" class="mobile-nav-link" data-mobile-nav="new-items">NEW ITEM (新着)</a></li>
+                <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
+                <li><a href="javascript:void(0)" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn">MANEKIN <span class="nav-tag">AI</span></a></li>
+                <li class="mobile-divider"></li>
+                <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN (ログイン)</a></li>
+                <li><a href="#register" class="mobile-nav-link" id="mobile-register-link" data-mobile-nav="register">REGISTER (会員登録)</a></li>
+                <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE (マイページ)</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- モバイルメニューの背景オーバーレイ -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- メインコンテンツ領域の開始 -->
+    <main class="main-content" id="app-main">
+
+        <!-- ============================================== -->
+        <!-- 1. トップページビュー (HOME)                   -->
+        <!-- ============================================== -->
+        <section class="page-view active" id="view-home">
+            <!-- メインビジュアル（HERO）セクション -->
+            <section class="hero-section">
+                <!-- ヒーロー画像のコンテナ -->
+                <div class="hero-image-wrap">
+                    <!-- 生成した高品質なブランドメイン画像 -->
+                    <img src="assets/images/hero.jpg" alt="MANEKIN FASHION 2026 コレクション" class="hero-image">
+                    <!-- 画像上のダークグラデーションオーバーレイ -->
+                    <div class="hero-overlay"></div>
+                </div>
+                <!-- ヒーローコンテンツ（キャッチコピーとCTA） -->
+                <div class="hero-content">
+                    <p class="hero-subheading">2026 SPRING / SUMMER COLLECTION</p>
+                    <h1 class="hero-heading">研ぎ澄まされたシンプルを日常に。</h1>
+                    <p class="hero-description">誰にでも自然と馴染み、着る人の個性を引き立てる。時代を超えて愛される、上質なベーシックウェアを展開します。</p>
+                    <div class="hero-buttons">
+                        <!-- 商品一覧への誘導ボタン -->
+                        <a href="#items" class="btn btn-primary">COLLECTION ALL</a>
+                        <!-- 新着商品への誘導ボタン -->
+                        <a href="#new-items" class="btn btn-secondary">NEW ARRIVALS</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ブランド紹介（BRAND CONCEPT）セクション -->
+            <section class="concept-section container">
+                <!-- セクションヘッダー -->
+                <div class="section-header text-center">
+                    <p class="section-en-title">BRAND CONCEPT</p>
+                    <h2 class="section-jp-title">MANEKIN FASHION について</h2>
+                    <div class="section-divider"></div>
+                </div>
+                <!-- コンセプト本文エリア -->
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <span class="concept-number">01</span>
+                        <h3 class="concept-title">MINIMAL DESIGN</h3>
+                        <p class="concept-text">装飾を削ぎ落としたモノトーン基調の洗練されたカッティング。どんなシチュエーションにも美しく溶け込みます。</p>
+                    </div>
+                    <div class="concept-card">
+                        <span class="concept-number">02</span>
+                        <h3 class="concept-title">SMART FIT</h3>
+                        <p class="concept-text">マネキンのように均整の取れたシルエットを、現代の日本人体型に合わせて綿密にミリ単位で設計しています。</p>
+                    </div>
+                    <div class="concept-card">
+                        <span class="concept-number">03</span>
+                        <h3 class="concept-title">NEXT TECH</h3>
+                        <p class="concept-text">AIとデジタルマネキン技術を融合し、あなただけの最適なコーディネートを提案する次世代のアパレル体験をお届けします。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- おすすめ商品（RECOMMEND ITEMS）セクション -->
+            <section class="featured-section container">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <p class="section-en-title">RECOMMENDED</p>
+                        <h2 class="section-jp-title">おすすめアイテム</h2>
+                    </div>
+                    <a href="#items" class="view-more-link">すべて見る &rarr;</a>
+                </div>
+                <!-- おすすめ商品を表示するグリッドコンテナ（JSで動的描画） -->
+                <div class="product-grid" id="home-featured-grid">
+                    <!-- JavaScriptによって商品カードが動的に挿入されます -->
+                </div>
+            </section>
+
+            <!-- 次世代MANEKIN機能告知バナーセクション -->
+            <section class="banner-section container">
+                <div class="manekin-teaser-banner" id="teaser-banner">
+                    <div class="teaser-content">
+                        <span class="teaser-tag">COMING SOON - PYTHON & AI</span>
+                        <h3 class="teaser-title">AIマネキンによるパーソナルスタイリング機能</h3>
+                        <p class="teaser-text">あなた専用のデジタルマネキンを作成し、手持ち服とブランドアイテムをバーチャル試着できる独自機能を開発中です。</p>
+                        <button class="btn btn-teaser nav-manekin-btn" id="banner-manekin-btn">MANEKIN機能の詳細を見る</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 新作ハイライト（NEW ARRIVALS）セクション -->
+            <section class="new-arrivals-section container">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <p class="section-en-title">NEW ARRIVALS</p>
+                        <h2 class="section-jp-title">新着コレクション</h2>
+                    </div>
+                    <a href="#new-items" class="view-more-link">新着一覧を見る &rarr;</a>
+                </div>
+                <!-- 新着商品を表示するグリッドコンテナ（JSで動的描画） -->
+                <div class="product-grid" id="home-new-grid">
+                    <!-- JavaScriptによって商品カードが動的に挿入されます -->
+                </div>
+            </section>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 2. 商品一覧ページビュー (ITEM)                  -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-items">
+            <div class="container page-container">
+                <!-- ページタイトルとパンくずナビ -->
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>ITEM</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">ALL ITEMS</h1>
+                    <p class="page-subtitle">すべてのアイテム一覧</p>
+                </div>
+
+                <!-- フィルターとソートバーのコントロールエリア -->
+                <div class="catalog-controls">
+                    <!-- カテゴリフィルターボタングループ -->
+                    <div class="filter-group" id="category-filter-group">
+                        <button class="filter-btn active" data-category="ALL">ALL (すべて)</button>
+                        <button class="filter-btn" data-category="TOPS">TOPS (トップス)</button>
+                        <button class="filter-btn" data-category="BOTTOMS">BOTTOMS (パンツ)</button>
+                        <button class="filter-btn" data-category="OUTER">OUTER (アウター)</button>
+                    </div>
+
+                    <!-- 並び替えセレクトボックス -->
+                    <div class="sort-group">
+                        <label for="sort-select" class="sort-label">並び替え:</label>
+                        <select id="sort-select" class="sort-select">
+                            <option value="default">おすすめ順</option>
+                            <option value="price-asc">価格の安い順</option>
+                            <option value="price-desc">価格の高い順</option>
+                            <option value="name-asc">商品名順</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 商品一覧グリッド表示エリア（JSで動的挿入） -->
+                <div class="product-grid" id="catalog-product-grid">
+                    <!-- 商品カードがJSで生成されます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 3. 新着商品ページビュー (NEW ITEM)              -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-new-items">
+            <div class="container page-container">
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>NEW ITEM</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">NEW ARRIVALS</h1>
+                    <p class="page-subtitle">今期の新作コレクション</p>
+                </div>
+
+                <!-- 新着商品一覧グリッド -->
+                <div class="product-grid" id="new-items-grid">
+                    <!-- 新着商品カードがJSで生成されます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 4. 商品詳細ページビュー (ITEM DETAIL)           -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-item-detail">
+            <div class="container page-container">
+                <!-- パンくずナビゲーション -->
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <a href="#items">ITEM</a> &gt; <span id="detail-breadcrumb-name">商品詳細</span>
+                </div>
+
+                <!-- 商品詳細の2カラムレイアウトコンテナ -->
+                <div class="item-detail-layout" id="item-detail-layout">
+                    <!-- 詳細コンテンツはJavaScriptによって動的にレンダリングされます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 5. お気に入り一覧ページビュー (FAVORITE)         -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-favorites">
+            <div class="container page-container">
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>FAVORITE</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">FAVORITE ITEMS</h1>
+                    <p class="page-subtitle">お気に入りに保存したアイテム</p>
+                </div>
+
+                <!-- お気に入り商品グリッド -->
+                <div class="product-grid" id="favorite-product-grid">
+                    <!-- お気に入りアイテムまたは空表示がJSで生成されます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 6. ログインページビュー (LOGIN)                 -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-login">
+            <div class="container page-container">
+                <div class="auth-card">
+                    <!-- フォームヘッダー -->
+                    <div class="auth-header">
+                        <h1 class="auth-title">LOGIN</h1>
+                        <p class="auth-subtitle">会員ログイン</p>
+                    </div>
+
+                    <!-- ログインフォーム -->
+                    <form id="login-form" class="auth-form" novalidate>
+                        <!-- メールアドレス入力項目 -->
+                        <div class="form-group">
+                            <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com" required>
+                            <span class="form-error" id="login-email-error"></span>
+                        </div>
+
+                        <!-- パスワード入力項目 -->
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <input type="password" id="login-password" class="form-input" placeholder="8文字以上の半角英数字" required>
+                            <span class="form-error" id="login-password-error"></span>
+                        </div>
+
+                        <!-- ログイン送信ボタン -->
+                        <button type="submit" class="btn btn-primary btn-block">ログインする</button>
+
+                        <!-- かんたんテストログインボタン -->
+                        <button type="button" class="btn btn-secondary btn-block demo-login-btn" id="demo-login-btn">
+                            テストアカウントで簡単ログイン
+                        </button>
+                    </form>
+
+                    <!-- 新規会員登録へのリンク -->
+                    <div class="auth-footer">
+                        <p class="auth-switch-text">アカウントをお持ちでないですか？</p>
+                        <a href="#register" class="auth-link">新規会員登録はこちら &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 7. 会員登録ページビュー (REGISTER)              -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-register">
+            <div class="container page-container">
+                <div class="auth-card">
+                    <!-- フォームヘッダー -->
+                    <div class="auth-header">
+                        <h1 class="auth-title">REGISTER</h1>
+                        <p class="auth-subtitle">新規会員登録</p>
+                    </div>
+
+                    <!-- 会員登録フォーム -->
+                    <form id="register-form" class="auth-form" novalidate>
+                        <!-- 氏名入力項目 -->
+                        <div class="form-group">
+                            <label for="reg-name" class="form-label">氏名 <span class="required">*</span></label>
+                            <input type="text" id="reg-name" class="form-input" placeholder="山田 太郎" required>
+                            <span class="form-error" id="reg-name-error"></span>
+                        </div>
+
+                        <!-- メールアドレス入力項目 -->
+                        <div class="form-group">
+                            <label for="reg-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <input type="email" id="reg-email" class="form-input" placeholder="example@manekin.com" required>
+                            <span class="form-error" id="reg-email-error"></span>
+                        </div>
+
+                        <!-- パスワード入力項目 -->
+                        <div class="form-group">
+                            <label for="reg-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <input type="password" id="reg-password" class="form-input" placeholder="8文字以上の半角英数字" required>
+                            <span class="form-error" id="reg-password-error"></span>
+                        </div>
+
+                        <!-- 利用規約同意チェックボックス -->
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="reg-agree" class="form-checkbox" required checked>
+                            <label for="reg-agree" class="checkbox-label">利用規約およびプライバシーポリシーに同意します</label>
+                        </div>
+
+                        <!-- 登録送信ボタン -->
+                        <button type="submit" class="btn btn-primary btn-block">会員登録を完了する</button>
+                    </form>
+
+                    <!-- ログイン画面への切り替えリンク -->
+                    <div class="auth-footer">
+                        <p class="auth-switch-text">すでにアカウントをお持ちですか？</p>
+                        <a href="#login" class="auth-link">ログインはこちら &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 8. マイページビュー (MYPAGE)                    -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-mypage">
+            <div class="container page-container">
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>MYPAGE</span>
+                </div>
+
+                <!-- マイページヘッダー -->
+                <div class="mypage-header-card">
+                    <div class="user-profile-info">
+                        <div class="user-avatar-circle">
+                            <span id="mypage-avatar-initial">M</span>
+                        </div>
+                        <div class="user-text-details">
+                            <div class="user-title-row">
+                                <h1 class="user-display-name" id="mypage-user-name">ゲスト 様</h1>
+                                <span class="membership-badge">REGULAR MEMBER</span>
+                            </div>
+                            <p class="user-display-email" id="mypage-user-email">guest@manekin.com</p>
+                        </div>
+                    </div>
+                    <!-- ログアウトボタン -->
+                    <div class="mypage-actions">
+                        <button class="btn btn-outline-sm" id="logout-btn">ログアウト</button>
+                    </div>
+                </div>
+
+                <!-- マイページの統計サマリーカード -->
+                <div class="mypage-stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">保有ポイント</span>
+                        <span class="stat-value">1,250 <span class="stat-unit">pt</span></span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">お気に入りアイテム</span>
+                        <span class="stat-value" id="mypage-fav-count">0 <span class="stat-unit">点</span></span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">利用可能クーポン</span>
+                        <span class="stat-value">2 <span class="stat-unit">枚</span></span>
+                    </div>
+                </div>
+
+                <!-- マイページのメインコンテンツタブ -->
+                <div class="mypage-tabs">
+                    <button class="mypage-tab-btn active" data-tab="orders">購入履歴 (サンプル)</button>
+                    <button class="mypage-tab-btn" data-tab="favorites-summary">お気に入りクイック閲覧</button>
+                    <button class="mypage-tab-btn" data-tab="python-features">Python連携機能予定</button>
+                </div>
+
+                <!-- タブ1: 購入履歴（サンプルデータ） -->
+                <div class="mypage-tab-content active" id="tab-orders">
+                    <div class="orders-table-wrapper">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>注文番号</th>
+                                    <th>注文日</th>
+                                    <th>注文商品</th>
+                                    <th>合計金額</th>
+                                    <th>配送状況</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <!-- JavaScriptでサンプル購入履歴を描画 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- タブ2: お気に入りクイック表示 -->
+                <div class="mypage-tab-content" id="tab-favorites-summary">
+                    <div class="product-grid" id="mypage-fav-grid">
+                        <!-- お気に入りアイテムを表示 -->
+                    </div>
+                </div>
+
+                <!-- タブ3: Python連携機能予定 -->
+                <div class="mypage-tab-content" id="tab-python-features">
+                    <div class="python-features-card">
+                        <h3 class="python-card-title">【開発ロードマップ】Pythonバックエンド連携機能</h3>
+                        <p class="python-card-desc">MANEKIN FASHIONでは、会員限定の革新的な機能として以下の3大機能をPython APIと連携予定です。</p>
+                        <div class="python-roadmap-list">
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 01</span>
+                                <h4>MANEKIN機能 (バーチャルマネキン試着)</h4>
+                                <p>ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用シルエットを事前に確認できる機能です。</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 02</span>
+                                <h4>マイクローゼット機能 (手持ち服管理)</h4>
+                                <p>写真一枚で手持ちの服をデジタルクローゼット化。ブランドアイテムとの組み合わせシミュレーションが可能です。</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 03</span>
+                                <h4>AIコーデ提案機能 (スマートスタイリスト)</h4>
+                                <p>本日の天気・気温・着用シーン（オフィス、デート、カフェ）に合わせた最適なコーディネートをAIが毎朝提案します。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- メインコンテンツ領域の終了 -->
+    </main>
+
+    <!-- ============================================== -->
+    <!-- MANEKIN機能クリック時の「開発中」モーダル      -->
+    <!-- ============================================== -->
+    <div class="modal-backdrop" id="manekin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-manekin-title">
+        <div class="modal-dialog">
+            <!-- モーダルヘッダー -->
+            <div class="modal-header">
+                <span class="modal-badge">FUTURE FEATURE</span>
+                <button class="modal-close-btn" id="modal-close-btn" aria-label="閉じる">&times;</button>
+            </div>
+            <!-- モーダルボディ -->
+            <div class="modal-body text-center">
+                <!-- アイコン表示 -->
+                <div class="modal-icon-wrap">
+                    <svg class="modal-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                    </svg>
+                </div>
+                <!-- タイトル：「開発中」 -->
+                <h2 class="modal-title" id="modal-manekin-title">開発中</h2>
+                <p class="modal-subtext">MANEKIN AI COORDINATE & VIRTUAL CLOSET</p>
+                <!-- 説明文 -->
+                <p class="modal-description">
+                    ご期待ありがとうございます。<br>
+                    <strong>「MANEKIN」機能</strong>は、Pythonバックエンドによる<br>
+                    <strong>「3Dマネキン試着」</strong>、<strong>「マイクローゼット管理」</strong>、<strong>「AIコーデ提案」</strong><br>
+                    を統合した会員限定の次世代スタイリングサービスです。<br>
+                    現在、順次実装を進めております。公開まで今しばらくお待ちください。
+                </p>
+                <!-- ボタン -->
+                <button class="btn btn-primary" id="modal-ok-btn">了解しました</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作通知用トーストメッセージコンテナ -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <!-- ============================================== -->
+    <!-- フッターエリア                                  -->
+    <!-- ============================================== -->
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <!-- フッター上部：ブランド紹介とリンク列 -->
+            <div class="footer-top">
+                <!-- フッターブランド情報 -->
+                <div class="footer-brand-column">
+                    <a href="#home" class="footer-logo">MANEKIN FASHION</a>
+                    <p class="footer-concept-text">
+                        研ぎ澄まされたシンプルを日常に。<br>
+                        20代〜30代に向けたニュースタンダードウェアを展開する、モダンアパレルECストアです。
+                    </p>
+                </div>
+                <!-- フッターリンク列1：NAVIGATION -->
+                <div class="footer-links-column">
+                    <h4 class="footer-col-title">NAVIGATION</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="#home">HOME (トップ)</a></li>
+                        <li><a href="#items">ITEM (全商品)</a></li>
+                        <li><a href="#new-items">NEW ITEM (新作)</a></li>
+                        <li><a href="#favorites">FAVORITE (お気に入り)</a></li>
+                        <li><a href="javascript:void(0)" class="nav-manekin-btn">MANEKIN (AI機能)</a></li>
+                    </ul>
+                </div>
+                <!-- フッターリンク列2：MEMBERSHIP -->
+                <div class="footer-links-column">
+                    <h4 class="footer-col-title">MEMBERSHIP</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="#mypage">マイページ</a></li>
+                        <li><a href="#login">ログイン</a></li>
+                        <li><a href="#register">新規会員登録</a></li>
+                        <li><a href="#mypage">注文履歴</a></li>
+                    </ul>
+                </div>
+                <!-- フッターリンク列3：ABOUT & HELP -->
+                <div class="footer-links-column">
+                    <h4 class="footer-col-title">HELP & INFO</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="javascript:void(0)">ご利用ガイド</a></li>
+                        <li><a href="javascript:void(0)">配送・送料について</a></li>
+                        <li><a href="javascript:void(0)">返品・交換ポリシー</a></li>
+                        <li><a href="javascript:void(0)">プライバシーポリシー</a></li>
+                        <li><a href="javascript:void(0)">特定商取引法に基づく表記</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- フッター下部：著作権表記 -->
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 MANEKIN FASHION Co., Ltd. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScriptアプリケーションロジックファイルの読み込み -->
+    <script src="js/app.js"></script>
+</body>
+</html>

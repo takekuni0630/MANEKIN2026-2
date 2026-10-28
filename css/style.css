@@ -1,0 +1,1927 @@
+@charset "UTF-8";
+/* ========================================================================== */
+/* MANEKIN FASHION - メインスタイルシート (style.css)                          */
+/* UNIQLO / GU ライクなモノトーン・ミニマル・モダンECデザイン                 */
+/* ========================================================================== */
+
+/* --- 1. CSS変数・カラーパレット・フォント設計 --- */
+:root {
+    /* プライマリカラー: 純黒 */
+    --color-black: #111111;
+    /* セカンダリカラー: 濃いダークグレー */
+    --color-dark: #222222;
+    /* 本文用ミッドグレー */
+    --color-gray-dark: #444444;
+    /* 補助テキスト用グレー */
+    --color-gray-medium: #777777;
+    /* 境界線・区切り線用ライトグレー */
+    --color-gray-light: #e5e5e5;
+    /* 背景用オフホワイト */
+    --color-gray-bg: #f7f7f7;
+    /* 純白 */
+    --color-white: #ffffff;
+    /* アクセントカラー: お気に入り等のレッド */
+    --color-accent: #e53935;
+    /* MANEKIN機能用テックブラック/シルバー */
+    --color-tech: #000000;
+    
+    /* 基本フォントファミリー（欧文Inter、和文Noto Sans JP） */
+    --font-primary: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* ヘッダーの高さ設定 */
+    --header-height: 72px;
+    /* 最大コンテンツ幅 */
+    --container-max-width: 1200px;
+    
+    /* トランジション速度 */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* 影の定義 */
+    --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* --- 2. リセットCSSとベース要素スタイル --- */
+/* 全要素のボックスサイズ基準をボーダーボックスに統一 */
+*, *::before, *::after {
+    /* パディングやボーダーを含めて幅・高さを計算 */
+    box-sizing: border-box;
+    /* デフォルトマージンをリセット */
+    margin: 0;
+    /* デフォルトパディングをリセット */
+    padding: 0;
+}
+
+/* HTMLの基本スクロール挙動 */
+html {
+    /* スムーズスクロールを有効化 */
+    scroll-behavior: smooth;
+    /* フォントサイズの基準設定 */
+    font-size: 16px;
+}
+
+/* bodyタグの全体基本設計 */
+body {
+    /* フォントファミリーを適用 */
+    font-family: var(--font-primary);
+    /* デフォルト文字色を黒に指定 */
+    color: var(--color-black);
+    /* サイト背景色を白に指定 */
+    background-color: var(--color-white);
+    /* 行間を美しく設定 */
+    line-height: 1.65;
+    /* テキストのアンチエイリアス処理で文字を滑らかに表示 */
+    -webkit-font-smoothing: antialiased;
+    /* Firefox用の文字滑らか設定 */
+    -moz-osx-font-smoothing: grayscale;
+    /* 横スクロールのはみ出しを防止 */
+    overflow-x: hidden;
+}
+
+/* リンク要素の基本装飾 */
+a {
+    /* 文字色を親から継承 */
+    color: inherit;
+    /* 下線を非表示 */
+    text-decoration: none;
+    /* ホバー時の変化を滑らかに */
+    transition: opacity var(--transition-fast);
+}
+
+/* リンクホバー時の汎用効果 */
+a:hover {
+    /* やや透過してクリック可能であることを明示 */
+    opacity: 0.75;
+}
+
+/* リスト要素のスタイルリセット */
+ul, ol {
+    /* 点や数字のビュレットを非表示 */
+    list-style: none;
+}
+
+/* 画像要素のレスポンシブ共通設定 */
+img {
+    /* 親要素の幅を超えないように最大幅を設定 */
+    max-width: 100%;
+    /* 高さはアスペクト比を自動維持 */
+    height: auto;
+    /* 画像下の微小な隙間を解消 */
+    display: block;
+}
+
+/* ボタン要素のリセット */
+button {
+    /* 背景色を透過 */
+    background: none;
+    /* ボーダーを解除 */
+    border: none;
+    /* フォントを親から継承 */
+    font-family: inherit;
+    /* 文字サイズを継承 */
+    font-size: inherit;
+    /* マウスカーソルをポインターに変更 */
+    cursor: pointer;
+    /* 遷移効果を適用 */
+    transition: all var(--transition-fast);
+}
+
+/* コンテナクラス（幅の統一） */
+.container {
+    /* 最大幅を設定 */
+    max-width: var(--container-max-width);
+    /* 左右中央揃え */
+    margin-left: auto;
+    margin-right: auto;
+    /* 左右の内部余白 */
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* --- 3. ヘッダーとナビゲーション --- */
+.site-header {
+    /* 画面上部に固定 */
+    position: fixed;
+    /* 上端に密着 */
+    top: 0;
+    /* 左端に密着 */
+    left: 0;
+    /* 横幅を100%に */
+    width: 100%;
+    /* ヘッダーの固定高さを指定 */
+    height: var(--header-height);
+    /* すりガラス風の白背景 */
+    background-color: rgba(255, 255, 255, 0.95);
+    /* 背景をぼかすグラスモフィズム */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 下部に極細のグレー境界線 */
+    border-bottom: 1px solid var(--color-gray-light);
+    /* 最前面に表示 */
+    z-index: 1000;
+    /* 表示変化のスムーズアニメーション */
+    transition: all var(--transition-normal);
+}
+
+/* ヘッダー内部のコンテナ */
+.header-container {
+    /* 最大幅を指定 */
+    max-width: var(--container-max-width);
+    /* 中央揃え */
+    margin: 0 auto;
+    /* 左右余白 */
+    padding: 0 24px;
+    /* 高さを100%に */
+    height: 100%;
+    /* フレックスボックスで配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 左右の要素を端と端に配置 */
+    justify-content: space-between;
+}
+
+/* ブランドロゴ */
+.brand-logo {
+    /* インラインフレックスで配置 */
+    display: inline-flex;
+    /* 縦並びに配置 */
+    flex-direction: column;
+    /* 行間を詰める */
+    line-height: 1;
+}
+
+/* ロゴのメインテキスト */
+.logo-text {
+    /* フォントサイズを大きく */
+    font-size: 1.5rem;
+    /* 極太ウェイトでUNIQLO風の存在感 */
+    font-weight: 700;
+    /* 文字間隔を広げる */
+    letter-spacing: 0.15em;
+    /* 黒文字 */
+    color: var(--color-black);
+}
+
+/* ロゴのサブテキスト */
+.logo-subtext {
+    /* 小さめのフォントサイズ */
+    font-size: 0.65rem;
+    /* 細字ウェイト */
+    font-weight: 400;
+    /* 広い文字間隔 */
+    letter-spacing: 0.35em;
+    /* グレーカラー */
+    color: var(--color-gray-medium);
+    /* 上部に少しマージン */
+    margin-top: 2px;
+}
+
+/* デスクトップナビゲーション */
+.desktop-nav {
+    /* デスクトップで表示 */
+    display: block;
+}
+
+/* ナビゲーションリスト */
+.nav-list {
+    /* フレックスボックスで横並び */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* メニュー間の間隔 */
+    gap: 28px;
+}
+
+/* ナビゲーションリンク */
+.nav-link {
+    /* フォントサイズ */
+    font-size: 0.85rem;
+    /* 中太ウェイト */
+    font-weight: 500;
+    /* 大文字変換 */
+    text-transform: uppercase;
+    /* 文字間隔 */
+    letter-spacing: 0.08em;
+    /* 文字色 */
+    color: var(--color-dark);
+    /* 内部余白 */
+    padding: 8px 0;
+    /* 相対位置指定（下線アニメーション用） */
+    position: relative;
+    /* フレックスでタグと並べる */
+    display: inline-flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 間隔 */
+    gap: 6px;
+}
+
+/* ナビリンクのアクティブ下線エフェクト用疑似要素 */
+.nav-link::after {
+    /* 空のコンテンツ */
+    content: '';
+    /* 絶対配置 */
+    position: absolute;
+    /* 下端に配置 */
+    bottom: 0;
+    /* 左端から */
+    left: 0;
+    /* 初期幅は0% */
+    width: 0;
+    /* 下線の太さ */
+    height: 2px;
+    /* 下線の色を黒に */
+    background-color: var(--color-black);
+    /* スムーズに幅を拡大するトランジション */
+    transition: width var(--transition-fast);
+}
+
+/* ホバー時およびアクティブ時の下線拡大 */
+.nav-link:hover::after,
+.nav-link.active::after {
+    /* 横幅を100%に伸長 */
+    width: 100%;
+}
+
+/* ナビゲーション内バッジ（お気に入り件数） */
+.nav-badge {
+    /* 小さめの文字サイズ */
+    font-size: 0.7rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 背景色を黒に */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 円形パディング */
+    padding: 1px 6px;
+    /* 丸み */
+    border-radius: 10px;
+    /* 縦位置調整 */
+    vertical-align: middle;
+}
+
+/* MANEKIN機能用特別タグ */
+.nav-tag {
+    /* 極小フォント */
+    font-size: 0.6rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 背景を濃いグレー */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 内部余白 */
+    padding: 2px 5px;
+    /* 角丸 */
+    border-radius: 3px;
+    /* 文字間隔 */
+    letter-spacing: 0.05em;
+}
+
+/* MANEKIN特別ボタンスタイル */
+.nav-manekin-btn {
+    /* テック感のあるボールド */
+    font-weight: 600;
+}
+
+/* ヘッダー右ツール群 */
+.header-tools {
+    /* 横並び配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* アイコン間の間隔 */
+    gap: 18px;
+}
+
+/* ツールアイコンボタン */
+.tool-icon-btn {
+    /* 相対位置指定（バッジ用） */
+    position: relative;
+    /* アイコンの中央配置 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* パディング */
+    padding: 6px;
+    /* 文字色 */
+    color: var(--color-black);
+}
+
+/* SVGアイコンのサイズ統一 */
+.icon-svg {
+    /* 幅22px */
+    width: 22px;
+    /* 高さ22px */
+    height: 22px;
+    /* 遷移効果 */
+    transition: transform var(--transition-fast);
+}
+
+/* ツールアイコンホバー効果 */
+.tool-icon-btn:hover .icon-svg {
+    /* わずかに拡大 */
+    transform: scale(1.1);
+}
+
+/* アイコン上の丸いバッジ */
+.icon-badge {
+    /* 絶対配置 */
+    position: absolute;
+    /* 右上に配置 */
+    top: -2px;
+    right: -4px;
+    /* 背景色を赤に */
+    background-color: var(--color-accent);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 極小フォント */
+    font-size: 0.65rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 最小幅 */
+    min-width: 16px;
+    /* 高さ */
+    height: 16px;
+    /* 上下左右中央 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 円形 */
+    border-radius: 50%;
+    /* パディング */
+    padding: 0 4px;
+}
+
+/* ハンバーガーメニューボタン（初期はデスクトップで非表示） */
+.hamburger-btn {
+    /* デスクトップ非表示 */
+    display: none;
+    /* 縦並び配置 */
+    flex-direction: column;
+    /* 線と線の間隔 */
+    justify-content: space-around;
+    /* 幅と高さ */
+    width: 24px;
+    height: 20px;
+    /* パディングリセット */
+    padding: 0;
+}
+
+/* ハンバーガーの線 */
+.hamburger-line {
+    /* 横幅100% */
+    width: 100%;
+    /* 線の太さ2px */
+    height: 2px;
+    /* 背景色を黒に */
+    background-color: var(--color-black);
+    /* トランジション */
+    transition: all var(--transition-fast);
+}
+
+/* モバイルドロワーメニュー */
+.mobile-menu-drawer {
+    /* 画面全体で固定 */
+    position: fixed;
+    /* 上端 */
+    top: 0;
+    /* 右端に初期配置（画面外） */
+    right: -300px;
+    /* 横幅300px */
+    width: 300px;
+    /* 画面の高さ100% */
+    height: 100vh;
+    /* 白背景 */
+    background-color: var(--color-white);
+    /* 最前面 */
+    z-index: 2000;
+    /* スムーズにスライドするトランジション */
+    transition: right var(--transition-smooth);
+    /* 影 */
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    /* 縦スクロール可能に */
+    overflow-y: auto;
+}
+
+/* ドロワーメニューが開いた状態 */
+.mobile-menu-drawer.open {
+    /* 画面内にスライドイン */
+    right: 0;
+}
+
+/* ドロワー内部のコンテナ */
+.drawer-content {
+    /* 内部パディング */
+    padding: 30px 24px;
+}
+
+/* ドロワー閉じるボタン */
+.drawer-close-btn {
+    /* フォントサイズを大きく */
+    font-size: 2rem;
+    /* 行間 */
+    line-height: 1;
+    /* 右寄せ */
+    display: block;
+    margin-left: auto;
+    /* 色 */
+    color: var(--color-black);
+    /* マージン下 */
+    margin-bottom: 24px;
+}
+
+/* モバイルナビゲーションリスト */
+.mobile-nav-list {
+    /* 縦並び */
+    display: flex;
+    flex-direction: column;
+    /* 間隔 */
+    gap: 16px;
+}
+
+/* モバイルナビリンク */
+.mobile-nav-link {
+    /* ブロック要素化 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* フォントサイズ */
+    font-size: 1rem;
+    /* 太さ */
+    font-weight: 500;
+    /* パディング */
+    padding: 10px 0;
+    /* 境界線 */
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+/* モバイル区切り線 */
+.mobile-divider {
+    /* マージン */
+    margin: 10px 0;
+    /* ボーダー */
+    border-top: 1px solid var(--color-gray-light);
+}
+
+/* メニュー用オーバーレイ背景 */
+.menu-overlay {
+    /* 固定配置 */
+    position: fixed;
+    /* 画面全体 */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* 半透明黒 */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* 初期は非表示 */
+    opacity: 0;
+    visibility: hidden;
+    /* トランジション */
+    transition: all var(--transition-normal);
+    /* ドロワーの背面、ヘッダーより前面 */
+    z-index: 1500;
+}
+
+/* オーバーレイ表示時 */
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- 4. ページビュー切り替え構造（SPA） --- */
+.main-content {
+    /* ヘッダーの高さ分のマージントップを確保 */
+    margin-top: var(--header-height);
+    /* 最小の画面高さ */
+    min-height: calc(100vh - var(--header-height) - 300px);
+}
+
+/* 各ページビューの非アクティブ状態（デフォルト非表示） */
+.page-view {
+    display: none;
+    /* フェードインアニメーション */
+    animation: fadeIn 0.35s ease forwards;
+}
+
+/* アクティブなページビューを表示 */
+.page-view.active {
+    display: block;
+}
+
+/* ページ切り替え用フェードインキーフレーム */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 5. メインビジュアル（HERO） --- */
+.hero-section {
+    /* 相対配置 */
+    position: relative;
+    /* 幅100% */
+    width: 100%;
+    /* 高さの確保 */
+    height: 85vh;
+    /* 最小高さ */
+    min-height: 520px;
+    /* 最大高さ */
+    max-height: 800px;
+    /* はみ出しを隠す */
+    overflow: hidden;
+    /* 中央揃え */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ヒーロー画像ラッパー */
+.hero-image-wrap {
+    /* 絶対配置で全体を覆う */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ヒーロー背景画像 */
+.hero-image {
+    width: 100%;
+    height: 100%;
+    /* 写真の比率を崩さずカバー */
+    object-fit: cover;
+    /* 上部寄りにフォーカス */
+    object-position: center 25%;
+}
+
+/* ヒーロー半透明オーバーレイ */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* 文字の視認性を高める微かなグラデーション */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+/* ヒーローコンテンツ（文字とボタン） */
+.hero-content {
+    /* 前面に配置 */
+    position: relative;
+    z-index: 2;
+    /* 最大幅 */
+    max-width: 800px;
+    /* パディング */
+    padding: 0 24px;
+    /* 白文字 */
+    color: var(--color-white);
+    /* テキストシャドウで鮮明化 */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ヒーローサブタイトル */
+.hero-subheading {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ヒーローメイン見出し */
+.hero-heading {
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+}
+
+/* ヒーロー説明文 */
+.hero-description {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: 580px;
+    margin-bottom: 32px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ヒーローボタングループ */
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* --- 6. 汎用ボタンコンポーネント --- */
+.btn {
+    /* インラインフレックス */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* パディング */
+    padding: 14px 32px;
+    /* 文字サイズ */
+    font-size: 0.9rem;
+    /* 太さ */
+    font-weight: 600;
+    /* 文字間隔 */
+    letter-spacing: 0.08em;
+    /* テキスト揃え */
+    text-align: center;
+    /* 角丸 */
+    border-radius: 0;
+    /* アニメーション */
+    transition: all var(--transition-fast);
+}
+
+/* プライマリボタン（黒背景、白文字） */
+.btn-primary {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: 1px solid var(--color-black);
+}
+
+/* プライマリボタンホバー */
+.btn-primary:hover {
+    background-color: var(--color-dark);
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+/* セカンダリボタン（白背景、黒文字、境界線あり） */
+.btn-secondary {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    border: 1px solid var(--color-white);
+}
+
+/* セカンダリボタンホバー */
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    opacity: 0.95;
+    transform: translateY(-2px);
+}
+
+/* アウトラインボタン */
+.btn-outline-sm {
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    border: 1px solid var(--color-black);
+    background-color: transparent;
+    color: var(--color-black);
+}
+
+.btn-outline-sm:hover {
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+/* ブロックボタンスタイル（横幅100%） */
+.btn-block {
+    width: 100%;
+    display: block;
+}
+
+/* --- 7. セクション共通見出し --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 36px;
+}
+
+.section-header.text-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-en-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--color-gray-medium);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.section-jp-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-black);
+}
+
+.section-divider {
+    width: 40px;
+    height: 2px;
+    background-color: var(--color-black);
+    margin: 16px auto 0;
+}
+
+.view-more-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-black);
+    padding-bottom: 2px;
+}
+
+/* --- 8. ブランドコンセプト（CONCEPT） --- */
+.concept-section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+}
+
+.concept-card {
+    padding: 32px 24px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    transition: transform var(--transition-fast);
+}
+
+.concept-card:hover {
+    transform: translateY(-4px);
+}
+
+.concept-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--color-gray-medium);
+    display: block;
+    margin-bottom: 12px;
+}
+
+.concept-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+}
+
+.concept-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--color-gray-dark);
+}
+
+/* --- 9. おすすめ商品 & 新作セクション --- */
+.featured-section, .new-arrivals-section {
+    padding-top: 40px;
+    padding-bottom: 80px;
+}
+
+/* --- 10. 商品グリッド & 商品カード --- */
+.product-grid {
+    display: grid;
+    /* 4カラム（デスクトップ） */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 20px;
+}
+
+/* 商品カード */
+.product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-white);
+    transition: transform var(--transition-fast);
+}
+
+/* 商品カードホバー時の微細な浮遊感 */
+.product-card:hover {
+    transform: translateY(-4px);
+}
+
+/* 商品画像コンテナ */
+.product-img-wrapper {
+    position: relative;
+    width: 100%;
+    /* 3:4のアスペクト比を維持 */
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-gray-bg);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* 商品画像 */
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* ホバー時に画像を微かにズーム */
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+/* NEWバッジ */
+.badge-new {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    z-index: 2;
+}
+
+/* お気に入りハートボタン */
+.fav-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark);
+    z-index: 5;
+    box-shadow: var(--shadow-subtle);
+    transition: all var(--transition-fast);
+}
+
+.fav-btn:hover {
+    transform: scale(1.15);
+    background-color: var(--color-white);
+}
+
+/* お気に入り登録済み状態（アクティブ） */
+.fav-btn.is-favorite {
+    color: var(--color-accent);
+}
+
+.fav-btn.is-favorite svg {
+    fill: var(--color-accent);
+}
+
+.fav-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: fill var(--transition-fast);
+}
+
+/* 商品情報エリア */
+.product-info {
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* カテゴリ表示 */
+.product-category {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+/* 商品名 */
+.product-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-black);
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.product-name:hover {
+    color: var(--color-gray-dark);
+}
+
+/* 価格表示 */
+.product-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-top: auto;
+}
+
+.product-price .tax {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-gray-medium);
+    margin-left: 4px;
+}
+
+/* --- 11. MANEKINティーザーバナー --- */
+.banner-section {
+    padding-top: 20px;
+    padding-bottom: 60px;
+}
+
+.manekin-teaser-banner {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    border: 1px solid #333333;
+}
+
+.teaser-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 12px;
+    margin-bottom: 16px;
+}
+
+.teaser-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.teaser-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+    margin: 0 auto 28px;
+    line-height: 1.8;
+}
+
+.btn-teaser {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-weight: 600;
+    padding: 12px 28px;
+}
+
+.btn-teaser:hover {
+    background-color: var(--color-gray-light);
+    transform: translateY(-2px);
+}
+
+/* --- 12. ページコンテナとパンくず --- */
+.page-container {
+    padding-top: 32px;
+    padding-bottom: 80px;
+}
+
+.page-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 24px;
+}
+
+.page-breadcrumb a:hover {
+    color: var(--color-black);
+    text-decoration: underline;
+}
+
+.page-header {
+    margin-bottom: 36px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+.page-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-gray-medium);
+}
+
+/* --- 13. カタログコントロール（フィルター & ソート） --- */
+.catalog-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--color-gray-light);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    color: var(--color-dark);
+}
+
+.filter-btn.active, .filter-btn:hover {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border-color: var(--color-black);
+}
+
+.sort-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-label {
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+}
+
+.sort-select {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    cursor: pointer;
+    outline: none;
+}
+
+/* --- 14. 商品詳細ページ（ITEM DETAIL）レイアウト --- */
+.item-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+    margin-top: 16px;
+}
+
+.detail-gallery {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+}
+
+.detail-main-img-box {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-gray-bg);
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-gray-light);
+}
+
+.detail-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.detail-info-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-meta {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.detail-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.detail-price-box {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.detail-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.detail-tax {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    margin-left: 6px;
+}
+
+/* カラー・サイズ選択 */
+.detail-options {
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.option-group-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.color-chips, .size-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.color-chip {
+    padding: 6px 14px;
+    border: 1px solid var(--color-gray-light);
+    font-size: 0.85rem;
+    background-color: var(--color-white);
+    cursor: pointer;
+}
+
+.color-chip.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.size-chip {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gray-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: var(--color-white);
+    cursor: pointer;
+}
+
+.size-chip.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+/* アクションボタン群 */
+.detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.btn-detail-fav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--color-black);
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: var(--color-white);
+}
+
+.btn-detail-fav.is-favorite {
+    background-color: #fff0f0;
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.btn-detail-fav.is-favorite svg {
+    fill: var(--color-accent);
+}
+
+/* 商品解説テキスト */
+.detail-description-box {
+    border-top: 1px solid var(--color-gray-light);
+    padding-top: 24px;
+}
+
+.detail-desc-heading {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.detail-desc-text {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--color-gray-dark);
+    margin-bottom: 20px;
+}
+
+.detail-spec-list {
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+    line-height: 2;
+}
+
+/* --- 15. お気に入り一覧（FAVORITE） --- */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    grid-column: 1 / -1;
+}
+
+.empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    color: var(--color-gray-medium);
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    font-size: 0.9rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 24px;
+}
+
+/* --- 16. 会員登録 & ログイン（AUTH） --- */
+.auth-card {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 48px 40px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    box-shadow: var(--shadow-subtle);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+
+.auth-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.form-label .required {
+    color: var(--color-accent);
+}
+
+.form-input {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    border: 1px solid var(--color-gray-light);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.form-input:focus {
+    border-color: var(--color-black);
+}
+
+.form-error {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    min-height: 18px;
+}
+
+.form-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.form-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.demo-login-btn {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    padding: 10px;
+    border-color: var(--color-gray-light);
+}
+
+.auth-footer {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-gray-light);
+    text-align: center;
+}
+
+.auth-switch-text {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 8px;
+}
+
+.auth-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-black);
+    text-decoration: underline;
+}
+
+/* --- 17. マイページ（MYPAGE） --- */
+.mypage-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.user-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.user-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.user-display-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.membership-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.user-display-email {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
+.mypage-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    padding: 24px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.stat-unit {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--color-gray-medium);
+}
+
+.mypage-tabs {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--color-gray-light);
+    margin-bottom: 28px;
+    overflow-x: auto;
+}
+
+.mypage-tab-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-gray-medium);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+}
+
+.mypage-tab-btn.active {
+    color: var(--color-black);
+    border-bottom-color: var(--color-black);
+}
+
+.mypage-tab-content {
+    display: none;
+}
+
+.mypage-tab-content.active {
+    display: block;
+}
+
+/* 購入履歴テーブル */
+.orders-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--color-gray-light);
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.orders-table th {
+    background-color: var(--color-gray-bg);
+    padding: 14px 18px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.orders-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 2px;
+}
+
+/* Pythonロードマップカード */
+.python-features-card {
+    padding: 32px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+}
+
+.python-card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.python-card-desc {
+    font-size: 0.9rem;
+    color: var(--color-gray-dark);
+    margin-bottom: 24px;
+}
+
+.python-roadmap-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.roadmap-item {
+    padding: 20px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+}
+
+.roadmap-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    margin-bottom: 8px;
+}
+
+.roadmap-item h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.roadmap-item p {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    line-height: 1.6;
+}
+
+/* --- 18. MANEKIN「開発中」モーダル --- */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.modal-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-dialog {
+    background-color: var(--color-white);
+    max-width: 480px;
+    width: 90%;
+    padding: 36px 32px;
+    position: relative;
+    box-shadow: var(--shadow-modal);
+    transform: translateY(20px);
+    transition: transform var(--transition-smooth);
+}
+
+.modal-backdrop.open .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 3px 8px;
+}
+
+.modal-close-btn {
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--color-dark);
+}
+
+.modal-icon-wrap {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-bg);
+    border-radius: 50%;
+}
+
+.modal-sparkle-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-black);
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+}
+
+.modal-subtext {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-gray-medium);
+    margin-bottom: 20px;
+}
+
+.modal-description {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--color-gray-dark);
+    margin-bottom: 28px;
+}
+
+/* --- 19. トースト通知コンポーネント --- */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4000;
+    pointer-events: none;
+}
+
+.toast-message {
+    pointer-events: auto;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 14px 24px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 260px;
+    animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast-message.toast-fadeout {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 20. フッター --- */
+.site-footer {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding-top: 64px;
+    padding-bottom: 40px;
+    margin-top: 80px;
+}
+
+.footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.footer-logo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.footer-concept-text {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 320px;
+}
+
+.footer-col-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-link-list a {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.65);
+    transition: color var(--transition-fast);
+}
+
+.footer-link-list a:hover {
+    color: var(--color-white);
+    opacity: 1;
+}
+
+.footer-bottom {
+    padding-top: 32px;
+    text-align: center;
+}
+
+.copyright {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.05em;
+}
+
+/* --- 21. レスポンシブ対応 (メディアクエリ) --- */
+/* タブレット対応 (992px以下) */
+@media screen and (max-width: 992px) {
+    /* デスクトップナビを非表示にしてハンバーガーを表示 */
+    .desktop-nav {
+        display: none;
+    }
+    .hamburger-btn {
+        display: flex;
+    }
+    /* 商品グリッドを3列に変更 */
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    /* フッターを2列×2行に */
+    .footer-top {
+        grid-template-columns: 1fr 1fr;
+    }
+    /* 詳細ページのレイアウト間隔を縮小 */
+    .item-detail-layout {
+        gap: 32px;
+    }
+    /* コンセプトグリッドを縦並びに */
+    .concept-grid {
+        grid-template-columns: 1fr;
+    }
+    /* Pythonロードマップを縦並びに */
+    .python-roadmap-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* スマホ対応 (768px以下) */
+@media screen and (max-width: 768px) {
+    /* ヒーローの高さを調整 */
+    .hero-section {
+        height: 70vh;
+        min-height: 440px;
+    }
+    .hero-heading {
+        font-size: 2rem;
+    }
+    .hero-description {
+        font-size: 0.9rem;
+    }
+    /* 商品グリッドをUNIQLO/GU標準の2列に */
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 12px;
+    }
+    /* 商品詳細を1カラム縦並びに */
+    .item-detail-layout {
+        grid-template-columns: 1fr;
+    }
+    .detail-gallery {
+        position: static;
+    }
+    /* マイページの統計を縦並びに */
+    .mypage-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    /* フッターを1カラムに */
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    /* 認証カードのパディング調整 */
+    .auth-card {
+        padding: 32px 20px;
+    }
+    .catalog-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
