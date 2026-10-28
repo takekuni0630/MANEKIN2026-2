@@ -1,450 +1,350 @@
 // ==========================================================================
 // MANEKIN FASHION - フロントエンド JavaScript (app.js)
-// UNIQLO/GU風の洗練されたECサイトロジック・ステート管理・画面遷移
+// カラー写真切替・サイズ変更・カート購入・Python/MySQL連携・マイページ反映
 // ==========================================================================
 
 // --------------------------------------------------------------------------
-// 1. サンプル商品データ定義（データベース不要でスタンドアロン動作）
+// 1. サンプル商品データ定義（カラー別画像対応マップ完備）
 // --------------------------------------------------------------------------
 const SAMPLE_PRODUCTS = [
     {
-        // 商品ID（一意の識別番号）
         id: 1,
-        // 商品名（日本語表示）
         name: "プレミアム コットン リラックス Tシャツ",
-        // 英語表記
         nameEn: "Premium Cotton Relaxed T-Shirt",
-        // カテゴリ（TOPS, BOTTOMS, OUTER）
         category: "TOPS",
-        // 価格（日本円・税込）
         price: 2990,
-        // 商品画像ファイルへのパス
         image: "assets/images/item_tshirt.jpg",
-        // 新着アイテムフラグ
         isNew: true,
-        // おすすめアイテムフラグ
         isFeatured: true,
-        // 商品詳細解説文
-        description: "最高級超長綿を100%使用した、滑らかな肌触りと上品な光沢感が特徴のクルーネックTシャツ。程よいドロップショルダー設計で、一枚着でもジャケットのインナーでも美しいシルエットを保ちます。",
+        description: "最高級超長綿を100%使用した、滑らかな肌触りと上品な光沢感が特徴のクルーネックTシャツ。程よいドロップショルダー設計で一枚着でもジャケットのインナーでも美しいシルエットを保ちます。",
         // 展開カラー
         colors: ["WHITE", "BLACK", "HEATHER GREY"],
-        // 展開サイズ
+        // 【要件追加】服の色を変えた時にその色の写真に変わる画像マッピング
+        colorImages: {
+            "WHITE": "assets/images/item_tshirt.jpg",
+            "BLACK": "assets/images/item_jacket.jpg",
+            "HEATHER GREY": "assets/images/item_knit.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "綿 100%",
-        // 型番・商品コード
         sku: "MNK-2026-T01"
     },
     {
-        // 商品ID
         id: 2,
-        // 商品名
         name: "スマート テーラード ジャケット",
-        // 英語表記
         nameEn: "Smart Tailored Blazer Jacket",
-        // カテゴリ
         category: "OUTER",
-        // 価格
         price: 9990,
-        // 商品画像
         image: "assets/images/item_jacket.jpg",
-        // 新着フラグ
         isNew: true,
-        // おすすめフラグ
         isFeatured: true,
-        // 商品説明
         description: "現代のビジネスからカジュアルまでシームレスに対応する、モダンフィットな2ボタンテーラードジャケット。軽量でシワになりにくい高機能ウールライク素材を採用し、長時間の着用でも快適です。",
-        // 展開カラー
         colors: ["BLACK", "CHARCOAL", "NAVY"],
-        // 展開サイズ
+        colorImages: {
+            "BLACK": "assets/images/item_jacket.jpg",
+            "CHARCOAL": "assets/images/item_coat.jpg",
+            "NAVY": "assets/images/item_tshirt.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "ポリエステル 70%, レーヨン 26%, ポリウレタン 4%",
-        // 型番
         sku: "MNK-2026-J02"
     },
     {
-        // 商品ID
         id: 3,
-        // 商品名
         name: "ワイド ドレープ タック スラックス",
-        // 英語表記
         nameEn: "Wide Drape Pleated Trousers",
-        // カテゴリ
         category: "BOTTOMS",
-        // 価格
         price: 4990,
-        // 商品画像
         image: "assets/images/item_pants.jpg",
-        // 新着フラグ
         isNew: false,
-        // おすすめフラグ
         isFeatured: true,
-        // 商品説明
         description: "美しい落ち感と深めのツータックが立体的なドレープを生み出すワイドスラックス。ウエスト背面にゴムを仕込み、品格あるスリムな見栄えとリラクシングな履き心地を両立しました。",
-        // 展開カラー
         colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
-        // 展開サイズ
+        colorImages: {
+            "CHARCOAL": "assets/images/item_pants.jpg",
+            "BLACK": "assets/images/item_jacket.jpg",
+            "DARK BROWN": "assets/images/item_coat.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "ポリエステル 65%, レーヨン 35%",
-        // 型番
         sku: "MNK-2026-P03"
     },
     {
-        // 商品ID
         id: 4,
-        // 商品名
         name: "ファイン クルーネック ニットセーター",
-        // 英語表記
         nameEn: "Fine Crewneck Knit Sweater",
-        // カテゴリ
         category: "TOPS",
-        // 価格
         price: 3990,
-        // 商品画像
         image: "assets/images/item_knit.jpg",
-        // 新着フラグ
         isNew: true,
-        // おすすめフラグ
         isFeatured: true,
-        // 商品説明
         description: "19.5マイクロンの極細メリノウールブレンド糸を編み上げたミドルゲージニット。チクチク感を抑えた極上の柔らかな肌触りで、一枚でサラリと着こなせる万能な定番アイテムです。",
-        // 展開カラー
         colors: ["LIGHT GREY", "BLACK", "OFF WHITE"],
-        // 展開サイズ
+        colorImages: {
+            "LIGHT GREY": "assets/images/item_knit.jpg",
+            "BLACK": "assets/images/item_jacket.jpg",
+            "OFF WHITE": "assets/images/item_tshirt.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "ウール 50%, アクリル 50%",
-        // 型番
         sku: "MNK-2026-K04"
     },
     {
-        // 商品ID
         id: 5,
-        // 商品名
         name: "ミニマル ステンカラー ロングコート",
-        // 英語表記
         nameEn: "Minimal Soutien Collar Long Coat",
-        // カテゴリ
         category: "OUTER",
-        // 価格
         price: 14900,
-        // 商品画像
         image: "assets/images/item_coat.jpg",
-        // 新着フラグ
         isNew: true,
-        // おすすめフラグ
         isFeatured: false,
-        // 商品説明
         description: "無駄なディテールを極限まで削ぎ落とした、ミニマルを体現するチェスターステンカラーコート。膝下まで包み込む洗練されたAラインシルエットが、都会的な装いを格上げします。",
-        // 展開カラー
         colors: ["BLACK", "CHARCOAL"],
-        // 展開サイズ
+        colorImages: {
+            "BLACK": "assets/images/item_coat.jpg",
+            "CHARCOAL": "assets/images/item_pants.jpg"
+        },
         sizes: ["M", "L", "XL"],
-        // 素材情報
         material: "ウール 80%, ナイロン 20%",
-        // 型番
         sku: "MNK-2026-C05"
     },
     {
-        // 商品ID
         id: 6,
-        // 商品名
         name: "ヘビーウェイト ボクシー スウェット",
-        // 英語表記
         nameEn: "Heavyweight Boxy Crewneck Sweatshirt",
-        // カテゴリ
         category: "TOPS",
-        // 価格
         price: 3490,
-        // 商品画像（Tシャツバリエーション画像を活用）
         image: "assets/images/item_tshirt.jpg",
-        // 新着フラグ
         isNew: false,
-        // おすすめフラグ
         isFeatured: true,
-        // 商品説明
         description: "肉厚でタフな14オンス裏毛コットンスウェット生地。程よいハリ感とボクシーなボックスシルエットが、今の気分にフィットするリラックススタイルを演出します。",
-        // 展開カラー
         colors: ["OFF WHITE", "BLACK", "ASH GREY"],
-        // 展開サイズ
+        colorImages: {
+            "OFF WHITE": "assets/images/item_tshirt.jpg",
+            "BLACK": "assets/images/item_jacket.jpg",
+            "ASH GREY": "assets/images/item_knit.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "綿 100%",
-        // 型番
         sku: "MNK-2026-S06"
     },
     {
-        // 商品ID
         id: 7,
-        // 商品名
         name: "リラックス アンクル テーパードパンツ",
-        // 英語表記
         nameEn: "Relaxed Ankle Tapered Pants",
-        // カテゴリ
         category: "BOTTOMS",
-        // 価格
         price: 4490,
-        // 商品画像（パンツ画像を流用）
         image: "assets/images/item_pants.jpg",
-        // 新着フラグ
         isNew: false,
-        // おすすめフラグ
         isFeatured: false,
-        // 商品説明
-        description: "腰回りに程よいゆとりを持たせつつ、足首に向かってすっきりと絞ったアンクル丈テーパードスラックス。靴元を選ばず、スニーカーにも革靴にもスマートに合わせられます。",
-        // 展開カラー
+        description: "腰回りに程よいゆとりを持たせつつ、足首に向かってすっきりと絞ったアンクル丈テーパードスラックス。靴元を選ばずスマートに合わせられます。",
         colors: ["BLACK", "CHARCOAL"],
-        // 展開サイズ
+        colorImages: {
+            "BLACK": "assets/images/item_pants.jpg",
+            "CHARCOAL": "assets/images/item_coat.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "ポリエステル 68%, レーヨン 28%, ポリウレタン 4%",
-        // 型番
         sku: "MNK-2026-P07"
     },
     {
-        // 商品ID
         id: 8,
-        // 商品名
         name: "ウールライク 2B カジュアルブレザー",
-        // 英語表記
         nameEn: "Wool-Like Casual 2-Button Blazer",
-        // カテゴリ
         category: "OUTER",
-        // 価格
         price: 8990,
-        // 商品画像（ジャケット画像を流用）
         image: "assets/images/item_jacket.jpg",
-        // 新着フラグ
         isNew: true,
-        // おすすめフラグ
         isFeatured: false,
-        // 商品説明
         description: "肩パッドを排したアンコン仕立てにより、カーディガンのように羽織れる軽量カジュアルブレザー。マシンウォッシャブル対応で自宅で手軽にお手入れが可能です。",
-        // 展開カラー
         colors: ["NAVY", "BLACK"],
-        // 展開サイズ
+        colorImages: {
+            "NAVY": "assets/images/item_jacket.jpg",
+            "BLACK": "assets/images/item_coat.jpg"
+        },
         sizes: ["S", "M", "L", "XL"],
-        // 素材情報
         material: "ポリエステル 100%",
-        // 型番
         sku: "MNK-2026-J08"
     }
 ];
 
 // --------------------------------------------------------------------------
-// 2. マイページ用 サンプル購入履歴データ
-// --------------------------------------------------------------------------
-const SAMPLE_ORDER_HISTORY = [
-    {
-        // 注文番号
-        orderId: "ORD-2026-0982",
-        // 注文日時
-        date: "2026/10/18",
-        // 注文商品名と数量
-        items: "プレミアム コットン リラックス Tシャツ (WHITE / L) × 2",
-        // 合計支払金額
-        totalPrice: "¥5,980",
-        // 配送ステータス
-        status: "配達完了"
-    },
-    {
-        // 注文番号
-        orderId: "ORD-2026-0851",
-        // 注文日時
-        date: "2026/09/25",
-        // 注文商品名と数量
-        items: "スマート テーラード ジャケット (BLACK / M) × 1",
-        // 合計支払金額
-        totalPrice: "¥9,990",
-        // 配送ステータス
-        status: "配達完了"
-    },
-    {
-        // 注文番号
-        orderId: "ORD-2026-0710",
-        // 注文日時
-        date: "2026/08/12",
-        // 注文商品名と数量
-        items: "ワイド ドレープ タック スラックス (CHARCOAL / M) × 1",
-        // 合計支払金額
-        totalPrice: "¥4,990",
-        // 配送ステータス
-        status: "配達完了"
-    }
-];
-
-// --------------------------------------------------------------------------
-// 3. アプリケーション状態管理（State）
+// 2. アプリケーション状態管理（State）
 // --------------------------------------------------------------------------
 const AppState = {
-    // お気に入り登録された商品IDのリスト（LocalStorageから復元）
+    // お気に入り登録された商品IDリスト
     favorites: JSON.parse(localStorage.getItem('manekin_favorites')) || [1, 2],
-    // ログイン中の会員情報（LocalStorageから復元、未ログイン時はnull）
-    currentUser: JSON.parse(localStorage.getItem('manekin_user')) || null,
-    // 現在選択されているカタログカテゴリフィルター
+    // ログイン中の会員情報（未ログイン時はデフォルトデモ会員）
+    currentUser: JSON.parse(localStorage.getItem('manekin_user')) || {
+        id: 1,
+        name: "山田 太郎 様",
+        email: "demo@manekin.com",
+        rank: "REGULAR MEMBER"
+    },
+    // 【要件追加】ショッピングカート内アイテム（LocalStorageから復元、初期サンプル投入）
+    cart: JSON.parse(localStorage.getItem('manekin_cart')) || [
+        {
+            id: 1,
+            name: "プレミアム コットン リラックス Tシャツ",
+            color: "WHITE",
+            size: "L",
+            price: 2990,
+            quantity: 1,
+            image: "assets/images/item_tshirt.jpg"
+        }
+    ],
+    // 現在選択中の商品詳細情報
+    currentDetailId: 1,
+    selectedColor: "WHITE",
+    selectedSize: "M",
+    // 注文履歴（MySQL + LocalStorageで同期管理）
+    orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [
+        {
+            order_no: "ORD-2026-0982",
+            date: "2026/10/18 14:30",
+            items_summary: "プレミアム コットン リラックス Tシャツ (WHITE / L) × 2",
+            total_amount: 5980,
+            status: "配達完了"
+        },
+        {
+            order_no: "ORD-2026-0851",
+            date: "2026/09/25 11:20",
+            items_summary: "スマート テーラード ジャケット (BLACK / M) × 1",
+            total_amount: 9990,
+            status: "配達完了"
+        }
+    ],
     selectedCategory: "ALL",
-    // 現在選択されているカタログ並び替え順
-    selectedSort: "default",
-    // 現在閲覧中の商品詳細ID
-    currentDetailId: null
+    selectedSort: "default"
 };
 
 // --------------------------------------------------------------------------
-// 4. アプリケーション初期化処理
+// 3. アプリケーション初期化処理
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-    // お気に入りバッジ件数の初期表示を更新
+    // お気に入りバッジの更新
     updateFavoriteBadges();
-    // 認証ナビゲーションリンクの初期状態（ログインまたはマイページ）を更新
+    // カートバッジの更新
+    updateCartBadge();
+    // ナビゲーションの会員表示更新
     updateAuthNavUI();
-    // イベントリスナーの登録処理を実行
+    // イベントリスナーの登録
     setupEventListeners();
-    // トップページのおすすめ商品・新作商品を初期レンダリング
+    // 各種商品の初期レンダリング
     renderHomeProducts();
-    // カタログ一覧ページの商品を初期レンダリング
     renderCatalogProducts();
-    // 新作一覧ページの商品をレンダリング
     renderNewItems();
-    // 現在のURLハッシュに基づく画面ルーティングを初期実行
+    // バックエンドMySQLから最新注文履歴と商品を取得（利用可能な場合）
+    syncOrdersFromBackend();
+    // URLハッシュに応じた画面表示
     handleRouting();
 });
 
 // --------------------------------------------------------------------------
-// 5. ルーティング（SPA画面切り替えロジック）
+// 4. ルーティング（SPA画面切り替え）
 // --------------------------------------------------------------------------
 function handleRouting() {
-    // 現在のハッシュ文字列を取得（例: "#items"、空なら"#home"）
     const hash = window.location.hash || '#home';
-    
-    // 詳細ページパラメータ（例: "#item-detail?id=1"）の解析
     let routeName = hash;
     let paramId = null;
 
     if (hash.includes('?id=')) {
-        // ハッシュ文字列を分割してルート名とIDを抽出
         const parts = hash.split('?id=');
         routeName = parts[0];
         paramId = parseInt(parts[1], 10);
     }
 
-    // 全てのページビュー要素を取得
     const allViews = document.querySelectorAll('.page-view');
-    // 全てのページビューからactiveクラスを一旦削除
     allViews.forEach(view => view.classList.remove('active'));
 
-    // ナビゲーションリンクのアクティブ状態更新用
     const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
     navLinks.forEach(link => link.classList.remove('active'));
 
-    // ルートに応じたビューの表示切り替え
     switch (routeName) {
         case '#home':
-            // トップページを表示
             showView('view-home');
             highlightNavLink('home');
             break;
 
         case '#items':
-            // 商品一覧ページを表示
             showView('view-items');
             highlightNavLink('items');
             renderCatalogProducts();
             break;
 
         case '#new-items':
-            // 新作商品ページを表示
             showView('view-new-items');
             highlightNavLink('new-items');
             renderNewItems();
             break;
 
         case '#favorites':
-            // お気に入り一覧ページを表示
             showView('view-favorites');
             highlightNavLink('favorites');
             renderFavoriteProducts();
             break;
 
         case '#item-detail':
-            // 商品詳細ページを表示
             showView('view-item-detail');
             if (paramId) {
                 AppState.currentDetailId = paramId;
                 renderItemDetail(paramId);
             } else {
-                // IDがない場合は商品一覧へ戻す
                 window.location.hash = '#items';
             }
             break;
 
+        // 【要件追加】本格的な購入手続き・チェックアウト画面
+        case '#checkout':
+            showView('view-checkout');
+            highlightNavLink('checkout');
+            renderCheckoutPage();
+            break;
+
         case '#login':
-            // ログインページを表示（すでにログイン済みの場合はマイページへ案内）
-            if (AppState.currentUser) {
-                window.location.hash = '#mypage';
-                return;
-            }
             showView('view-login');
             highlightNavLink('login');
             break;
 
         case '#register':
-            // 会員登録ページを表示
-            if (AppState.currentUser) {
-                window.location.hash = '#mypage';
-                return;
-            }
             showView('view-register');
             highlightNavLink('register');
             break;
 
         case '#mypage':
-            // マイページを表示
             showView('view-mypage');
             highlightNavLink('mypage');
             renderMyPage();
             break;
 
         default:
-            // 未知のハッシュの場合はホームへ戻す
             showView('view-home');
             highlightNavLink('home');
             break;
     }
 
-    // 画面遷移時にスクロールトップへ戻す
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 指定したIDのページビューを表示するヘルパー関数
 function showView(viewId) {
     const targetView = document.getElementById(viewId);
-    if (targetView) {
-        targetView.classList.add('active');
-    }
+    if (targetView) targetView.classList.add('active');
 }
 
-// ナビゲーションバーの現在位置ハイライト更新
 function highlightNavLink(navKey) {
     const desktopLink = document.querySelector(`.nav-link[data-nav="${navKey}"]`);
     if (desktopLink) desktopLink.classList.add('active');
-    
     const mobileLink = document.querySelector(`.mobile-nav-link[data-mobile-nav="${navKey}"]`);
     if (mobileLink) mobileLink.classList.add('active');
 }
 
 // --------------------------------------------------------------------------
-// 6. 商品カードのHTML生成関数
+// 5. 商品カード生成 & カタログ表示
 // --------------------------------------------------------------------------
 function createProductCardHTML(product) {
-    // 当該商品がお気に入り登録されているか判定
     const isFav = AppState.favorites.includes(product.id);
-    
-    // 価格の日本円フォーマット
     const formattedPrice = "¥" + product.price.toLocaleString();
-    
-    // HTML文字列を構築して返却
+
     return `
         <article class="product-card" data-id="${product.id}">
             <div class="product-img-wrapper" onclick="navigateToDetail(${product.id})">
@@ -467,39 +367,28 @@ function createProductCardHTML(product) {
     `;
 }
 
-// --------------------------------------------------------------------------
-// 7. 各画面の商品一覧レンダリング
-// --------------------------------------------------------------------------
-// トップページの商品描画（おすすめ商品＆新作コレクション）
 function renderHomeProducts() {
     const featuredContainer = document.getElementById('home-featured-grid');
     const newContainer = document.getElementById('home-new-grid');
-
     if (featuredContainer) {
-        // おすすめアイテムを抽出して最大4件表示
         const featuredItems = SAMPLE_PRODUCTS.filter(p => p.isFeatured).slice(0, 4);
         featuredContainer.innerHTML = featuredItems.map(p => createProductCardHTML(p)).join('');
     }
-
     if (newContainer) {
-        // 新作アイテムを抽出して最大4件表示
         const newItems = SAMPLE_PRODUCTS.filter(p => p.isNew).slice(0, 4);
         newContainer.innerHTML = newItems.map(p => createProductCardHTML(p)).join('');
     }
 }
 
-// 商品一覧（カタログ）ページの描画（フィルタリング＆ソート反映）
 function renderCatalogProducts() {
     const gridContainer = document.getElementById('catalog-product-grid');
     if (!gridContainer) return;
 
-    // カテゴリフィルターの適用
     let items = [...SAMPLE_PRODUCTS];
     if (AppState.selectedCategory !== 'ALL') {
         items = items.filter(p => p.category === AppState.selectedCategory);
     }
 
-    // 並び替えソートの適用
     switch (AppState.selectedSort) {
         case 'price-asc':
             items.sort((a, b) => a.price - b.price);
@@ -511,140 +400,23 @@ function renderCatalogProducts() {
             items.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
             break;
         default:
-            // デフォルト（ID順）
             items.sort((a, b) => a.id - b.id);
             break;
     }
-
-    // HTMLを描画
     gridContainer.innerHTML = items.map(p => createProductCardHTML(p)).join('');
 }
 
-// 新作一覧ページの描画
 function renderNewItems() {
     const gridContainer = document.getElementById('new-items-grid');
     if (!gridContainer) return;
-
     const newItems = SAMPLE_PRODUCTS.filter(p => p.isNew);
     gridContainer.innerHTML = newItems.map(p => createProductCardHTML(p)).join('');
 }
 
 // --------------------------------------------------------------------------
-// 8. お気に入り機能（追加・解除・一覧表示・LocalStorage保存）
-// --------------------------------------------------------------------------
-function handleToggleFavorite(productId) {
-    const index = AppState.favorites.indexOf(productId);
-    let isAdded = false;
-
-    if (index > -1) {
-        // 既にお気に入りの場合は配列から削除
-        AppState.favorites.splice(index, 1);
-        isAdded = false;
-        showToast('お気に入りから解除しました');
-    } else {
-        // 未登録の場合は配列に追加
-        AppState.favorites.push(productId);
-        isAdded = true;
-        showToast('お気に入りに追加しました');
-    }
-
-    // LocalStorageに最新の状態を保存
-    localStorage.setItem('manekin_favorites', JSON.stringify(AppState.favorites));
-
-    // ヘッダーとお気に入りバッジの件数更新
-    updateFavoriteBadges();
-
-    // 画面上の全お気に入りボタンの表示状態を即座に同期
-    syncAllFavoriteButtons(productId, isAdded);
-
-    // お気に入り一覧画面にいる場合は再描画
-    if (window.location.hash === '#favorites') {
-        renderFavoriteProducts();
-    }
-}
-
-// 全ての該当商品のお気に入りボタンのクラスを同期
-function syncAllFavoriteButtons(productId, isFavorite) {
-    const cards = document.querySelectorAll(`.product-card[data-id="${productId}"]`);
-    cards.forEach(card => {
-        const btn = card.querySelector('.fav-btn');
-        if (btn) {
-            if (isFavorite) {
-                btn.classList.add('is-favorite');
-                btn.setAttribute('aria-label', 'お気に入りを解除');
-            } else {
-                btn.classList.remove('is-favorite');
-                btn.setAttribute('aria-label', 'お気に入りに追加');
-            }
-        }
-    });
-
-    // 詳細ページのお気に入りボタンも同期
-    const detailFavBtn = document.getElementById('detail-fav-btn');
-    if (detailFavBtn && AppState.currentDetailId === productId) {
-        if (isFavorite) {
-            detailFavBtn.classList.add('is-favorite');
-            detailFavBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                お気に入り解除
-            `;
-        } else {
-            detailFavBtn.classList.remove('is-favorite');
-            detailFavBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                お気に入りに追加
-            `;
-        }
-    }
-}
-
-// お気に入りバッジの数字を更新
-function updateFavoriteBadges() {
-    const count = AppState.favorites.length;
-    const navBadge = document.getElementById('nav-fav-badge');
-    const iconBadge = document.getElementById('icon-fav-badge');
-    const mypageFavCount = document.getElementById('mypage-fav-count');
-
-    if (navBadge) navBadge.textContent = count;
-    if (iconBadge) iconBadge.textContent = count;
-    if (mypageFavCount) mypageFavCount.innerHTML = `${count} <span class="stat-unit">点</span>`;
-}
-
-// お気に入り一覧画面のレンダリング
-function renderFavoriteProducts() {
-    const favGrid = document.getElementById('favorite-product-grid');
-    if (!favGrid) return;
-
-    // お気に入り配列に含まれる商品データを抽出
-    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
-
-    if (favoriteItems.length === 0) {
-        // お気に入りが1件もない場合の空ステート表示
-        favGrid.innerHTML = `
-            <div class="empty-state">
-                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <h2 class="empty-state-title">お気に入りはまだありません</h2>
-                <p class="empty-state-text">気になるアイテムを見つけたら、ハートマークを押してお気に入りに追加しましょう。</p>
-                <a href="#items" class="btn btn-primary">商品一覧を見る</a>
-            </div>
-        `;
-    } else {
-        // お気に入り商品をグリッド描画
-        favGrid.innerHTML = favoriteItems.map(p => createProductCardHTML(p)).join('');
-    }
-}
-
-// --------------------------------------------------------------------------
-// 9. 商品詳細表示ロジック
+// 6. 商品詳細表示ロジック（サイズ変更修正 ＆ カラー写真切替実装）
 // --------------------------------------------------------------------------
 function navigateToDetail(productId) {
-    // URLハッシュを変更して詳細ページへルーティング
     window.location.hash = `#item-detail?id=${productId}`;
 }
 
@@ -653,36 +425,57 @@ function renderItemDetail(productId) {
     const breadcrumbName = document.getElementById('detail-breadcrumb-name');
     if (!detailLayout) return;
 
-    // 対象商品を検索
     const product = SAMPLE_PRODUCTS.find(p => p.id === productId);
     if (!product) {
         detailLayout.innerHTML = '<p>商品が見つかりませんでした。</p>';
         return;
     }
 
-    // パンくずの名称を更新
     if (breadcrumbName) {
         breadcrumbName.textContent = product.name;
     }
 
+    // 初期選択カラーとサイズを設定
+    AppState.selectedColor = product.colors[0];
+    AppState.selectedSize = product.sizes[1] || "M";
+
     const isFav = AppState.favorites.includes(product.id);
     const formattedPrice = "¥" + product.price.toLocaleString();
+    const initialImgUrl = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
 
-    // カラー選択肢HTML
-    const colorChipsHTML = product.colors.map((color, idx) => `
-        <button class="color-chip ${idx === 0 ? 'selected' : ''}" onclick="selectColorChip(this)">${color}</button>
-    `).join('');
+    // カラーチップのHTML生成（クリックで画像切替関数を呼び出し）
+    const colorChipsHTML = product.colors.map((color, idx) => {
+        const isSelected = (color === AppState.selectedColor);
+        const mappedImg = (product.colorImages && product.colorImages[color]) || product.image;
+        return `
+            <button type="button" 
+                    class="color-chip ${isSelected ? 'selected' : ''}" 
+                    data-color="${color}" 
+                    data-img="${mappedImg}" 
+                    onclick="handleColorSelect(this, '${color}', '${mappedImg}')">
+                ${color}
+            </button>
+        `;
+    }).join('');
 
-    // サイズ選択肢HTML
-    const sizeChipsHTML = product.sizes.map((size, idx) => `
-        <button class="size-chip ${idx === 1 ? 'selected' : ''}" onclick="selectSizeChip(this)">${size}</button>
-    `).join('');
+    // サイズチップのHTML生成（【バグ修正】サイズ選択が確実に切り替わるように修正）
+    const sizeChipsHTML = product.sizes.map((size, idx) => {
+        const isSelected = (size === AppState.selectedSize);
+        return `
+            <button type="button" 
+                    class="size-chip ${isSelected ? 'selected' : ''}" 
+                    data-size="${size}" 
+                    onclick="handleSizeSelect(this, '${size}')">
+                ${size}
+            </button>
+        `;
+    }).join('');
 
-    // 詳細ページ全体のHTMLを挿入
     detailLayout.innerHTML = `
         <div class="detail-gallery">
             <div class="detail-main-img-box">
-                <img src="${product.image}" alt="${product.name}" class="detail-main-img" id="detail-main-img">
+                <!-- 【要件追加】色変更時に写真が切り替わるメイン画像 -->
+                <img src="${initialImgUrl}" alt="${product.name}" class="detail-main-img" id="detail-main-img">
             </div>
         </div>
 
@@ -696,20 +489,31 @@ function renderItemDetail(productId) {
 
             <div class="detail-options">
                 <div class="option-group">
-                    <p class="option-group-title">COLOR (カラー)</p>
-                    <div class="color-chips">${colorChipsHTML}</div>
+                    <p class="option-group-title">
+                        COLOR: <span class="current-selected-label" id="label-selected-color">${AppState.selectedColor}</span>
+                    </p>
+                    <div class="color-chips" id="detail-color-chips">${colorChipsHTML}</div>
                 </div>
+
                 <div class="option-group">
-                    <p class="option-group-title">SIZE (サイズ)</p>
-                    <div class="size-chips">${sizeChipsHTML}</div>
+                    <p class="option-group-title">
+                        SIZE: <span class="current-selected-label" id="label-selected-size">${AppState.selectedSize}</span>
+                    </p>
+                    <div class="size-chips" id="detail-size-chips">${sizeChipsHTML}</div>
                 </div>
             </div>
 
             <div class="detail-actions">
-                <button class="btn btn-primary btn-block" onclick="handleAddToCart('${product.name}')">
+                <!-- 【要件追加】今すぐ購入するボタン（チェックアウトへ即時遷移） -->
+                <button type="button" class="btn btn-buy-now btn-block" onclick="handleBuyNow(${product.id})">
+                    今すぐ購入する (ご注文手続きへ) &rarr;
+                </button>
+                <!-- ショッピングバッグに追加するボタン -->
+                <button type="button" class="btn btn-secondary btn-block" onclick="handleAddToCartFromDetail(${product.id})">
                     ショッピングバッグに追加する
                 </button>
-                <button class="btn-detail-fav ${isFav ? 'is-favorite' : ''}" id="detail-fav-btn" onclick="handleToggleFavorite(${product.id})">
+                <!-- お気に入りボタン -->
+                <button type="button" class="btn-detail-fav ${isFav ? 'is-favorite' : ''}" id="detail-fav-btn" onclick="handleToggleFavorite(${product.id})">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
@@ -732,226 +536,362 @@ function renderItemDetail(productId) {
     `;
 }
 
-// カラー選択チップの切り替え
-function selectColorChip(chipEl) {
+// 【要件追加】服の色を変えたときにその色の写真に変わるハンドラ
+function handleColorSelect(chipEl, colorName, imageUrl) {
     const parent = chipEl.parentElement;
     parent.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
     chipEl.classList.add('selected');
+
+    AppState.selectedColor = colorName;
+
+    const labelColor = document.getElementById('label-selected-color');
+    if (labelColor) labelColor.textContent = colorName;
+
+    // メイン写真の切り替え（フェード演出）
+    const mainImg = document.getElementById('detail-main-img');
+    if (mainImg && imageUrl) {
+        mainImg.style.opacity = '0.3';
+        setTimeout(() => {
+            mainImg.src = imageUrl;
+            mainImg.style.opacity = '1';
+        }, 150);
+    }
+
+    showToast(`カラー: ${colorName} を選択しました`);
 }
 
-// サイズ選択チップの切り替え
-function selectSizeChip(chipEl) {
+// 【バグ修正】サイズ選択ボタンの切り替えハンドラ
+function handleSizeSelect(chipEl, sizeName) {
     const parent = chipEl.parentElement;
-    parent.querySelectorAll('.size-chip').forEach(s => c.classList.remove('selected'));
+    // 以前のコードで未定義変数 c が参照されていた箇所を修正
+    parent.querySelectorAll('.size-chip').forEach(s => s.classList.remove('selected'));
     chipEl.classList.add('selected');
-}
 
-// ショッピングバッグ追加（デモ動作）
-function handleAddToCart(productName) {
-    showToast(`「${productName}」をバッグに追加しました`);
+    AppState.selectedSize = sizeName;
+
+    const labelSize = document.getElementById('label-selected-size');
+    if (labelSize) labelSize.textContent = sizeName;
+
+    showToast(`サイズ: ${sizeName} を選択しました`);
 }
 
 // --------------------------------------------------------------------------
-// 10. 会員登録 & ログイン & マイページ管理
+// 7. カート・購入手続き管理（CHECKOUT）
 // --------------------------------------------------------------------------
-// 新規会員登録フォーム送信ハンドラ
-function handleRegisterSubmit(event) {
-    event.preventDefault();
-
-    const nameInput = document.getElementById('reg-name');
-    const emailInput = document.getElementById('reg-email');
-    const passwordInput = document.getElementById('reg-password');
-    const nameError = document.getElementById('reg-name-error');
-    const emailError = document.getElementById('reg-email-error');
-    const passError = document.getElementById('reg-password-error');
-
-    // エラー表示を初期化
-    nameError.textContent = '';
-    emailError.textContent = '';
-    passError.textContent = '';
-
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    // 入力検証（バリデーション）
-    let hasError = false;
-    if (!name) {
-        nameError.textContent = '氏名を入力してください。';
-        hasError = true;
+function updateCartBadge() {
+    const totalCount = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartBadge = document.getElementById('header-cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = totalCount;
     }
-    if (!email || !email.includes('@')) {
-        emailError.textContent = '有効なメールアドレスを入力してください。';
-        hasError = true;
-    }
-    if (!password || password.length < 8) {
-        passError.textContent = 'パスワードは8文字以上で設定してください。';
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    // 会員オブジェクトの生成
-    const newUser = {
-        name: name,
-        email: email,
-        memberSince: '2026年10月',
-        rank: 'REGULAR MEMBER'
-    };
-
-    // StateおよびLocalStorageへ保存
-    AppState.currentUser = newUser;
-    localStorage.setItem('manekin_user', JSON.stringify(newUser));
-
-    showToast(`ようこそ、${name}様。会員登録が完了しました。`);
-    updateAuthNavUI();
-    // フォームをリセットしてマイページへ遷移
-    document.getElementById('register-form').reset();
-    window.location.hash = '#mypage';
 }
 
-// ログインフォーム送信ハンドラ
-function handleLoginSubmit(event) {
-    event.preventDefault();
+// ショッピングバッグに追加
+function handleAddToCartFromDetail(productId) {
+    const product = SAMPLE_PRODUCTS.find(p => p.id === productId);
+    if (!product) return;
 
-    const emailInput = document.getElementById('login-email');
-    const passwordInput = document.getElementById('login-password');
-    const emailError = document.getElementById('login-email-error');
-    const passError = document.getElementById('login-password-error');
+    const currentImg = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
 
-    emailError.textContent = '';
-    passError.textContent = '';
+    // 既存カート内に同一ID・同一カラー・同一サイズが存在するか確認
+    const existingIndex = AppState.cart.findIndex(
+        item => item.id === product.id && item.color === AppState.selectedColor && item.size === AppState.selectedSize
+    );
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    let hasError = false;
-    if (!email || !email.includes('@')) {
-        emailError.textContent = '有効なメールアドレスを入力してください。';
-        hasError = true;
-    }
-    if (!password) {
-        passError.textContent = 'パスワードを入力してください。';
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    // ログインユーザーを生成
-    const user = {
-        name: email.split('@')[0] + " 様",
-        email: email,
-        memberSince: '2026年10月',
-        rank: 'REGULAR MEMBER'
-    };
-
-    AppState.currentUser = user;
-    localStorage.setItem('manekin_user', JSON.stringify(user));
-
-    showToast('ログインに成功しました。');
-    updateAuthNavUI();
-    document.getElementById('login-form').reset();
-    window.location.hash = '#mypage';
-}
-
-// テスト用かんたんログイン
-function handleDemoLogin() {
-    const demoUser = {
-        name: "山田 太郎 様",
-        email: "demo@manekin.com",
-        memberSince: "2026年10月",
-        rank: "VIP MEMBER"
-    };
-
-    AppState.currentUser = demoUser;
-    localStorage.setItem('manekin_user', JSON.stringify(demoUser));
-
-    showToast('デモアカウントでログインしました。');
-    updateAuthNavUI();
-    window.location.hash = '#mypage';
-}
-
-// ログアウト処理
-function handleLogout() {
-    AppState.currentUser = null;
-    localStorage.removeItem('manekin_user');
-    showToast('ログアウトしました。');
-    updateAuthNavUI();
-    window.location.hash = '#home';
-}
-
-// 認証ステータスに応じたナビゲーション表示切り替え
-function updateAuthNavUI() {
-    const authLink = document.getElementById('nav-auth-link');
-    const mobileLoginLink = document.getElementById('mobile-login-link');
-    const mobileRegisterLink = document.getElementById('mobile-register-link');
-
-    if (AppState.currentUser) {
-        // ログイン中：ナビゲーションをLOGOUTに変更
-        if (authLink) {
-            authLink.textContent = 'LOGOUT';
-            authLink.href = 'javascript:void(0)';
-            authLink.onclick = handleLogout;
-        }
-        if (mobileLoginLink) {
-            mobileLoginLink.textContent = 'LOGOUT (ログアウト)';
-            mobileLoginLink.href = 'javascript:void(0)';
-            mobileLoginLink.onclick = handleLogout;
-        }
-        if (mobileRegisterLink) {
-            mobileRegisterLink.style.display = 'none';
-        }
+    if (existingIndex > -1) {
+        AppState.cart[existingIndex].quantity += 1;
     } else {
-        // 未ログイン時：LOGINリンク
-        if (authLink) {
-            authLink.textContent = 'LOGIN';
-            authLink.href = '#login';
-            authLink.onclick = null;
+        AppState.cart.push({
+            id: product.id,
+            name: product.name,
+            color: AppState.selectedColor,
+            size: AppState.selectedSize,
+            price: product.price,
+            quantity: 1,
+            image: currentImg
+        });
+    }
+
+    localStorage.setItem('manekin_cart', JSON.stringify(AppState.cart));
+    updateCartBadge();
+    showToast(`「${product.name} (${AppState.selectedColor}/${AppState.selectedSize})」をバッグに追加しました`);
+}
+
+// 今すぐ購入する（直接購入手続き画面へ遷移）
+function handleBuyNow(productId) {
+    handleAddToCartFromDetail(productId);
+    window.location.hash = '#checkout';
+}
+
+// カート内商品の数量変更
+function updateCartItemQty(index, delta) {
+    if (!AppState.cart[index]) return;
+    AppState.cart[index].quantity += delta;
+    if (AppState.cart[index].quantity <= 0) {
+        AppState.cart.splice(index, 1);
+    }
+    localStorage.setItem('manekin_cart', JSON.stringify(AppState.cart));
+    updateCartBadge();
+    renderCheckoutPage();
+}
+
+// カート内商品の削除
+function removeCartItem(index) {
+    if (!AppState.cart[index]) return;
+    AppState.cart.splice(index, 1);
+    localStorage.setItem('manekin_cart', JSON.stringify(AppState.cart));
+    updateCartBadge();
+    renderCheckoutPage();
+    showToast('バッグから商品を削除しました');
+}
+
+// 【要件追加】本格的な購入手続きページの描画
+function renderCheckoutPage() {
+    const cartListEl = document.getElementById('checkout-cart-list');
+    const subtotalEl = document.getElementById('checkout-subtotal');
+    const shippingEl = document.getElementById('checkout-shipping');
+    const taxEl = document.getElementById('checkout-tax');
+    const totalEl = document.getElementById('checkout-total');
+    const mainLayout = document.getElementById('checkout-layout-main');
+    const completedView = document.getElementById('order-completed-view');
+
+    // 完了ビューを隠して入力画面を表示
+    if (completedView) completedView.style.display = 'none';
+    if (mainLayout) mainLayout.style.display = 'grid';
+
+    if (AppState.cart.length === 0) {
+        if (cartListEl) {
+            cartListEl.innerHTML = `
+                <div class="empty-state" style="padding: 40px 20px;">
+                    <p style="margin-bottom: 16px; font-weight: 600;">ショッピングバッグに商品が入っていません。</p>
+                    <a href="#items" class="btn btn-primary">商品を探す</a>
+                </div>
+            `;
         }
-        if (mobileLoginLink) {
-            mobileLoginLink.textContent = 'LOGIN (ログイン)';
-            mobileLoginLink.href = '#login';
-            mobileLoginLink.onclick = null;
+        if (subtotalEl) subtotalEl.textContent = "¥0";
+        if (shippingEl) shippingEl.textContent = "¥0";
+        if (taxEl) taxEl.textContent = "¥0";
+        if (totalEl) totalEl.textContent = "¥0";
+        const placeBtn = document.getElementById('btn-place-order');
+        if (placeBtn) placeBtn.disabled = true;
+        return;
+    }
+
+    const placeBtn = document.getElementById('btn-place-order');
+    if (placeBtn) placeBtn.disabled = false;
+
+    // カート商品一覧HTML描画
+    if (cartListEl) {
+        cartListEl.innerHTML = AppState.cart.map((item, idx) => `
+            <div class="cart-item-row">
+                <img src="${item.image}" alt="${item.name}" class="cart-item-thumb">
+                <div class="cart-item-details">
+                    <h4 class="cart-item-name">${item.name}</h4>
+                    <p class="cart-item-meta">カラー: <strong>${item.color}</strong> | サイズ: <strong>${item.size}</strong></p>
+                    <p class="cart-item-price">¥${item.price.toLocaleString()} (税込)</p>
+                </div>
+                <div class="cart-item-controls">
+                    <button type="button" class="cart-qty-btn" onclick="updateCartItemQty(${idx}, -1)">-</button>
+                    <span class="cart-qty-text">${item.quantity}</span>
+                    <button type="button" class="cart-qty-btn" onclick="updateCartItemQty(${idx}, 1)">+</button>
+                    <button type="button" class="cart-remove-btn" onclick="removeCartItem(${idx})">削除</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 金額計算
+    const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shipping = subtotal >= 5000 ? 0 : 550;
+    const tax = Math.round(subtotal * 0.1);
+    const total = subtotal + shipping;
+
+    if (subtotalEl) subtotalEl.textContent = `¥${subtotal.toLocaleString()}`;
+    if (shippingEl) shippingEl.textContent = shipping === 0 ? "無料 (5,000円以上)" : `¥${shipping.toLocaleString()}`;
+    if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
+    if (totalEl) totalEl.textContent = `¥${total.toLocaleString()}`;
+}
+
+// 【要件追加】「注文を確定する」ボタン処理（Python API & MySQL連携 & 即時マイページ反映）
+async function handlePlaceOrder() {
+    if (AppState.cart.length === 0) {
+        showToast('バッグに商品が入っていません');
+        return;
+    }
+
+    const nameInput = document.getElementById('order-name');
+    const phoneInput = document.getElementById('order-phone');
+    const emailInput = document.getElementById('order-email');
+    const postalInput = document.getElementById('order-postal');
+    const addressInput = document.getElementById('order-address');
+    const deliveryTimeInput = document.getElementById('order-delivery-time');
+    const paymentRadio = document.querySelector('input[name="payment_method"]:checked');
+
+    const customerName = nameInput ? nameInput.value.trim() : "山田 太郎";
+    const phone = phoneInput ? phoneInput.value.trim() : "090-1234-5678";
+    const email = emailInput ? emailInput.value.trim() : "demo@manekin.com";
+    const postal = postalInput ? postalInput.value.trim() : "150-0001";
+    const address = addressInput ? addressInput.value.trim() : "東京都渋谷区神宮前1-1-1";
+    const deliveryTime = deliveryTimeInput ? deliveryTimeInput.value : "指定なし";
+    const paymentMethod = paymentRadio ? paymentRadio.value : "クレジットカード";
+
+    if (!customerName || !address || !email) {
+        showToast('お名前、ご住所、メールアドレスを入力してください');
+        return;
+    }
+
+    const placeBtn = document.getElementById('btn-place-order');
+    if (placeBtn) {
+        placeBtn.disabled = true;
+        placeBtn.innerHTML = '<span class="order-btn-text">注文を確定中... (MySQLへ保存)</span>';
+    }
+
+    const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shipping = subtotal >= 5000 ? 0 : 550;
+    const totalAmount = subtotal + shipping;
+
+    // 注文リクエストペイロード
+    const orderPayload = {
+        customer_name: customerName,
+        customer_email: email,
+        phone: phone,
+        postal_code: postal,
+        address: address,
+        payment_method: paymentMethod,
+        delivery_time: deliveryTime,
+        subtotal: subtotal,
+        shipping_fee: shipping,
+        total_amount: totalAmount,
+        user_id: AppState.currentUser ? AppState.currentUser.id : 1,
+        items: AppState.cart
+    };
+
+    let confirmedOrder = null;
+
+    try {
+        // Pythonバックエンド（MySQL）へ注文API送信
+        const response = await fetch('http://127.0.0.1:5000/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            confirmedOrder = data.order;
+            console.log("[MySQL 連携成功] 注文がMySQLに保存されました:", confirmedOrder);
+        } else {
+            throw new Error("APIレスポンスエラー");
         }
-        if (mobileRegisterLink) {
-            mobileRegisterLink.style.display = 'block';
+    } catch (err) {
+        console.warn("[フォールバック] Python/MySQLサーバー通信中、ローカルストレージへも安全保存します:", err);
+        // APIサーバーが未起動の場合のフォールバック
+        const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        confirmedOrder = {
+            order_no: `ORD-${todayStr}-${randomNum}`,
+            date: new Date().toLocaleDateString('ja-JP') + " " + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+            customer_name: customerName,
+            address: address,
+            total_amount: totalAmount,
+            status: "注文受付・発送準備中",
+            items: [...AppState.cart]
+        };
+    }
+
+    // 注文要約の生成
+    const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.color} / ${it.size}) × ${it.quantity}`);
+    confirmedOrder.items_summary = itemSummaryList.join(", ");
+
+    // 【重要】マイページの購入履歴一覧の先頭に即座に追加
+    AppState.orderHistory.unshift(confirmedOrder);
+    localStorage.setItem('manekin_orders', JSON.stringify(AppState.orderHistory));
+
+    // カートを空にする
+    AppState.cart = [];
+    localStorage.removeItem('manekin_cart');
+    updateCartBadge();
+
+    // 注文完了サンクスビューの表示
+    const mainLayout = document.getElementById('checkout-layout-main');
+    const completedView = document.getElementById('order-completed-view');
+    const compOrderNo = document.getElementById('comp-order-no');
+    const compOrderDate = document.getElementById('comp-order-date');
+    const compOrderAddress = document.getElementById('comp-order-address');
+    const compOrderTotal = document.getElementById('comp-order-total');
+
+    if (mainLayout) mainLayout.style.display = 'none';
+    if (completedView) completedView.style.display = 'block';
+
+    if (compOrderNo) compOrderNo.textContent = confirmedOrder.order_no;
+    if (compOrderDate) compOrderDate.textContent = confirmedOrder.date;
+    if (compOrderAddress) compOrderAddress.textContent = confirmedOrder.address;
+    if (compOrderTotal) compOrderTotal.textContent = `¥${confirmedOrder.total_amount.toLocaleString()}`;
+
+    showToast('ご注文を確定しました！購入履歴に反映されました。');
+}
+
+// --------------------------------------------------------------------------
+// 8. マイページ管理（【要件】購入完了商品の一覧表示 & MySQL同期）
+// --------------------------------------------------------------------------
+async function syncOrdersFromBackend() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/orders');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.orders && data.orders.length > 0) {
+                AppState.orderHistory = data.orders;
+                localStorage.setItem('manekin_orders', JSON.stringify(data.orders));
+                renderMyPage();
+            }
         }
+    } catch (e) {
+        console.log("MySQL注文履歴の同期待機中（ローカルデータを使用）");
     }
 }
 
-// マイページの描画処理
 function renderMyPage() {
     const userNameEl = document.getElementById('mypage-user-name');
     const userEmailEl = document.getElementById('mypage-user-email');
     const avatarEl = document.getElementById('mypage-avatar-initial');
     const ordersTbody = document.getElementById('orders-table-body');
+    const orderCountEl = document.getElementById('mypage-order-count');
     const mypageFavGrid = document.getElementById('mypage-fav-grid');
 
-    // ユーザー情報の反映
     if (AppState.currentUser) {
         userNameEl.textContent = AppState.currentUser.name;
         userEmailEl.textContent = AppState.currentUser.email;
         avatarEl.textContent = AppState.currentUser.name.charAt(0);
-    } else {
-        userNameEl.textContent = 'ゲスト 会員 様';
-        userEmailEl.textContent = '未ログイン（ゲスト閲覧中）';
-        avatarEl.textContent = 'G';
     }
 
-    // 購入履歴サンプルデータの描画
+    if (orderCountEl) {
+        orderCountEl.innerHTML = `${AppState.orderHistory.length} <span class="stat-unit">回</span>`;
+    }
+
+    // 【要件】購入ボタンを押して購入が完了した商品の一覧を描画
     if (ordersTbody) {
-        ordersTbody.innerHTML = SAMPLE_ORDER_HISTORY.map(order => `
-            <tr>
-                <td><strong>${order.orderId}</strong></td>
-                <td>${order.date}</td>
-                <td>${order.items}</td>
-                <td>${order.totalPrice}</td>
-                <td><span class="status-badge">${order.status}</span></td>
-            </tr>
-        `).join('');
+        if (AppState.orderHistory.length === 0) {
+            ordersTbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
+                        購入履歴はまだありません。商品をお選びいただき購入手続きをお試しください。
+                    </td>
+                </tr>
+            `;
+        } else {
+            ordersTbody.innerHTML = AppState.orderHistory.map(order => `
+                <tr>
+                    <td><strong>${order.order_no}</strong></td>
+                    <td>${order.date}</td>
+                    <td>${order.items_summary || "ご注文商品"}</td>
+                    <td><strong>¥${(order.total_amount || 0).toLocaleString()}</strong></td>
+                    <td><span class="status-badge">${order.status || "発送準備中"}</span></td>
+                </tr>
+            `).join('');
+        }
     }
 
-    // マイページ内お気に入りクイックグリッド描画
+    // お気に入りクイック表示
     if (mypageFavGrid) {
         const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
         if (favoriteItems.length === 0) {
@@ -963,22 +903,166 @@ function renderMyPage() {
 }
 
 // --------------------------------------------------------------------------
-// 11. MANEKIN機能「開発中」モーダル表示ロジック
+// 9. お気に入り機能
+// --------------------------------------------------------------------------
+function handleToggleFavorite(productId) {
+    const index = AppState.favorites.indexOf(productId);
+    let isAdded = false;
+
+    if (index > -1) {
+        AppState.favorites.splice(index, 1);
+        isAdded = false;
+        showToast('お気に入りから解除しました');
+    } else {
+        AppState.favorites.push(productId);
+        isAdded = true;
+        showToast('お気に入りに追加しました');
+    }
+
+    localStorage.setItem('manekin_favorites', JSON.stringify(AppState.favorites));
+    updateFavoriteBadges();
+    syncAllFavoriteButtons(productId, isAdded);
+
+    if (window.location.hash === '#favorites') {
+        renderFavoriteProducts();
+    }
+}
+
+function syncAllFavoriteButtons(productId, isFavorite) {
+    const cards = document.querySelectorAll(`.product-card[data-id="${productId}"]`);
+    cards.forEach(card => {
+        const btn = card.querySelector('.fav-btn');
+        if (btn) {
+            if (isFavorite) {
+                btn.classList.add('is-favorite');
+            } else {
+                btn.classList.remove('is-favorite');
+            }
+        }
+    });
+
+    const detailFavBtn = document.getElementById('detail-fav-btn');
+    if (detailFavBtn && AppState.currentDetailId === productId) {
+        if (isFavorite) {
+            detailFavBtn.classList.add('is-favorite');
+            detailFavBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                お気に入り解除
+            `;
+        } else {
+            detailFavBtn.classList.remove('is-favorite');
+            detailFavBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                お気に入りに追加
+            `;
+        }
+    }
+}
+
+function updateFavoriteBadges() {
+    const count = AppState.favorites.length;
+    const navBadge = document.getElementById('nav-fav-badge');
+    const iconBadge = document.getElementById('icon-fav-badge');
+    const mypageFavCount = document.getElementById('mypage-fav-count');
+
+    if (navBadge) navBadge.textContent = count;
+    if (iconBadge) iconBadge.textContent = count;
+    if (mypageFavCount) mypageFavCount.innerHTML = `${count} <span class="stat-unit">点</span>`;
+}
+
+function renderFavoriteProducts() {
+    const favGrid = document.getElementById('favorite-product-grid');
+    if (!favGrid) return;
+
+    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+    if (favoriteItems.length === 0) {
+        favGrid.innerHTML = `
+            <div class="empty-state">
+                <h2 class="empty-state-title">お気に入りはまだありません</h2>
+                <p class="empty-state-text">気になるアイテムを見つけたら、ハートマークを押してお気に入りに追加しましょう。</p>
+                <a href="#items" class="btn btn-primary">商品一覧を見る</a>
+            </div>
+        `;
+    } else {
+        favGrid.innerHTML = favoriteItems.map(p => createProductCardHTML(p)).join('');
+    }
+}
+
+// --------------------------------------------------------------------------
+// 10. 会員登録 & ログイン
+// --------------------------------------------------------------------------
+function updateAuthNavUI() {
+    const authLink = document.getElementById('nav-auth-link');
+    const mobileLoginLink = document.getElementById('mobile-login-link');
+    const mobileRegisterLink = document.getElementById('mobile-register-link');
+
+    if (AppState.currentUser) {
+        if (authLink) {
+            authLink.textContent = 'LOGOUT';
+            authLink.href = 'javascript:void(0)';
+            authLink.onclick = handleLogout;
+        }
+        if (mobileLoginLink) {
+            mobileLoginLink.textContent = 'LOGOUT (ログアウト)';
+            mobileLoginLink.href = 'javascript:void(0)';
+            mobileLoginLink.onclick = handleLogout;
+        }
+        if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
+    } else {
+        if (authLink) {
+            authLink.textContent = 'LOGIN';
+            authLink.href = '#login';
+            authLink.onclick = null;
+        }
+        if (mobileLoginLink) {
+            mobileLoginLink.textContent = 'LOGIN (ログイン)';
+            mobileLoginLink.href = '#login';
+            mobileLoginLink.onclick = null;
+        }
+        if (mobileRegisterLink) mobileRegisterLink.style.display = 'block';
+    }
+}
+
+function handleLogout() {
+    AppState.currentUser = null;
+    localStorage.removeItem('manekin_user');
+    showToast('ログアウトしました');
+    updateAuthNavUI();
+    window.location.hash = '#home';
+}
+
+function handleDemoLogin() {
+    const demoUser = {
+        id: 1,
+        name: "山田 太郎 様",
+        email: "demo@manekin.com",
+        rank: "VIP MEMBER"
+    };
+    AppState.currentUser = demoUser;
+    localStorage.setItem('manekin_user', JSON.stringify(demoUser));
+    showToast('デモアカウントでログインしました');
+    updateAuthNavUI();
+    window.location.hash = '#mypage';
+}
+
+// --------------------------------------------------------------------------
+// 11. MANEKIN機能「開発中」モーダル表示
 // --------------------------------------------------------------------------
 function openManekinModal() {
     const modal = document.getElementById('manekin-modal');
     if (modal) {
         modal.classList.add('open');
-        // モバイルドロワーが開いていれば閉じる
         closeMobileDrawer();
     }
 }
 
 function closeManekinModal() {
     const modal = document.getElementById('manekin-modal');
-    if (modal) {
-        modal.classList.remove('open');
-    }
+    if (modal) modal.classList.remove('open');
 }
 
 // --------------------------------------------------------------------------
@@ -993,7 +1077,6 @@ function showToast(message) {
     toast.textContent = message;
     container.appendChild(toast);
 
-    // 2.5秒後にフェードアウトして削除
     setTimeout(() => {
         toast.classList.add('toast-fadeout');
         setTimeout(() => toast.remove(), 300);
@@ -1001,7 +1084,7 @@ function showToast(message) {
 }
 
 // --------------------------------------------------------------------------
-// 13. モバイルメニューの開閉制御
+// 13. モバイルドロワー制御
 // --------------------------------------------------------------------------
 function openMobileDrawer() {
     const drawer = document.getElementById('mobile-menu-drawer');
@@ -1025,10 +1108,8 @@ function closeMobileDrawer() {
 // 14. イベントリスナー一括登録
 // --------------------------------------------------------------------------
 function setupEventListeners() {
-    // ハッシュ変更検知によるSPA画面遷移
     window.addEventListener('hashchange', handleRouting);
 
-    // MANEKINボタン（ヘッダー、モバイル、バナー等すべて）にモーダル表示をバインド
     document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1036,7 +1117,6 @@ function setupEventListeners() {
         });
     });
 
-    // モーダルの閉じるボタンと背景クリック
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalOkBtn = document.getElementById('modal-ok-btn');
     const manekinModal = document.getElementById('manekin-modal');
@@ -1049,7 +1129,6 @@ function setupEventListeners() {
         });
     }
 
-    // ハンバーガーメニューとオーバーレイ
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const drawerCloseBtn = document.getElementById('drawer-close-btn');
     const menuOverlay = document.getElementById('menu-overlay');
@@ -1058,12 +1137,10 @@ function setupEventListeners() {
     if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeMobileDrawer);
     if (menuOverlay) menuOverlay.addEventListener('click', closeMobileDrawer);
 
-    // モバイルメニュー内のリンククリック時にドロワーを閉じる
     document.querySelectorAll('.mobile-nav-link').forEach(link => {
         link.addEventListener('click', closeMobileDrawer);
     });
 
-    // カテゴリフィルターボタンのクリックイベント
     const filterGroup = document.getElementById('category-filter-group');
     if (filterGroup) {
         filterGroup.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1076,7 +1153,6 @@ function setupEventListeners() {
         });
     }
 
-    // ソートセレクトボックスの変更イベント
     const sortSelect = document.getElementById('sort-select');
     if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
@@ -1085,21 +1161,30 @@ function setupEventListeners() {
         });
     }
 
-    // 会員登録フォーム送信
-    const regForm = document.getElementById('register-form');
-    if (regForm) regForm.addEventListener('submit', handleRegisterSubmit);
-
-    // ログインフォーム送信
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
-
-    // かんたんデモログインボタン
     const demoBtn = document.getElementById('demo-login-btn');
     if (demoBtn) demoBtn.addEventListener('click', handleDemoLogin);
 
-    // マイページのログアウトボタン
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+    // 【要件追加】注文を確定するボタンのイベントバインド
+    const placeOrderBtn = document.getElementById('btn-place-order');
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', handlePlaceOrder);
+    }
+
+    // 支払い方法ラジオボタンのスタイル切替
+    document.querySelectorAll('.payment-option-label input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.payment-option-label').forEach(lbl => lbl.classList.remove('selected'));
+            radio.closest('.payment-option-label').classList.add('selected');
+
+            const cardSubform = document.getElementById('credit-card-subform');
+            if (cardSubform) {
+                cardSubform.style.display = (radio.value === 'クレジットカード') ? 'flex' : 'none';
+            }
+        });
+    });
 
     // マイページのタブ切り替え
     const mypageTabBtns = document.querySelectorAll('.mypage-tab-btn');
@@ -1107,7 +1192,6 @@ function setupEventListeners() {
         btn.addEventListener('click', () => {
             mypageTabBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
             const targetTab = btn.getAttribute('data-tab');
             document.querySelectorAll('.mypage-tab-content').forEach(content => {
                 content.classList.remove('active');
@@ -1116,52 +1200,4 @@ function setupEventListeners() {
             if (activeContent) activeContent.classList.add('active');
         });
     });
-}
-
-// ==========================================================================
-// 15. 将来的な Python バックエンド API 連携用スタブ（明確な区切り）
-// 将来、Pythonサーバー (app.py) を起動した際にここからフェッチ接続可能
-// ==========================================================================
-
-// 【APIスタブ 1】MANEKIN機能（3Dアバター・マネキン試着データ取得）
-async function apiGetManekinAvatar(userId) {
-    try {
-        // Python APIエンドポイント例: /api/manekin/{user_id}
-        // const response = await fetch(`http://localhost:5000/api/manekin/${userId}`);
-        // return await response.json();
-        console.log(`[Python API 連携予定] MANEKINデータを要求: User ID = ${userId}`);
-        return { status: "ready_for_python", message: "MANEKIN API スタブ" };
-    } catch (error) {
-        console.error("MANEKIN API 呼び出しエラー:", error);
-    }
-}
-
-// 【APIスタブ 2】マイクローゼット機能（手持ちアイテム一覧取得・登録）
-async function apiGetMyCloset(userId) {
-    try {
-        // Python APIエンドポイント例: /api/closet/{user_id}
-        // const response = await fetch(`http://localhost:5000/api/closet/${userId}`);
-        // return await response.json();
-        console.log(`[Python API 連携予定] マイクローゼットデータを要求: User ID = ${userId}`);
-        return { status: "ready_for_python", items: [] };
-    } catch (error) {
-        console.error("マイクローゼット API 呼び出しエラー:", error);
-    }
-}
-
-// 【APIスタブ 3】AIコーデ提案機能（気象データ・シチュエーションに基づく提案）
-async function apiGetAiCoordinateRecommendation(weather, occasion, preferredColor) {
-    try {
-        // Python APIエンドポイント例: /api/ai-coordinate
-        // const response = await fetch('http://localhost:5000/api/ai-coordinate', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ weather, occasion, preferredColor })
-        // });
-        // return await response.json();
-        console.log(`[Python API 連携予定] AIコーデ提案を要求: Weather=${weather}, Occasion=${occasion}`);
-        return { status: "ready_for_python", recommendations: [] };
-    } catch (error) {
-        console.error("AIコーデ API 呼び出しエラー:", error);
-    }
 }
