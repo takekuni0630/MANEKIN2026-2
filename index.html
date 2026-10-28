@@ -3,6 +3,7 @@
 <!-- 言語設定を日本語に指定 -->
 <html lang="ja">
 <!-- ヘッダーメタ情報エリアの開始 -->
+
 <head>
     <!-- 文字エンコーディングをUTF-8に設定 -->
     <meta charset="UTF-8">
@@ -17,14 +18,16 @@
     <!-- Google Fonts静的リソースの事前接続設定 -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- モダンなタイポグラフィを提供するGoogle Fonts（InterとNoto Sans JP）の読み込み -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <!-- サイト共通のスタイルシートを読み込み -->
     <link rel="stylesheet" href="css/style.css">
-<!-- ヘッダーメタ情報エリアの終了 -->
+    <!-- ヘッダーメタ情報エリアの終了 -->
 </head>
 <!-- ページ本体ボディの開始 -->
-<body>
 
+<body>
     <!-- グローバルサイトヘッダーの開始 -->
     <header class="site-header" id="site-header">
         <!-- ヘッダー内部のコンテナラッパー -->
@@ -79,7 +82,7 @@
                         <a href="#mypage" class="nav-link" data-nav="mypage">MYPAGE</a>
                     </li>
                 </ul>
-            <!-- デスクトップナビゲーション終了 -->
+                <!-- デスクトップナビゲーション終了 -->
             </nav>
 
             <!-- ヘッダー右側のユーザーツールアイコン群 -->
@@ -88,7 +91,9 @@
                 <a href="#favorites" class="tool-icon-btn" aria-label="お気に入り一覧を表示">
                     <!-- ハートアイコンSVG -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
                     </svg>
                     <!-- アイコン上の件数バッジ -->
                     <span class="icon-badge" id="icon-fav-badge">0</span>
@@ -110,7 +115,7 @@
                 </button>
             </div>
         </div>
-    <!-- グローバルサイトヘッダーの終了 -->
+        <!-- グローバルサイトヘッダーの終了 -->
     </header>
 
     <!-- モバイル用スライドインナビゲーションメニューの開始 -->
@@ -125,11 +130,15 @@
                 <li><a href="#items" class="mobile-nav-link" data-mobile-nav="items">ITEM (商品一覧)</a></li>
                 <li><a href="#new-items" class="mobile-nav-link" data-mobile-nav="new-items">NEW ITEM (新着)</a></li>
                 <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
-                <li><a href="javascript:void(0)" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn">MANEKIN <span class="nav-tag">AI</span></a></li>
+                <li><a href="javascript:void(0)" class="mobile-nav-link mobile-manekin-btn"
+                        id="mobile-manekin-btn">MANEKIN <span class="nav-tag">AI</span></a></li>
                 <li class="mobile-divider"></li>
-                <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN (ログイン)</a></li>
-                <li><a href="#register" class="mobile-nav-link" id="mobile-register-link" data-mobile-nav="register">REGISTER (会員登録)</a></li>
-                <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE (マイページ)</a></li>
+                <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN
+                        (ログイン)</a></li>
+                <li><a href="#register" class="mobile-nav-link" id="mobile-register-link"
+                        data-mobile-nav="register">REGISTER (会員登録)</a></li>
+                <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE
+                        (マイページ)</a></li>
             </ul>
         </div>
     </div>
@@ -307,7 +316,8 @@
             <div class="container page-container">
                 <!-- パンくずナビゲーション -->
                 <div class="page-breadcrumb">
-                    <a href="#home">HOME</a> &gt; <a href="#items">ITEM</a> &gt; <span id="detail-breadcrumb-name">商品詳細</span>
+                    <a href="#home">HOME</a> &gt; <a href="#items">ITEM</a> &gt; <span
+                        id="detail-breadcrumb-name">商品詳細</span>
                 </div>
 
                 <!-- 商品詳細の2カラムレイアウトコンテナ -->
@@ -354,14 +364,16 @@
                         <!-- メールアドレス入力項目 -->
                         <div class="form-group">
                             <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
-                            <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com" required>
+                            <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com"
+                                required>
                             <span class="form-error" id="login-email-error"></span>
                         </div>
 
                         <!-- パスワード入力項目 -->
                         <div class="form-group">
                             <label for="login-password" class="form-label">パスワード <span class="required">*</span></label>
-                            <input type="password" id="login-password" class="form-input" placeholder="8文字以上の半角英数字" required>
+                            <input type="password" id="login-password" class="form-input" placeholder="8文字以上の半角英数字"
+                                required>
                             <span class="form-error" id="login-password-error"></span>
                         </div>
 
@@ -407,14 +419,16 @@
                         <!-- メールアドレス入力項目 -->
                         <div class="form-group">
                             <label for="reg-email" class="form-label">メールアドレス <span class="required">*</span></label>
-                            <input type="email" id="reg-email" class="form-input" placeholder="example@manekin.com" required>
+                            <input type="email" id="reg-email" class="form-input" placeholder="example@manekin.com"
+                                required>
                             <span class="form-error" id="reg-email-error"></span>
                         </div>
 
                         <!-- パスワード入力項目 -->
                         <div class="form-group">
                             <label for="reg-password" class="form-label">パスワード <span class="required">*</span></label>
-                            <input type="password" id="reg-password" class="form-input" placeholder="8文字以上の半角英数字" required>
+                            <input type="password" id="reg-password" class="form-input" placeholder="8文字以上の半角英数字"
+                                required>
                             <span class="form-error" id="reg-password-error"></span>
                         </div>
 
@@ -543,13 +557,14 @@
             </div>
         </section>
 
-    <!-- メインコンテンツ領域の終了 -->
+        <!-- メインコンテンツ領域の終了 -->
     </main>
 
     <!-- ============================================== -->
     <!-- MANEKIN機能クリック時の「開発中」モーダル      -->
     <!-- ============================================== -->
-    <div class="modal-backdrop" id="manekin-modal" role="dialog" aria-modal="true" aria-labelledby="modal-manekin-title">
+    <div class="modal-backdrop" id="manekin-modal" role="dialog" aria-modal="true"
+        aria-labelledby="modal-manekin-title">
         <div class="modal-dialog">
             <!-- モーダルヘッダー -->
             <div class="modal-header">
@@ -560,8 +575,11 @@
             <div class="modal-body text-center">
                 <!-- アイコン表示 -->
                 <div class="modal-icon-wrap">
-                    <svg class="modal-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                    <svg class="modal-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                        </path>
                     </svg>
                 </div>
                 <!-- タイトル：「開発中」 -->
@@ -643,4 +661,5 @@
     <!-- JavaScriptアプリケーションロジックファイルの読み込み -->
     <script src="js/app.js"></script>
 </body>
+
 </html>
