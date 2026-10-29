@@ -58,7 +58,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Over-Draped Double Trench Coat",
         category: "OUTER",
         price: 16900,
-        image: "assets/images/coat_black.jpg",
+        image: "assets/images/men/オーバードレープダブルトレンチコート.png",
         isNew: true,
         isFeatured: true,
         description: "たっぷりとした身幅とラグランスリーブが生み出す優美な落ち感が魅力。撥水性と防風性を備えた高密度ギャバジン素材を使用し、クラシックなディテールを削ぎ落とした現代的なオーバーサイズトレンチ。",
@@ -69,22 +69,6 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 2,
-        gender: "MEN",
-        name: "リラックス ダブルブレスト テーラードジャケット",
-        nameEn: "Relaxed Double-Breasted Tailored Jacket",
-        category: "OUTER",
-        price: 11900,
-        image: "assets/images/jacket_black.jpg",
-        isNew: true,
-        isFeatured: true,
-        description: "適度なドロップショルダーと低めのゴージラインが抜け感を演出する4ボタンダブルジャケット。シワに強いウールライクな梳毛調ファブリックで、日常からオケージョンまで着回せます。",
-        colors: ["BLACK", "NAVY", "CHARCOAL"],
-        sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 68%, レーヨン 29%, ポリウレタン 3%",
-        sku: "MNK-2026-M02"
-    },
-    {
-        id: 3,
         gender: "MEN",
         name: "ミニマル スタンドカラー ジップアップブルゾン",
         nameEn: "Minimal Stand-Collar Zip Blouson",
@@ -97,10 +81,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["BLACK", "CHARCOAL", "NAVY"],
         sizes: ["S", "M", "L", "XL"],
         material: "ナイロン 100%（撥水加工）",
-        sku: "MNK-2026-M03"
+        sku: "MNK-2026-M02"
     },
     {
-        id: 4,
+        id: 3,
         gender: "MEN",
         name: "ヘビーウェイト フルジップ スウェットパーカー",
         nameEn: "Heavyweight Full-Zip Sweat Hoodie",
@@ -113,10 +97,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["HEATHER GREY", "CHARCOAL", "BLACK", "BROWN"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%（裏パイル仕立て）",
-        sku: "MNK-2026-M04"
+        sku: "MNK-2026-M03"
     },
     {
-        id: 5,
+        id: 4,
         gender: "MEN",
         name: "ファインメリノ リラックス モックネックセーター",
         nameEn: "Fine Merino Relaxed Mockneck Sweater",
@@ -129,10 +113,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["OFF WHITE", "BLACK", "NAVY", "TERRACOTTA"],
         sizes: ["S", "M", "L", "XL"],
         material: "エクストラファインメリノウール 100%",
-        sku: "MNK-2026-M05"
+        sku: "MNK-2026-M04"
     },
     {
-        id: 6,
+        id: 5,
         gender: "MEN",
         name: "プレミアム コットン ドロップショルダー ボクシーTシャツ",
         nameEn: "Premium Cotton Drop-Shoulder Boxy T-Shirt",
@@ -145,10 +129,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["WHITE", "BLACK", "NAVY", "ASH GREY"],
         sizes: ["S", "M", "L", "XL"],
         material: "超長綿 100%",
-        sku: "MNK-2026-M06"
+        sku: "MNK-2026-M05"
     },
     {
-        id: 7,
+        id: 6,
         gender: "MEN",
         name: "ウォッシャブル ミラノリブ クルーネックニット",
         nameEn: "Washable Milano Rib Crewneck Knit",
@@ -161,10 +145,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["CHARCOAL", "OFF WHITE", "BLACK", "BLUE"],
         sizes: ["S", "M", "L", "XL"],
         material: "レーヨン 55%, ポリエステル 45%",
-        sku: "MNK-2026-M07"
+        sku: "MNK-2026-M06"
     },
     {
-        id: 8,
+        id: 7,
         gender: "MEN",
         name: "ルーズフィット オックスフォード バンドカラーシャツ",
         nameEn: "Loose Fit Oxford Band Collar Shirt",
@@ -177,10 +161,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["WHITE", "STRIPE BLUE", "CHARCOAL"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%",
-        sku: "MNK-2026-M08"
+        sku: "MNK-2026-M07"
     },
     {
-        id: 9,
+        id: 8,
         gender: "MEN",
         name: "ワイド 2タック ドレープ バギースラックス",
         nameEn: "Wide 2-Tuck Drape Baggy Trousers",
@@ -193,10 +177,10 @@ const SAMPLE_PRODUCTS = [
         colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 65%, レーヨン 33%, ポリウレタン 2%",
-        sku: "MNK-2026-M09"
+        sku: "MNK-2026-M08"
     },
     {
-        id: 10,
+        id: 9,
         gender: "MEN",
         name: "ストレート ドレープ セミフレアスラックス",
         nameEn: "Straight Drape Semi-Flare Trousers",
@@ -209,38 +193,54 @@ const SAMPLE_PRODUCTS = [
         colors: ["BLACK", "CHARCOAL", "NAVY"],
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 100%",
+        sku: "MNK-2026-M09"
+    },
+    {  // ここまで10~12まで写真の置き換えをしました。
+        id: 10,
+        gender: "MEN",
+        name: "スマート アンクル テーパードイージースラックス",
+        nameEn: "Smart Ankle Tapered Easy Pants",
+        category: "BOTTOMS",
+        price: 4990,
+        image: "assets/images/men/スマートアンクルテーパードイージースラックス.png",
+        isNew: true,
+        isFeatured: false,
+        description: "立体裁断による緩やかなカーブラインが現代的。",
+        colors: ["OLIVE", "BLACK", "CHARCOAL"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "綿 80%, リネン 20%",
         sku: "MNK-2026-M10"
     },
     {
         id: 11,
         gender: "MEN",
-        name: "リラックス カーブフィット ユーティリティパンツ",
-        nameEn: "Relaxed Curved Utility Pants",
+        name: "ストレート ドレープ セミフレアスラックス",
+        nameEn: "Straight Drape Semi-Flare Trousers",
         category: "BOTTOMS",
-        price: 4990,
-        image: "assets/images/tapered_black.jpg",
-        isNew: true,
+        price: 4490,
+        image: "assets/images/man/ストレートドレープセミフレアスラックス.png",
+        isNew: false,
         isFeatured: false,
-        description: "立体裁断による緩やかなカーブラインが現代的なテックミリタリーパンツ。余分なディテールを削ぎ落としたクリーンなポケット配置で、都会的なスタイリングにフィット。",
-        colors: ["OLIVE", "BLACK", "CHARCOAL"],
+        description: "ウエストゴムと内側ドローコードを備えた快適設計ながら、脚長効果が実感できるセミフレアシルエット。素材はドレープ感を美しく見せる高密度のTRツイル素材を使用。",
+        colors: ["BLACK", "CHARCOAL", "NAVY"],
         sizes: ["S", "M", "L", "XL"],
-        material: "綿 70%, ナイロン 30%",
+        material: "ポリエステル 72%, レーヨン 24%, ポリウレタン 4%",
         sku: "MNK-2026-M11"
     },
     {
         id: 12,
         gender: "MEN",
-        name: "スマート アンクル テーパードイージースラックス",
-        nameEn: "Smart Ankle Tapered Easy Trousers",
+        name: "ストライプ パンツ",
+        nameEn: "Stripe Pants",
         category: "BOTTOMS",
-        price: 4490,
-        image: "assets/images/tapered_charcoal.jpg",
-        isNew: false,
-        isFeatured: false,
-        description: "ウエストゴムと内側ドローコードを備えた快適設計ながら、360度どこから見ても端正なテーパードライン。足元をすっきりと見せるアンクル丈で季節を問わず活躍します。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
-        sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 68%, レーヨン 28%, ポリウレタン 4%",
+        price: 11900,
+        image: "assets/images/men/shimashimapants.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "しましま模様なのでシマウマ気分で日常生活が送れます。",
+        colors: ["BLACK", "NAVY", "CHARCOAL"],
+        sizes: ["M", "L"],
+        material: "ポリエステル 100%",
         sku: "MNK-2026-M12"
     },
 
@@ -538,17 +538,17 @@ function handleRouting() {
             renderCatalogProducts();
             break;
 
-        case '#man':
-            AppState.selectedGender = 'MAN';
+        case '#men':
+            AppState.selectedGender = 'MEN';
             showView('view-items');
-            highlightNavLink('man');
+            highlightNavLink('men');
             renderCatalogProducts();
             break;
 
-        case '#woman':
-            AppState.selectedGender = 'WOMAN';
+        case '#women':
+            AppState.selectedGender = 'WOMEN';
             showView('view-items');
-            highlightNavLink('woman');
+            highlightNavLink('women');
             renderCatalogProducts();
             break;
 
