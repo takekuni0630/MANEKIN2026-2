@@ -24,20 +24,20 @@
     --color-accent: #e53935;
     /* MANEKIN機能用テックブラック/シルバー */
     --color-tech: #000000;
-    
+
     /* 基本フォントファミリー（欧文Inter、和文Noto Sans JP） */
     --font-primary: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-    
+
     /* ヘッダーの高さ設定 */
     --header-height: 72px;
     /* 最大コンテンツ幅 */
     --container-max-width: 1200px;
-    
+
     /* トランジション速度 */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    
+
     /* 影の定義 */
     --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
     --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
@@ -46,7 +46,9 @@
 
 /* --- 2. リセットCSSとベース要素スタイル --- */
 /* 全要素のボックスサイズ基準をボーダーボックスに統一 */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     /* パディングやボーダーを含めて幅・高さを計算 */
     box-sizing: border-box;
     /* デフォルトマージンをリセット */
@@ -98,7 +100,8 @@ a:hover {
 }
 
 /* リスト要素のスタイルリセット */
-ul, ol {
+ul,
+ol {
     /* 点や数字のビュレットを非表示 */
     list-style: none;
 }
@@ -562,6 +565,7 @@ button {
         opacity: 0;
         transform: translateY(6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -811,7 +815,8 @@ button {
 }
 
 /* --- 9. おすすめ商品 & 新作セクション --- */
-.featured-section, .new-arrivals-section {
+.featured-section,
+.new-arrivals-section {
     padding-top: 40px;
     padding-bottom: 80px;
 }
@@ -1059,7 +1064,8 @@ button {
     color: var(--color-dark);
 }
 
-.filter-btn.active, .filter-btn:hover {
+.filter-btn.active,
+.filter-btn:hover {
     background-color: var(--color-black);
     color: var(--color-white);
     border-color: var(--color-black);
@@ -1113,7 +1119,7 @@ button {
 .detail-main-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: opacity 0.25s ease-in-out;
 }
 
@@ -1175,7 +1181,8 @@ button {
     color: var(--color-black);
 }
 
-.color-chips, .size-chips {
+.color-chips,
+.size-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -1454,8 +1461,13 @@ button {
     gap: 16px;
 }
 
-.flex-1 { flex: 1; }
-.flex-2 { flex: 2; }
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
 
 /* 支払い方法選択グリッド */
 .payment-method-box {
@@ -2179,6 +2191,7 @@ button {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2258,24 +2271,31 @@ button {
     .desktop-nav {
         display: none;
     }
+
     .hamburger-btn {
         display: flex;
     }
+
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .footer-top {
         grid-template-columns: 1fr 1fr;
     }
+
     .item-detail-layout {
         gap: 32px;
     }
+
     .concept-grid {
         grid-template-columns: 1fr;
     }
+
     .checkout-layout {
         grid-template-columns: 1fr;
     }
+
     .python-roadmap-list {
         grid-template-columns: 1fr;
     }
@@ -2286,42 +2306,54 @@ button {
         height: 70vh;
         min-height: 440px;
     }
+
     .hero-heading {
         font-size: 2rem;
     }
+
     .hero-description {
         font-size: 0.9rem;
     }
+
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px 12px;
     }
+
     .item-detail-layout {
         grid-template-columns: 1fr;
     }
+
     .detail-gallery {
         position: static;
     }
+
     .mypage-stats-grid {
         grid-template-columns: 1fr;
     }
+
     .footer-top {
         grid-template-columns: 1fr;
         gap: 32px;
     }
+
     .auth-card {
         padding: 32px 20px;
     }
+
     .catalog-controls {
         flex-direction: column;
         align-items: flex-start;
     }
+
     .cart-btn-label {
         display: none;
     }
+
     .payment-options-grid {
         grid-template-columns: 1fr;
     }
+
     .form-row {
         flex-direction: column;
         gap: 12px;

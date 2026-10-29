@@ -51,7 +51,7 @@ const SAMPLE_PRODUCTS = [
     // =========================================================================
     // ■ MEN'S COLLECTION (メンズ 12着)
     // =========================================================================
-    {
+    {   // 1~2まで終わった　10~12まで終わった
         id: 1,
         gender: "MEN",
         name: "オーバードレープ ダブルトレンチコート",
@@ -70,30 +70,30 @@ const SAMPLE_PRODUCTS = [
     {
         id: 2,
         gender: "MEN",
-        name: "ミニマル スタンドカラー ジップアップブルゾン",
-        nameEn: "Minimal Stand-Collar Zip Blouson",
+        name: "リラックス ダブル ブレスト テーラードジャケット",
+        nameEn: "Relaxed Double Breasted Tailored Jacket",
         category: "OUTER",
         price: 9990,
-        image: "assets/images/jacket_charcoal.jpg",
+        image: "assets/images/men/リラックスダブルブレストテーラードジャケット.png",
         isNew: false,
         isFeatured: false,
-        description: "首元をすっきりと見せるミニマルなスタンドカラーと、高級感漂うマットシルバーのダブルジップが特徴のショート丈ブルゾン。裾と袖口のアジャスターでシルエットの変化を楽しめます。",
+        description: "リラックスしたサイジングと、端正なダブルプレストデザインが融合したテーラードジャケット。滑らかなウールブレンド素材を使用し、肩パッドを排すことでカーディガン感覚で羽織れる軽やかさを実現しました。ドレスシーンからカジュアルダウンまで、幅広いスタイリングに洗練されたムードを加えます。",
         colors: ["BLACK", "CHARCOAL", "NAVY"],
         sizes: ["S", "M", "L", "XL"],
-        material: "ナイロン 100%（撥水加工）",
+        material: "ウール 50%、ポリエステル 48%、ポリウレタン 2%",
         sku: "MNK-2026-M02"
     },
     {
         id: 3,
         gender: "MEN",
-        name: "ヘビーウェイト フルジップ スウェットパーカー",
+        name: "ミニマル スタンドカラー ジップアップブルゾーン",
         nameEn: "Heavyweight Full-Zip Sweat Hoodie",
         category: "TOPS",
         price: 6990,
-        image: "assets/images/sweat_grey.jpg",
+        image: "assets/images/men/TOPS5.png",
         isNew: true,
         isFeatured: true,
-        description: "立ち上がりの美しい立体2重フードと、肉厚な14oz度詰め裏毛スウェット生地を採用。フロントには滑らかなメタルファスナーを配し、一枚でもアウターのインナーでも主役級の存在感を放ちます。",
+        description: "",
         colors: ["HEATHER GREY", "CHARCOAL", "BLACK", "BROWN"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%（裏パイル仕立て）",
@@ -106,10 +106,10 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Fine Merino Relaxed Mockneck Sweater",
         category: "TOPS",
         price: 4990,
-        image: "assets/images/knit_grey.jpg",
+        image: "assets/images/men/TOPS4.png",
         isNew: true,
         isFeatured: false,
-        description: "極細19.5ミクロンのメリノウール糸を使用した滑らかな肌触りのモックネック。首元に窮屈感を与えない絶妙なハイネック設計で、ジャケットのインナーに最適な上品ニットです。",
+        description: "",
         colors: ["OFF WHITE", "BLACK", "NAVY", "TERRACOTTA"],
         sizes: ["S", "M", "L", "XL"],
         material: "エクストラファインメリノウール 100%",
@@ -122,7 +122,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Premium Cotton Drop-Shoulder Boxy T-Shirt",
         category: "TOPS",
         price: 2990,
-        image: "assets/images/tshirt_white.jpg",
+        image: "assets/images/men/TOPS3.png",
         isNew: false,
         isFeatured: true,
         description: "毛羽立ちを抑えた極上のガス焼きシルケットコットン天竺。肘にかかる絶妙な袖丈と美しいボクシーシルエットで、一枚着でも透けにくくクリーンな印象を保ちます。",
@@ -138,7 +138,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Washable Milano Rib Crewneck Knit",
         category: "TOPS",
         price: 3990,
-        image: "assets/images/knit_white.jpg",
+        image: "assets/images/men/TOPS2.png",
         isNew: false,
         isFeatured: false,
         description: "型崩れしにくくハリのあるミラノリブ編みを採用。スウェットのような気軽さで着られ、スラックスと合わせるだけで洗練された大人カジュアルが完成します。マシンウォッシャブル対応。",
@@ -150,14 +150,14 @@ const SAMPLE_PRODUCTS = [
     {
         id: 7,
         gender: "MEN",
-        name: "ルーズフィット オックスフォード バンドカラーシャツ",
-        nameEn: "Loose Fit Oxford Band Collar Shirt",
+        name: "ブルーシャツ",
+        nameEn: "Blue Shirt",
         category: "TOPS",
         price: 4490,
-        image: "assets/images/tshirt_grey.jpg",
+        image: "assets/images/men/TOPS1.png",
         isNew: true,
         isFeatured: false,
-        description: "太番手の上質コットンで仕立てたリラックスシルエットのバンドカラー。洗いざらしでも自然な風合いを楽しめ、羽織りとしてもタックインでも決まる万能シャツ。",
+        description: "爽やかな水色のストライプシャツ。",
         colors: ["WHITE", "STRIPE BLUE", "CHARCOAL"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%",
@@ -186,7 +186,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Straight Drape Semi-Flare Trousers",
         category: "BOTTOMS",
         price: 5490,
-        image: "assets/images/pants_black.jpg",
+        image: "assets/images/men/〇〇.png",
         isNew: false,
         isFeatured: false,
         description: "膝位置をわずかに高く設定し、裾にかけて自然に広がる美脚シルエットスラックス。センタープレスが半永久的に保たれるクリース加工を施し、スタイルアップを約束します。",
@@ -195,7 +195,7 @@ const SAMPLE_PRODUCTS = [
         material: "ポリエステル 100%",
         sku: "MNK-2026-M09"
     },
-    {  // ここまで10~12まで写真の置き換えをしました。
+    {   // 10~12まで完了
         id: 10,
         gender: "MEN",
         name: "スマート アンクル テーパードイージースラックス",
@@ -218,7 +218,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Straight Drape Semi-Flare Trousers",
         category: "BOTTOMS",
         price: 4490,
-        image: "assets/images/man/ストレートドレープセミフレアスラックス.png",
+        image: "assets/images/men/ストレートドレープセミフレアスラックス.png",
         isNew: false,
         isFeatured: false,
         description: "ウエストゴムと内側ドローコードを備えた快適設計ながら、脚長効果が実感できるセミフレアシルエット。素材はドレープ感を美しく見せる高密度のTRツイル素材を使用。",
@@ -234,7 +234,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Stripe Pants",
         category: "BOTTOMS",
         price: 11900,
-        image: "assets/images/men/shimashimapants.jpg",
+        image: "assets/images/men/newsimapants.png",
         isNew: true,
         isFeatured: true,
         description: "しましま模様なのでシマウマ気分で日常生活が送れます。",
@@ -247,41 +247,42 @@ const SAMPLE_PRODUCTS = [
     // =========================================================================
     // ■ WOMEN'S COLLECTION (ウィメンズ 12着)
     // =========================================================================
-    {
+    { // 女性は画像の差し替えすべて完了
         id: 13,
         gender: "WOMEN",
-        name: "ミニマル ベルテッド ガウン ロングコート",
-        nameEn: "Minimal Belted Gown Long Coat",
+        name: "フリースジャケット",
+        nameEn: "Fleece Jacket",
         category: "OUTER",
         price: 16900,
-        image: "assets/images/coat_charcoal.jpg",
+        image: "assets/images/women/outer1.png",
         isNew: true,
         isFeatured: true,
-        description: "ボタンを排した流れるようなラップデザインと、共布ベルトでウエストマークできるエレガントなガウンコート。軽量で暖かいダブルフェイスウールを使用し、羽織るだけでこなれ感を演出。",
+        description: "軽くて暖かいシェルパ素材を使用し、肌触りは柔らかく、見た目にも上品。高めのスタンドカラーが首元までしっかり包み込み、冷たい風を防ぎます。",
         colors: ["OATMEAL", "BLACK", "CHARCOAL"],
         sizes: ["S", "M", "L"],
-        material: "ウール 80%, ナイロン 20%",
+        material: "ポリエステル 100%",
         sku: "MNK-2026-W13"
     },
     {
         id: 14,
         gender: "WOMEN",
-        name: "クロップド ボクシー テーラードジャケット",
-        nameEn: "Cropped Boxy Tailored Jacket",
+        name: "グリッドパフジャケット",
+        nameEn: "Grid Puff Jacket",
         category: "OUTER",
         price: 10900,
-        image: "assets/images/jacket_black.jpg",
+        image: "assets/images/women/outer2.png",
         isNew: true,
         isFeatured: true,
-        description: "ハイウエストボトムスと黄金比でマッチするトレンドの短丈ジャケット。程よい肩パッドとボクシーな直線的ラインがマニッシュな魅力を引き立てます。",
+        description: "細かなチェック柄が特徴の軽量パフジャケット。しっかり暖かい中綿仕様で、冬の外出でも快適。高めのスタンドカラーと袖口のゴムで冷気を防ぎ、デイリーに使いやすい一着。",
         colors: ["BLACK", "CHARCOAL", "OFF WHITE"],
         sizes: ["S", "M", "L"],
-        material: "ポリエステル 70%, レーヨン 26%, ポリウレタン 4%",
+        material: "ポリエステル 100%",
         sku: "MNK-2026-W14"
     },
     {
         id: 15,
         gender: "WOMEN",
+<<<<<<< HEAD
         name: "スタンドカラー パテッド パフジャケット",
         nameEn: "Stand Collar Padded Puff Jacket",
         category: "OUTER",
@@ -290,6 +291,16 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "首元までしっかり暖かなスタンドカラーとマットな質感が魅力の、ミニマルでスタイリッシュな中綿パフジャケット。",
+=======
+        name: "レザージャケット",
+        nameEn: "Leather Jacket",
+        category: "OUTER",
+        price: 12900,
+        image: "assets/images/women/outer3.png",
+        isNew: false,
+        isFeatured: false,
+        description: "レザーの質感とボア襟が特徴のジャケット。暖かく、冬のアウターとして使いやすい一着。フロントのジップとフラップポケットで、機能性とデザインを両立。",
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         colors: ["BLACK", "IVORY", "CHARCOAL"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
@@ -298,6 +309,7 @@ const SAMPLE_PRODUCTS = [
     {
         id: 16,
         gender: "WOMEN",
+<<<<<<< HEAD
         name: "シャギーニット オーバーサイズ クルーネックセーター",
         nameEn: "Shaggy Oversized Crewneck Sweater",
         category: "TOPS",
@@ -307,13 +319,26 @@ const SAMPLE_PRODUCTS = [
         isFeatured: true,
         description: "ふんわりとした毛足の長いシャギー素材が心地よく、上品なネイビーとゆるめのオーバーサイズシルエットで抜け感のあるニットプルオーバー。",
         colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
+=======
+        name: "スタンドカラー パテッド パフジャケット",
+        nameEn: "Stand Collar Padded Puff Jacket",
+        category: "OUTER",
+        price: 12900,
+        image: "assets/images/women/outer4.png",
+        isNew: false,
+        isFeatured: false,
+        description: "首元までしっかり暖かなスタンドカラーとマットな質感が魅力の、ミニマルでスタイリッシュな中綿パフジャケット。",
+        colors: ["BLACK", "IVORY", "CHARCOAL"],
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sizes: ["S", "M", "L"],
-        material: "ウール 85%, カシミヤ 15%",
+        material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
         sku: "MNK-2026-W16"
     },
+    // 13~20まで設定完了
     {
         id: 17,
         gender: "WOMEN",
+<<<<<<< HEAD
         name: "ヘビーウェイト ルーズクルーネック スウェット",
         nameEn: "Heavyweight Loose Crewneck Sweatshirt",
         category: "TOPS",
@@ -323,13 +348,65 @@ const SAMPLE_PRODUCTS = [
         isFeatured: false,
         description: "しっかりとした肉厚感と、ドロップショルダーのゆったりシルエットで洗練された雰囲気に仕上がる万能スウェットプルオーバー。",
         colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
+=======
+        name: "シャギーニット オーバーサイズ クルーネックセーター",
+        nameEn: "Shaggy Oversized Crewneck Sweater",
+        category: "TOPS",
+        price: 4990,
+        image: "assets/images/women/tops1.png",
+        isNew: true,
+        isFeatured: true,
+        description: "ふんわりとした毛足の長いシャギー素材が心地よく、上品なネイビーとゆるめのオーバーサイズシルエットで抜け感のあるニットプルオーバー。",
+        colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sizes: ["S", "M", "L"],
-        material: "綿 100%",
+        material: "ウール 85%, カシミヤ 15%",
         sku: "MNK-2026-W17"
     },
     {
         id: 18,
         gender: "WOMEN",
+<<<<<<< HEAD
+        name: "ヴィンテージウォッシュ フルジップパーカー",
+        nameEn: "Vintage Wash Full-Zip Hoodie",
+        category: "TOPS",
+        price: 2990,
+        image: "assets/images/women/tops3.png",
+        isNew: false,
+        isFeatured: false,
+        description: "味のあるヴィンテージ加工とシックなブラウンカラーが魅力的で、羽織るだけでこなれ感を演出できるオーバーサイズジップパーカー。",
+        colors: ["WHITE", "BLACK", "CHARCOAL"],
+=======
+        name: "ヘビーウェイト ルーズクルーネック スウェット",
+        nameEn: "Heavyweight Loose Crewneck Sweatshirt",
+        category: "TOPS",
+        price: 5990,
+        image: "assets/images/women/tops2.png",
+        isNew: true,
+        isFeatured: false,
+        description: "しっかりとした肉厚感と、ドロップショルダーのゆったりシルエットで洗練された雰囲気に仕上がる万能スウェットプルオーバー。",
+        colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
+        sizes: ["S", "M", "L"],
+        material: "綿 100%",
+        sku: "MNK-2026-W18"
+    },
+    {
+        id: 19,
+        gender: "WOMEN",
+<<<<<<< HEAD
+        name: "ドット柄 シアーヘンリーネック クロップドTシャツ",
+        nameEn: "Polka Dot Sheer Henley Crop Top",
+        category: "TOPS",
+        price: 3990,
+        image: "assets/images/women/tops4.png",
+        isNew: true,
+        isFeatured: false,
+        description: "程よい透け感のあるシアー素材とキュートなドット柄が印象的な、ヘンリーネックデザインのクロップド丈長袖カットソー。",
+        colors: ["CHARCOAL", "OFF WHITE", "BLACK"],
+        sizes: ["FREE"],
+        material: "アクリル 55%, コットン 45%",
+=======
         name: "ヴィンテージウォッシュ フルジップパーカー",
         nameEn: "Vintage Wash Full-Zip Hoodie",
         category: "TOPS",
@@ -341,10 +418,11 @@ const SAMPLE_PRODUCTS = [
         colors: ["WHITE", "BLACK", "CHARCOAL"],
         sizes: ["S", "M", "L"],
         material: "スビンコットン 100%",
-        sku: "MNK-2026-W18"
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
+        sku: "MNK-2026-W19"
     },
     {
-        id: 19,
+        id: 20,
         gender: "WOMEN",
         name: "ドット柄 シアーヘンリーネック クロップドTシャツ",
         nameEn: "Polka Dot Sheer Henley Crop Top",
@@ -357,22 +435,6 @@ const SAMPLE_PRODUCTS = [
         colors: ["CHARCOAL", "OFF WHITE", "BLACK"],
         sizes: ["FREE"],
         material: "アクリル 55%, コットン 45%",
-        sku: "MNK-2026-W19"
-    },
-    {
-        id: 20,
-        gender: "WOMEN",
-        name: "ボウタイ 2WAY ドレープ サテンブラウス",
-        nameEn: "2-Way Drape Bow-Tie Satin Blouse",
-        category: "TOPS",
-        price: 4990,
-        image: "assets/images/tshirt_grey.jpg",
-        isNew: false,
-        isFeatured: true,
-        description: "結び方次第でタイ風にもリボン風にもアレンジ可能なとろみサテンブラウス。上品なヴィンテージサテンの落ち感で、オフィスからお出かけまで華やかに演出します。",
-        colors: ["IVORY", "CHARCOAL", "BLACK"],
-        sizes: ["S", "M", "L"],
-        material: "ポリエステル 100%",
         sku: "MNK-2026-W20"
     },
     {
@@ -382,7 +444,11 @@ const SAMPLE_PRODUCTS = [
         nameEn: "High-Waist Wide Drape Pleated Trousers",
         category: "BOTTOMS",
         price: 5490,
+<<<<<<< HEAD
         image: "assets/images/women/denim1.jpg",
+=======
+        image: "assets/images/women/denim1.png",
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: true,
         description: "タックの立体的なドレープとハイウエストが魅力の、上品できれいめに履ける濃紺デニムトラウザー。",
@@ -398,7 +464,11 @@ const SAMPLE_PRODUCTS = [
         nameEn: "High-Waist Wide Drape Pleated Trousers",
         category: "BOTTOMS",
         price: 4990,
+<<<<<<< HEAD
         image: "assets/images/women/denim2.jpg",
+=======
+        image: "assets/images/women/denim2.png",
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: false,
         isFeatured: false,
         description: "綺麗なドレープ感はそのままに、爽やかなブリーチ加工で抜け感をプラスしたライトブルーデニム。",
@@ -414,7 +484,11 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Camouflage Super Wide Baggy Denim Pants",
         category: "BOTTOMS",
         price: 5990,
+<<<<<<< HEAD
         image: "assets/images/women/denim3.jpg",
+=======
+        image: "assets/images/women/denim3.png",
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: false,
         description: "落ち着いた迷彩柄と圧倒的なスーパーワイドシルエットで、コーデの主役になるストリートデニム。",
@@ -430,7 +504,11 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Pleated Easy Wide Sweatpants",
         category: "ONEPIECE",
         price: 7990,
+<<<<<<< HEAD
         image: "assets/images/women/denim4.jpg",
+=======
+        image: "assets/images/women/denim4.png",
+>>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: true,
         description: "ウエストゴムで楽な履き心地ながら、フロントタックでスラックス風にキレイ見えするスウェットパンツ。",
