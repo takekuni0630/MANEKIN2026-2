@@ -282,7 +282,6 @@ const SAMPLE_PRODUCTS = [
     {
         id: 15,
         gender: "WOMEN",
-<<<<<<< HEAD
         name: "スタンドカラー パテッド パフジャケット",
         nameEn: "Stand Collar Padded Puff Jacket",
         category: "OUTER",
@@ -291,7 +290,6 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "首元までしっかり暖かなスタンドカラーとマットな質感が魅力の、ミニマルでスタイリッシュな中綿パフジャケット。",
-=======
         name: "レザージャケット",
         nameEn: "Leather Jacket",
         category: "OUTER",
@@ -300,7 +298,6 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "レザーの質感とボア襟が特徴のジャケット。暖かく、冬のアウターとして使いやすい一着。フロントのジップとフラップポケットで、機能性とデザインを両立。",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         colors: ["BLACK", "IVORY", "CHARCOAL"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
@@ -309,7 +306,6 @@ const SAMPLE_PRODUCTS = [
     {
         id: 16,
         gender: "WOMEN",
-<<<<<<< HEAD
         name: "シャギーニット オーバーサイズ クルーネックセーター",
         nameEn: "Shaggy Oversized Crewneck Sweater",
         category: "TOPS",
@@ -319,7 +315,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: true,
         description: "ふんわりとした毛足の長いシャギー素材が心地よく、上品なネイビーとゆるめのオーバーサイズシルエットで抜け感のあるニットプルオーバー。",
         colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
-=======
         name: "スタンドカラー パテッド パフジャケット",
         nameEn: "Stand Collar Padded Puff Jacket",
         category: "OUTER",
@@ -329,7 +324,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: false,
         description: "首元までしっかり暖かなスタンドカラーとマットな質感が魅力の、ミニマルでスタイリッシュな中綿パフジャケット。",
         colors: ["BLACK", "IVORY", "CHARCOAL"],
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
         sku: "MNK-2026-W16"
@@ -338,7 +332,6 @@ const SAMPLE_PRODUCTS = [
     {
         id: 17,
         gender: "WOMEN",
-<<<<<<< HEAD
         name: "ヘビーウェイト ルーズクルーネック スウェット",
         nameEn: "Heavyweight Loose Crewneck Sweatshirt",
         category: "TOPS",
@@ -348,7 +341,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: false,
         description: "しっかりとした肉厚感と、ドロップショルダーのゆったりシルエットで洗練された雰囲気に仕上がる万能スウェットプルオーバー。",
         colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
-=======
         name: "シャギーニット オーバーサイズ クルーネックセーター",
         nameEn: "Shaggy Oversized Crewneck Sweater",
         category: "TOPS",
@@ -358,7 +350,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: true,
         description: "ふんわりとした毛足の長いシャギー素材が心地よく、上品なネイビーとゆるめのオーバーサイズシルエットで抜け感のあるニットプルオーバー。",
         colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sizes: ["S", "M", "L"],
         material: "ウール 85%, カシミヤ 15%",
         sku: "MNK-2026-W17"
@@ -366,7 +357,6 @@ const SAMPLE_PRODUCTS = [
     {
         id: 18,
         gender: "WOMEN",
-<<<<<<< HEAD
         name: "ヴィンテージウォッシュ フルジップパーカー",
         nameEn: "Vintage Wash Full-Zip Hoodie",
         category: "TOPS",
@@ -376,7 +366,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: false,
         description: "味のあるヴィンテージ加工とシックなブラウンカラーが魅力的で、羽織るだけでこなれ感を演出できるオーバーサイズジップパーカー。",
         colors: ["WHITE", "BLACK", "CHARCOAL"],
-=======
         name: "ヘビーウェイト ルーズクルーネック スウェット",
         nameEn: "Heavyweight Loose Crewneck Sweatshirt",
         category: "TOPS",
@@ -386,7 +375,6 @@ const SAMPLE_PRODUCTS = [
         isFeatured: false,
         description: "しっかりとした肉厚感と、ドロップショルダーのゆったりシルエットで洗練された雰囲気に仕上がる万能スウェットプルオーバー。",
         colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sizes: ["S", "M", "L"],
         material: "綿 100%",
         sku: "MNK-2026-W18"
@@ -394,7 +382,6 @@ const SAMPLE_PRODUCTS = [
     {
         id: 19,
         gender: "WOMEN",
-<<<<<<< HEAD
         name: "ドット柄 シアーヘンリーネック クロップドTシャツ",
         nameEn: "Polka Dot Sheer Henley Crop Top",
         category: "TOPS",
@@ -406,7 +393,6 @@ const SAMPLE_PRODUCTS = [
         colors: ["CHARCOAL", "OFF WHITE", "BLACK"],
         sizes: ["FREE"],
         material: "アクリル 55%, コットン 45%",
-=======
         name: "ヴィンテージウォッシュ フルジップパーカー",
         nameEn: "Vintage Wash Full-Zip Hoodie",
         category: "TOPS",
@@ -418,7 +404,6 @@ const SAMPLE_PRODUCTS = [
         colors: ["WHITE", "BLACK", "CHARCOAL"],
         sizes: ["S", "M", "L"],
         material: "スビンコットン 100%",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         sku: "MNK-2026-W19"
     },
     {
@@ -444,11 +429,8 @@ const SAMPLE_PRODUCTS = [
         nameEn: "High-Waist Wide Drape Pleated Trousers",
         category: "BOTTOMS",
         price: 5490,
-<<<<<<< HEAD
         image: "assets/images/women/denim1.jpg",
-=======
         image: "assets/images/women/denim1.png",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: true,
         description: "タックの立体的なドレープとハイウエストが魅力の、上品できれいめに履ける濃紺デニムトラウザー。",
@@ -464,11 +446,8 @@ const SAMPLE_PRODUCTS = [
         nameEn: "High-Waist Wide Drape Pleated Trousers",
         category: "BOTTOMS",
         price: 4990,
-<<<<<<< HEAD
         image: "assets/images/women/denim2.jpg",
-=======
         image: "assets/images/women/denim2.png",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: false,
         isFeatured: false,
         description: "綺麗なドレープ感はそのままに、爽やかなブリーチ加工で抜け感をプラスしたライトブルーデニム。",
@@ -484,11 +463,8 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Camouflage Super Wide Baggy Denim Pants",
         category: "BOTTOMS",
         price: 5990,
-<<<<<<< HEAD
         image: "assets/images/women/denim3.jpg",
-=======
         image: "assets/images/women/denim3.png",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: false,
         description: "落ち着いた迷彩柄と圧倒的なスーパーワイドシルエットで、コーデの主役になるストリートデニム。",
@@ -504,11 +480,8 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Pleated Easy Wide Sweatpants",
         category: "ONEPIECE",
         price: 7990,
-<<<<<<< HEAD
         image: "assets/images/women/denim4.jpg",
-=======
         image: "assets/images/women/denim4.png",
->>>>>>> bec0263d8a17fc8ec41ddb0c69424dbc7c0217d2
         isNew: true,
         isFeatured: true,
         description: "ウエストゴムで楽な履き心地ながら、フロントタックでスラックス風にキレイ見えするスウェットパンツ。",
