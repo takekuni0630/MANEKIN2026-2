@@ -1,32 +1,85 @@
 // ==========================================================================
 // MANEKIN FASHION - フロントエンド JavaScript (app.js)
-// カラー写真切替・サイズ変更・カート購入・Python/MySQL連携・マイページ反映
+// ==========================================================================
+//
+// ★★★【写真（画像ファイル）の差し替え場所について】★★★
+// ご自身で生成・撮影された写真は、以下のフォルダに保存するだけで自動反映されます：
+// 
+// 保存先フォルダ: assets/images/
+//
+// 【画像ファイル名 一覧】
+// ■ 1. プレミアム コットン リラックス Tシャツ
+//    - WHITE (白)        : assets/images/tshirt_white.jpg
+//    - BLACK (黒)        : assets/images/tshirt_black.jpg
+//    - HEATHER GREY (灰) : assets/images/tshirt_grey.jpg
+//
+// ■ 2. スマート テーラード ジャケット
+//    - BLACK (黒)        : assets/images/jacket_black.jpg
+//    - CHARCOAL (炭灰)   : assets/images/jacket_charcoal.jpg
+//    - NAVY (紺)         : assets/images/jacket_navy.jpg
+//
+// ■ 3. ワイド ドレープ タック スラックス
+//    - CHARCOAL (炭灰)   : assets/images/pants_charcoal.jpg
+//    - BLACK (黒)        : assets/images/pants_black.jpg
+//    - DARK BROWN (茶)   : assets/images/pants_brown.jpg
+//
+// ■ 4. ファイン クルーネック ニットセーター
+//    - LIGHT GREY (明灰) : assets/images/knit_grey.jpg
+//    - BLACK (黒)        : assets/images/knit_black.jpg
+//    - OFF WHITE (白)    : assets/images/knit_white.jpg
+//
+// ■ 5. ミニマル ステンカラー ロングコート
+//    - BLACK (黒)        : assets/images/coat_black.jpg
+//    - CHARCOAL (炭灰)   : assets/images/coat_charcoal.jpg
+//
+// ■ 6. ヘビーウェイト ボクシー スウェット
+//    - OFF WHITE (白)    : assets/images/sweat_white.jpg
+//    - BLACK (黒)        : assets/images/sweat_black.jpg
+//    - ASH GREY (灰)     : assets/images/sweat_grey.jpg
+//
+// ■ 7. リラックス アンクル テーパードパンツ
+//    - BLACK (黒)        : assets/images/tapered_black.jpg
+//    - CHARCOAL (炭灰)   : assets/images/tapered_charcoal.jpg
+//
+// ■ メインビジュアル (トップページ看板画像): assets/images/hero.jpg
 // ==========================================================================
 
 // --------------------------------------------------------------------------
-// 1. サンプル商品データ定義（カラー別画像対応マップ完備）
+// 1. サンプル商品データ定義（服の種類・カラーバリエーションはそのまま保持）
 // --------------------------------------------------------------------------
 const SAMPLE_PRODUCTS = [
     {
+        // 商品ID
         id: 1,
+        // 商品名（日本語）
         name: "プレミアム コットン リラックス Tシャツ",
+        // 商品名（英語）
         nameEn: "Premium Cotton Relaxed T-Shirt",
+        // カテゴリ
         category: "TOPS",
+        // 価格（税込・日本円）
         price: 2990,
-        image: "assets/images/item_tshirt.jpg",
+        // 代表画像パス
+        image: "assets/images/tshirt_white.jpg",
+        // 新作フラグ
         isNew: true,
+        // おすすめフラグ
         isFeatured: true,
+        // 商品説明文
         description: "最高級超長綿を100%使用した、滑らかな肌触りと上品な光沢感が特徴のクルーネックTシャツ。程よいドロップショルダー設計で一枚着でもジャケットのインナーでも美しいシルエットを保ちます。",
-        // 展開カラー
+        // 展開カラー（バリエーションそのまま）
         colors: ["WHITE", "BLACK", "HEATHER GREY"],
-        // 【要件追加】服の色を変えた時にその色の写真に変わる画像マッピング
+        // 【画像差し替え先】カラーごとの画像ファイル
         colorImages: {
-            "WHITE": "assets/images/item_tshirt.jpg",
-            "BLACK": "assets/images/item_jacket.jpg",
-            "HEATHER GREY": "assets/images/item_knit.jpg"
+            "WHITE": "assets/images/tshirt_white.jpg",
+            "BLACK": "assets/images/tshirt_black.jpg",
+            "HEATHER GREY": "assets/images/tshirt_grey.jpg"
         },
+        // 展開サイズ
         sizes: ["S", "M", "L", "XL"],
+        // 素材
         material: "綿 100%",
+        // 型番
         sku: "MNK-2026-T01"
     },
     {
@@ -35,15 +88,15 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Smart Tailored Blazer Jacket",
         category: "OUTER",
         price: 9990,
-        image: "assets/images/item_jacket.jpg",
+        image: "assets/images/jacket_black.jpg",
         isNew: true,
         isFeatured: true,
         description: "現代のビジネスからカジュアルまでシームレスに対応する、モダンフィットな2ボタンテーラードジャケット。軽量でシワになりにくい高機能ウールライク素材を採用し、長時間の着用でも快適です。",
         colors: ["BLACK", "CHARCOAL", "NAVY"],
         colorImages: {
-            "BLACK": "assets/images/item_jacket.jpg",
-            "CHARCOAL": "assets/images/item_coat.jpg",
-            "NAVY": "assets/images/item_tshirt.jpg"
+            "BLACK": "assets/images/jacket_black.jpg",
+            "CHARCOAL": "assets/images/jacket_charcoal.jpg",
+            "NAVY": "assets/images/jacket_navy.jpg"
         },
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 70%, レーヨン 26%, ポリウレタン 4%",
@@ -55,15 +108,15 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Wide Drape Pleated Trousers",
         category: "BOTTOMS",
         price: 4990,
-        image: "assets/images/item_pants.jpg",
+        image: "assets/images/pants_charcoal.jpg",
         isNew: false,
         isFeatured: true,
         description: "美しい落ち感と深めのツータックが立体的なドレープを生み出すワイドスラックス。ウエスト背面にゴムを仕込み、品格あるスリムな見栄えとリラクシングな履き心地を両立しました。",
         colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
         colorImages: {
-            "CHARCOAL": "assets/images/item_pants.jpg",
-            "BLACK": "assets/images/item_jacket.jpg",
-            "DARK BROWN": "assets/images/item_coat.jpg"
+            "CHARCOAL": "assets/images/pants_charcoal.jpg",
+            "BLACK": "assets/images/pants_black.jpg",
+            "DARK BROWN": "assets/images/pants_brown.jpg"
         },
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 65%, レーヨン 35%",
@@ -75,15 +128,15 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Fine Crewneck Knit Sweater",
         category: "TOPS",
         price: 3990,
-        image: "assets/images/item_knit.jpg",
+        image: "assets/images/knit_grey.jpg",
         isNew: true,
         isFeatured: true,
         description: "19.5マイクロンの極細メリノウールブレンド糸を編み上げたミドルゲージニット。チクチク感を抑えた極上の柔らかな肌触りで、一枚でサラリと着こなせる万能な定番アイテムです。",
         colors: ["LIGHT GREY", "BLACK", "OFF WHITE"],
         colorImages: {
-            "LIGHT GREY": "assets/images/item_knit.jpg",
-            "BLACK": "assets/images/item_jacket.jpg",
-            "OFF WHITE": "assets/images/item_tshirt.jpg"
+            "LIGHT GREY": "assets/images/knit_grey.jpg",
+            "BLACK": "assets/images/knit_black.jpg",
+            "OFF WHITE": "assets/images/knit_white.jpg"
         },
         sizes: ["S", "M", "L", "XL"],
         material: "ウール 50%, アクリル 50%",
@@ -95,14 +148,14 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Minimal Soutien Collar Long Coat",
         category: "OUTER",
         price: 14900,
-        image: "assets/images/item_coat.jpg",
+        image: "assets/images/coat_black.jpg",
         isNew: true,
         isFeatured: false,
         description: "無駄なディテールを極限まで削ぎ落とした、ミニマルを体現するチェスターステンカラーコート。膝下まで包み込む洗練されたAラインシルエットが、都会的な装いを格上げします。",
         colors: ["BLACK", "CHARCOAL"],
         colorImages: {
-            "BLACK": "assets/images/item_coat.jpg",
-            "CHARCOAL": "assets/images/item_pants.jpg"
+            "BLACK": "assets/images/coat_black.jpg",
+            "CHARCOAL": "assets/images/coat_charcoal.jpg"
         },
         sizes: ["M", "L", "XL"],
         material: "ウール 80%, ナイロン 20%",
@@ -114,15 +167,15 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Heavyweight Boxy Crewneck Sweatshirt",
         category: "TOPS",
         price: 3490,
-        image: "assets/images/item_tshirt.jpg",
+        image: "assets/images/sweat_white.jpg",
         isNew: false,
         isFeatured: true,
         description: "肉厚でタフな14オンス裏毛コットンスウェット生地。程よいハリ感とボクシーなボックスシルエットが、今の気分にフィットするリラックススタイルを演出します。",
         colors: ["OFF WHITE", "BLACK", "ASH GREY"],
         colorImages: {
-            "OFF WHITE": "assets/images/item_tshirt.jpg",
-            "BLACK": "assets/images/item_jacket.jpg",
-            "ASH GREY": "assets/images/item_knit.jpg"
+            "OFF WHITE": "assets/images/sweat_white.jpg",
+            "BLACK": "assets/images/sweat_black.jpg",
+            "ASH GREY": "assets/images/sweat_grey.jpg"
         },
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%",
@@ -134,37 +187,18 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Relaxed Ankle Tapered Pants",
         category: "BOTTOMS",
         price: 4490,
-        image: "assets/images/item_pants.jpg",
+        image: "assets/images/tapered_black.jpg",
         isNew: false,
         isFeatured: false,
         description: "腰回りに程よいゆとりを持たせつつ、足首に向かってすっきりと絞ったアンクル丈テーパードスラックス。靴元を選ばずスマートに合わせられます。",
         colors: ["BLACK", "CHARCOAL"],
         colorImages: {
-            "BLACK": "assets/images/item_pants.jpg",
-            "CHARCOAL": "assets/images/item_coat.jpg"
+            "BLACK": "assets/images/tapered_black.jpg",
+            "CHARCOAL": "assets/images/tapered_charcoal.jpg"
         },
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 68%, レーヨン 28%, ポリウレタン 4%",
         sku: "MNK-2026-P07"
-    },
-    {
-        id: 8,
-        name: "ウールライク 2B カジュアルブレザー",
-        nameEn: "Wool-Like Casual 2-Button Blazer",
-        category: "OUTER",
-        price: 8990,
-        image: "assets/images/item_jacket.jpg",
-        isNew: true,
-        isFeatured: false,
-        description: "肩パッドを排したアンコン仕立てにより、カーディガンのように羽織れる軽量カジュアルブレザー。マシンウォッシャブル対応で自宅で手軽にお手入れが可能です。",
-        colors: ["NAVY", "BLACK"],
-        colorImages: {
-            "NAVY": "assets/images/item_jacket.jpg",
-            "BLACK": "assets/images/item_coat.jpg"
-        },
-        sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 100%",
-        sku: "MNK-2026-J08"
     }
 ];
 
@@ -172,16 +206,16 @@ const SAMPLE_PRODUCTS = [
 // 2. アプリケーション状態管理（State）
 // --------------------------------------------------------------------------
 const AppState = {
-    // お気に入り登録された商品IDリスト
+    // お気に入り登録IDリスト
     favorites: JSON.parse(localStorage.getItem('manekin_favorites')) || [1, 2],
-    // ログイン中の会員情報（未ログイン時はデフォルトデモ会員）
+    // ログイン中の会員情報
     currentUser: JSON.parse(localStorage.getItem('manekin_user')) || {
         id: 1,
         name: "山田 太郎 様",
         email: "demo@manekin.com",
         rank: "REGULAR MEMBER"
     },
-    // 【要件追加】ショッピングカート内アイテム（LocalStorageから復元、初期サンプル投入）
+    // ショッピングカート内アイテム
     cart: JSON.parse(localStorage.getItem('manekin_cart')) || [
         {
             id: 1,
@@ -190,14 +224,13 @@ const AppState = {
             size: "L",
             price: 2990,
             quantity: 1,
-            image: "assets/images/item_tshirt.jpg"
+            image: "assets/images/tshirt_white.jpg"
         }
     ],
-    // 現在選択中の商品詳細情報
     currentDetailId: 1,
     selectedColor: "WHITE",
     selectedSize: "M",
-    // 注文履歴（MySQL + LocalStorageで同期管理）
+    // 注文履歴データ
     orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [
         {
             order_no: "ORD-2026-0982",
@@ -222,21 +255,14 @@ const AppState = {
 // 3. アプリケーション初期化処理
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-    // お気に入りバッジの更新
     updateFavoriteBadges();
-    // カートバッジの更新
     updateCartBadge();
-    // ナビゲーションの会員表示更新
     updateAuthNavUI();
-    // イベントリスナーの登録
     setupEventListeners();
-    // 各種商品の初期レンダリング
     renderHomeProducts();
     renderCatalogProducts();
     renderNewItems();
-    // バックエンドMySQLから最新注文履歴と商品を取得（利用可能な場合）
     syncOrdersFromBackend();
-    // URLハッシュに応じた画面表示
     handleRouting();
 });
 
@@ -294,7 +320,6 @@ function handleRouting() {
             }
             break;
 
-        // 【要件追加】本格的な購入手続き・チェックアウト画面
         case '#checkout':
             showView('view-checkout');
             highlightNavLink('checkout');
@@ -349,7 +374,7 @@ function createProductCardHTML(product) {
         <article class="product-card" data-id="${product.id}">
             <div class="product-img-wrapper" onclick="navigateToDetail(${product.id})">
                 ${product.isNew ? '<span class="badge-new">NEW</span>' : ''}
-                <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+                <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy" onerror="this.src='assets/images/item_tshirt.jpg'">
                 <button class="fav-btn ${isFav ? 'is-favorite' : ''}" 
                         onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
                         aria-label="${isFav ? 'お気に入りを解除' : 'お気に入りに追加'}">
@@ -414,7 +439,7 @@ function renderNewItems() {
 }
 
 // --------------------------------------------------------------------------
-// 6. 商品詳細表示ロジック（サイズ変更修正 ＆ カラー写真切替実装）
+// 6. 商品詳細表示ロジック（写真切替 & サイズ変更）
 // --------------------------------------------------------------------------
 function navigateToDetail(productId) {
     window.location.hash = `#item-detail?id=${productId}`;
@@ -435,7 +460,6 @@ function renderItemDetail(productId) {
         breadcrumbName.textContent = product.name;
     }
 
-    // 初期選択カラーとサイズを設定
     AppState.selectedColor = product.colors[0];
     AppState.selectedSize = product.sizes[1] || "M";
 
@@ -443,7 +467,7 @@ function renderItemDetail(productId) {
     const formattedPrice = "¥" + product.price.toLocaleString();
     const initialImgUrl = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
 
-    // カラーチップのHTML生成（クリックで画像切替関数を呼び出し）
+    // カラーチップのHTML生成
     const colorChipsHTML = product.colors.map((color, idx) => {
         const isSelected = (color === AppState.selectedColor);
         const mappedImg = (product.colorImages && product.colorImages[color]) || product.image;
@@ -458,7 +482,7 @@ function renderItemDetail(productId) {
         `;
     }).join('');
 
-    // サイズチップのHTML生成（【バグ修正】サイズ選択が確実に切り替わるように修正）
+    // サイズチップのHTML生成
     const sizeChipsHTML = product.sizes.map((size, idx) => {
         const isSelected = (size === AppState.selectedSize);
         return `
@@ -474,8 +498,8 @@ function renderItemDetail(productId) {
     detailLayout.innerHTML = `
         <div class="detail-gallery">
             <div class="detail-main-img-box">
-                <!-- 【要件追加】色変更時に写真が切り替わるメイン画像 -->
-                <img src="${initialImgUrl}" alt="${product.name}" class="detail-main-img" id="detail-main-img">
+                <!-- 写真切り替えメイン画像（画像がない場合も安全にフォールバック） -->
+                <img src="${initialImgUrl}" alt="${product.name}" class="detail-main-img" id="detail-main-img" onerror="this.src='${product.image}'">
             </div>
         </div>
 
@@ -504,15 +528,12 @@ function renderItemDetail(productId) {
             </div>
 
             <div class="detail-actions">
-                <!-- 【要件追加】今すぐ購入するボタン（チェックアウトへ即時遷移） -->
                 <button type="button" class="btn btn-buy-now btn-block" onclick="handleBuyNow(${product.id})">
                     今すぐ購入する (ご注文手続きへ) &rarr;
                 </button>
-                <!-- ショッピングバッグに追加するボタン -->
                 <button type="button" class="btn btn-secondary btn-block" onclick="handleAddToCartFromDetail(${product.id})">
                     ショッピングバッグに追加する
                 </button>
-                <!-- お気に入りボタン -->
                 <button type="button" class="btn-detail-fav ${isFav ? 'is-favorite' : ''}" id="detail-fav-btn" onclick="handleToggleFavorite(${product.id})">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -536,7 +557,7 @@ function renderItemDetail(productId) {
     `;
 }
 
-// 【要件追加】服の色を変えたときにその色の写真に変わるハンドラ
+// カラー選択ハンドラ
 function handleColorSelect(chipEl, colorName, imageUrl) {
     const parent = chipEl.parentElement;
     parent.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
@@ -547,23 +568,22 @@ function handleColorSelect(chipEl, colorName, imageUrl) {
     const labelColor = document.getElementById('label-selected-color');
     if (labelColor) labelColor.textContent = colorName;
 
-    // メイン写真の切り替え（フェード演出）
+    // 写真の切り替え
     const mainImg = document.getElementById('detail-main-img');
     if (mainImg && imageUrl) {
-        mainImg.style.opacity = '0.3';
+        mainImg.style.opacity = '0.25';
         setTimeout(() => {
             mainImg.src = imageUrl;
             mainImg.style.opacity = '1';
-        }, 150);
+        }, 120);
     }
 
-    showToast(`カラー: ${colorName} を選択しました`);
+    showToast(`カラー: ${colorName} に切り替えました`);
 }
 
-// 【バグ修正】サイズ選択ボタンの切り替えハンドラ
+// サイズ選択ハンドラ
 function handleSizeSelect(chipEl, sizeName) {
     const parent = chipEl.parentElement;
-    // 以前のコードで未定義変数 c が参照されていた箇所を修正
     parent.querySelectorAll('.size-chip').forEach(s => s.classList.remove('selected'));
     chipEl.classList.add('selected');
 
@@ -586,14 +606,12 @@ function updateCartBadge() {
     }
 }
 
-// ショッピングバッグに追加
 function handleAddToCartFromDetail(productId) {
     const product = SAMPLE_PRODUCTS.find(p => p.id === productId);
     if (!product) return;
 
     const currentImg = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
 
-    // 既存カート内に同一ID・同一カラー・同一サイズが存在するか確認
     const existingIndex = AppState.cart.findIndex(
         item => item.id === product.id && item.color === AppState.selectedColor && item.size === AppState.selectedSize
     );
@@ -617,13 +635,11 @@ function handleAddToCartFromDetail(productId) {
     showToast(`「${product.name} (${AppState.selectedColor}/${AppState.selectedSize})」をバッグに追加しました`);
 }
 
-// 今すぐ購入する（直接購入手続き画面へ遷移）
 function handleBuyNow(productId) {
     handleAddToCartFromDetail(productId);
     window.location.hash = '#checkout';
 }
 
-// カート内商品の数量変更
 function updateCartItemQty(index, delta) {
     if (!AppState.cart[index]) return;
     AppState.cart[index].quantity += delta;
@@ -635,7 +651,6 @@ function updateCartItemQty(index, delta) {
     renderCheckoutPage();
 }
 
-// カート内商品の削除
 function removeCartItem(index) {
     if (!AppState.cart[index]) return;
     AppState.cart.splice(index, 1);
@@ -645,7 +660,6 @@ function removeCartItem(index) {
     showToast('バッグから商品を削除しました');
 }
 
-// 【要件追加】本格的な購入手続きページの描画
 function renderCheckoutPage() {
     const cartListEl = document.getElementById('checkout-cart-list');
     const subtotalEl = document.getElementById('checkout-subtotal');
@@ -655,7 +669,6 @@ function renderCheckoutPage() {
     const mainLayout = document.getElementById('checkout-layout-main');
     const completedView = document.getElementById('order-completed-view');
 
-    // 完了ビューを隠して入力画面を表示
     if (completedView) completedView.style.display = 'none';
     if (mainLayout) mainLayout.style.display = 'grid';
 
@@ -680,11 +693,10 @@ function renderCheckoutPage() {
     const placeBtn = document.getElementById('btn-place-order');
     if (placeBtn) placeBtn.disabled = false;
 
-    // カート商品一覧HTML描画
     if (cartListEl) {
         cartListEl.innerHTML = AppState.cart.map((item, idx) => `
             <div class="cart-item-row">
-                <img src="${item.image}" alt="${item.name}" class="cart-item-thumb">
+                <img src="${item.image}" alt="${item.name}" class="cart-item-thumb" onerror="this.src='assets/images/item_tshirt.jpg'">
                 <div class="cart-item-details">
                     <h4 class="cart-item-name">${item.name}</h4>
                     <p class="cart-item-meta">カラー: <strong>${item.color}</strong> | サイズ: <strong>${item.size}</strong></p>
@@ -700,7 +712,6 @@ function renderCheckoutPage() {
         `).join('');
     }
 
-    // 金額計算
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shipping = subtotal >= 5000 ? 0 : 550;
     const tax = Math.round(subtotal * 0.1);
@@ -712,7 +723,6 @@ function renderCheckoutPage() {
     if (totalEl) totalEl.textContent = `¥${total.toLocaleString()}`;
 }
 
-// 【要件追加】「注文を確定する」ボタン処理（Python API & MySQL連携 & 即時マイページ反映）
 async function handlePlaceOrder() {
     if (AppState.cart.length === 0) {
         showToast('バッグに商品が入っていません');
@@ -750,7 +760,6 @@ async function handlePlaceOrder() {
     const shipping = subtotal >= 5000 ? 0 : 550;
     const totalAmount = subtotal + shipping;
 
-    // 注文リクエストペイロード
     const orderPayload = {
         customer_name: customerName,
         customer_email: email,
@@ -769,7 +778,6 @@ async function handlePlaceOrder() {
     let confirmedOrder = null;
 
     try {
-        // Pythonバックエンド（MySQL）へ注文API送信
         const response = await fetch('http://127.0.0.1:5000/api/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -779,13 +787,10 @@ async function handlePlaceOrder() {
         if (response.ok) {
             const data = await response.json();
             confirmedOrder = data.order;
-            console.log("[MySQL 連携成功] 注文がMySQLに保存されました:", confirmedOrder);
         } else {
             throw new Error("APIレスポンスエラー");
         }
     } catch (err) {
-        console.warn("[フォールバック] Python/MySQLサーバー通信中、ローカルストレージへも安全保存します:", err);
-        // APIサーバーが未起動の場合のフォールバック
         const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         confirmedOrder = {
@@ -799,20 +804,16 @@ async function handlePlaceOrder() {
         };
     }
 
-    // 注文要約の生成
     const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.color} / ${it.size}) × ${it.quantity}`);
     confirmedOrder.items_summary = itemSummaryList.join(", ");
 
-    // 【重要】マイページの購入履歴一覧の先頭に即座に追加
     AppState.orderHistory.unshift(confirmedOrder);
     localStorage.setItem('manekin_orders', JSON.stringify(AppState.orderHistory));
 
-    // カートを空にする
     AppState.cart = [];
     localStorage.removeItem('manekin_cart');
     updateCartBadge();
 
-    // 注文完了サンクスビューの表示
     const mainLayout = document.getElementById('checkout-layout-main');
     const completedView = document.getElementById('order-completed-view');
     const compOrderNo = document.getElementById('comp-order-no');
@@ -832,7 +833,7 @@ async function handlePlaceOrder() {
 }
 
 // --------------------------------------------------------------------------
-// 8. マイページ管理（【要件】購入完了商品の一覧表示 & MySQL同期）
+// 8. マイページ管理
 // --------------------------------------------------------------------------
 async function syncOrdersFromBackend() {
     try {
@@ -846,7 +847,7 @@ async function syncOrdersFromBackend() {
             }
         }
     } catch (e) {
-        console.log("MySQL注文履歴の同期待機中（ローカルデータを使用）");
+        console.log("MySQL注文履歴の同期待機中");
     }
 }
 
@@ -868,7 +869,6 @@ function renderMyPage() {
         orderCountEl.innerHTML = `${AppState.orderHistory.length} <span class="stat-unit">回</span>`;
     }
 
-    // 【要件】購入ボタンを押して購入が完了した商品の一覧を描画
     if (ordersTbody) {
         if (AppState.orderHistory.length === 0) {
             ordersTbody.innerHTML = `
@@ -891,7 +891,6 @@ function renderMyPage() {
         }
     }
 
-    // お気に入りクイック表示
     if (mypageFavGrid) {
         const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
         if (favoriteItems.length === 0) {
@@ -947,7 +946,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
             detailFavBtn.classList.add('is-favorite');
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 0z"></path>
                 </svg>
                 お気に入り解除
             `;
@@ -1167,13 +1166,11 @@ function setupEventListeners() {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
-    // 【要件追加】注文を確定するボタンのイベントバインド
     const placeOrderBtn = document.getElementById('btn-place-order');
     if (placeOrderBtn) {
         placeOrderBtn.addEventListener('click', handlePlaceOrder);
     }
 
-    // 支払い方法ラジオボタンのスタイル切替
     document.querySelectorAll('.payment-option-label input[type="radio"]').forEach(radio => {
         radio.addEventListener('change', () => {
             document.querySelectorAll('.payment-option-label').forEach(lbl => lbl.classList.remove('selected'));
@@ -1186,7 +1183,6 @@ function setupEventListeners() {
         });
     });
 
-    // マイページのタブ切り替え
     const mypageTabBtns = document.querySelectorAll('.mypage-tab-btn');
     mypageTabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
