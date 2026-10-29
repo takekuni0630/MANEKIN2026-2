@@ -336,7 +336,64 @@ button {
     /* 上下中央揃え */
     align-items: center;
     /* アイコン間の間隔 */
-    gap: 18px;
+    gap: 16px;
+}
+
+/* 【要件追加】ユーザーのツールアイコンの左側に配置する購入ボタン（BAG / カートボタン） */
+.cart-tool-btn {
+    /* フレックス配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 間隔 */
+    gap: 8px;
+    /* 内部パディング */
+    padding: 7px 16px;
+    /* 背景色を黒に（視認性向上） */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 太字 */
+    font-weight: 700;
+    /* 文字サイズ */
+    font-size: 0.82rem;
+    /* 文字間隔 */
+    letter-spacing: 0.08em;
+    /* 境界線 */
+    border: 1px solid var(--color-black);
+    /* トランジション */
+    transition: all var(--transition-fast);
+    /* 角丸なし（GU/UNIQLOスタイル） */
+    border-radius: 0;
+}
+
+/* カートボタンのホバー */
+.cart-tool-btn:hover {
+    background-color: var(--color-dark);
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+/* カートボタン内のSVGアイコン */
+.cart-tool-btn .icon-svg {
+    width: 17px;
+    height: 17px;
+    color: var(--color-white);
+}
+
+/* カート内商品点数バッジ */
+.cart-badge {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-size: 0.72rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0 4px;
 }
 
 /* ツールアイコンボタン */
@@ -398,138 +455,88 @@ button {
     padding: 0 4px;
 }
 
-/* ハンバーガーメニューボタン（初期はデスクトップで非表示） */
+/* ハンバーガーメニューボタン */
 .hamburger-btn {
-    /* デスクトップ非表示 */
     display: none;
-    /* 縦並び配置 */
     flex-direction: column;
-    /* 線と線の間隔 */
     justify-content: space-around;
-    /* 幅と高さ */
     width: 24px;
     height: 20px;
-    /* パディングリセット */
     padding: 0;
 }
 
-/* ハンバーガーの線 */
 .hamburger-line {
-    /* 横幅100% */
     width: 100%;
-    /* 線の太さ2px */
     height: 2px;
-    /* 背景色を黒に */
     background-color: var(--color-black);
-    /* トランジション */
     transition: all var(--transition-fast);
 }
 
 /* モバイルドロワーメニュー */
 .mobile-menu-drawer {
-    /* 画面全体で固定 */
     position: fixed;
-    /* 上端 */
     top: 0;
-    /* 右端に初期配置（画面外） */
     right: -300px;
-    /* 横幅300px */
     width: 300px;
-    /* 画面の高さ100% */
     height: 100vh;
-    /* 白背景 */
     background-color: var(--color-white);
-    /* 最前面 */
     z-index: 2000;
-    /* スムーズにスライドするトランジション */
     transition: right var(--transition-smooth);
-    /* 影 */
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
-    /* 縦スクロール可能に */
     overflow-y: auto;
 }
 
-/* ドロワーメニューが開いた状態 */
 .mobile-menu-drawer.open {
-    /* 画面内にスライドイン */
     right: 0;
 }
 
-/* ドロワー内部のコンテナ */
 .drawer-content {
-    /* 内部パディング */
     padding: 30px 24px;
 }
 
-/* ドロワー閉じるボタン */
 .drawer-close-btn {
-    /* フォントサイズを大きく */
     font-size: 2rem;
-    /* 行間 */
     line-height: 1;
-    /* 右寄せ */
     display: block;
     margin-left: auto;
-    /* 色 */
     color: var(--color-black);
-    /* マージン下 */
     margin-bottom: 24px;
 }
 
-/* モバイルナビゲーションリスト */
 .mobile-nav-list {
-    /* 縦並び */
     display: flex;
     flex-direction: column;
-    /* 間隔 */
     gap: 16px;
 }
 
-/* モバイルナビリンク */
 .mobile-nav-link {
-    /* ブロック要素化 */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* フォントサイズ */
     font-size: 1rem;
-    /* 太さ */
     font-weight: 500;
-    /* パディング */
     padding: 10px 0;
-    /* 境界線 */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
-/* モバイル区切り線 */
 .mobile-divider {
-    /* マージン */
     margin: 10px 0;
-    /* ボーダー */
     border-top: 1px solid var(--color-gray-light);
 }
 
-/* メニュー用オーバーレイ背景 */
 .menu-overlay {
-    /* 固定配置 */
     position: fixed;
-    /* 画面全体 */
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    /* 半透明黒 */
     background-color: rgba(0, 0, 0, 0.5);
-    /* 初期は非表示 */
     opacity: 0;
     visibility: hidden;
-    /* トランジション */
     transition: all var(--transition-normal);
-    /* ドロワーの背面、ヘッダーより前面 */
     z-index: 1500;
 }
 
-/* オーバーレイ表示時 */
 .menu-overlay.active {
     opacity: 1;
     visibility: visible;
@@ -537,25 +544,19 @@ button {
 
 /* --- 4. ページビュー切り替え構造（SPA） --- */
 .main-content {
-    /* ヘッダーの高さ分のマージントップを確保 */
     margin-top: var(--header-height);
-    /* 最小の画面高さ */
     min-height: calc(100vh - var(--header-height) - 300px);
 }
 
-/* 各ページビューの非アクティブ状態（デフォルト非表示） */
 .page-view {
     display: none;
-    /* フェードインアニメーション */
     animation: fadeIn 0.35s ease forwards;
 }
 
-/* アクティブなページビューを表示 */
 .page-view.active {
     display: block;
 }
 
-/* ページ切り替え用フェードインキーフレーム */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -569,27 +570,18 @@ button {
 
 /* --- 5. メインビジュアル（HERO） --- */
 .hero-section {
-    /* 相対配置 */
     position: relative;
-    /* 幅100% */
     width: 100%;
-    /* 高さの確保 */
     height: 85vh;
-    /* 最小高さ */
     min-height: 520px;
-    /* 最大高さ */
     max-height: 800px;
-    /* はみ出しを隠す */
     overflow: hidden;
-    /* 中央揃え */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* ヒーロー画像ラッパー */
 .hero-image-wrap {
-    /* 絶対配置で全体を覆う */
     position: absolute;
     top: 0;
     left: 0;
@@ -598,43 +590,31 @@ button {
     z-index: 1;
 }
 
-/* ヒーロー背景画像 */
 .hero-image {
     width: 100%;
     height: 100%;
-    /* 写真の比率を崩さずカバー */
     object-fit: cover;
-    /* 上部寄りにフォーカス */
     object-position: center 25%;
 }
 
-/* ヒーロー半透明オーバーレイ */
 .hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* 文字の視認性を高める微かなグラデーション */
     background: linear-gradient(to right, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.15) 100%);
 }
 
-/* ヒーローコンテンツ（文字とボタン） */
 .hero-content {
-    /* 前面に配置 */
     position: relative;
     z-index: 2;
-    /* 最大幅 */
     max-width: 800px;
-    /* パディング */
     padding: 0 24px;
-    /* 白文字 */
     color: var(--color-white);
-    /* テキストシャドウで鮮明化 */
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ヒーローサブタイトル */
 .hero-subheading {
     font-size: 0.9rem;
     font-weight: 600;
@@ -644,7 +624,6 @@ button {
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* ヒーローメイン見出し */
 .hero-heading {
     font-size: 2.8rem;
     font-weight: 700;
@@ -653,7 +632,6 @@ button {
     margin-bottom: 20px;
 }
 
-/* ヒーロー説明文 */
 .hero-description {
     font-size: 1.05rem;
     line-height: 1.8;
@@ -662,7 +640,6 @@ button {
     color: rgba(255, 255, 255, 0.85);
 }
 
-/* ヒーローボタングループ */
 .hero-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -671,34 +648,24 @@ button {
 
 /* --- 6. 汎用ボタンコンポーネント --- */
 .btn {
-    /* インラインフレックス */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    /* パディング */
     padding: 14px 32px;
-    /* 文字サイズ */
     font-size: 0.9rem;
-    /* 太さ */
     font-weight: 600;
-    /* 文字間隔 */
     letter-spacing: 0.08em;
-    /* テキスト揃え */
     text-align: center;
-    /* 角丸 */
     border-radius: 0;
-    /* アニメーション */
     transition: all var(--transition-fast);
 }
 
-/* プライマリボタン（黒背景、白文字） */
 .btn-primary {
     background-color: var(--color-black);
     color: var(--color-white);
     border: 1px solid var(--color-black);
 }
 
-/* プライマリボタンホバー */
 .btn-primary:hover {
     background-color: var(--color-dark);
     opacity: 0.95;
@@ -706,21 +673,18 @@ button {
     box-shadow: var(--shadow-card);
 }
 
-/* セカンダリボタン（白背景、黒文字、境界線あり） */
 .btn-secondary {
     background-color: var(--color-white);
     color: var(--color-black);
     border: 1px solid var(--color-white);
 }
 
-/* セカンダリボタンホバー */
 .btn-secondary:hover {
     background-color: rgba(255, 255, 255, 0.9);
     opacity: 0.95;
     transform: translateY(-2px);
 }
 
-/* アウトラインボタン */
 .btn-outline-sm {
     padding: 8px 18px;
     font-size: 0.8rem;
@@ -734,10 +698,24 @@ button {
     color: var(--color-white);
 }
 
-/* ブロックボタンスタイル（横幅100%） */
 .btn-block {
     width: 100%;
     display: block;
+}
+
+/* 今すぐ購入するボタン（アンダーライン・太字） */
+.btn-buy-now {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: 1px solid var(--color-black);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 16px;
+}
+
+.btn-buy-now:hover {
+    background-color: #2b2b2b;
+    transform: translateY(-2px);
 }
 
 /* --- 7. セクション共通見出し --- */
@@ -841,12 +819,10 @@ button {
 /* --- 10. 商品グリッド & 商品カード --- */
 .product-grid {
     display: grid;
-    /* 4カラム（デスクトップ） */
     grid-template-columns: repeat(4, 1fr);
     gap: 28px 20px;
 }
 
-/* 商品カード */
 .product-card {
     position: relative;
     display: flex;
@@ -855,23 +831,19 @@ button {
     transition: transform var(--transition-fast);
 }
 
-/* 商品カードホバー時の微細な浮遊感 */
 .product-card:hover {
     transform: translateY(-4px);
 }
 
-/* 商品画像コンテナ */
 .product-img-wrapper {
     position: relative;
     width: 100%;
-    /* 3:4のアスペクト比を維持 */
     aspect-ratio: 3 / 4;
     background-color: var(--color-gray-bg);
     overflow: hidden;
     cursor: pointer;
 }
 
-/* 商品画像 */
 .product-img {
     width: 100%;
     height: 100%;
@@ -879,12 +851,10 @@ button {
     transition: transform 0.5s ease;
 }
 
-/* ホバー時に画像を微かにズーム */
 .product-card:hover .product-img {
     transform: scale(1.04);
 }
 
-/* NEWバッジ */
 .badge-new {
     position: absolute;
     top: 10px;
@@ -898,7 +868,6 @@ button {
     z-index: 2;
 }
 
-/* お気に入りハートボタン */
 .fav-btn {
     position: absolute;
     top: 10px;
@@ -921,7 +890,6 @@ button {
     background-color: var(--color-white);
 }
 
-/* お気に入り登録済み状態（アクティブ） */
 .fav-btn.is-favorite {
     color: var(--color-accent);
 }
@@ -936,7 +904,6 @@ button {
     transition: fill var(--transition-fast);
 }
 
-/* 商品情報エリア */
 .product-info {
     padding-top: 12px;
     display: flex;
@@ -944,7 +911,6 @@ button {
     flex-grow: 1;
 }
 
-/* カテゴリ表示 */
 .product-category {
     font-size: 0.75rem;
     color: var(--color-gray-medium);
@@ -953,7 +919,6 @@ button {
     margin-bottom: 4px;
 }
 
-/* 商品名 */
 .product-name {
     font-size: 0.95rem;
     font-weight: 500;
@@ -968,7 +933,6 @@ button {
     color: var(--color-gray-dark);
 }
 
-/* 価格表示 */
 .product-price {
     font-size: 1rem;
     font-weight: 700;
@@ -1143,12 +1107,14 @@ button {
     overflow: hidden;
     margin-bottom: 16px;
     border: 1px solid var(--color-gray-light);
+    position: relative;
 }
 
 .detail-main-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.25s ease-in-out;
 }
 
 .detail-info-column {
@@ -1199,6 +1165,14 @@ button {
     font-size: 0.85rem;
     font-weight: 600;
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-selected-label {
+    font-weight: 700;
+    color: var(--color-black);
 }
 
 .color-chips, .size-chips {
@@ -1207,12 +1181,20 @@ button {
     gap: 10px;
 }
 
+/* カラーチップ（ボタン） */
 .color-chip {
-    padding: 6px 14px;
-    border: 1px solid var(--color-gray-light);
+    padding: 8px 18px;
+    border: 2px solid var(--color-gray-light);
     font-size: 0.85rem;
+    font-weight: 600;
     background-color: var(--color-white);
+    color: var(--color-black);
     cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.color-chip:hover {
+    border-color: var(--color-gray-medium);
 }
 
 .color-chip.selected {
@@ -1221,17 +1203,24 @@ button {
     color: var(--color-white);
 }
 
+/* サイズチップ（正方形ボタン） */
 .size-chip {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--color-gray-light);
-    font-size: 0.85rem;
-    font-weight: 600;
+    border: 2px solid var(--color-gray-light);
+    font-size: 0.9rem;
+    font-weight: 700;
     background-color: var(--color-white);
+    color: var(--color-black);
     cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.size-chip:hover {
+    border-color: var(--color-gray-medium);
 }
 
 .size-chip.selected {
@@ -1240,7 +1229,7 @@ button {
     color: var(--color-white);
 }
 
-/* アクションボタン群 */
+/* 詳細アクションボタン群 */
 .detail-actions {
     display: flex;
     flex-direction: column;
@@ -1270,7 +1259,6 @@ button {
     fill: var(--color-accent);
 }
 
-/* 商品解説テキスト */
 .detail-description-box {
     border-top: 1px solid var(--color-gray-light);
     padding-top: 24px;
@@ -1295,7 +1283,409 @@ button {
     line-height: 2;
 }
 
-/* --- 15. お気に入り一覧（FAVORITE） --- */
+/* --- 15. 本格的な購入手続き（CHECKOUT） --- */
+.checkout-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto 36px;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--color-gray-light);
+    color: var(--color-gray-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.step-item.active .step-num {
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.step-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-medium);
+}
+
+.step-item.active .step-text {
+    color: var(--color-black);
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--color-gray-light);
+    margin: 0 12px 20px;
+}
+
+.step-line.active {
+    background-color: var(--color-black);
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+.checkout-section-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.checkout-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sec-badge {
+    width: 26px;
+    height: 26px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* カートアイテム行 */
+.checkout-cart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-gray-bg);
+    gap: 16px;
+}
+
+.cart-item-thumb {
+    width: 64px;
+    height: 80px;
+    object-fit: cover;
+    background-color: #eee;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cart-item-meta {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 4px;
+}
+
+.cart-item-price {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cart-qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.cart-qty-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.cart-remove-btn {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* フォーム行 */
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+/* 支払い方法選択グリッド */
+.payment-method-box {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-gray-light);
+}
+
+.payment-box-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.payment-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.payment-option-label {
+    border: 2px solid var(--color-gray-light);
+    padding: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all var(--transition-fast);
+}
+
+.payment-option-label.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-gray-bg);
+}
+
+.pay-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.pay-sub {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+}
+
+.credit-card-inputs {
+    background-color: var(--color-gray-bg);
+    padding: 20px;
+    border: 1px solid var(--color-gray-light);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* チェックアウト金額サマリーサイドバー */
+.checkout-summary-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 32px;
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    box-shadow: var(--shadow-subtle);
+}
+
+.summary-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.summary-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--color-gray-dark);
+}
+
+.text-muted {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+}
+
+.summary-divider {
+    height: 1px;
+    background-color: var(--color-gray-light);
+    margin: 8px 0;
+}
+
+.summary-row.total-row {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-black);
+    padding-top: 4px;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+}
+
+/* 注文確定ボタン */
+.btn-place-order {
+    padding: 18px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn-place-order:hover {
+    background-color: #222;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.order-btn-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.order-btn-sub {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+.summary-security-note {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.5;
+}
+
+/* 注文完了サンクスカード */
+.order-completed-view {
+    max-width: 650px;
+    margin: 40px auto;
+}
+
+.completed-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 48px 36px;
+    box-shadow: var(--shadow-card);
+}
+
+.completed-check-icon {
+    width: 72px;
+    height: 72px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.completed-check-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.completed-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    padding: 4px 12px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.completed-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.completed-subtitle {
+    font-size: 0.95rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 28px;
+}
+
+.completed-details-box {
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.comp-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.highlight-price {
+    font-size: 1.25rem;
+    color: var(--color-black);
+}
+
+.completed-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* --- 16. お気に入り一覧（FAVORITE） --- */
 .empty-state {
     text-align: center;
     padding: 80px 20px;
@@ -1323,7 +1713,7 @@ button {
     margin-bottom: 24px;
 }
 
-/* --- 16. 会員登録 & ログイン（AUTH） --- */
+/* --- 17. 会員登録 & ログイン（AUTH） --- */
 .auth-card {
     max-width: 480px;
     margin: 40px auto;
@@ -1431,7 +1821,7 @@ button {
     text-decoration: underline;
 }
 
-/* --- 17. マイページ（MYPAGE） --- */
+/* --- 18. マイページ（MYPAGE） --- */
 .mypage-header-card {
     display: flex;
     justify-content: space-between;
@@ -1551,7 +1941,21 @@ button {
     display: block;
 }
 
-/* 購入履歴テーブル */
+.orders-section-header {
+    margin-bottom: 16px;
+}
+
+.orders-subheading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.orders-info-text {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
 .orders-table-wrapper {
     overflow-x: auto;
     border: 1px solid var(--color-gray-light);
@@ -1578,15 +1982,14 @@ button {
 
 .status-badge {
     display: inline-block;
-    padding: 3px 8px;
+    padding: 4px 10px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     background-color: #e8f5e9;
     color: #2e7d32;
     border-radius: 2px;
 }
 
-/* Pythonロードマップカード */
 .python-features-card {
     padding: 32px;
     background-color: var(--color-gray-bg);
@@ -1607,7 +2010,7 @@ button {
 
 .python-roadmap-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
@@ -1639,7 +2042,7 @@ button {
     line-height: 1.6;
 }
 
-/* --- 18. MANEKIN「開発中」モーダル --- */
+/* --- 19. MANEKIN「開発中」モーダル --- */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -1738,7 +2141,7 @@ button {
     margin-bottom: 28px;
 }
 
-/* --- 19. トースト通知コンポーネント --- */
+/* --- 20. トースト通知コンポーネント --- */
 .toast-container {
     position: fixed;
     bottom: 24px;
@@ -1782,7 +2185,7 @@ button {
     }
 }
 
-/* --- 20. フッター --- */
+/* --- 21. フッター --- */
 .site-footer {
     background-color: var(--color-black);
     color: var(--color-white);
@@ -1850,41 +2253,35 @@ button {
     letter-spacing: 0.05em;
 }
 
-/* --- 21. レスポンシブ対応 (メディアクエリ) --- */
-/* タブレット対応 (992px以下) */
+/* --- 22. レスポンシブ対応 (メディアクエリ) --- */
 @media screen and (max-width: 992px) {
-    /* デスクトップナビを非表示にしてハンバーガーを表示 */
     .desktop-nav {
         display: none;
     }
     .hamburger-btn {
         display: flex;
     }
-    /* 商品グリッドを3列に変更 */
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    /* フッターを2列×2行に */
     .footer-top {
         grid-template-columns: 1fr 1fr;
     }
-    /* 詳細ページのレイアウト間隔を縮小 */
     .item-detail-layout {
         gap: 32px;
     }
-    /* コンセプトグリッドを縦並びに */
     .concept-grid {
         grid-template-columns: 1fr;
     }
-    /* Pythonロードマップを縦並びに */
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
     .python-roadmap-list {
         grid-template-columns: 1fr;
     }
 }
 
-/* スマホ対応 (768px以下) */
 @media screen and (max-width: 768px) {
-    /* ヒーローの高さを調整 */
     .hero-section {
         height: 70vh;
         min-height: 440px;
@@ -1895,33 +2292,38 @@ button {
     .hero-description {
         font-size: 0.9rem;
     }
-    /* 商品グリッドをUNIQLO/GU標準の2列に */
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px 12px;
     }
-    /* 商品詳細を1カラム縦並びに */
     .item-detail-layout {
         grid-template-columns: 1fr;
     }
     .detail-gallery {
         position: static;
     }
-    /* マイページの統計を縦並びに */
     .mypage-stats-grid {
         grid-template-columns: 1fr;
     }
-    /* フッターを1カラムに */
     .footer-top {
         grid-template-columns: 1fr;
         gap: 32px;
     }
-    /* 認証カードのパディング調整 */
     .auth-card {
         padding: 32px 20px;
     }
     .catalog-controls {
         flex-direction: column;
         align-items: flex-start;
+    }
+    .cart-btn-label {
+        display: none;
+    }
+    .payment-options-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 12px;
     }
 }
