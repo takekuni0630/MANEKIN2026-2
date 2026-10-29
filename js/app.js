@@ -53,7 +53,7 @@ const SAMPLE_PRODUCTS = [
     // =========================================================================
     {
         id: 1,
-        gender: "MAN",
+        gender: "MEN",
         name: "オーバードレープ ダブルトレンチコート",
         nameEn: "Over-Draped Double Trench Coat",
         category: "OUTER",
@@ -69,7 +69,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 2,
-        gender: "MAN",
+        gender: "MEN",
         name: "リラックス ダブルブレスト テーラードジャケット",
         nameEn: "Relaxed Double-Breasted Tailored Jacket",
         category: "OUTER",
@@ -85,7 +85,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 3,
-        gender: "MAN",
+        gender: "MEN",
         name: "ミニマル スタンドカラー ジップアップブルゾン",
         nameEn: "Minimal Stand-Collar Zip Blouson",
         category: "OUTER",
@@ -101,7 +101,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 4,
-        gender: "MAN",
+        gender: "MEN",
         name: "ヘビーウェイト フルジップ スウェットパーカー",
         nameEn: "Heavyweight Full-Zip Sweat Hoodie",
         category: "TOPS",
@@ -117,7 +117,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 5,
-        gender: "MAN",
+        gender: "MEN",
         name: "ファインメリノ リラックス モックネックセーター",
         nameEn: "Fine Merino Relaxed Mockneck Sweater",
         category: "TOPS",
@@ -133,7 +133,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 6,
-        gender: "MAN",
+        gender: "MEN",
         name: "プレミアム コットン ドロップショルダー ボクシーTシャツ",
         nameEn: "Premium Cotton Drop-Shoulder Boxy T-Shirt",
         category: "TOPS",
@@ -149,7 +149,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 7,
-        gender: "MAN",
+        gender: "MEN",
         name: "ウォッシャブル ミラノリブ クルーネックニット",
         nameEn: "Washable Milano Rib Crewneck Knit",
         category: "TOPS",
@@ -165,7 +165,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 8,
-        gender: "MAN",
+        gender: "MEN",
         name: "ルーズフィット オックスフォード バンドカラーシャツ",
         nameEn: "Loose Fit Oxford Band Collar Shirt",
         category: "TOPS",
@@ -181,7 +181,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 9,
-        gender: "MAN",
+        gender: "MEN",
         name: "ワイド 2タック ドレープ バギースラックス",
         nameEn: "Wide 2-Tuck Drape Baggy Trousers",
         category: "BOTTOMS",
@@ -197,7 +197,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 10,
-        gender: "MAN",
+        gender: "MEN",
         name: "ストレート ドレープ セミフレアスラックス",
         nameEn: "Straight Drape Semi-Flare Trousers",
         category: "BOTTOMS",
@@ -213,7 +213,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 11,
-        gender: "MAN",
+        gender: "MEN",
         name: "リラックス カーブフィット ユーティリティパンツ",
         nameEn: "Relaxed Curved Utility Pants",
         category: "BOTTOMS",
@@ -229,7 +229,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 12,
-        gender: "MAN",
+        gender: "MEN",
         name: "スマート アンクル テーパードイージースラックス",
         nameEn: "Smart Ankle Tapered Easy Trousers",
         category: "BOTTOMS",
@@ -249,7 +249,7 @@ const SAMPLE_PRODUCTS = [
     // =========================================================================
     {
         id: 13,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "ミニマル ベルテッド ガウン ロングコート",
         nameEn: "Minimal Belted Gown Long Coat",
         category: "OUTER",
@@ -265,7 +265,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 14,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "クロップド ボクシー テーラードジャケット",
         nameEn: "Cropped Boxy Tailored Jacket",
         category: "OUTER",
@@ -281,7 +281,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 15,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "オーバーサイズ スタンドカラー パデッドブルゾン",
         nameEn: "Oversized Stand-Collar Padded Blouson",
         category: "OUTER",
@@ -297,7 +297,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 16,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "カシミヤブレンド シアー クルーネックニット",
         nameEn: "Cashmere-Blend Sheer Crewneck Knit",
         category: "TOPS",
@@ -313,7 +313,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 17,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "コンパクト クロップド フルジップパーカー",
         nameEn: "Compact Cropped Full-Zip Hoodie",
         category: "TOPS",
@@ -329,7 +329,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 18,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "スビンコットン スムース フレンチスリーブTシャツ",
         nameEn: "Suvin Cotton Smooth French-Sleeve T-Shirt",
         category: "TOPS",
@@ -345,7 +345,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 19,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "アシンメトリー ドレープ ニットベスト",
         nameEn: "Asymmetric Drape Knit Vest",
         category: "TOPS",
@@ -361,7 +361,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 20,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "ボウタイ 2WAY ドレープ サテンブラウス",
         nameEn: "2-Way Drape Bow-Tie Satin Blouse",
         category: "TOPS",
@@ -377,7 +377,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 21,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "ハイウエスト ワイド ドレープ タックトラウザー",
         nameEn: "High-Waist Wide Drape Pleated Trousers",
         category: "BOTTOMS",
@@ -393,7 +393,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 22,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "ナロー ストレート スリット マキシスカート",
         nameEn: "Narrow Straight Slit Maxi Skirt",
         category: "BOTTOMS",
@@ -409,7 +409,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 23,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "カーブレッグ バギー デニムスラックス",
         nameEn: "Curved-Leg Baggy Denim Trousers",
         category: "BOTTOMS",
@@ -425,7 +425,7 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 24,
-        gender: "WOMAN",
+        gender: "WOMEN",
         name: "バックオープン リブ リラックス ニットマキシワンピース",
         nameEn: "Back-Open Ribbed Knit Maxi Dress",
         category: "ONEPIECE",
