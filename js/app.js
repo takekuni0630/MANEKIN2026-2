@@ -48,157 +48,396 @@
 // 1. サンプル商品データ定義（服の種類・カラーバリエーションはそのまま保持）
 // --------------------------------------------------------------------------
 const SAMPLE_PRODUCTS = [
+    // =========================================================================
+    // ■ MEN'S COLLECTION (メンズ 12着)
+    // =========================================================================
     {
-        // 商品ID
         id: 1,
-        // 商品名（日本語）
-        name: "プレミアム コットン リラックス Tシャツ",
-        // 商品名（英語）
-        nameEn: "Premium Cotton Relaxed T-Shirt",
-        // カテゴリ
-        category: "TOPS",
-        // 価格（税込・日本円）
-        price: 2990,
-        // 代表画像パス
-        image: "assets/images/tshirt_white.jpg",
-        // 新作フラグ
+        gender: "MAN",
+        name: "オーバードレープ ダブルトレンチコート",
+        nameEn: "Over-Draped Double Trench Coat",
+        category: "OUTER",
+        price: 16900,
+        image: "assets/images/coat_black.jpg",
         isNew: true,
-        // おすすめフラグ
         isFeatured: true,
-        // 商品説明文
-        description: "最高級超長綿を100%使用した、滑らかな肌触りと上品な光沢感が特徴のクルーネックTシャツ。程よいドロップショルダー設計で一枚着でもジャケットのインナーでも美しいシルエットを保ちます。",
-        // 展開カラー（バリエーションそのまま）
-        colors: ["WHITE", "BLACK", "HEATHER GREY"],
-        // 【画像差し替え先】カラーごとの画像ファイル
-        colorImages: {
-            "WHITE": "assets/images/tshirt_white.jpg",
-            "BLACK": "assets/images/tshirt_black.jpg",
-            "HEATHER GREY": "assets/images/tshirt_grey.jpg"
-        },
-        // 展開サイズ
-        sizes: ["S", "M", "L", "XL"],
-        // 素材
-        material: "綿 100%",
-        // 型番
-        sku: "MNK-2026-T01"
+        description: "たっぷりとした身幅とラグランスリーブが生み出す優美な落ち感が魅力。撥水性と防風性を備えた高密度ギャバジン素材を使用し、クラシックなディテールを削ぎ落とした現代的なオーバーサイズトレンチ。",
+        colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
+        sizes: ["M", "L", "XL"],
+        material: "ポリエステル 70%, レーヨン 28%, ポリウレタン 2%",
+        sku: "MNK-2026-M01"
     },
     {
         id: 2,
-        name: "スマート テーラード ジャケット",
-        nameEn: "Smart Tailored Blazer Jacket",
+        gender: "MAN",
+        name: "リラックス ダブルブレスト テーラードジャケット",
+        nameEn: "Relaxed Double-Breasted Tailored Jacket",
         category: "OUTER",
-        price: 9990,
+        price: 11900,
         image: "assets/images/jacket_black.jpg",
         isNew: true,
         isFeatured: true,
-        description: "現代のビジネスからカジュアルまでシームレスに対応する、モダンフィットな2ボタンテーラードジャケット。軽量でシワになりにくい高機能ウールライク素材を採用し、長時間の着用でも快適です。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
-        colorImages: {
-            "BLACK": "assets/images/jacket_black.jpg",
-            "CHARCOAL": "assets/images/jacket_charcoal.jpg",
-            "NAVY": "assets/images/jacket_navy.jpg"
-        },
+        description: "適度なドロップショルダーと低めのゴージラインが抜け感を演出する4ボタンダブルジャケット。シワに強いウールライクな梳毛調ファブリックで、日常からオケージョンまで着回せます。",
+        colors: ["BLACK", "NAVY", "CHARCOAL"],
         sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 70%, レーヨン 26%, ポリウレタン 4%",
-        sku: "MNK-2026-J02"
+        material: "ポリエステル 68%, レーヨン 29%, ポリウレタン 3%",
+        sku: "MNK-2026-M02"
     },
     {
         id: 3,
-        name: "ワイド ドレープ タック スラックス",
-        nameEn: "Wide Drape Pleated Trousers",
-        category: "BOTTOMS",
-        price: 4990,
-        image: "assets/images/pants_charcoal.jpg",
+        gender: "MAN",
+        name: "ミニマル スタンドカラー ジップアップブルゾン",
+        nameEn: "Minimal Stand-Collar Zip Blouson",
+        category: "OUTER",
+        price: 9990,
+        image: "assets/images/jacket_charcoal.jpg",
         isNew: false,
-        isFeatured: true,
-        description: "美しい落ち感と深めのツータックが立体的なドレープを生み出すワイドスラックス。ウエスト背面にゴムを仕込み、品格あるスリムな見栄えとリラクシングな履き心地を両立しました。",
-        colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
-        colorImages: {
-            "CHARCOAL": "assets/images/pants_charcoal.jpg",
-            "BLACK": "assets/images/pants_black.jpg",
-            "DARK BROWN": "assets/images/pants_brown.jpg"
-        },
+        isFeatured: false,
+        description: "首元をすっきりと見せるミニマルなスタンドカラーと、高級感漂うマットシルバーのダブルジップが特徴のショート丈ブルゾン。裾と袖口のアジャスターでシルエットの変化を楽しめます。",
+        colors: ["BLACK", "CHARCOAL", "NAVY"],
         sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 65%, レーヨン 35%",
-        sku: "MNK-2026-P03"
+        material: "ナイロン 100%（撥水加工）",
+        sku: "MNK-2026-M03"
     },
     {
         id: 4,
-        name: "ファイン クルーネック ニットセーター",
-        nameEn: "Fine Crewneck Knit Sweater",
+        gender: "MAN",
+        name: "ヘビーウェイト フルジップ スウェットパーカー",
+        nameEn: "Heavyweight Full-Zip Sweat Hoodie",
+        category: "TOPS",
+        price: 6990,
+        image: "assets/images/sweat_grey.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "立ち上がりの美しい立体2重フードと、肉厚な14oz度詰め裏毛スウェット生地を採用。フロントには滑らかなメタルファスナーを配し、一枚でもアウターのインナーでも主役級の存在感を放ちます。",
+        colors: ["HEATHER GREY", "CHARCOAL", "BLACK", "BROWN"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "綿 100%（裏パイル仕立て）",
+        sku: "MNK-2026-M04"
+    },
+    {
+        id: 5,
+        gender: "MAN",
+        name: "ファインメリノ リラックス モックネックセーター",
+        nameEn: "Fine Merino Relaxed Mockneck Sweater",
+        category: "TOPS",
+        price: 4990,
+        image: "assets/images/knit_grey.jpg",
+        isNew: true,
+        isFeatured: false,
+        description: "極細19.5ミクロンのメリノウール糸を使用した滑らかな肌触りのモックネック。首元に窮屈感を与えない絶妙なハイネック設計で、ジャケットのインナーに最適な上品ニットです。",
+        colors: ["OFF WHITE", "BLACK", "NAVY", "TERRACOTTA"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "エクストラファインメリノウール 100%",
+        sku: "MNK-2026-M05"
+    },
+    {
+        id: 6,
+        gender: "MAN",
+        name: "プレミアム コットン ドロップショルダー ボクシーTシャツ",
+        nameEn: "Premium Cotton Drop-Shoulder Boxy T-Shirt",
+        category: "TOPS",
+        price: 2990,
+        image: "assets/images/tshirt_white.jpg",
+        isNew: false,
+        isFeatured: true,
+        description: "毛羽立ちを抑えた極上のガス焼きシルケットコットン天竺。肘にかかる絶妙な袖丈と美しいボクシーシルエットで、一枚着でも透けにくくクリーンな印象を保ちます。",
+        colors: ["WHITE", "BLACK", "NAVY", "ASH GREY"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "超長綿 100%",
+        sku: "MNK-2026-M06"
+    },
+    {
+        id: 7,
+        gender: "MAN",
+        name: "ウォッシャブル ミラノリブ クルーネックニット",
+        nameEn: "Washable Milano Rib Crewneck Knit",
+        category: "TOPS",
+        price: 3990,
+        image: "assets/images/knit_white.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "型崩れしにくくハリのあるミラノリブ編みを採用。スウェットのような気軽さで着られ、スラックスと合わせるだけで洗練された大人カジュアルが完成します。マシンウォッシャブル対応。",
+        colors: ["CHARCOAL", "OFF WHITE", "BLACK", "BLUE"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "レーヨン 55%, ポリエステル 45%",
+        sku: "MNK-2026-M07"
+    },
+    {
+        id: 8,
+        gender: "MAN",
+        name: "ルーズフィット オックスフォード バンドカラーシャツ",
+        nameEn: "Loose Fit Oxford Band Collar Shirt",
+        category: "TOPS",
+        price: 4490,
+        image: "assets/images/tshirt_grey.jpg",
+        isNew: true,
+        isFeatured: false,
+        description: "太番手の上質コットンで仕立てたリラックスシルエットのバンドカラー。洗いざらしでも自然な風合いを楽しめ、羽織りとしてもタックインでも決まる万能シャツ。",
+        colors: ["WHITE", "STRIPE BLUE", "CHARCOAL"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "綿 100%",
+        sku: "MNK-2026-M08"
+    },
+    {
+        id: 9,
+        gender: "MAN",
+        name: "ワイド 2タック ドレープ バギースラックス",
+        nameEn: "Wide 2-Tuck Drape Baggy Trousers",
+        category: "BOTTOMS",
+        price: 5990,
+        image: "assets/images/pants_charcoal.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "深めのインタックが美しい縦の落ち感を生み出す最旬ワイドバギー。高密度TRツイル素材により、歩くたびに流麗なドレープを描き、スニーカーから革靴まで相性抜群です。",
+        colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "ポリエステル 65%, レーヨン 33%, ポリウレタン 2%",
+        sku: "MNK-2026-M09"
+    },
+    {
+        id: 10,
+        gender: "MAN",
+        name: "ストレート ドレープ セミフレアスラックス",
+        nameEn: "Straight Drape Semi-Flare Trousers",
+        category: "BOTTOMS",
+        price: 5490,
+        image: "assets/images/pants_black.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "膝位置をわずかに高く設定し、裾にかけて自然に広がる美脚シルエットスラックス。センタープレスが半永久的に保たれるクリース加工を施し、スタイルアップを約束します。",
+        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "ポリエステル 100%",
+        sku: "MNK-2026-M10"
+    },
+    {
+        id: 11,
+        gender: "MAN",
+        name: "リラックス カーブフィット ユーティリティパンツ",
+        nameEn: "Relaxed Curved Utility Pants",
+        category: "BOTTOMS",
+        price: 4990,
+        image: "assets/images/tapered_black.jpg",
+        isNew: true,
+        isFeatured: false,
+        description: "立体裁断による緩やかなカーブラインが現代的なテックミリタリーパンツ。余分なディテールを削ぎ落としたクリーンなポケット配置で、都会的なスタイリングにフィット。",
+        colors: ["OLIVE", "BLACK", "CHARCOAL"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "綿 70%, ナイロン 30%",
+        sku: "MNK-2026-M11"
+    },
+    {
+        id: 12,
+        gender: "MAN",
+        name: "スマート アンクル テーパードイージースラックス",
+        nameEn: "Smart Ankle Tapered Easy Trousers",
+        category: "BOTTOMS",
+        price: 4490,
+        image: "assets/images/tapered_charcoal.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "ウエストゴムと内側ドローコードを備えた快適設計ながら、360度どこから見ても端正なテーパードライン。足元をすっきりと見せるアンクル丈で季節を問わず活躍します。",
+        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        sizes: ["S", "M", "L", "XL"],
+        material: "ポリエステル 68%, レーヨン 28%, ポリウレタン 4%",
+        sku: "MNK-2026-M12"
+    },
+
+    // =========================================================================
+    // ■ WOMEN'S COLLECTION (ウィメンズ 12着)
+    // =========================================================================
+    {
+        id: 13,
+        gender: "WOMAN",
+        name: "ミニマル ベルテッド ガウン ロングコート",
+        nameEn: "Minimal Belted Gown Long Coat",
+        category: "OUTER",
+        price: 16900,
+        image: "assets/images/coat_charcoal.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "ボタンを排した流れるようなラップデザインと、共布ベルトでウエストマークできるエレガントなガウンコート。軽量で暖かいダブルフェイスウールを使用し、羽織るだけでこなれ感を演出。",
+        colors: ["OATMEAL", "BLACK", "CHARCOAL"],
+        sizes: ["S", "M", "L"],
+        material: "ウール 80%, ナイロン 20%",
+        sku: "MNK-2026-W13"
+    },
+    {
+        id: 14,
+        gender: "WOMAN",
+        name: "クロップド ボクシー テーラードジャケット",
+        nameEn: "Cropped Boxy Tailored Jacket",
+        category: "OUTER",
+        price: 10900,
+        image: "assets/images/jacket_black.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "ハイウエストボトムスと黄金比でマッチするトレンドの短丈ジャケット。程よい肩パッドとボクシーな直線的ラインがマニッシュな魅力を引き立てます。",
+        colors: ["BLACK", "CHARCOAL", "OFF WHITE"],
+        sizes: ["S", "M", "L"],
+        material: "ポリエステル 70%, レーヨン 26%, ポリウレタン 4%",
+        sku: "MNK-2026-W14"
+    },
+    {
+        id: 15,
+        gender: "WOMAN",
+        name: "オーバーサイズ スタンドカラー パデッドブルゾン",
+        nameEn: "Oversized Stand-Collar Padded Blouson",
+        category: "OUTER",
+        price: 12900,
+        image: "assets/images/sweat_black.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "丸みを帯びたバルーンシルエットが愛らしい中綿ショートブルゾン。裾のドローコードを絞ることでコクーンシルエットにアレンジでき、真冬でも抜群の防寒性を誇ります。",
+        colors: ["BLACK", "IVORY", "CHARCOAL"],
+        sizes: ["S", "M", "L"],
+        material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
+        sku: "MNK-2026-W15"
+    },
+    {
+        id: 16,
+        gender: "WOMAN",
+        name: "カシミヤブレンド シアー クルーネックニット",
+        nameEn: "Cashmere-Blend Sheer Crewneck Knit",
+        category: "TOPS",
+        price: 4990,
+        image: "assets/images/knit_white.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "ほんのりと透け感のあるシアー編みで仕立てた極上カシミヤブレンドニット。繊細な編み地と肌馴染みの良さが、インナーのレイヤードをセンシュアルに格上げします。",
+        colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
+        sizes: ["S", "M", "L"],
+        material: "ウール 85%, カシミヤ 15%",
+        sku: "MNK-2026-W16"
+    },
+    {
+        id: 17,
+        gender: "WOMAN",
+        name: "コンパクト クロップド フルジップパーカー",
+        nameEn: "Compact Cropped Full-Zip Hoodie",
+        category: "TOPS",
+        price: 5990,
+        image: "assets/images/sweat_grey.jpg",
+        isNew: true,
+        isFeatured: false,
+        description: "上半身をコンパクトに見せるクロップド丈と、華奢なダブルジップが女性らしいスウェットパーカー。ワイドボトムスやマキシスカートとの相性が抜群で、スタイルアップ効果絶大。",
+        colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
+        sizes: ["S", "M", "L"],
+        material: "綿 100%",
+        sku: "MNK-2026-W17"
+    },
+    {
+        id: 18,
+        gender: "WOMAN",
+        name: "スビンコットン スムース フレンチスリーブTシャツ",
+        nameEn: "Suvin Cotton Smooth French-Sleeve T-Shirt",
+        category: "TOPS",
+        price: 2990,
+        image: "assets/images/tshirt_white.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "最高峰スビンコットンの光沢と、二の腕をすっきり華奢に見せるフレンチスリーブ。詰まり気味のクルーネックとサイドスリットで、一枚でもジャケットインでも品格を保ちます。",
+        colors: ["WHITE", "BLACK", "CHARCOAL"],
+        sizes: ["S", "M", "L"],
+        material: "スビンコットン 100%",
+        sku: "MNK-2026-W18"
+    },
+    {
+        id: 19,
+        gender: "WOMAN",
+        name: "アシンメトリー ドレープ ニットベスト",
+        nameEn: "Asymmetric Drape Knit Vest",
         category: "TOPS",
         price: 3990,
         image: "assets/images/knit_grey.jpg",
         isNew: true,
-        isFeatured: true,
-        description: "19.5マイクロンの極細メリノウールブレンド糸を編み上げたミドルゲージニット。チクチク感を抑えた極上の柔らかな肌触りで、一枚でサラリと着こなせる万能な定番アイテムです。",
-        colors: ["LIGHT GREY", "BLACK", "OFF WHITE"],
-        colorImages: {
-            "LIGHT GREY": "assets/images/knit_grey.jpg",
-            "BLACK": "assets/images/knit_black.jpg",
-            "OFF WHITE": "assets/images/knit_white.jpg"
-        },
-        sizes: ["S", "M", "L", "XL"],
-        material: "ウール 50%, アクリル 50%",
-        sku: "MNK-2026-K04"
+        isFeatured: false,
+        description: "片側のヘムに大胆なドレープを寄せたデザインニットベスト。シャツやロンTの上に重ねるだけで、いつものベーシックスタイルが一気にモードな表情に様変わりします。",
+        colors: ["CHARCOAL", "OFF WHITE", "BLACK"],
+        sizes: ["FREE"],
+        material: "アクリル 55%, コットン 45%",
+        sku: "MNK-2026-W19"
     },
     {
-        id: 5,
-        name: "ミニマル ステンカラー ロングコート",
-        nameEn: "Minimal Soutien Collar Long Coat",
-        category: "OUTER",
-        price: 14900,
-        image: "assets/images/coat_black.jpg",
+        id: 20,
+        gender: "WOMAN",
+        name: "ボウタイ 2WAY ドレープ サテンブラウス",
+        nameEn: "2-Way Drape Bow-Tie Satin Blouse",
+        category: "TOPS",
+        price: 4990,
+        image: "assets/images/tshirt_grey.jpg",
+        isNew: false,
+        isFeatured: true,
+        description: "結び方次第でタイ風にもリボン風にもアレンジ可能なとろみサテンブラウス。上品なヴィンテージサテンの落ち感で、オフィスからお出かけまで華やかに演出します。",
+        colors: ["IVORY", "CHARCOAL", "BLACK"],
+        sizes: ["S", "M", "L"],
+        material: "ポリエステル 100%",
+        sku: "MNK-2026-W20"
+    },
+    {
+        id: 21,
+        gender: "WOMAN",
+        name: "ハイウエスト ワイド ドレープ タックトラウザー",
+        nameEn: "High-Waist Wide Drape Pleated Trousers",
+        category: "BOTTOMS",
+        price: 5490,
+        image: "assets/images/pants_charcoal.jpg",
+        isNew: true,
+        isFeatured: true,
+        description: "深めのハイライズとツータックで圧倒的な脚長効果を叶える主役級スラックス。しなやかな落ち感と程よいワイドストレートが、マニッシュでありながら女性らしい佇まいを作ります。",
+        colors: ["CHARCOAL", "BLACK", "ECRU"],
+        sizes: ["S", "M", "L"],
+        material: "ポリエステル 65%, レーヨン 35%",
+        sku: "MNK-2026-W21"
+    },
+    {
+        id: 22,
+        gender: "WOMAN",
+        name: "ナロー ストレート スリット マキシスカート",
+        nameEn: "Narrow Straight Slit Maxi Skirt",
+        category: "BOTTOMS",
+        price: 4990,
+        image: "assets/images/pants_black.jpg",
+        isNew: false,
+        isFeatured: false,
+        description: "腰回りをすっきりと削ぎ落としたIラインシルエットのマキシスカート。バックに深めのセンタースリットを配し、足さばきの良さとほんのり抜け感のある色香を両立しました。",
+        colors: ["BLACK", "CHARCOAL", "BROWN"],
+        sizes: ["S", "M", "L"],
+        material: "ポリエステル 95%, ポリウレタン 5%",
+        sku: "MNK-2026-W22"
+    },
+    {
+        id: 23,
+        gender: "WOMAN",
+        name: "カーブレッグ バギー デニムスラックス",
+        nameEn: "Curved-Leg Baggy Denim Trousers",
+        category: "BOTTOMS",
+        price: 5990,
+        image: "assets/images/tapered_black.jpg",
         isNew: true,
         isFeatured: false,
-        description: "無駄なディテールを極限まで削ぎ落とした、ミニマルを体現するチェスターステンカラーコート。膝下まで包み込む洗練されたAラインシルエットが、都会的な装いを格上げします。",
-        colors: ["BLACK", "CHARCOAL"],
-        colorImages: {
-            "BLACK": "assets/images/coat_black.jpg",
-            "CHARCOAL": "assets/images/coat_charcoal.jpg"
-        },
-        sizes: ["M", "L", "XL"],
-        material: "ウール 80%, ナイロン 20%",
-        sku: "MNK-2026-C05"
+        description: "立体的なカーブを描くワイドレッグが今季らしいデニムトラウザー。スラックス仕立てのすっきりとしたウエスト周りで、カジュアルすぎない洗練された大人のデニムスタイルを実現。",
+        colors: ["VINTAGE BLUE", "BLACK", "WHITE"],
+        sizes: ["S", "M", "L"],
+        material: "コットン 100%（12ozセルビッジ調デニム）",
+        sku: "MNK-2026-W23"
     },
     {
-        id: 6,
-        name: "ヘビーウェイト ボクシー スウェット",
-        nameEn: "Heavyweight Boxy Crewneck Sweatshirt",
-        category: "TOPS",
-        price: 3490,
+        id: 24,
+        gender: "WOMAN",
+        name: "バックオープン リブ リラックス ニットマキシワンピース",
+        nameEn: "Back-Open Ribbed Knit Maxi Dress",
+        category: "ONEPIECE",
+        price: 7990,
         image: "assets/images/sweat_white.jpg",
-        isNew: false,
+        isNew: true,
         isFeatured: true,
-        description: "肉厚でタフな14オンス裏毛コットンスウェット生地。程よいハリ感とボクシーなボックスシルエットが、今の気分にフィットするリラックススタイルを演出します。",
-        colors: ["OFF WHITE", "BLACK", "ASH GREY"],
-        colorImages: {
-            "OFF WHITE": "assets/images/sweat_white.jpg",
-            "BLACK": "assets/images/sweat_black.jpg",
-            "ASH GREY": "assets/images/sweat_grey.jpg"
-        },
-        sizes: ["S", "M", "L", "XL"],
-        material: "綿 100%",
-        sku: "MNK-2026-S06"
-    },
-    {
-        id: 7,
-        name: "リラックス アンクル テーパードパンツ",
-        nameEn: "Relaxed Ankle Tapered Pants",
-        category: "BOTTOMS",
-        price: 4490,
-        image: "assets/images/tapered_black.jpg",
-        isNew: false,
-        isFeatured: false,
-        description: "腰回りに程よいゆとりを持たせつつ、足首に向かってすっきりと絞ったアンクル丈テーパードスラックス。靴元を選ばずスマートに合わせられます。",
-        colors: ["BLACK", "CHARCOAL"],
-        colorImages: {
-            "BLACK": "assets/images/tapered_black.jpg",
-            "CHARCOAL": "assets/images/tapered_charcoal.jpg"
-        },
-        sizes: ["S", "M", "L", "XL"],
-        material: "ポリエステル 68%, レーヨン 28%, ポリウレタン 4%",
-        sku: "MNK-2026-P07"
+        description: "程よくボディラインに寄り添うストレートリブニットドレス。背中にヘルシーなカッティングを施し、一枚で決まる洗練されたリラクシングスタイルを提案します。",
+        colors: ["BLACK", "CHARCOAL", "MOCHA"],
+        sizes: ["S", "M"],
+        material: "レーヨン 60%, ナイロン 40%",
+        sku: "MNK-2026-W24"
     }
 ];
 
@@ -293,8 +532,23 @@ function handleRouting() {
             break;
 
         case '#items':
+            AppState.selectedGender = 'ALL';
             showView('view-items');
             highlightNavLink('items');
+            renderCatalogProducts();
+            break;
+
+        case '#man':
+            AppState.selectedGender = 'MAN';
+            showView('view-items');
+            highlightNavLink('man');
+            renderCatalogProducts();
+            break;
+
+        case '#woman':
+            AppState.selectedGender = 'WOMAN';
+            showView('view-items');
+            highlightNavLink('woman');
             renderCatalogProducts();
             break;
 
@@ -374,7 +628,7 @@ function createProductCardHTML(product) {
         <article class="product-card" data-id="${product.id}">
             <div class="product-img-wrapper" onclick="navigateToDetail(${product.id})">
                 ${product.isNew ? '<span class="badge-new">NEW</span>' : ''}
-                <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy" onerror="this.src='assets/images/item_tshirt.jpg'">
+                <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22800%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20600%20800%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22600%22%20height%3D%22800%22%2F%3E%3Cpath%20d%3D%22M250%20320%20L350%20320%20L370%20420%20L230%20420%20Z%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22480%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20letter-spacing%3D%222%22%3EMANEKIN%20COLLECTION%3C%2Ftext%3E%3C%2Fsvg%3E'">
                 <button class="fav-btn ${isFav ? 'is-favorite' : ''}" 
                         onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
                         aria-label="${isFav ? 'お気に入りを解除' : 'お気に入りに追加'}">
@@ -409,7 +663,29 @@ function renderCatalogProducts() {
     const gridContainer = document.getElementById('catalog-product-grid');
     if (!gridContainer) return;
 
+    // 性別に応じた動的タイトル・パンくずの更新
+    const breadcrumbCurrent = document.getElementById('catalog-breadcrumb-current');
+    const pageTitle = document.getElementById('catalog-page-title');
+    const pageSubtitle = document.getElementById('catalog-page-subtitle');
+
+    if (AppState.selectedGender === 'MAN') {
+        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'MAN';
+        if (pageTitle) pageTitle.textContent = "MEN'S COLLECTION";
+        if (pageSubtitle) pageSubtitle.textContent = "現代の男性に向けた、洗練されたモダンウェア（全12アイテム）";
+    } else if (AppState.selectedGender === 'WOMAN') {
+        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'WOMAN';
+        if (pageTitle) pageTitle.textContent = "WOMEN'S COLLECTION";
+        if (pageSubtitle) pageSubtitle.textContent = "凛とした美しさと現代的なリラックス感を纏うウィメンズウェア（全12アイテム）";
+    } else {
+        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'ALL COLLECTION';
+        if (pageTitle) pageTitle.textContent = "ALL COLLECTION";
+        if (pageSubtitle) pageSubtitle.textContent = "すべての最新アイテム一覧（全24アイテム）";
+    }
+
     let items = [...SAMPLE_PRODUCTS];
+    if (AppState.selectedGender && AppState.selectedGender !== 'ALL') {
+        items = items.filter(p => p.gender === AppState.selectedGender);
+    }
     if (AppState.selectedCategory !== 'ALL') {
         items = items.filter(p => p.category === AppState.selectedCategory);
     }
@@ -696,7 +972,7 @@ function renderCheckoutPage() {
     if (cartListEl) {
         cartListEl.innerHTML = AppState.cart.map((item, idx) => `
             <div class="cart-item-row">
-                <img src="${item.image}" alt="${item.name}" class="cart-item-thumb" onerror="this.src='assets/images/item_tshirt.jpg'">
+                <img src="${item.image}" alt="${item.name}" class="cart-item-thumb" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22800%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20600%20800%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22600%22%20height%3D%22800%22%2F%3E%3Cpath%20d%3D%22M250%20320%20L350%20320%20L370%20420%20L230%20420%20Z%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22480%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20letter-spacing%3D%222%22%3EMANEKIN%20COLLECTION%3C%2Ftext%3E%3C%2Fsvg%3E'">
                 <div class="cart-item-details">
                     <h4 class="cart-item-name">${item.name}</h4>
                     <p class="cart-item-meta">カラー: <strong>${item.color}</strong> | サイズ: <strong>${item.size}</strong></p>
