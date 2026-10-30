@@ -289,7 +289,7 @@ const SAMPLE_PRODUCTS = [
         image: "assets/images/women/スタンドカラーパテッドパフジャケット.png",
         isNew: false,
         isFeatured: false,
-        description: "レザーの質感とボア襟が特徴のジャケット。暖かく、冬のアウターとして使いやすい一着。フロントのジップとフラップポケットで、機能性とデザインを両立。",
+        description: "首元を包み込むスタンドカラーとマットな質感の生地が、都会的で洗練された印象を与える中綿パフジャケット。",
         colors: ["BLACK", "IVORY", "CHARCOAL"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
@@ -297,6 +297,22 @@ const SAMPLE_PRODUCTS = [
     },
     {
         id: 16,
+        gender: "WOMEN",
+        name: "レザージャケット",
+        nameEn: "Leather Jacket",
+        category: "OUTER",
+        price: 12900,
+        image: "assets/images/women/レザージャケット.png",
+        isNew: false,
+        isFeatured: false,
+        description: "レザーの質感とボア襟が特徴のジャケット。暖かく、冬のアウターとして使いやすい一着。フロントのジップとフラップポケットで、機能性とデザインを両立。",
+        colors: ["BLACK", "IVORY", "CHARCOAL"],
+        sizes: ["S", "M", "L"],
+        material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
+        sku: "MNK-2026-W15"
+    },
+    {
+        id: 17,
         gender: "WOMEN",
         name: "シャギーニットオーバーサイズクルーネックセーター",
         nameEn: "Shaggy Oversized Crewneck Sweater",
@@ -313,7 +329,7 @@ const SAMPLE_PRODUCTS = [
     },
     // 13~20まで設定完了
     {
-        id: 17,
+        id: 18,
         gender: "WOMEN",
         name: "ヘビーウェイトルーズクルーネックスウェット",
         nameEn: "Heavyweight Loose Crewneck Sweatshirt",
@@ -329,7 +345,7 @@ const SAMPLE_PRODUCTS = [
         sku: "MNK-2026-W17"
     },
     {
-        id: 18,
+        id: 19,
         gender: "WOMEN",
         name: "ヴィンテージウォッシュフルジップパーカー",
         nameEn: "Vintage Wash Full-Zip Hoodie",
@@ -345,7 +361,7 @@ const SAMPLE_PRODUCTS = [
         sku: "MNK-2026-W18"
     },
     {
-        id: 19,
+        id: 20,
         gender: "WOMEN",
         name: "ドット柄シアーヘンリーネッククロップドTシャツ",
         nameEn: "Polka Dot Sheer Henley Crop Top",
@@ -359,22 +375,6 @@ const SAMPLE_PRODUCTS = [
         sizes: ["S", "M", "L"],
         material: "スビンコットン 100%",
         sku: "MNK-2026-W19"
-    },
-    {
-        id: 20,
-        gender: "WOMEN",
-        name: "ドット柄シアーヘンリーネッククロップドTシャツ",
-        nameEn: "Polka Dot Sheer Henley Crop Top",
-        category: "TOPS",
-        price: 3990,
-        image: "assets/images/women/ドット柄シアーヘンリーネッククロップドTシャツ.png",
-        isNew: true,
-        isFeatured: false,
-        description: "程よい透け感のあるシアー素材とキュートなドット柄が印象的な、ヘンリーネックデザインのクロップド丈長袖カットソー。",
-        colors: ["CHARCOAL", "OFF WHITE", "BLACK"],
-        sizes: ["FREE"],
-        material: "アクリル 55%, コットン 45%",
-        sku: "MNK-2026-W20"
     },
     {
         id: 21,
