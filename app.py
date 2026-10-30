@@ -584,10 +584,6 @@ def main():
         debug=True,
         use_reloader=False
     )
-<<<<<<< HEAD
-=======
-
->>>>>>> c5f3c295cfe6eded1ea99b66754207c43c15c897
 
 if __name__ == '__main__':
     main()
