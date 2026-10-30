@@ -17,6 +17,7 @@ import string
 from datetime import datetime
 
 # Flaskフレームワーク関連のインポート
+# pyrefly: ignore[missing-import]
 from flask import Flask, jsonify, request, send_from_directory
 # CORS（クロスオリジンリソース共有）モジュールのインポート
 from flask_cors import CORS
