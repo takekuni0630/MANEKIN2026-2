@@ -429,7 +429,7 @@ const SAMPLE_PRODUCTS = [
         gender: "WOMEN",
         name: "タックイージーワイドスウェットパンツ",
         nameEn: "Pleated Easy Wide Sweatpants",
-        category: "ONEPIECE",
+        category: "BOTTOMS",
         price: 7990,
         image: "assets/images/women/タックイージーワイドスウェットパンツ.png",
         isNew: true,
