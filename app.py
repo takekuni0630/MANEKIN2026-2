@@ -17,6 +17,7 @@ import string
 from datetime import datetime
 
 # Flaskフレームワーク関連のインポート
+# pyrefly: ignore[missing-import]
 from flask import Flask, jsonify, request, send_from_directory
 # CORS（クロスオリジンリソース共有）モジュールのインポート
 from flask_cors import CORS
@@ -565,7 +566,7 @@ def serve_static(path):
 # サーバー起動メインルーチン
 # ==============================================================================
 def main():
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))
     print("=" * 70)
     print("【MANEKIN FASHION バックエンドAPIサーバー (Python + MySQL) 起動中】")
     print(f"URL: http://localhost:{port}")
@@ -577,8 +578,12 @@ def main():
     print("  ・会員登録 / ログイン  : POST /api/auth/register , POST /api/auth/login")
     print("  ・MANEKIN 3D / AI機能 : /api/manekin/* , /api/closet/* , /api/ai-coordinate/*")
     print("=" * 70)
-    app.run(host='0.0.0.0', port=port, debug=True)
-
+    app.run(
+        host='127.0.0.1',
+        port=8080,
+        debug=True,
+        use_reloader=False
+    )
 
 if __name__ == '__main__':
     main()
