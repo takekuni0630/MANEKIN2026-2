@@ -214,11 +214,11 @@ const SAMPLE_PRODUCTS = [
     {   // 10~12まで完了
         id: 11,
         gender: "MEN",
-        name: "スマートアンクル テーパードイージースラックス",
+        name: "スマートアンクルテーパードイージースラックス",
         nameEn: "Smart Ankle Tapered Easy Pants",
         category: "BOTTOMS",
         price: 4990,
-        image: "assets/images/men/スマートアンクルテーパードイージースラックス.png",
+        image: "assets/images/men/c",
         isNew: true,
         isFeatured: false,
         description: "立体裁断による緩やかなカーブラインが現代的。",
@@ -2562,7 +2562,7 @@ function openAddClosetModal() {
         modal.classList.add('open');
         modal.classList.add('active');
         // 背景クリックで閉じる処理
-        modal.onclick = function(e) {
+        modal.onclick = function (e) {
             if (e.target === modal) closeAddClosetModal();
         };
     }
@@ -2623,7 +2623,7 @@ function handleClosetImageSelect(e) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
         currentClosetUploadDataUrl = evt.target.result;
         const preview = document.getElementById('closet-img-preview');
         const previewImg = document.getElementById('closet-preview-img');

@@ -1085,7 +1085,7 @@
                                 </div>
                             </div>
 
-                            <!-- マネキンビジュアルステージ -->
+                            マネキンビジュアルステージ
                             <div class="mannequin-stage-box" id="mannequin-stage-box">
                                 <!-- マネキン本体と重ね着レイヤー群 -->
                                 <div class="mannequin-model-wrap" id="mannequin-model-wrap">
@@ -1093,31 +1093,8 @@
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
                                         <defs>
-                                            <!-- 布地（エクリュ・リネンファブリック）立体グラデーション -->
-                                            <linearGradient id="linenBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stop-color="#fdfbf7" />
-                                                <stop offset="28%" stop-color="#f5efe4" />
-                                                <stop offset="68%" stop-color="#e7decd" />
-                                                <stop offset="100%" stop-color="#d4c9b5" />
-                                            </linearGradient>
-                                            <!-- 頭部グラデーション -->
-                                            <radialGradient id="linenHeadGrad" cx="42%" cy="38%" r="65%">
-                                                <stop offset="0%" stop-color="#fffefb" />
-                                                <stop offset="55%" stop-color="#f4ece0" />
-                                                <stop offset="85%" stop-color="#e3d8c5" />
-                                                <stop offset="100%" stop-color="#cdbfab" />
-                                            </radialGradient>
-                                            <!-- 腕グラデーション（円筒陰影） -->
-                                            <linearGradient id="linenArmLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stop-color="#faf6ee" />
-                                                <stop offset="50%" stop-color="#eee5d5" />
-                                                <stop offset="100%" stop-color="#d6cbba" />
-                                            </linearGradient>
-                                            <linearGradient id="linenArmRightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stop-color="#faf6ee" />
-                                                <stop offset="50%" stop-color="#ece2d2" />
-                                                <stop offset="100%" stop-color="#cebfab" />
-                                            </linearGradient>
+
+
                                             <!-- メタリッククローム支柱ポール -->
                                             <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                                                 <stop offset="0%" stop-color="#ffffff" />
@@ -1145,75 +1122,6 @@
                                             <circle cx="157" cy="484" r="3" fill="#64748b" />
                                         </g>
 
-                                        <!-- 2. 脚部（直立・左右揃った脚） -->
-                                        <g id="legs-group">
-                                            <!-- 左脚（太もも〜ふくらはぎ〜足首） -->
-                                            <path
-                                                d="M112 322 C114 365 116 420 120 448 C122 470 123 520 125 558 L144 558 C144 520 143 470 143 448 C142 420 141 365 146 322 Z"
-                                                fill="url(#linenBodyGrad)" />
-                                            <!-- 右脚（太もも〜ふくらはぎ〜足首） -->
-                                            <path
-                                                d="M154 322 C159 365 158 420 157 448 C157 470 156 520 156 558 L175 558 C177 520 178 470 180 448 C184 420 186 365 188 322 Z"
-                                                fill="url(#linenBodyGrad)" />
-                                            <!-- 膝の立体陰影ライン -->
-                                            <ellipse cx="132" cy="446" rx="9" ry="5" fill="#ded4c0" opacity="0.6" />
-                                            <ellipse cx="168" cy="446" rx="9" ry="5" fill="#ded4c0" opacity="0.6" />
-                                        </g>
-
-                                        <!-- 3. トルソー（胴体・直立） -->
-                                        <g id="torso-group">
-                                            <!-- メインボディ（肩幅〜バスト〜ウエスト〜ヒップ） -->
-                                            <path d="M116 98 
-                                                     C100 102 92 120 90 138 
-                                                     C88 165 96 200 104 228 
-                                                     C110 248 106 280 102 312 
-                                                     C100 322 108 324 116 322 
-                                                     L184 322 
-                                                     C192 324 200 322 198 312 
-                                                     C194 280 190 248 196 228 
-                                                     C204 200 212 165 210 138 
-                                                     C208 120 200 102 184 98 
-                                                     Z" fill="url(#linenBodyGrad)" />
-                                            <!-- 首元への立ち上がり -->
-                                            <path d="M141 78 L159 78 L163 100 L137 100 Z" fill="url(#linenBodyGrad)" />
-                                            <!-- 首元の切り替えステッチライン（写真の特徴） -->
-                                            <path d="M139 78 C145 81 155 81 161 78" stroke="#beaf96" stroke-width="1.8"
-                                                fill="none" />
-                                            <!-- ウエストリボン（写真のウエストにある白いラインマーク） -->
-                                            <path
-                                                d="M104 227 C128 232 172 232 196 227 L196 233 C172 238 128 238 104 233 Z"
-                                                fill="#ffffff" opacity="0.88" />
-                                        </g>
-
-                                        <!-- 4. 腕部（直立・自然に体側に沿って下ろした腕） -->
-                                        <g id="arms-group">
-                                            <!-- 左腕（肩ジョイント〜上腕〜肘〜前腕〜手先） -->
-                                            <path d="M90 135 
-                                                     C82 145 74 185 74 220 
-                                                     C74 250 78 285 80 315 
-                                                     C81 328 82 342 84 345 
-                                                     C86 347 90 345 91 340 
-                                                     C93 328 92 312 92 285 
-                                                     C92 250 96 210 98 175 
-                                                     C98 152 96 140 90 135 Z" fill="url(#linenArmLeftGrad)" />
-                                            <!-- 右腕（肩ジョイント〜上腕〜肘〜前腕〜手先） -->
-                                            <path d="M210 135 
-                                                     C218 145 226 185 226 220 
-                                                     C226 250 222 285 220 315 
-                                                     C219 328 218 342 216 345 
-                                                     C214 347 210 345 209 340 
-                                                     C207 328 208 312 208 285 
-                                                     C208 250 204 210 202 175 
-                                                     C202 152 204 140 210 135 Z" fill="url(#linenArmRightGrad)" />
-                                            <!-- 肩の可動ジョイントの丸みステッチ -->
-                                            <circle cx="91" cy="136" r="6" fill="#ded4c0" opacity="0.5" />
-                                            <circle cx="209" cy="136" r="6" fill="#ded4c0" opacity="0.5" />
-                                        </g>
-
-                                        <!-- 5. 頭部（写真と同じ卵型の布張りヘッド） -->
-                                        <g id="head-group">
-                                            <ellipse cx="150" cy="46" rx="20" ry="28" fill="url(#linenHeadGrad)" />
-                                        </g>
 
                                         <!-- 6. 床面：写真と同じ四角いクロームメタリック台座＆シャドウ -->
                                         <g id="stand-base-group">
