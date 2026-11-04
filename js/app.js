@@ -218,7 +218,7 @@ const SAMPLE_PRODUCTS = [
         nameEn: "Smart Ankle Tapered Easy Pants",
         category: "BOTTOMS",
         price: 4990,
-        image: "assets/images/men/c",
+        image: "assets/images/men/スマートアンクルテーパードイージースラックス.png",
         isNew: true,
         isFeatured: false,
         description: "立体裁断による緩やかなカーブラインが現代的。",
