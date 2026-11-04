@@ -56,9 +56,10 @@
                     <li class="nav-item">
                         <a href="#women" class="nav-link" data-nav="women">WOMEN</a>
                     </li>
-                    <!-- MANEKIN機能リンク項目（クリックで「開発中」モーダルを表示） -->
+                    <!-- MANEKIN機能リンク項目（AIコーデシミュレーション・スタジオへ遷移） -->
                     <li class="nav-item">
-                        <a href="javascript:void(0)" class="nav-link nav-manekin-btn" id="manekin-menu-btn">
+                        <a href="#manekin-studio" class="nav-link nav-manekin-btn" id="manekin-menu-btn"
+                            data-nav="manekin-studio">
                             MANEKIN
                             <!-- 先端的な機能であることを示すミニタグ -->
                             <span class="nav-tag">AI</span>
@@ -139,10 +140,8 @@
                 <li><a href="#women" class="mobile-nav-link" data-mobile-nav="women">WOMEN (ウィメンズ)</a></li>
                 <li><a href="#checkout" class="mobile-nav-link" data-mobile-nav="checkout">CART (ショッピングカート)</a></li>
                 <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
-                <li><a href="javascript:void(0)" class="mobile-nav-link mobile-manekin-btn"
-                        id="mobile-manekin-btn">MANEKIN <span class="nav-tag">AI</span></a></li>
-                <li><a href="javascript:void(0)" class="mobile-nav-link mobile-manekin-btn"
-                        id="mobile-manekin-btn">MANEKIN <span class="nav-tag">AI</span></a></li>
+                <li><a href="#manekin-studio" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn"
+                        data-mobile-nav="manekin-studio">MANEKIN <span class="nav-tag">AI</span></a></li>
                 <li class="mobile-divider"></li>
                 <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN
                         (ログイン)</a></li>
@@ -233,10 +232,12 @@
             <section class="banner-section container">
                 <div class="manekin-teaser-banner" id="teaser-banner">
                     <div class="teaser-content">
-                        <span class="teaser-tag">COMING SOON - PYTHON & MYSQL & AI</span>
-                        <h3 class="teaser-title">AIマネキンによるパーソナルスタイリング機能</h3>
-                        <p class="teaser-text">あなた専用のデジタルマネキンを作成し、手持ち服とブランドアイテムをバーチャル試着できる独自機能を開発中です。</p>
-                        <button class="btn btn-teaser nav-manekin-btn" id="banner-manekin-btn">MANEKIN機能の詳細を見る</button>
+                        <span class="teaser-tag">NEW FEATURE - 会員限定 AIコーデシミュレーション</span>
+                        <h3 class="teaser-title">手持ち服 × ブランド商品 バーチャル試着スタジオ</h3>
+                        <p class="teaser-text">
+                            あなたの「マイクローゼット」とMANEKINの最新アイテムを組み合わせ、AIスタイリストがリアルタイムでコーデ診断。試着から即購入までシームレスに体験できます。</p>
+                        <a href="#manekin-studio" class="btn btn-teaser" id="banner-manekin-btn">AIコーデシミュレーションを始める
+                            &rarr;</a>
                     </div>
                 </div>
             </section>
@@ -806,6 +807,745 @@
             </div>
         </section>
 
+        <!-- ============================================== -->
+        <!-- 10. 会員限定 AIコーデシミュレーション (MANEKIN STUDIO) -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-manekin-studio">
+            <div class="container studio-container">
+                <!-- ページパンくずナビ -->
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>MANEKIN AI STUDIO (会員限定コーデシミュレーション)</span>
+                </div>
+
+                <!-- スタジオヘッダー -->
+                <div class="studio-header-card">
+                    <div class="studio-header-text">
+                        <div class="studio-title-badge">
+                            <span class="badge-sparkle">✨ AI POWERED</span>
+                            <span class="badge-exclusive">MEMBER ONLY</span>
+                        </div>
+                        <h1 class="studio-title">MANEKIN AI STUDIO</h1>
+                        <p class="studio-subtitle">手持ちの服とブランドアイテムをバーチャル試着。AIスタイリストがあなただけの最適なコーデを提案します。</p>
+                    </div>
+                    <div class="studio-header-user">
+                        <div class="user-chip">
+                            <span class="user-chip-avatar" id="studio-avatar-char">M</span>
+                            <div class="user-chip-info">
+                                <span class="user-chip-name" id="studio-user-name">山田 太郎 様</span>
+                                <span class="user-chip-rank">REGULAR MEMBER</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ダッシュボード サブナビゲーション（タブ） -->
+                <nav class="studio-nav-tabs" aria-label="スタジオナビゲーション">
+                    <button class="studio-tab-btn" data-studio-tab="home" onclick="switchStudioTab('home')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span>ホーム</span>
+                    </button>
+                    <button class="studio-tab-btn" data-studio-tab="closet" onclick="switchStudioTab('closet')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>マイクローゼット</span>
+                        <span class="tab-badge" id="studio-closet-badge">0</span>
+                    </button>
+                    <button class="studio-tab-btn" data-studio-tab="favorites" onclick="switchStudioTab('favorites')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                            </path>
+                        </svg>
+                        <span>お気に入り商品</span>
+                        <span class="tab-badge" id="studio-fav-badge">0</span>
+                    </button>
+                    <button class="studio-tab-btn active" data-studio-tab="create" onclick="switchStudioTab('create')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="12 8 8 12 12 16 16 12 12 8"></polygon>
+                        </svg>
+                        <span>★ コーデ作成</span>
+                        <span class="tab-highlight-tag">STUDIO</span>
+                    </button>
+                    <button class="studio-tab-btn" data-studio-tab="saved" onclick="switchStudioTab('saved')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span>保存したコーデ</span>
+                        <span class="tab-badge" id="studio-saved-badge">0</span>
+                    </button>
+                    <button class="studio-tab-btn" data-studio-tab="profile" onclick="switchStudioTab('profile')">
+                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>プロフィール・体型</span>
+                    </button>
+                </nav>
+
+                <!-- ============================== -->
+                <!-- パネル1: ホーム（ダッシュボード） -->
+                <!-- ============================== -->
+                <div class="studio-pane" id="studio-pane-home">
+                    <!-- サマリーステータス -->
+                    <div class="studio-stats-grid">
+                        <div class="studio-stat-card">
+                            <span class="stat-icon-wrap">👕</span>
+                            <div>
+                                <span class="stat-card-label">登録中の手持ち服</span>
+                                <span class="stat-card-val" id="home-stat-closet">0 <small>点</small></span>
+                            </div>
+                        </div>
+                        <div class="studio-stat-card">
+                            <span class="stat-icon-wrap">✨</span>
+                            <div>
+                                <span class="stat-card-label">保存したコーデ</span>
+                                <span class="stat-card-val" id="home-stat-saved">0 <small>組</small></span>
+                            </div>
+                        </div>
+                        <div class="studio-stat-card">
+                            <span class="stat-icon-wrap">♥</span>
+                            <div>
+                                <span class="stat-card-label">お気に入りブランド服</span>
+                                <span class="stat-card-val" id="home-stat-fav">0 <small>点</small></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI本日のレコメンドバナー -->
+                    <div class="studio-recommend-banner">
+                        <div class="banner-badge">TODAY'S AI STYLING</div>
+                        <h3 class="banner-title">気温20℃・秋晴れに映える「手持ち黒パンツ × ダブルトレンチコート」</h3>
+                        <p class="banner-desc">あなたのマイクローゼット「黒ワイドパンツ」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
+                            ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
+                        <div class="banner-actions">
+                            <button class="btn btn-primary"
+                                onclick="applyPresetLook('trench_daily')">このおすすめをマネキンで試着する</button>
+                            <button class="btn btn-outline" onclick="switchStudioTab('create')">自由にコーデを作成する</button>
+                        </div>
+                    </div>
+
+                    <!-- クイックショートカットカード -->
+                    <div class="studio-quick-cards">
+                        <div class="quick-card" onclick="openAddClosetModal()">
+                            <div class="quick-card-icon">➕</div>
+                            <h4>手持ちの服を新しく登録</h4>
+                            <p>写真やメモを追加して、クローゼットをデジタル化しましょう。</p>
+                        </div>
+                        <div class="quick-card" onclick="switchStudioTab('create')">
+                            <div class="quick-card-icon">🪞</div>
+                            <h4>マネキン試着スタジオを開く</h4>
+                            <p>3カラムのシミュレーターで、手持ち服とブランド服を着せ替え試着。</p>
+                        </div>
+                        <div class="quick-card" onclick="switchStudioTab('saved')">
+                            <div class="quick-card-icon">📖</div>
+                            <h4>保存したコーデ（ルックブック）</h4>
+                            <p>通学・デート・冬コーデなど、保存したスタイルをいつでも再現。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- パネル2: マイクローゼット         -->
+                <!-- ============================== -->
+                <div class="studio-pane" id="studio-pane-closet">
+                    <div class="pane-action-bar">
+                        <div class="pane-action-left">
+                            <h2 class="pane-title">マイクローゼット <small class="text-muted">（手持ち服一覧）</small></h2>
+                            <p class="pane-desc">所有している服を登録しておくと、コーデ作成スタジオでブランド商品と自由に組み合わせられます。</p>
+                        </div>
+                        <div class="pane-action-right">
+                            <button class="btn btn-primary" onclick="openAddClosetModal()">
+                                <span>+ 手持ちの服を登録する</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- カテゴリフィルター -->
+                    <div class="closet-filter-bar" id="pane-closet-filter-bar">
+                        <button class="filter-pill active" data-cat="ALL" onclick="handlePaneClosetFilter('ALL')">ALL
+                            (すべて)</button>
+                        <button class="filter-pill" data-cat="OUTER"
+                            onclick="handlePaneClosetFilter('OUTER')">アウター</button>
+                        <button class="filter-pill" data-cat="TOPS"
+                            onclick="handlePaneClosetFilter('TOPS')">トップス</button>
+                        <button class="filter-pill" data-cat="BOTTOMS"
+                            onclick="handlePaneClosetFilter('BOTTOMS')">パンツ</button>
+                        <button class="filter-pill" data-cat="SHOES" onclick="handlePaneClosetFilter('SHOES')">靴
+                            (シューズ)</button>
+                    </div>
+
+                    <!-- クローゼットグリッド -->
+                    <div class="closet-grid" id="closet-items-grid">
+                        <!-- JSで動的描画 -->
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- パネル3: お気に入り商品         -->
+                <!-- ============================== -->
+                <div class="studio-pane" id="studio-pane-favorites">
+                    <div class="pane-action-bar">
+                        <div class="pane-action-left">
+                            <h2 class="pane-title">お気に入りブランドアイテム</h2>
+                            <p class="pane-desc">ECサイト上でハートを付けたアイテムです。ワンクリックでマネキンに着せ替えて手持ち服との相性を確認できます。</p>
+                        </div>
+                    </div>
+                    <div class="product-grid" id="studio-fav-grid">
+                        <!-- JSで動的描画 -->
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- パネル4: ★ コーデ作成 (STUDIO)  -->
+                <!-- ============================== -->
+                <div class="studio-pane active" id="studio-pane-create">
+                    <!-- モバイル専用：ビュー切り替えセグメントタブ -->
+                    <div class="studio-mobile-tabs" id="studio-mobile-tabs">
+                        <button class="mobile-tab-btn active" data-mobile-view="mannequin"
+                            onclick="switchMobileStudioView('mannequin')">マネキン試着室</button>
+                        <button class="mobile-tab-btn" data-mobile-view="closet"
+                            onclick="switchMobileStudioView('closet')">手持ちの服 (<span
+                                id="mob-closet-cnt">0</span>)</button>
+                        <button class="mobile-tab-btn" data-mobile-view="brand"
+                            onclick="switchMobileStudioView('brand')">ブランド商品</button>
+                    </div>
+
+                    <!-- 3カラム・シミュレーションスタジオグリッド -->
+                    <div class="studio-workspace-grid" id="studio-workspace-grid">
+                        <!-- ◀ 左カラム: マイクローゼット（手持ち服） -->
+                        <div class="studio-col studio-col-left" id="col-studio-closet">
+                            <div class="col-header">
+                                <div class="col-title-wrap">
+                                    <h3 class="col-title">1. 手持ちの服</h3>
+                                    <span class="col-badge">MY CLOSET</span>
+                                </div>
+                                <button class="btn btn-outline-xs" onclick="openAddClosetModal()">+ 登録</button>
+                            </div>
+
+                            <!-- フィルターチップ -->
+                            <div class="mini-filter-bar" id="col-closet-filter">
+                                <button class="mini-chip active" data-cat="ALL"
+                                    onclick="handleStudioClosetFilter('ALL')">ALL</button>
+                                <button class="mini-chip" data-cat="OUTER"
+                                    onclick="handleStudioClosetFilter('OUTER')">アウター</button>
+                                <button class="mini-chip" data-cat="TOPS"
+                                    onclick="handleStudioClosetFilter('TOPS')">トップス</button>
+                                <button class="mini-chip" data-cat="BOTTOMS"
+                                    onclick="handleStudioClosetFilter('BOTTOMS')">パンツ</button>
+                                <button class="mini-chip" data-cat="SHOES"
+                                    onclick="handleStudioClosetFilter('SHOES')">靴</button>
+                            </div>
+
+                            <!-- アイテムリスト -->
+                            <div class="studio-item-list" id="studio-closet-list">
+                                <!-- JS描画 -->
+                            </div>
+                        </div>
+
+                        <!-- ◆ 中央カラム: マネキン試着ステージ -->
+                        <div class="studio-col studio-col-center" id="col-studio-mannequin">
+                            <div class="mannequin-toolbar">
+                                <div class="toolbar-left">
+                                    <span class="stage-tag">2. 試着マネキン</span>
+                                </div>
+                                <div class="toolbar-right">
+                                    <button class="btn-toolbar-adjust" id="btn-toggle-adjust-mode"
+                                        onclick="toggleFittingAdjustPanel()" title="服の位置やサイズを微調整する">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M12 20h9"></path>
+                                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                        </svg>
+                                        位置・サイズ微調整
+                                    </button>
+                                    <div class="gender-toggle-wrap">
+                                        <button class="btn-gender active" id="btn-gender-men"
+                                            onclick="setMannequinGender('MEN')">MEN</button>
+                                        <button class="btn-gender" id="btn-gender-women"
+                                            onclick="setMannequinGender('WOMEN')">WOMEN</button>
+                                    </div>
+                                    <button class="btn-toolbar-clear" onclick="clearMannequin()" title="着用中の服をすべて脱がせる">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18"></path>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                        全身クリア
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- マネキンビジュアルステージ -->
+                            <div class="mannequin-stage-box" id="mannequin-stage-box">
+                                <!-- マネキン本体と重ね着レイヤー群 -->
+                                <div class="mannequin-model-wrap" id="mannequin-model-wrap">
+                                    <!-- リアル直立布張りマネキン（高級リネン生地・クロームスタンド仕様） -->
+                                    <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
+                                        <defs>
+                                            <!-- 布地（エクリュ・リネンファブリック）立体グラデーション -->
+                                            <linearGradient id="linenBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#fdfbf7" />
+                                                <stop offset="28%" stop-color="#f5efe4" />
+                                                <stop offset="68%" stop-color="#e7decd" />
+                                                <stop offset="100%" stop-color="#d4c9b5" />
+                                            </linearGradient>
+                                            <!-- 頭部グラデーション -->
+                                            <radialGradient id="linenHeadGrad" cx="42%" cy="38%" r="65%">
+                                                <stop offset="0%" stop-color="#fffefb" />
+                                                <stop offset="55%" stop-color="#f4ece0" />
+                                                <stop offset="85%" stop-color="#e3d8c5" />
+                                                <stop offset="100%" stop-color="#cdbfab" />
+                                            </radialGradient>
+                                            <!-- 腕グラデーション（円筒陰影） -->
+                                            <linearGradient id="linenArmLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#faf6ee" />
+                                                <stop offset="50%" stop-color="#eee5d5" />
+                                                <stop offset="100%" stop-color="#d6cbba" />
+                                            </linearGradient>
+                                            <linearGradient id="linenArmRightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#faf6ee" />
+                                                <stop offset="50%" stop-color="#ece2d2" />
+                                                <stop offset="100%" stop-color="#cebfab" />
+                                            </linearGradient>
+                                            <!-- メタリッククローム支柱ポール -->
+                                            <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stop-color="#ffffff" />
+                                                <stop offset="20%" stop-color="#e2e8f0" />
+                                                <stop offset="50%" stop-color="#64748b" />
+                                                <stop offset="75%" stop-color="#cbd5e1" />
+                                                <stop offset="100%" stop-color="#334155" />
+                                            </linearGradient>
+                                            <!-- メタリックフロア台座プレート -->
+                                            <linearGradient id="chromePlateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <stop offset="0%" stop-color="#f8fafc" />
+                                                <stop offset="40%" stop-color="#e2e8f0" />
+                                                <stop offset="85%" stop-color="#94a3b8" />
+                                                <stop offset="100%" stop-color="#64748b" />
+                                            </linearGradient>
+                                        </defs>
+
+                                        <!-- 1. 背景側：クロームスタンド支柱（脚の奥から床へ） -->
+                                        <g id="stand-pole-group">
+                                            <!-- 支柱ポール（股下から床プレートまで） -->
+                                            <rect x="146" y="325" width="8" height="290" rx="3"
+                                                fill="url(#chromePoleGrad)" />
+                                            <!-- 高さ調節金具ノブ -->
+                                            <rect x="143" y="478" width="14" height="12" rx="2" fill="#94a3b8" />
+                                            <circle cx="157" cy="484" r="3" fill="#64748b" />
+                                        </g>
+
+                                        <!-- 2. 脚部（直立・左右揃った脚） -->
+                                        <g id="legs-group">
+                                            <!-- 左脚（太もも〜ふくらはぎ〜足首） -->
+                                            <path
+                                                d="M112 322 C114 365 116 420 120 448 C122 470 123 520 125 558 L144 558 C144 520 143 470 143 448 C142 420 141 365 146 322 Z"
+                                                fill="url(#linenBodyGrad)" />
+                                            <!-- 右脚（太もも〜ふくらはぎ〜足首） -->
+                                            <path
+                                                d="M154 322 C159 365 158 420 157 448 C157 470 156 520 156 558 L175 558 C177 520 178 470 180 448 C184 420 186 365 188 322 Z"
+                                                fill="url(#linenBodyGrad)" />
+                                            <!-- 膝の立体陰影ライン -->
+                                            <ellipse cx="132" cy="446" rx="9" ry="5" fill="#ded4c0" opacity="0.6" />
+                                            <ellipse cx="168" cy="446" rx="9" ry="5" fill="#ded4c0" opacity="0.6" />
+                                        </g>
+
+                                        <!-- 3. トルソー（胴体・直立） -->
+                                        <g id="torso-group">
+                                            <!-- メインボディ（肩幅〜バスト〜ウエスト〜ヒップ） -->
+                                            <path d="M116 98 
+                                                     C100 102 92 120 90 138 
+                                                     C88 165 96 200 104 228 
+                                                     C110 248 106 280 102 312 
+                                                     C100 322 108 324 116 322 
+                                                     L184 322 
+                                                     C192 324 200 322 198 312 
+                                                     C194 280 190 248 196 228 
+                                                     C204 200 212 165 210 138 
+                                                     C208 120 200 102 184 98 
+                                                     Z" fill="url(#linenBodyGrad)" />
+                                            <!-- 首元への立ち上がり -->
+                                            <path d="M141 78 L159 78 L163 100 L137 100 Z" fill="url(#linenBodyGrad)" />
+                                            <!-- 首元の切り替えステッチライン（写真の特徴） -->
+                                            <path d="M139 78 C145 81 155 81 161 78" stroke="#beaf96" stroke-width="1.8"
+                                                fill="none" />
+                                            <!-- ウエストリボン（写真のウエストにある白いラインマーク） -->
+                                            <path
+                                                d="M104 227 C128 232 172 232 196 227 L196 233 C172 238 128 238 104 233 Z"
+                                                fill="#ffffff" opacity="0.88" />
+                                        </g>
+
+                                        <!-- 4. 腕部（直立・自然に体側に沿って下ろした腕） -->
+                                        <g id="arms-group">
+                                            <!-- 左腕（肩ジョイント〜上腕〜肘〜前腕〜手先） -->
+                                            <path d="M90 135 
+                                                     C82 145 74 185 74 220 
+                                                     C74 250 78 285 80 315 
+                                                     C81 328 82 342 84 345 
+                                                     C86 347 90 345 91 340 
+                                                     C93 328 92 312 92 285 
+                                                     C92 250 96 210 98 175 
+                                                     C98 152 96 140 90 135 Z" fill="url(#linenArmLeftGrad)" />
+                                            <!-- 右腕（肩ジョイント〜上腕〜肘〜前腕〜手先） -->
+                                            <path d="M210 135 
+                                                     C218 145 226 185 226 220 
+                                                     C226 250 222 285 220 315 
+                                                     C219 328 218 342 216 345 
+                                                     C214 347 210 345 209 340 
+                                                     C207 328 208 312 208 285 
+                                                     C208 250 204 210 202 175 
+                                                     C202 152 204 140 210 135 Z" fill="url(#linenArmRightGrad)" />
+                                            <!-- 肩の可動ジョイントの丸みステッチ -->
+                                            <circle cx="91" cy="136" r="6" fill="#ded4c0" opacity="0.5" />
+                                            <circle cx="209" cy="136" r="6" fill="#ded4c0" opacity="0.5" />
+                                        </g>
+
+                                        <!-- 5. 頭部（写真と同じ卵型の布張りヘッド） -->
+                                        <g id="head-group">
+                                            <ellipse cx="150" cy="46" rx="20" ry="28" fill="url(#linenHeadGrad)" />
+                                        </g>
+
+                                        <!-- 6. 床面：写真と同じ四角いクロームメタリック台座＆シャドウ -->
+                                        <g id="stand-base-group">
+                                            <!-- 床のソフトドロップシャドウ -->
+                                            <ellipse cx="150" cy="627" rx="72" ry="10" fill="rgba(0, 0, 0, 0.12)" />
+                                            <!-- 四角いステンレスベースプレート（上面パース） -->
+                                            <polygon points="85 614, 215 614, 235 628, 65 628"
+                                                fill="url(#chromePlateGrad)" />
+                                            <!-- プレート厚み（側面） -->
+                                            <polygon points="65 628, 235 628, 235 632, 65 632" fill="#475569" />
+                                            <!-- ポール接合リング（フランジ） -->
+                                            <ellipse cx="150" cy="616" rx="10" ry="4" fill="#64748b" />
+                                            <ellipse cx="150" cy="615" rx="8" ry="3" fill="#cbd5e1" />
+                                        </g>
+                                    </svg>
+
+                                    <!-- 4層のバーチャル試着レイヤー -->
+                                    <!-- 1. 靴レイヤー -->
+                                    <div class="layer-slot layer-shoes" id="layer-shoes">
+                                        <div class="layer-content" id="layer-content-shoes"></div>
+                                        <div class="slot-empty-label" id="label-shoes">靴 (未選択)</div>
+                                    </div>
+                                    <!-- 2. パンツレイヤー -->
+                                    <div class="layer-slot layer-bottoms" id="layer-bottoms">
+                                        <div class="layer-content" id="layer-content-bottoms"></div>
+                                        <div class="slot-empty-label" id="label-bottoms">パンツ (未選択)</div>
+                                    </div>
+                                    <!-- 3. トップスレイヤー -->
+                                    <div class="layer-slot layer-tops" id="layer-tops">
+                                        <div class="layer-content" id="layer-content-tops"></div>
+                                        <div class="slot-empty-label" id="label-tops">トップス (未選択)</div>
+                                    </div>
+                                    <!-- 4. アウターレイヤー -->
+                                    <div class="layer-slot layer-outer" id="layer-outer">
+                                        <div class="layer-content" id="layer-content-outer"></div>
+                                        <div class="slot-empty-label" id="label-outer"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 服の位置・サイズ微調整コントロールパネル -->
+                                <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
+                                    <div class="adjust-panel-header">
+                                        <div class="adjust-header-title">
+                                            <span class="adjust-icon">📐</span>
+                                            <span class="adjust-title-text">服の位置・サイズ微調整</span>
+                                        </div>
+                                        <div class="adjust-header-btns">
+                                            <button type="button" class="btn-adjust-reset"
+                                                onclick="resetFittingOffsets()" title="初期値に戻す">リセット</button>
+                                            <button type="button" class="btn-adjust-close"
+                                                onclick="toggleFittingAdjustPanel()" title="パネルを閉じる">×</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- 調整対象カテゴリタブ -->
+                                    <div class="adjust-slot-tabs" id="adjust-slot-tabs">
+                                        <button type="button" class="adjust-tab-btn active" data-adjust-slot="tops"
+                                            onclick="switchAdjustSlot('tops')">トップス</button>
+                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="outer"
+                                            onclick="switchAdjustSlot('outer')">アウター</button>
+                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="bottoms"
+                                            onclick="switchAdjustSlot('bottoms')">パンツ</button>
+                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="shoes"
+                                            onclick="switchAdjustSlot('shoes')">靴</button>
+                                    </div>
+
+                                    <!-- スライダー操作群 -->
+                                    <div class="adjust-sliders-body">
+                                        <!-- 上下位置 (Y Offset) -->
+                                        <div class="adjust-slider-row">
+                                            <div class="slider-meta">
+                                                <span class="slider-name">上下位置 (Y)</span>
+                                                <span class="slider-val" id="val-adjust-y">0px</span>
+                                            </div>
+                                            <div class="slider-input-wrap">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('y', -2)">▲</button>
+                                                <input type="range" class="adjust-range" id="slider-adjust-y" min="-60"
+                                                    max="60" value="0" step="1"
+                                                    oninput="handleAdjustInput('y', this.value)">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('y', 2)">▼</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 左右位置 (X Offset) -->
+                                        <div class="adjust-slider-row">
+                                            <div class="slider-meta">
+                                                <span class="slider-name">左右位置 (X)</span>
+                                                <span class="slider-val" id="val-adjust-x">0px</span>
+                                            </div>
+                                            <div class="slider-input-wrap">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('x', -2)">◀</button>
+                                                <input type="range" class="adjust-range" id="slider-adjust-x" min="-40"
+                                                    max="40" value="0" step="1"
+                                                    oninput="handleAdjustInput('x', this.value)">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('x', 2)">▶</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 大きさ・拡大縮小 (Scale) -->
+                                        <div class="adjust-slider-row">
+                                            <div class="slider-meta">
+                                                <span class="slider-name">大きさ (サイズ)</span>
+                                                <span class="slider-val" id="val-adjust-scale">100%</span>
+                                            </div>
+                                            <div class="slider-input-wrap">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('scale', -3)">－</button>
+                                                <input type="range" class="adjust-range" id="slider-adjust-scale"
+                                                    min="70" max="140" value="100" step="1"
+                                                    oninput="handleAdjustInput('scale', this.value)">
+                                                <button type="button" class="btn-step"
+                                                    onclick="stepAdjust('scale', 3)">＋</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="adjust-panel-footer">
+                                        <span class="adjust-hint">💡 スライダーやボタンでリアルタイムに位置を合わせられます（自動保存）</span>
+                                    </div>
+                                </div>
+
+                                <!-- 着用中スロットクイック解除バー -->
+                                <div class="wearing-slots-bar" id="wearing-slots-bar">
+                                    <!-- JSでスロットチップを描画 -->
+                                </div>
+                            </div>
+
+                            <!-- ブランド服購入サマリー & 1クリックカート追加バー -->
+                            <div class="stage-brand-summary" id="stage-brand-summary">
+                                <div class="brand-sum-info">
+                                    <span class="sum-label">着用中ブランド品:</span>
+                                    <span class="sum-items-count" id="brand-sum-count">0点</span>
+                                    <span class="sum-total-price" id="brand-sum-price">¥0</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm" id="btn-add-brand-to-cart"
+                                    onclick="addCurrentBrandItemsToCart()" disabled>
+                                    <span>着用アイテムをカートに追加</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ▶ 右カラム: ブランドアイテム一覧 -->
+                        <div class="studio-col studio-col-right" id="col-studio-brand">
+                            <div class="col-header">
+                                <div class="col-title-wrap">
+                                    <h3 class="col-title">3. ブランド商品</h3>
+                                    <span class="col-badge brand-badge">MANEKIN</span>
+                                </div>
+                                <label class="fav-filter-toggle" title="お気に入りのみ表示">
+                                    <input type="checkbox" id="brand-fav-filter-chk"
+                                        onchange="toggleBrandFavFilter(this)">
+                                    <span class="fav-heart-icon">♥</span>
+                                    <span class="fav-text">お気に入りのみ</span>
+                                </label>
+                            </div>
+
+                            <!-- フィルターチップ -->
+                            <div class="mini-filter-bar" id="col-brand-filter">
+                                <button class="mini-chip active" data-brand-cat="ALL"
+                                    onclick="handleStudioBrandFilter('ALL')">ALL</button>
+                                <button class="mini-chip" data-brand-cat="OUTER"
+                                    onclick="handleStudioBrandFilter('OUTER')">アウター</button>
+                                <button class="mini-chip" data-brand-cat="TOPS"
+                                    onclick="handleStudioBrandFilter('TOPS')">トップス</button>
+                                <button class="mini-chip" data-brand-cat="BOTTOMS"
+                                    onclick="handleStudioBrandFilter('BOTTOMS')">パンツ</button>
+                            </div>
+
+                            <!-- ブランド商品リスト -->
+                            <div class="studio-item-list" id="studio-brand-list">
+                                <!-- JS描画 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ▼ 下部エリア: AIコメント & スタイリング診断 & コーデ保存 -->
+                    <div class="studio-bottom-panel">
+                        <!-- AIコメントセクション -->
+                        <div class="ai-comment-card">
+                            <div class="ai-comment-header">
+                                <div class="ai-header-left">
+                                    <span class="ai-sparkle-dot"></span>
+                                    <span class="ai-label">AI STYLING COMMENT</span>
+                                    <span class="ai-engine-tag">MANEKIN-AI v2.6</span>
+                                </div>
+                                <div class="ai-header-right">
+                                    <span class="ai-score-label">カラー調和度:</span>
+                                    <span class="ai-score-stars" id="ai-score-stars">★★★★★</span>
+                                    <span class="ai-score-val" id="ai-score-val">95点</span>
+                                </div>
+                            </div>
+                            <div class="ai-comment-body">
+                                <p class="ai-comment-text" id="ai-comment-text">
+                                    左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
+                                </p>
+                            </div>
+                            <div class="ai-meta-bar">
+                                <div class="ai-tags-wrap" id="ai-tags-wrap">
+                                    <span class="ai-tag">#シンプル</span>
+                                    <span class="ai-tag">#ベーシック</span>
+                                    <span class="ai-tag">#通年着回し</span>
+                                </div>
+                                <div class="ai-palette-wrap" id="ai-palette-wrap">
+                                    <span class="palette-label">カラー構成:</span>
+                                    <div class="palette-dots" id="palette-dots">
+                                        <!-- JSで色のドットを配置 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- コーデ保存フォーム -->
+                        <div class="outfit-save-card">
+                            <h4 class="save-card-title">コーディネートを保存</h4>
+                            <p class="save-card-desc">作成した組み合わせに名前を付けて保存しておくと、「保存したコーデ」一覧からいつでも再確認・復元できます。</p>
+
+                            <div class="preset-name-chips">
+                                <span class="preset-chip" onclick="applyPresetName('通学・デイリーコーデ')">通学・デイリー</span>
+                                <span class="preset-chip" onclick="applyPresetName('デート・きれいめコーデ')">デート・きれいめ</span>
+                                <span class="preset-chip" onclick="applyPresetName('休日カフェコーデ')">休日カフェ</span>
+                                <span class="preset-chip" onclick="applyPresetName('冬の防寒モードコーデ')">冬コーデ</span>
+                                <span class="preset-chip" onclick="applyPresetName('オフィスカジュアル')">オフィス</span>
+                            </div>
+
+                            <form class="save-outfit-form" id="save-outfit-form" onsubmit="handleSaveOutfit(event)">
+                                <div class="save-input-group">
+                                    <input type="text" id="outfit-name-input" class="form-input outfit-name-input"
+                                        placeholder="例: 秋の通学カジュアルコーデ" required>
+                                    <button type="submit" class="btn btn-primary save-outfit-btn">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        <span>このコーデを保存する</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- パネル5: 保存したコーデ (LOOKBOOK) -->
+                <!-- ============================== -->
+                <div class="studio-pane" id="studio-pane-saved">
+                    <div class="pane-action-bar">
+                        <div class="pane-action-left">
+                            <h2 class="pane-title">保存したコーディネート <small class="text-muted">（ルックブック）</small></h2>
+                            <p class="pane-desc">作成・保存したコーディネートの一覧です。クリックしてマネキンに再試着したり、含まれるブランド商品をまとめて購入できます。</p>
+                        </div>
+                    </div>
+                    <div class="saved-outfits-grid" id="saved-outfits-grid">
+                        <!-- JSで動的描画 -->
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- パネル6: プロフィール・体型設定    -->
+                <!-- ============================== -->
+                <div class="studio-pane" id="studio-pane-profile">
+                    <div class="pane-action-bar">
+                        <div class="pane-action-left">
+                            <h2 class="pane-title">プロフィール & 体型カスタマイズ</h2>
+                            <p class="pane-desc">あなたの体型データや好みのテイストを設定することで、マネキンのシルエットやAIの提案精度が向上します。</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-settings-layout">
+                        <!-- 会員情報カード -->
+                        <div class="profile-card">
+                            <h3 class="profile-section-title">基本会員情報</h3>
+                            <div class="profile-field-row">
+                                <span class="profile-label">お名前:</span>
+                                <strong class="profile-val" id="prof-display-name">山田 太郎 様</strong>
+                            </div>
+                            <div class="profile-field-row">
+                                <span class="profile-label">メールアドレス:</span>
+                                <span class="profile-val" id="prof-display-email">demo@manekin.com</span>
+                            </div>
+                            <div class="profile-field-row">
+                                <span class="profile-label">会員ステータス:</span>
+                                <span class="membership-badge">REGULAR MEMBER (AI機能解放済み)</span>
+                            </div>
+                        </div>
+
+                        <!-- 将来拡張：体型設定フォーム -->
+                        <div class="profile-card">
+                            <h3 class="profile-section-title">
+                                体型反映・シルエット設定 <span class="future-tag">NEXT FEATURE</span>
+                            </h3>
+                            <p class="text-muted mb-3">マネキンのプロポーション比率をお客様の体型に近づけるためのパラメータです。</p>
+
+                            <form id="body-profile-form" onsubmit="handleSaveBodyProfile(event)">
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label class="form-label" for="body-height">身長 (cm)</label>
+                                        <input type="number" id="body-height" class="form-input" min="140" max="210"
+                                            value="172">
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label class="form-label" for="body-type">体型タイプ</label>
+                                        <select id="body-type" class="form-input">
+                                            <option value="SLIM">スリム・細身</option>
+                                            <option value="REGULAR" selected>標準 (スタンダード)</option>
+                                            <option value="ATHLETIC">アスリート・がっしり</option>
+                                            <option value="RELAXED">ゆったり・リラックス</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="style-taste">好みのスタイリングテイスト</label>
+                                    <select id="style-taste" class="form-input">
+                                        <option value="MINIMAL" selected>ミニマル・シンプル（モノトーン中心）</option>
+                                        <option value="CASUAL">クリーンカジュアル（日常・通学向け）</option>
+                                        <option value="DRESS">スマートドレス・きれいめ（デート・外出向け）</option>
+                                        <option value="OVERSIZED">モード・ストリート（オーバーサイズ中心）</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-sm">体型・好みの設定を保存する</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- メインコンテンツ領域の終了 -->
     </main>
 
@@ -842,6 +1582,135 @@
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- マイクローゼット：手持ち服登録モーダル          -->
+    <!-- ============================================== -->
+    <div class="modal-backdrop" id="modal-add-closet" role="dialog" aria-modal="true"
+        aria-labelledby="modal-add-closet-title">
+        <div class="modal-dialog modal-dialog-closet">
+            <div class="modal-header">
+                <span class="modal-badge">MY CLOSET</span>
+                <button class="modal-close-btn" onclick="closeAddClosetModal()" aria-label="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h2 class="modal-title" id="modal-add-closet-title">手持ちの服を登録する</h2>
+                <p class="modal-subtext">登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。</p>
+
+                <form id="form-add-closet" onsubmit="handleAddClosetItem(event)">
+                    <!-- 写真・画像登録エリア -->
+                    <div class="form-group">
+                        <label class="form-label">服の写真（画像） <span class="required">*</span></label>
+                        <div class="closet-upload-box" id="closet-upload-box"
+                            onclick="document.getElementById('closet-file-input').click()">
+                            <input type="file" id="closet-file-input" accept="image/*" style="display: none;"
+                                onchange="handleClosetImageSelect(event)">
+                            <div class="upload-preview" id="closet-img-preview" style="display: none;">
+                                <img src="" alt="プレビュー" id="closet-preview-img">
+                                <span class="upload-change-text">タップして写真を変更</span>
+                            </div>
+                            <div class="upload-placeholder" id="closet-img-placeholder">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="upload-main-text">写真を選択・撮影する</span>
+                                <span class="upload-sub-text">または、以下のクイック写真から選ぶこともできます</span>
+                            </div>
+                        </div>
+
+                        <!-- 撮影なしでもすぐ試せるクイック画像選択 -->
+                        <div class="preset-img-selector">
+                            <span class="preset-label">クイック写真:</span>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒パンツ</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('white_sneakers', '白レザースニーカー')">白スニーカー</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('grey_hoodie', 'ヘビーウェイト グレーパーカー')">グレーパーカー</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('white_tshirt', 'リラックス 白Tシャツ')">白Tシャツ</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('denim_jacket', 'オーバーサイズ デニムジャケット')">デニムジャケット</button>
+                        </div>
+                    </div>
+
+                    <!-- 服名 -->
+                    <div class="form-group">
+                        <label class="form-label" for="closet-item-name">服の名前・ブランド <span
+                                class="required">*</span></label>
+                        <input type="text" id="closet-item-name" class="form-input" placeholder="例: 黒ワイドタックパンツ、白スニーカー"
+                            required>
+                    </div>
+
+                    <!-- カテゴリ -->
+                    <div class="form-group">
+                        <label class="form-label">カテゴリ <span class="required">*</span></label>
+                        <div class="category-radio-grid">
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="TOPS" required>
+                                <span>トップス (Tシャツ/ニット/パーカー)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="BOTTOMS" required checked>
+                                <span>パンツ (スラックス/デニム/スウェット)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="OUTER" required>
+                                <span>アウター (コート/ジャケット)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="SHOES" required>
+                                <span>靴 (スニーカー/革靴/ブーツ)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- メインカラー -->
+                        <div class="form-group flex-1">
+                            <label class="form-label" for="closet-item-color">メインの色 <span
+                                    class="required">*</span></label>
+                            <select id="closet-item-color" class="form-input" required>
+                                <option value="BLACK" selected>BLACK (ブラック・黒)</option>
+                                <option value="WHITE">WHITE (ホワイト・白)</option>
+                                <option value="CHARCOAL">CHARCOAL (チャコール・濃灰)</option>
+                                <option value="GREY">GREY (グレー・灰)</option>
+                                <option value="NAVY">NAVY (ネイビー・紺)</option>
+                                <option value="BEIGE">BEIGE (ベージュ・生成)</option>
+                                <option value="BROWN">BROWN (ブラウン・茶)</option>
+                                <option value="BLUE">BLUE (ブルー・青・デニム)</option>
+                                <option value="OTHER">OTHER (その他)</option>
+                            </select>
+                        </div>
+
+                        <!-- 季節 -->
+                        <div class="form-group flex-1">
+                            <label class="form-label" for="closet-item-season">着用季節 <span
+                                    class="required">*</span></label>
+                            <select id="closet-item-season" class="form-input" required>
+                                <option value="通年" selected>通年 (オールシーズン)</option>
+                                <option value="春">春 (Spring)</option>
+                                <option value="夏">夏 (Summer)</option>
+                                <option value="秋">秋 (Autumn)</option>
+                                <option value="冬">冬 (Winter)</option>
+                                <option value="秋冬">秋冬 (Fall/Winter)</option>
+                                <option value="春夏">春夏 (Spring/Summer)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddClosetModal()">キャンセル</button>
+                        <button type="submit" class="btn btn-primary" id="btn-closet-submit"
+                            onclick="handleAddClosetItem(event)">クローゼットに登録する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- 操作通知用トーストメッセージコンテナ -->
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
@@ -866,7 +1735,7 @@
                         <li><a href="#new-items">NEW ITEM (新作)</a></li>
                         <li><a href="#favorites">FAVORITE (お気に入り)</a></li>
                         <li><a href="#checkout">CHECKOUT (ご購入)</a></li>
-                        <li><a href="javascript:void(0)" class="nav-manekin-btn">MANEKIN (AI機能)</a></li>
+                        <li><a href="#manekin-studio">MANEKIN (AIコーデ機能)</a></li>
                     </ul>
                 </div>
                 <div class="footer-links-column">

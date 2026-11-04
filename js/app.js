@@ -488,7 +488,92 @@ const AppState = {
         }
     ],
     selectedCategory: "ALL",
-    selectedSort: "default"
+    selectedSort: "default",
+
+    // =========================================================================
+    // ■ AIコーデシミュレーション（MANEKIN AI STUDIO）状態管理
+    // =========================================================================
+    // マイクローゼット（手持ち服データ）
+    myCloset: JSON.parse(localStorage.getItem('manekin_my_closet')) || [
+        {
+            id: 'c1',
+            name: '黒ワイドスラックス',
+            category: 'BOTTOMS',
+            color: 'BLACK',
+            season: '通年',
+            image: 'assets/images/pants_black.jpg',
+            isOwned: true
+        },
+        {
+            id: 'c2',
+            name: 'クラシック 白レザースニーカー',
+            category: 'SHOES',
+            color: 'WHITE',
+            season: '通年',
+            image: 'assets/images/shoes_white.jpg',
+            isOwned: true
+        },
+        {
+            id: 'c3',
+            name: 'ヘビーウェイト グレーパーカー',
+            category: 'TOPS',
+            color: 'GREY',
+            season: '秋冬',
+            image: 'assets/images/sweat_grey.jpg',
+            isOwned: true
+        },
+        {
+            id: 'c4',
+            name: 'プレミアム リラックス 白Tシャツ',
+            category: 'TOPS',
+            color: 'WHITE',
+            season: '春夏',
+            image: 'assets/images/tshirt_white.jpg',
+            isOwned: true
+        }
+    ],
+    // マネキン現在着用スロット
+    currentOutfit: JSON.parse(localStorage.getItem('manekin_current_outfit')) || {
+        outer: null,
+        tops: null,
+        bottoms: null,
+        shoes: null
+    },
+    // 保存したコーデ一覧（ルックブック）
+    savedOutfits: JSON.parse(localStorage.getItem('manekin_saved_outfits')) || [
+        {
+            id: 'outfit-sample-1',
+            title: '秋の通学・デイリーコーデ',
+            date: '2026/10/26 15:20',
+            comment: '黒パンツとグレーパーカーの組み合わせは落ち着いた印象を与えます。白スニーカーがアクセントとなりバランスの良いカジュアルコーデです。',
+            tags: ['#キレイめカジュアル', '#通学デイリー', '#モノトーン+1'],
+            score: 95,
+            items: {
+                bottoms: { id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/pants_black.jpg' },
+                shoes: { id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: 'assets/images/shoes_white.jpg' },
+                tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'ASH GREY', isOwned: false, price: 3490, image: 'assets/images/sweat_grey.jpg' }
+            }
+        }
+    ],
+    // スタジオ内のUI状態
+    studioActiveTab: 'create',
+    studioGender: 'MEN',
+    studioClosetFilter: 'ALL',
+    studioBrandFilter: 'ALL',
+    studioBrandFavOnly: false,
+    studioMobileView: 'mannequin',
+    activeAdjustSlot: 'tops',
+    fittingOffsets: JSON.parse(localStorage.getItem('manekin_fitting_offsets')) || {
+        tops: { x: 0, y: 0, scale: 100 },
+        outer: { x: 0, y: 0, scale: 100 },
+        bottoms: { x: 0, y: 0, scale: 100 },
+        shoes: { x: 0, y: 0, scale: 100 }
+    },
+    userBodyProfile: JSON.parse(localStorage.getItem('manekin_body_profile')) || {
+        height: 172,
+        bodyType: 'REGULAR',
+        styleTaste: 'MINIMAL'
+    }
 };
 
 // --------------------------------------------------------------------------
@@ -595,6 +680,13 @@ function handleRouting() {
             showView('view-mypage');
             highlightNavLink('mypage');
             renderMyPage();
+            break;
+
+        case '#manekin':
+        case '#manekin-studio':
+            showView('view-manekin-studio');
+            highlightNavLink('manekin-studio');
+            renderManekinStudio(AppState.studioActiveTab || 'create');
             break;
 
         default:
@@ -1156,11 +1248,16 @@ function renderMyPage() {
                 </tr>
             `;
         } else {
-            ordersTbody.innerHTML = AppState.orderHistory.map(order => `
+            ordersTbody.innerHTML = AppState.orderHistory.map((order, idx) => `
                 <tr>
                     <td><strong>${order.order_no}</strong></td>
                     <td>${order.date}</td>
-                    <td>${order.items_summary || "ご注文商品"}</td>
+                    <td>
+                        <div>${order.items_summary || "ご注文商品"}</div>
+                        <button class="btn btn-outline-xs mt-1" onclick="importOrderToCloset(${idx})" style="font-size: 0.72rem; padding: 2px 8px; margin-top: 4px;" title="購入した服をマイクローゼットへ登録">
+                            + クローゼットへ登録
+                        </button>
+                    </td>
                     <td><strong>¥${(order.total_amount || 0).toLocaleString()}</strong></td>
                     <td><span class="status-badge">${order.status || "発送準備中"}</span></td>
                 </tr>
@@ -1389,7 +1486,7 @@ function setupEventListeners() {
     document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            openManekinModal();
+            window.location.hash = '#manekin-studio';
         });
     });
 
@@ -1403,6 +1500,18 @@ function setupEventListeners() {
         manekinModal.addEventListener('click', (e) => {
             if (e.target === manekinModal) closeManekinModal();
         });
+    }
+
+    const closetModal = document.getElementById('modal-add-closet');
+    if (closetModal) {
+        closetModal.addEventListener('click', (e) => {
+            if (e.target === closetModal) closeAddClosetModal();
+        });
+    }
+
+    const closetForm = document.getElementById('form-add-closet');
+    if (closetForm) {
+        closetForm.addEventListener('submit', handleAddClosetItem);
     }
 
     const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -1474,3 +1583,1299 @@ function setupEventListeners() {
         });
     });
 }
+
+// ==========================================================================
+// 15. MANEKIN AI STUDIO（AIコーデシミュレーション機能）ロジック
+// ==========================================================================
+
+// クイック選択用プリセット画像マッピング
+const PRESET_CLOSET_PRESETS = {
+    'black_pants': {
+        name: '黒ワイドスラックス',
+        category: 'BOTTOMS',
+        color: 'BLACK',
+        season: '通年',
+        image: 'assets/images/pants_black.jpg'
+    },
+    'white_sneakers': {
+        name: '白レザースニーカー',
+        category: 'SHOES',
+        color: 'WHITE',
+        season: '通年',
+        image: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22300%22%20viewBox%3D%220%200%20300%20300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22300%22%20height%3D%22300%22%2F%3E%3Cpath%20d%3D%22M40%20200%20C40%20170%2090%20150%20140%20150%20C170%20150%20200%20130%20230%20140%20C260%20150%20270%20180%20270%20210%20L40%20210%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23111111%22%20stroke-width%3D%226%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%20210%20L270%20210%20L270%20230%20C270%20235%20265%20240%20260%20240%20L50%20240%20C45%20240%2040%20235%2040%20230%20Z%22%20fill%3D%22%23e5e7eb%22%20stroke%3D%22%23111111%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M150%20150%20L180%20170%20M170%20150%20L200%20170%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22270%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-size%3D%2214%22%20font-family%3D%22sans-serif%22%20letter-spacing%3D%221%22%3ESNEAKERS%3C%2Ftext%3E%3C%2Fsvg%3E'
+    },
+    'grey_hoodie': {
+        name: 'ヘビーウェイト グレーパーカー',
+        category: 'TOPS',
+        color: 'GREY',
+        season: '秋冬',
+        image: 'assets/images/sweat_grey.jpg'
+    },
+    'white_tshirt': {
+        name: 'プレミアム リラックス 白Tシャツ',
+        category: 'TOPS',
+        color: 'WHITE',
+        season: '春夏',
+        image: 'assets/images/tshirt_white.jpg'
+    },
+    'denim_jacket': {
+        name: 'オーバーサイズ デニムジャケット',
+        category: 'OUTER',
+        color: 'BLUE',
+        season: '春秋',
+        image: 'assets/images/jacket_black.jpg'
+    }
+};
+
+let currentClosetUploadDataUrl = '';
+
+/**
+ * スタジオ内のサブタブ切り替え
+ */
+function switchStudioTab(tabKey) {
+    AppState.studioActiveTab = tabKey;
+
+    // タブボタンのアクティブ更新
+    document.querySelectorAll('.studio-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-studio-tab') === tabKey);
+    });
+
+    // パネルのアクティブ更新
+    document.querySelectorAll('.studio-pane').forEach(pane => {
+        pane.classList.remove('active');
+    });
+    const targetPane = document.getElementById(`studio-pane-${tabKey}`);
+    if (targetPane) {
+        targetPane.classList.add('active');
+    }
+
+    renderManekinStudio(tabKey);
+}
+
+/**
+ * MANEKIN AI STUDIOの全般描画
+ */
+function renderManekinStudio(activeTab = 'create') {
+    // ユーザー名反映
+    const userNameElem = document.getElementById('studio-user-name');
+    if (userNameElem && AppState.currentUser) {
+        userNameElem.textContent = AppState.currentUser.name || '会員 様';
+    }
+    const avatarCharElem = document.getElementById('studio-avatar-char');
+    if (avatarCharElem && AppState.currentUser) {
+        avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
+    }
+
+    // バッジ件数更新
+    const closetBadge = document.getElementById('studio-closet-badge');
+    if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
+
+    const favBadge = document.getElementById('studio-fav-badge');
+    if (favBadge) favBadge.textContent = AppState.favorites.length;
+
+    const savedBadge = document.getElementById('studio-saved-badge');
+    if (savedBadge) savedBadge.textContent = AppState.savedOutfits.length;
+
+    const mobClosetCnt = document.getElementById('mob-closet-cnt');
+    if (mobClosetCnt) mobClosetCnt.textContent = AppState.myCloset.length;
+
+    // ホームサマリーの数値
+    const homeCloset = document.getElementById('home-stat-closet');
+    if (homeCloset) homeCloset.innerHTML = `${AppState.myCloset.length} <small>点</small>`;
+
+    const homeSaved = document.getElementById('home-stat-saved');
+    if (homeSaved) homeSaved.innerHTML = `${AppState.savedOutfits.length} <small>組</small>`;
+
+    const homeFav = document.getElementById('home-stat-fav');
+    if (homeFav) homeFav.innerHTML = `${AppState.favorites.length} <small>点</small>`;
+
+    // プロフィール情報反映
+    const profName = document.getElementById('prof-display-name');
+    if (profName && AppState.currentUser) profName.textContent = AppState.currentUser.name;
+    const profEmail = document.getElementById('prof-display-email');
+    if (profEmail && AppState.currentUser) profEmail.textContent = AppState.currentUser.email;
+
+    // 各タブごとの描画
+    switch (activeTab) {
+        case 'home':
+            break;
+        case 'closet':
+            renderPaneClosetGrid();
+            break;
+        case 'favorites':
+            renderStudioFavoritesGrid();
+            break;
+        case 'create':
+            renderStudioClosetList();
+            renderStudioBrandList();
+            renderMannequinStage();
+            updateAIStylingComment();
+            break;
+        case 'saved':
+            renderSavedOutfitsGrid();
+            break;
+        case 'profile':
+            break;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 15.1 マイクローゼット（手持ち服）の描画 & 操作
+// --------------------------------------------------------------------------
+
+/**
+ * パネル2（マイクローゼット画面）のグリッド描画
+ */
+function renderPaneClosetGrid() {
+    const grid = document.getElementById('closet-items-grid');
+    if (!grid) return;
+
+    const filter = AppState.studioClosetFilter || 'ALL';
+    const items = (filter === 'ALL')
+        ? AppState.myCloset
+        : AppState.myCloset.filter(item => item.category === filter);
+
+    if (items.length === 0) {
+        grid.innerHTML = `
+            <div class="closet-empty-card">
+                <div class="closet-empty-icon">🧥</div>
+                <h3 class="closet-empty-title">まだ手持ちの服が登録されていません</h3>
+                <p class="closet-empty-desc">お気に入りの服やよく着る服を登録すると、ブランド商品とのコーディネートを試着できます。</p>
+                <button class="btn btn-primary" onclick="openAddClosetModal()">+ 手持ちの服を登録する</button>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = items.map(item => {
+        const isWearing = isItemWearing(item);
+        const colorHex = getColorHex(item.color);
+
+        return `
+            <div class="closet-card ${isWearing ? 'is-wearing' : ''}">
+                <div class="closet-card-thumb-wrap">
+                    <img src="${item.image}" alt="${item.name}" class="closet-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                    <span class="closet-badge-owned">手持ち服</span>
+                    ${isWearing ? '<span class="closet-badge-wearing">● 着用中</span>' : ''}
+                </div>
+                <div class="closet-card-body">
+                    <div class="closet-card-meta">
+                        <span class="closet-card-cat">${getCategoryNameJP(item.category)}</span>
+                        <span class="closet-color-dot" style="background-color: ${colorHex};" title="${item.color}"></span>
+                    </div>
+                    <h4 class="closet-card-name">${item.name}</h4>
+                    <p class="closet-card-season">季節: ${item.season || '通年'}</p>
+                    <div class="closet-card-actions">
+                        <button class="btn-wear-toggle ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem('${item.id}', true)">
+                            ${isWearing ? '試着を外す' : 'マネキンに着せる'}
+                        </button>
+                        <button class="btn-closet-del" onclick="deleteClosetItem('${item.id}')" title="削除">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * スタジオ内（左カラム）の手持ち服リスト描画
+ */
+function renderStudioClosetList() {
+    const list = document.getElementById('studio-closet-list');
+    if (!list) return;
+
+    const filter = AppState.studioClosetFilter || 'ALL';
+    const items = (filter === 'ALL')
+        ? AppState.myCloset
+        : AppState.myCloset.filter(item => item.category === filter);
+
+    if (items.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 30px 10px; color: var(--color-gray-medium);">
+                <p style="font-size: 0.85rem; margin-bottom: 12px;">該当する手持ち服がありません</p>
+                <button class="btn btn-outline-xs" onclick="openAddClosetModal()">+ 手持ち服を登録</button>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = items.map(item => {
+        const isWearing = isItemWearing(item);
+        const colorHex = getColorHex(item.color);
+
+        return `
+            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem('${item.id}', true)">
+                <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                <div class="studio-item-card-info">
+                    <div class="studio-card-cat-row">
+                        <span class="studio-card-cat">${getCategoryNameJP(item.category)}</span>
+                        <span class="closet-color-dot" style="background-color: ${colorHex}; width: 9px; height: 9px;" title="${item.color}"></span>
+                    </div>
+                    <div class="studio-card-name" title="${item.name}">${item.name}</div>
+                    <div class="studio-card-sub">${item.season || '通年'}</div>
+                </div>
+                ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function handlePaneClosetFilter(cat) {
+    AppState.studioClosetFilter = cat;
+    document.querySelectorAll('#pane-closet-filter-bar .filter-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+    });
+    renderPaneClosetGrid();
+}
+
+function handleStudioClosetFilter(cat) {
+    AppState.studioClosetFilter = cat;
+    document.querySelectorAll('#col-closet-filter .mini-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+    });
+    renderStudioClosetList();
+}
+
+// --------------------------------------------------------------------------
+// 15.2 ブランド商品（右カラム & お気に入り）の描画
+// --------------------------------------------------------------------------
+
+/**
+ * スタジオ内（右カラム）のブランド商品リスト描画
+ */
+function renderStudioBrandList() {
+    const list = document.getElementById('studio-brand-list');
+    if (!list) return;
+
+    const filter = AppState.studioBrandFilter || 'ALL';
+    let products = (filter === 'ALL')
+        ? SAMPLE_PRODUCTS
+        : SAMPLE_PRODUCTS.filter(p => p.category === filter);
+
+    if (AppState.studioBrandFavOnly) {
+        products = products.filter(p => AppState.favorites.includes(p.id));
+    }
+
+    if (products.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 30px 10px; color: var(--color-gray-medium);">
+                <p style="font-size: 0.85rem;">該当するアイテムがありません</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = products.map(product => {
+        const isWearing = isItemWearing(product);
+        const isFav = AppState.favorites.includes(product.id);
+
+        return `
+            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem(${product.id}, false)">
+                <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                <div class="studio-item-card-info">
+                    <div class="studio-card-cat-row">
+                        <span class="studio-card-cat">${product.category}</span>
+                        ${isFav ? '<span style="color: var(--color-accent); font-size: 0.7rem;">♥</span>' : ''}
+                    </div>
+                    <div class="studio-card-name" title="${product.name}">${product.name}</div>
+                    <div class="studio-card-sub">¥${product.price.toLocaleString()}</div>
+                </div>
+                ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function handleStudioBrandFilter(cat) {
+    AppState.studioBrandFilter = cat;
+    document.querySelectorAll('#col-brand-filter .mini-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-brand-cat') === cat);
+    });
+    renderStudioBrandList();
+}
+
+function toggleBrandFavFilter(chk) {
+    AppState.studioBrandFavOnly = chk.checked;
+    renderStudioBrandList();
+}
+
+/**
+ * パネル3（お気に入りブランド商品）の描画
+ */
+function renderStudioFavoritesGrid() {
+    const grid = document.getElementById('studio-fav-grid');
+    if (!grid) return;
+
+    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+
+    if (favProducts.length === 0) {
+        grid.innerHTML = `
+            <div class="closet-empty-card">
+                <div class="closet-empty-icon">♥</div>
+                <h3 class="closet-empty-title">お気に入りに登録されたアイテムはありません</h3>
+                <p class="closet-empty-desc">商品一覧でお気に入り（ハート）を登録すると、ここに一覧表示されワンクリックでマネキンに着せ替えることができます。</p>
+                <a href="#items" class="btn btn-primary">商品コレクションを見る</a>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = favProducts.map(product => {
+        const isWearing = isItemWearing(product);
+        return `
+            <article class="product-card" data-id="${product.id}">
+                <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
+                    <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                    <span class="badge-new" style="background: var(--color-black);">試着する</span>
+                </div>
+                <div class="product-info">
+                    <span class="product-category">${product.category}</span>
+                    <h3 class="product-name" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">${product.name}</h3>
+                    <p class="product-price">¥${product.price.toLocaleString()}</p>
+                    <button class="btn btn-primary btn-block btn-sm mt-2" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
+                        ${isWearing ? '試着中 (スタジオを開く)' : 'マネキンに着せて試着する'}
+                    </button>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
+// --------------------------------------------------------------------------
+// 15.3 マネキン試着室 & 自動反映 & レイヤード表示
+// --------------------------------------------------------------------------
+
+/**
+ * アイテムが現在マネキンに着用されているか判定
+ */
+function isItemWearing(item) {
+    const outfit = AppState.currentOutfit;
+    if (!outfit) return false;
+    for (const slotKey in outfit) {
+        const worn = outfit[slotKey];
+        if (worn && String(worn.id) === String(item.id)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * 試着トグル（着用 / 脱がす）
+ */
+function toggleWearItem(itemId, isOwned) {
+    let targetItem = null;
+    if (isOwned) {
+        targetItem = AppState.myCloset.find(c => String(c.id) === String(itemId));
+    } else {
+        targetItem = SAMPLE_PRODUCTS.find(p => p.id === parseInt(itemId, 10));
+    }
+
+    if (!targetItem) return;
+
+    const slotKey = getSlotKeyByCategory(targetItem.category);
+    if (!slotKey) return;
+
+    const currentWorn = AppState.currentOutfit[slotKey];
+    if (currentWorn && String(currentWorn.id) === String(targetItem.id)) {
+        // すでに着用中なら脱がす
+        AppState.currentOutfit[slotKey] = null;
+        showToastNotification(`「${targetItem.name}」を外しました`);
+    } else {
+        // スロットに着用
+        AppState.currentOutfit[slotKey] = {
+            id: targetItem.id,
+            name: targetItem.name,
+            category: targetItem.category,
+            color: targetItem.color || (targetItem.colors ? targetItem.colors[0] : 'BLACK'),
+            price: targetItem.price || 0,
+            image: targetItem.image,
+            isOwned: !!isOwned
+        };
+        showToastNotification(`「${targetItem.name}」をマネキンに試着しました`);
+    }
+
+    localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+
+    // UI更新
+    renderMannequinStage();
+    renderStudioClosetList();
+    renderStudioBrandList();
+    updateAIStylingComment();
+}
+
+/**
+ * カテゴリをスロットキーにマッピング
+ */
+function getSlotKeyByCategory(category) {
+    switch (category) {
+        case 'OUTER': return 'outer';
+        case 'TOPS': return 'tops';
+        case 'BOTTOMS': return 'bottoms';
+        case 'SHOES': return 'shoes';
+        default: return 'tops';
+    }
+}
+
+/**
+ * スロットの服を脱がせる
+ */
+function unwearSlot(slotKey) {
+    if (AppState.currentOutfit[slotKey]) {
+        const name = AppState.currentOutfit[slotKey].name;
+        AppState.currentOutfit[slotKey] = null;
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+        showToastNotification(`「${name}」を外しました`);
+
+        renderMannequinStage();
+        renderStudioClosetList();
+        renderStudioBrandList();
+        updateAIStylingComment();
+    }
+}
+
+/**
+ * 全身クリア（すべての服を脱がす）
+ */
+function clearMannequin() {
+    AppState.currentOutfit = {
+        outer: null,
+        tops: null,
+        bottoms: null,
+        shoes: null
+    };
+    localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+    showToastNotification('マネキンの着用服をすべてクリアしました');
+
+    renderMannequinStage();
+    renderStudioClosetList();
+    renderStudioBrandList();
+    updateAIStylingComment();
+}
+
+/**
+ * マネキンステージの描画更新
+ */
+function renderMannequinStage() {
+    const outfit = AppState.currentOutfit || {};
+
+    const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+    slots.forEach(slot => {
+        const layerContent = document.getElementById(`layer-content-${slot}`);
+        const labelElem = document.getElementById(`label-${slot}`);
+        const item = outfit[slot];
+
+        if (layerContent) {
+            if (item && item.image) {
+                layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.src='assets/images/tshirt_white.jpg'">`;
+                if (labelElem) labelElem.style.display = 'none';
+            } else {
+                layerContent.innerHTML = '';
+                if (labelElem) labelElem.style.display = 'block';
+            }
+        }
+    });
+
+    // 着用中チップバーの更新
+    const slotsBar = document.getElementById('wearing-slots-bar');
+    if (slotsBar) {
+        const chipsHtml = [];
+        for (const slotKey of slots) {
+            const item = outfit[slotKey];
+            if (item) {
+                const badgeLabel = item.isOwned ? '手持ち' : 'ブランド';
+                chipsHtml.push(`
+                    <span class="wearing-chip">
+                        <span>${getCategoryNameJP(item.category)}: ${item.name} (${badgeLabel})</span>
+                        <button class="wearing-chip-del" onclick="unwearSlot('${slotKey}')" title="脱がせる">×</button>
+                    </span>
+                `);
+            }
+        }
+        slotsBar.innerHTML = chipsHtml.join('');
+    }
+
+    // ブランド商品サマリー計算
+    let brandCount = 0;
+    let brandPrice = 0;
+    for (const slotKey of slots) {
+        const item = outfit[slotKey];
+        if (item && !item.isOwned) {
+            brandCount++;
+            brandPrice += (item.price || 0);
+        }
+    }
+
+    const countElem = document.getElementById('brand-sum-count');
+    if (countElem) countElem.textContent = `${brandCount}点`;
+
+    const priceElem = document.getElementById('brand-sum-price');
+    if (priceElem) priceElem.textContent = `¥${brandPrice.toLocaleString()}`;
+
+    const cartBtn = document.getElementById('btn-add-brand-to-cart');
+    if (cartBtn) {
+        cartBtn.disabled = (brandCount === 0);
+    }
+
+    // 服の位置・サイズ微調整オフセットを適用
+    applyFittingOffsets();
+}
+
+/**
+ * 服の位置・サイズ微調整オフセットを各レイヤーに適用
+ */
+function applyFittingOffsets() {
+    const offsets = AppState.fittingOffsets || {};
+    const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+
+    slots.forEach(slot => {
+        const layerElem = document.getElementById(`layer-${slot}`);
+        if (!layerElem) return;
+        const off = offsets[slot] || { x: 0, y: 0, scale: 100 };
+        layerElem.style.setProperty('--offset-x', `${off.x || 0}px`);
+        layerElem.style.setProperty('--offset-y', `${off.y || 0}px`);
+        layerElem.style.setProperty('--scale', (off.scale || 100) / 100);
+    });
+}
+
+/**
+ * 位置微調整パネルの開閉トグル
+ */
+function toggleFittingAdjustPanel() {
+    const panel = document.getElementById('fitting-adjust-panel');
+    const btn = document.getElementById('btn-toggle-adjust-mode');
+    if (!panel) return;
+
+    const isHidden = panel.style.display === 'none' || panel.style.display === '';
+    panel.style.display = isHidden ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', isHidden);
+
+    if (isHidden) {
+        syncAdjustPanelUI();
+    }
+}
+
+/**
+ * 微調整対象スロットタブ切り替え
+ */
+function switchAdjustSlot(slotKey) {
+    AppState.activeAdjustSlot = slotKey;
+    document.querySelectorAll('#adjust-slot-tabs .adjust-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-adjust-slot') === slotKey);
+    });
+    syncAdjustPanelUI();
+}
+
+/**
+ * スライダーUIの値を現在のオフセットに同期
+ */
+function syncAdjustPanelUI() {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const offsets = AppState.fittingOffsets || {};
+    const off = offsets[slotKey] || { x: 0, y: 0, scale: 100 };
+
+    const sliderY = document.getElementById('slider-adjust-y');
+    const sliderX = document.getElementById('slider-adjust-x');
+    const sliderScale = document.getElementById('slider-adjust-scale');
+
+    const valY = document.getElementById('val-adjust-y');
+    const valX = document.getElementById('val-adjust-x');
+    const valScale = document.getElementById('val-adjust-scale');
+
+    if (sliderY) sliderY.value = off.y || 0;
+    if (sliderX) sliderX.value = off.x || 0;
+    if (sliderScale) sliderScale.value = off.scale || 100;
+
+    if (valY) valY.textContent = `${off.y > 0 ? '+' : ''}${off.y || 0}px`;
+    if (valX) valX.textContent = `${off.x > 0 ? '+' : ''}${off.x || 0}px`;
+    if (valScale) valScale.textContent = `${off.scale || 100}%`;
+}
+
+/**
+ * スライダー変更時の処理
+ */
+function handleAdjustInput(prop, val) {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    if (!AppState.fittingOffsets[slotKey]) {
+        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+    }
+
+    const numVal = parseInt(val, 10);
+    AppState.fittingOffsets[slotKey][prop] = numVal;
+
+    // UI表示更新
+    if (prop === 'y') {
+        const valElem = document.getElementById('val-adjust-y');
+        if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
+    } else if (prop === 'x') {
+        const valElem = document.getElementById('val-adjust-x');
+        if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
+    } else if (prop === 'scale') {
+        const valElem = document.getElementById('val-adjust-scale');
+        if (valElem) valElem.textContent = `${numVal}%`;
+    }
+
+    // 画面のマネキン服へ即座に反映
+    applyFittingOffsets();
+
+    // ローカルストレージへ保存
+    localStorage.setItem('manekin_fitting_offsets', JSON.stringify(AppState.fittingOffsets));
+}
+
+/**
+ * 微調整ボタン（▲▼◀▶＋－）クリック時の増減
+ */
+function stepAdjust(prop, delta) {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    if (!AppState.fittingOffsets[slotKey]) {
+        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+    }
+
+    let current = AppState.fittingOffsets[slotKey][prop];
+    if (current === undefined) {
+        current = (prop === 'scale') ? 100 : 0;
+    }
+    const nextVal = current + delta;
+    handleAdjustInput(prop, nextVal);
+
+    const slider = document.getElementById(`slider-adjust-${prop}`);
+    if (slider) slider.value = nextVal;
+}
+
+/**
+ * オフセット初期化リセット
+ */
+function resetFittingOffsets() {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+    syncAdjustPanelUI();
+    applyFittingOffsets();
+    localStorage.setItem('manekin_fitting_offsets', JSON.stringify(AppState.fittingOffsets));
+    showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
+}
+
+/**
+ * 性別切り替え
+ */
+function setMannequinGender(gender) {
+    AppState.studioGender = gender;
+    document.getElementById('btn-gender-men').classList.toggle('active', gender === 'MEN');
+    document.getElementById('btn-gender-women').classList.toggle('active', gender === 'WOMEN');
+
+    // マネキンSVGのプロポーション切り替え
+    const torso = document.querySelector('#torso-group');
+    if (torso) {
+        torso.style.transform = (gender === 'WOMEN') ? 'scale(0.95)' : 'none';
+        torso.style.transformOrigin = 'center 120px';
+    }
+
+    showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
+}
+
+/**
+ * モバイルビューの切り替え
+ */
+function switchMobileStudioView(viewKey) {
+    AppState.studioMobileView = viewKey;
+
+    document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-mobile-view') === viewKey);
+    });
+
+    const colCloset = document.getElementById('col-studio-closet');
+    const colMannequin = document.getElementById('col-studio-mannequin');
+    const colBrand = document.getElementById('col-studio-brand');
+
+    if (colCloset) colCloset.classList.toggle('mobile-active', viewKey === 'closet');
+    if (colMannequin) colMannequin.classList.toggle('mobile-active', viewKey === 'mannequin');
+    if (colBrand) colBrand.classList.toggle('mobile-active', viewKey === 'brand');
+}
+
+// --------------------------------------------------------------------------
+// 15.4 AIコメント生成エンジン & スタイリング診断
+// --------------------------------------------------------------------------
+
+/**
+ * マネキンの現在着用状態からリアルタイムAIコメントを生成
+ */
+function updateAIStylingComment() {
+    const outfit = AppState.currentOutfit || {};
+    const commentElem = document.getElementById('ai-comment-text');
+    const tagsElem = document.getElementById('ai-tags-wrap');
+    const dotsElem = document.getElementById('palette-dots');
+    const scoreValElem = document.getElementById('ai-score-val');
+    const scoreStarsElem = document.getElementById('ai-score-stars');
+
+    const wornItems = Object.values(outfit).filter(Boolean);
+
+    if (wornItems.length === 0) {
+        if (commentElem) {
+            commentElem.textContent = '左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。';
+        }
+        if (tagsElem) tagsElem.innerHTML = '<span class="ai-tag">#試着待ち</span>';
+        if (dotsElem) dotsElem.innerHTML = '';
+        if (scoreValElem) scoreValElem.textContent = '--点';
+        if (scoreStarsElem) scoreStarsElem.textContent = '☆☆☆☆☆';
+        return;
+    }
+
+    const hasBottoms = !!outfit.bottoms;
+    const hasTops = !!outfit.tops;
+    const hasOuter = !!outfit.outer;
+    const hasShoes = !!outfit.shoes;
+
+    // カラーパレット抽出
+    const colors = wornItems.map(item => item.color || 'BLACK');
+    const uniqueColors = [...new Set(colors)];
+
+    if (dotsElem) {
+        dotsElem.innerHTML = uniqueColors.map(c => `
+            <span class="palette-dot" style="background-color: ${getColorHex(c)};" title="${c}"></span>
+        `).join('');
+    }
+
+    // AI診断ロジックの構築
+    let comment = '';
+    let tags = [];
+    let score = 95;
+
+    // パターン1: 黒パンツ + 白スニーカー + パーカー/トップス（要件例の完全再現）
+    if (hasBottoms && hasShoes && outfit.bottoms.color === 'BLACK' && outfit.shoes.color === 'WHITE' && hasTops) {
+        comment = `「${outfit.bottoms.name}」と「${outfit.tops.name}」の組み合わせは落ち着いた印象を与えます。足元の「${outfit.shoes.name}」がアクセントとなり、視線が自然に抜けるバランスの良いカジュアルコーデです。`;
+        if (hasOuter) {
+            comment += ` さらに「${outfit.outer.name}」を羽織ることで、程よい大人の上品さとこなれ感がプラスされます。`;
+            tags = ['#大人の品格', '#モノトーン+1', '#Aラインシルエット'];
+            score = 98;
+        } else {
+            tags = ['#キレイめカジュアル', '#通学デイリー', '#モノトーンアクセント'];
+            score = 95;
+        }
+    }
+    // パターン2: アウターがある全身コーデ
+    else if (hasOuter && hasBottoms) {
+        comment = `「${outfit.outer.name}」の優美なドレープ感が全体のシルエットを引き締めています。ボトムスに「${outfit.bottoms.name}」を合わせることで、現代的で清潔感のあるミニマルな装いに仕上がっています。`;
+        tags = ['#スマートシルエット', '#都会派モード', '#大人の休日'];
+        score = 96;
+    }
+    // パターン3: トップス + ボトムス
+    else if (hasTops && hasBottoms) {
+        comment = `「${outfit.tops.name}」と「${outfit.bottoms.name}」の明度バランスが非常に美しく調和しています。手持ち服の日常感にブランドの上質さが加わり、抜け感のある洗練されたスタイルです。`;
+        tags = ['#黄金バランス', '#デイリーシック', '#着回し自在'];
+        score = 94;
+    }
+    // パターン4: 単品試着
+    else {
+        const singleItem = wornItems[0];
+        comment = `「${singleItem.name}」を着用中。美しいカッティングが際立っています。さらに相性の良い${hasTops ? 'パンツや靴' : 'トップスやアウター'}を組み合わせると、全体のトータルバランスを診断できます。`;
+        tags = ['#シルエット重視', '#スタイリング途中'];
+        score = 90;
+    }
+
+    // DOMへ反映
+    if (commentElem) commentElem.textContent = comment;
+    if (tagsElem) {
+        tagsElem.innerHTML = tags.map(t => `<span class="ai-tag">${t}</span>`).join('');
+    }
+    if (scoreValElem) scoreValElem.textContent = `${score}点`;
+    if (scoreStarsElem) scoreStarsElem.textContent = '★★★★★';
+}
+
+// --------------------------------------------------------------------------
+// 15.5 コーデ保存機能 & ルックブック
+// --------------------------------------------------------------------------
+
+/**
+ * プリセットコーデ名の適用
+ */
+function applyPresetName(name) {
+    const input = document.getElementById('outfit-name-input');
+    if (input) input.value = name;
+}
+
+/**
+ * コーデの保存処理
+ */
+function handleSaveOutfit(e) {
+    if (e) e.preventDefault();
+
+    const wornItems = Object.values(AppState.currentOutfit).filter(Boolean);
+    if (wornItems.length === 0) {
+        showToastNotification('マネキンに服を1着以上着せてから保存してください');
+        return;
+    }
+
+    const input = document.getElementById('outfit-name-input');
+    const title = (input && input.value.trim()) ? input.value.trim() : 'マイスタイリングコーデ';
+
+    const commentElem = document.getElementById('ai-comment-text');
+    const comment = commentElem ? commentElem.textContent : '';
+
+    const newOutfit = {
+        id: 'outfit-' + Date.now(),
+        title: title,
+        date: new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+        comment: comment,
+        items: JSON.parse(JSON.stringify(AppState.currentOutfit))
+    };
+
+    AppState.savedOutfits.unshift(newOutfit);
+    localStorage.setItem('manekin_saved_outfits', JSON.stringify(AppState.savedOutfits));
+
+    showToastNotification(`「${title}」を保存しました！`);
+    if (input) input.value = '';
+
+    // バッジ等の更新
+    renderManekinStudio(AppState.studioActiveTab);
+}
+
+/**
+ * 保存したコーデ一覧（ルックブック）の描画
+ */
+function renderSavedOutfitsGrid() {
+    const grid = document.getElementById('saved-outfits-grid');
+    if (!grid) return;
+
+    if (AppState.savedOutfits.length === 0) {
+        grid.innerHTML = `
+            <div class="closet-empty-card">
+                <div class="closet-empty-icon">📖</div>
+                <h3 class="closet-empty-title">保存したコーディネートはありません</h3>
+                <p class="closet-empty-desc">コーデ作成スタジオで組み合わせを作り、名前を付けて保存するとここにルックブックとしてストックされます。</p>
+                <button class="btn btn-primary" onclick="switchStudioTab('create')">コーデを作成する</button>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = AppState.savedOutfits.map(outfit => {
+        const items = outfit.items || {};
+        const itemList = Object.values(items).filter(Boolean);
+
+        const stripsHtml = itemList.map(it => `
+            <div class="saved-strip-item" title="${it.name}">
+                <img src="${it.image}" alt="${it.name}" class="saved-strip-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                <span class="saved-strip-tag">${it.isOwned ? '手持ち' : 'ブランド'}</span>
+            </div>
+        `).join('');
+
+        return `
+            <div class="saved-outfit-card">
+                <div class="saved-outfit-header">
+                    <div>
+                        <h4 class="saved-outfit-title">${outfit.title}</h4>
+                        <span class="saved-outfit-date">保存日: ${outfit.date}</span>
+                    </div>
+                    <button class="btn-closet-del" onclick="deleteSavedOutfit('${outfit.id}')" title="削除">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+                <div class="saved-items-preview-strip">
+                    ${stripsHtml}
+                </div>
+                <div class="saved-comment-excerpt">
+                    ${outfit.comment || 'AIスタイリング診断'}
+                </div>
+                <div class="saved-outfit-actions">
+                    <button class="btn-restore-outfit" onclick="restoreOutfit('${outfit.id}')">
+                        このコーデをマネキンに再現
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 保存したコーデをマネキンに再現
+ */
+function restoreOutfit(outfitId) {
+    const target = AppState.savedOutfits.find(o => o.id === outfitId);
+    if (!target) return;
+
+    AppState.currentOutfit = JSON.parse(JSON.stringify(target.items));
+    localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+
+    showToastNotification(`「${target.title}」をマネキンに復元しました`);
+    switchStudioTab('create');
+}
+
+/**
+ * 保存コーデの削除
+ */
+function deleteSavedOutfit(outfitId) {
+    if (confirm('この保存コーディネートを削除しますか？')) {
+        AppState.savedOutfits = AppState.savedOutfits.filter(o => o.id !== outfitId);
+        localStorage.setItem('manekin_saved_outfits', JSON.stringify(AppState.savedOutfits));
+        showToastNotification('コーディネートを削除しました');
+        renderSavedOutfitsGrid();
+        renderManekinStudio(AppState.studioActiveTab);
+    }
+}
+
+// --------------------------------------------------------------------------
+// 15.6 EC連携（試着中ブランド商品の1クリックカート追加）
+// --------------------------------------------------------------------------
+
+/**
+ * 着用中のブランド商品をショッピングカートへ一括追加
+ */
+function addCurrentBrandItemsToCart() {
+    const outfit = AppState.currentOutfit || {};
+    const brandItems = Object.values(outfit).filter(it => it && !it.isOwned);
+
+    if (brandItems.length === 0) {
+        showToastNotification('現在マネキンが着用しているブランド商品はありません');
+        return;
+    }
+
+    brandItems.forEach(item => {
+        const existing = AppState.cart.find(c => c.id === item.id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            AppState.cart.push({
+                id: item.id,
+                name: item.name,
+                color: item.color || 'BLACK',
+                size: 'M',
+                price: item.price || 0,
+                quantity: 1,
+                image: item.image
+            });
+        }
+    });
+
+    localStorage.setItem('manekin_cart', JSON.stringify(AppState.cart));
+    updateCartBadge();
+    showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しました！`);
+}
+
+// --------------------------------------------------------------------------
+// 15.7 手持ち服の登録モーダル処理
+// --------------------------------------------------------------------------
+
+function openAddClosetModal() {
+    const modal = document.getElementById('modal-add-closet');
+    if (modal) {
+        modal.classList.add('open');
+        modal.classList.add('active');
+        // 背景クリックで閉じる処理
+        modal.onclick = function(e) {
+            if (e.target === modal) closeAddClosetModal();
+        };
+    }
+}
+
+function closeAddClosetModal() {
+    const modal = document.getElementById('modal-add-closet');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.classList.remove('active');
+    }
+    currentClosetUploadDataUrl = '';
+    const preview = document.getElementById('closet-img-preview');
+    const placeholder = document.getElementById('closet-img-placeholder');
+    if (preview) preview.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    const form = document.getElementById('form-add-closet');
+    if (form) form.reset();
+}
+
+/**
+ * クイック写真の選択
+ */
+function selectPresetImage(presetKey, presetName) {
+    const preset = PRESET_CLOSET_PRESETS[presetKey];
+    if (!preset) return;
+
+    currentClosetUploadDataUrl = preset.image;
+
+    const preview = document.getElementById('closet-img-preview');
+    const previewImg = document.getElementById('closet-preview-img');
+    const placeholder = document.getElementById('closet-img-placeholder');
+
+    if (preview && previewImg && placeholder) {
+        previewImg.src = preset.image;
+        preview.style.display = 'flex';
+        placeholder.style.display = 'none';
+    }
+
+    const nameInput = document.getElementById('closet-item-name');
+    if (nameInput) nameInput.value = preset.name;
+
+    const catRadio = document.querySelector(`input[name="closet_category"][value="${preset.category}"]`);
+    if (catRadio) catRadio.checked = true;
+
+    const colorSelect = document.getElementById('closet-item-color');
+    if (colorSelect) colorSelect.value = preset.color;
+
+    const seasonSelect = document.getElementById('closet-item-season');
+    if (seasonSelect) seasonSelect.value = preset.season;
+}
+
+/**
+ * ファイル選択プレビュー
+ */
+function handleClosetImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        currentClosetUploadDataUrl = evt.target.result;
+        const preview = document.getElementById('closet-img-preview');
+        const previewImg = document.getElementById('closet-preview-img');
+        const placeholder = document.getElementById('closet-img-placeholder');
+
+        if (preview && previewImg && placeholder) {
+            previewImg.src = currentClosetUploadDataUrl;
+            preview.style.display = 'flex';
+            placeholder.style.display = 'none';
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+/**
+ * 新規手持ち服の登録
+ */
+function handleAddClosetItem(e) {
+    if (e) e.preventDefault();
+
+    const nameInput = document.getElementById('closet-item-name');
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) {
+        showToastNotification('服の名前を入力してください');
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    const catInput = document.querySelector('input[name="closet_category"]:checked');
+    const category = catInput ? catInput.value : 'BOTTOMS';
+
+    const colorSelect = document.getElementById('closet-item-color');
+    const color = colorSelect ? colorSelect.value : 'BLACK';
+
+    const seasonSelect = document.getElementById('closet-item-season');
+    const season = seasonSelect ? seasonSelect.value : '通年';
+
+    // 画像が手動アップロードされていない場合、カテゴリに即した最適なデフォルト写真を自動セット
+    let image = currentClosetUploadDataUrl;
+    if (!image) {
+        if (category === 'BOTTOMS') {
+            image = 'assets/images/pants_black.jpg';
+        } else if (category === 'SHOES') {
+            image = PRESET_CLOSET_PRESETS['white_sneakers'].image;
+        } else if (category === 'OUTER') {
+            image = 'assets/images/jacket_black.jpg';
+        } else {
+            image = 'assets/images/tshirt_white.jpg';
+        }
+    }
+
+    const newItem = {
+        id: 'c-' + Date.now(),
+        name: name,
+        category: category,
+        color: color,
+        season: season,
+        image: image,
+        isOwned: true
+    };
+
+    AppState.myCloset.unshift(newItem);
+    localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+
+    showToastNotification(`「${name}」をマイクローゼットに登録しました！`);
+    closeAddClosetModal();
+
+    // 画面再描画
+    renderManekinStudio(AppState.studioActiveTab);
+}
+
+/**
+ * 手持ち服の削除
+ */
+function deleteClosetItem(itemId) {
+    if (confirm('この手持ちの服をクローゼットから削除しますか？')) {
+        // もし現在着用中なら脱がす
+        for (const slotKey in AppState.currentOutfit) {
+            if (AppState.currentOutfit[slotKey] && String(AppState.currentOutfit[slotKey].id) === String(itemId)) {
+                AppState.currentOutfit[slotKey] = null;
+            }
+        }
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+
+        AppState.myCloset = AppState.myCloset.filter(c => String(c.id) !== String(itemId));
+        localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+
+        showToastNotification('手持ちの服を削除しました');
+        renderManekinStudio(AppState.studioActiveTab);
+    }
+}
+
+/**
+ * おすすめプリセットコーデの適用（ホームバナー用）
+ */
+function applyPresetLook(lookKey) {
+    // 例: 手持ち黒パンツ + 白スニーカー + トレンチコート
+    const blackPants = AppState.myCloset.find(c => c.category === 'BOTTOMS') || {
+        id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/pants_black.jpg'
+    };
+    const whiteSneakers = AppState.myCloset.find(c => c.category === 'SHOES') || {
+        id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: 'assets/images/shoes_white.jpg'
+    };
+    const trenchCoat = SAMPLE_PRODUCTS.find(p => p.id === 1) || SAMPLE_PRODUCTS[0];
+
+    AppState.currentOutfit = {
+        outer: { id: trenchCoat.id, name: trenchCoat.name, category: trenchCoat.category, color: 'CHARCOAL', price: trenchCoat.price, image: trenchCoat.image, isOwned: false },
+        tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'OFF WHITE', price: 3490, image: 'assets/images/sweat_white.jpg', isOwned: false },
+        bottoms: { id: blackPants.id, name: blackPants.name, category: blackPants.category, color: blackPants.color, isOwned: true, image: blackPants.image },
+        shoes: { id: whiteSneakers.id, name: whiteSneakers.name, category: whiteSneakers.category, color: whiteSneakers.color, isOwned: true, image: whiteSneakers.image }
+    };
+    localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+
+    showToastNotification('AIおすすめコーデをマネキンにセットしました');
+    switchStudioTab('create');
+}
+
+/**
+ * 体型プロフィールの保存
+ */
+function handleSaveBodyProfile(e) {
+    e.preventDefault();
+    const height = document.getElementById('body-height')?.value || 172;
+    const type = document.getElementById('body-type')?.value || 'REGULAR';
+    const taste = document.getElementById('style-taste')?.value || 'MINIMAL';
+
+    AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
+    localStorage.setItem('manekin_body_profile', JSON.stringify(AppState.userBodyProfile));
+
+    showToastNotification('体型および好みの設定を保存しました');
+}
+
+// --------------------------------------------------------------------------
+// 15.8 ユーティリティ
+// --------------------------------------------------------------------------
+
+function getCategoryNameJP(cat) {
+    switch (cat) {
+        case 'OUTER': return 'アウター';
+        case 'TOPS': return 'トップス';
+        case 'BOTTOMS': return 'パンツ';
+        case 'SHOES': return '靴';
+        default: return cat;
+    }
+}
+
+function getColorHex(colorName) {
+    switch (colorName) {
+        case 'BLACK': return '#111111';
+        case 'WHITE': return '#ffffff';
+        case 'CHARCOAL': return '#333333';
+        case 'GREY': case 'ASH GREY': case 'HEATHER GREY': return '#888888';
+        case 'NAVY': return '#1a2a44';
+        case 'BEIGE': case 'ECRU': return '#e8ddcb';
+        case 'BROWN': case 'DARK BROWN': return '#593822';
+        case 'BLUE': case 'VINTAGE BLUE': return '#2b5876';
+        default: return '#666666';
+    }
+}
+
+function showToastNotification(message) {
+    if (typeof showToast === 'function') {
+        showToast(message);
+    }
+}
+
+/**
+ * 購入履歴からマイクローゼットへインポートする連携機能
+ */
+function importOrderToCloset(orderIndex) {
+    const order = AppState.orderHistory[orderIndex];
+    if (!order) return;
+
+    const rawSummary = order.items_summary || "購入アイテム";
+    // 商品名部分を抽出
+    let itemName = rawSummary.split('(')[0].trim();
+    if (!itemName) itemName = "購入アイテム";
+
+    // カテゴリと色を推定
+    let cat = 'TOPS';
+    let img = 'assets/images/tshirt_white.jpg';
+    let color = 'BLACK';
+
+    if (itemName.includes('パンツ') || itemName.includes('スラックス') || itemName.includes('トラウザー') || itemName.includes('デニム')) {
+        cat = 'BOTTOMS';
+        img = 'assets/images/pants_black.jpg';
+    } else if (itemName.includes('ジャケット') || itemName.includes('コート')) {
+        cat = 'OUTER';
+        img = 'assets/images/jacket_black.jpg';
+    } else if (itemName.includes('靴') || itemName.includes('スニーカー')) {
+        cat = 'SHOES';
+        img = PRESET_CLOSET_PRESETS['white_sneakers'].image;
+        color = 'WHITE';
+    } else if (itemName.includes('スウェット') || itemName.includes('パーカー')) {
+        cat = 'TOPS';
+        img = 'assets/images/sweat_grey.jpg';
+        color = 'GREY';
+    }
+
+    const newItem = {
+        id: 'c-order-' + Date.now(),
+        name: itemName,
+        category: cat,
+        color: color,
+        season: '通年',
+        image: img,
+        isOwned: true
+    };
+
+    AppState.myCloset.unshift(newItem);
+    localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+
+    showToastNotification(`「${itemName}」をマイクローゼットにインポートしました！`);
+
+    // スタジオバッジ等の更新
+    const closetBadge = document.getElementById('studio-closet-badge');
+    if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
+}
+
+// ==========================================================================
+// 15.9 グローバル関数登録（HTMLのonclick/onsubmitからの確実な呼び出し保証）
+// ==========================================================================
+window.openAddClosetModal = openAddClosetModal;
+window.closeAddClosetModal = closeAddClosetModal;
+window.handleAddClosetItem = handleAddClosetItem;
+window.handleClosetImageSelect = handleClosetImageSelect;
+window.selectPresetImage = selectPresetImage;
+window.deleteClosetItem = deleteClosetItem;
+window.switchStudioTab = switchStudioTab;
+window.toggleWearItem = toggleWearItem;
+window.unwearSlot = unwearSlot;
+window.clearMannequin = clearMannequin;
+window.setMannequinGender = setMannequinGender;
+window.switchMobileStudioView = switchMobileStudioView;
+window.handleSaveOutfit = handleSaveOutfit;
+window.applyPresetName = applyPresetName;
+window.applyPresetLook = applyPresetLook;
+window.restoreOutfit = restoreOutfit;
+window.deleteSavedOutfit = deleteSavedOutfit;
+window.addCurrentBrandItemsToCart = addCurrentBrandItemsToCart;
+window.importOrderToCloset = importOrderToCloset;
+window.handlePaneClosetFilter = handlePaneClosetFilter;
+window.handleStudioClosetFilter = handleStudioClosetFilter;
+window.handleStudioBrandFilter = handleStudioBrandFilter;
+window.toggleBrandFavFilter = toggleBrandFavFilter;
+window.handleSaveBodyProfile = handleSaveBodyProfile;
+window.toggleFittingAdjustPanel = toggleFittingAdjustPanel;
+window.switchAdjustSlot = switchAdjustSlot;
+window.handleAdjustInput = handleAdjustInput;
+window.stepAdjust = stepAdjust;
+window.resetFittingOffsets = resetFittingOffsets;
+window.applyFittingOffsets = applyFittingOffsets;
+
+
+
