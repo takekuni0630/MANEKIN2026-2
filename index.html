@@ -1,4 +1,4 @@
-<!-- ドキュメントタイプをHTML5として宣言 -->
+﻿<!-- ドキュメントタイプをHTML5として宣言 -->
 <!DOCTYPE html>
 <!-- 言語設定を日本語に指定 -->
 <html lang="ja">
@@ -1050,11 +1050,11 @@
                             </div>
                         </div>
 
-                        <!-- ◆ 中央カラム: マネキン試着ステージ -->
+                        <!-- ◆ 中央カラム: 試着ステージ -->
                         <div class="studio-col studio-col-center" id="col-studio-mannequin">
                             <div class="mannequin-toolbar">
                                 <div class="toolbar-left">
-                                    <span class="stage-tag">2. 試着マネキン</span>
+                                    <span class="stage-tag">2. 試着室</span>
                                 </div>
                                 <div class="toolbar-right">
                                     <button class="btn-toolbar-adjust" id="btn-toggle-adjust-mode"
@@ -1085,16 +1085,19 @@
                                 </div>
                             </div>
 
-                            マネキンビジュアルステージ
-                            <div class="mannequin-stage-box" id="mannequin-stage-box">
+                            <!-- ビジュアルステージ -->
+                            <div class="mannequin-stage-box" id="mannequin-stage-box" ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)" ondrop="handleStageDrop(event)">
+                                <!-- ステージ操作ガイダンス -->
+                                <div class="stage-guide-hint">
+                                    <span>💡 各スロットをクリックするか、左右の服をクリック・ドラッグして試着できます</span>
+                                </div>
+
                                 <!-- マネキン本体と重ね着レイヤー群 -->
                                 <div class="mannequin-model-wrap" id="mannequin-model-wrap">
-                                    <!-- リアル直立布張りマネキン（高級リネン生地・クロームスタンド仕様） -->
+                                    <!-- 直立クロームスタンド仕様（ゴーストマネキン表示・マネキン本体は非表示） -->
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
                                         <defs>
-
-
                                             <!-- メタリッククローム支柱ポール -->
                                             <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                                                 <stop offset="0%" stop-color="#ffffff" />
@@ -1122,7 +1125,6 @@
                                             <circle cx="157" cy="484" r="3" fill="#64748b" />
                                         </g>
 
-
                                         <!-- 6. 床面：写真と同じ四角いクロームメタリック台座＆シャドウ -->
                                         <g id="stand-base-group">
                                             <!-- 床のソフトドロップシャドウ -->
@@ -1138,26 +1140,36 @@
                                         </g>
                                     </svg>
 
-                                    <!-- 4層のバーチャル試着レイヤー -->
+                                    <!-- 4層のバーチャル試着レイヤー（クリック操作・着せ替え・脱衣対応） -->
                                     <!-- 1. 靴レイヤー -->
-                                    <div class="layer-slot layer-shoes" id="layer-shoes">
+                                    <div class="layer-slot layer-shoes" id="layer-shoes" onclick="handleStageSlotClick('shoes')" title="クリックして靴を選択">
                                         <div class="layer-content" id="layer-content-shoes"></div>
-                                        <div class="slot-empty-label" id="label-shoes">靴 (未選択)</div>
+                                        <div class="slot-empty-label" id="label-shoes">＋ 靴を選ぶ</div>
                                     </div>
                                     <!-- 2. パンツレイヤー -->
-                                    <div class="layer-slot layer-bottoms" id="layer-bottoms">
+                                    <div class="layer-slot layer-bottoms" id="layer-bottoms" onclick="handleStageSlotClick('bottoms')" title="クリックしてパンツを選択">
                                         <div class="layer-content" id="layer-content-bottoms"></div>
-                                        <div class="slot-empty-label" id="label-bottoms">パンツ (未選択)</div>
+                                        <div class="slot-empty-label" id="label-bottoms">＋ パンツをはかせる</div>
                                     </div>
                                     <!-- 3. トップスレイヤー -->
-                                    <div class="layer-slot layer-tops" id="layer-tops">
+                                    <div class="layer-slot layer-tops" id="layer-tops" onclick="handleStageSlotClick('tops')" title="クリックしてトップスを選択">
                                         <div class="layer-content" id="layer-content-tops"></div>
-                                        <div class="slot-empty-label" id="label-tops">トップス (未選択)</div>
+                                        <div class="slot-empty-label" id="label-tops">＋ トップスを着せる</div>
                                     </div>
                                     <!-- 4. アウターレイヤー -->
-                                    <div class="layer-slot layer-outer" id="layer-outer">
+                                    <div class="layer-slot layer-outer" id="layer-outer" onclick="handleStageSlotClick('outer')" title="クリックしてアウターを選択">
                                         <div class="layer-content" id="layer-content-outer"></div>
-                                        <div class="slot-empty-label" id="label-outer"></div>
+                                        <div class="slot-empty-label" id="label-outer">＋ アウターを着せる</div>
+                                    </div>
+                                </div>
+
+                                <!-- クイックアイテム選択ポップオーバー -->
+                                <div class="stage-quick-picker" id="stage-quick-picker" style="display: none;">
+                                    <div class="quick-picker-header">
+                                        <span class="quick-picker-title" id="quick-picker-title">アイテムを選択</span>
+                                        <button type="button" class="quick-picker-close" onclick="closeStageQuickPicker()">&times;</button>
+                                    </div>
+                                    <div class="quick-picker-body" id="quick-picker-body">
                                     </div>
                                 </div>
 
@@ -1234,24 +1246,31 @@
                                         </div>
 
                                         <!-- 【販売されている服】XS〜XLの5段階サイズ選択スライダー -->
-                                        <div class="adjust-slider-row adjust-slider-row-brand" id="adjust-row-scale-brand">
+                                        <div class="adjust-slider-row adjust-slider-row-brand"
+                                            id="adjust-row-scale-brand">
                                             <div class="slider-meta">
                                                 <span class="slider-name">商品サイズ</span>
-                                                <span class="slider-val brand-size-badge" id="val-adjust-brand-size">M</span>
+                                                <span class="slider-val brand-size-badge"
+                                                    id="val-adjust-brand-size">M</span>
                                             </div>
                                             <div class="slider-input-wrap slider-brand-wrap">
                                                 <button type="button" class="btn-step" id="btn-brand-size-minus"
                                                     onclick="stepBrandSize(-1)" title="1サイズ小さく">－</button>
                                                 <div class="brand-slider-container">
-                                                    <input type="range" class="adjust-range adjust-range-brand" id="slider-adjust-brand-size"
-                                                        min="0" max="4" value="2" step="1"
+                                                    <input type="range" class="adjust-range adjust-range-brand"
+                                                        id="slider-adjust-brand-size" min="0" max="4" value="2" step="1"
                                                         oninput="handleBrandSizeInput(this.value)">
                                                     <div class="brand-size-ticks" id="brand-size-ticks">
-                                                        <span class="brand-size-tick" data-size-idx="0" onclick="handleBrandSizeInput(0)">XS</span>
-                                                        <span class="brand-size-tick" data-size-idx="1" onclick="handleBrandSizeInput(1)">S</span>
-                                                        <span class="brand-size-tick active" data-size-idx="2" onclick="handleBrandSizeInput(2)">M</span>
-                                                        <span class="brand-size-tick" data-size-idx="3" onclick="handleBrandSizeInput(3)">L</span>
-                                                        <span class="brand-size-tick" data-size-idx="4" onclick="handleBrandSizeInput(4)">XL</span>
+                                                        <span class="brand-size-tick" data-size-idx="0"
+                                                            onclick="handleBrandSizeInput(0)">XS</span>
+                                                        <span class="brand-size-tick" data-size-idx="1"
+                                                            onclick="handleBrandSizeInput(1)">S</span>
+                                                        <span class="brand-size-tick active" data-size-idx="2"
+                                                            onclick="handleBrandSizeInput(2)">M</span>
+                                                        <span class="brand-size-tick" data-size-idx="3"
+                                                            onclick="handleBrandSizeInput(3)">L</span>
+                                                        <span class="brand-size-tick" data-size-idx="4"
+                                                            onclick="handleBrandSizeInput(4)">XL</span>
                                                     </div>
                                                 </div>
                                                 <button type="button" class="btn-step" id="btn-brand-size-plus"
@@ -1260,7 +1279,8 @@
                                         </div>
 
                                         <!-- 【手持ちの服】自由な拡大・縮小スライダー (Scale: 70%〜140%) -->
-                                        <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free" style="display: none;">
+                                        <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free"
+                                            style="display: none;">
                                             <div class="slider-meta">
                                                 <span class="slider-name">見た目サイズ</span>
                                                 <span class="slider-val" id="val-adjust-scale">100%</span>

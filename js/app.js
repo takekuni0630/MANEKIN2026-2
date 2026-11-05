@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 // MANEKIN FASHION - フロントエンド JavaScript (app.js)
 // ==========================================================================
 //
@@ -501,7 +501,7 @@ const AppState = {
             category: 'BOTTOMS',
             color: 'BLACK',
             season: '通年',
-            image: 'assets/images/pants_black.jpg',
+            image: 'assets/images/men/ストレートレープセミフレアスラックス.png',
             isOwned: true
         },
         {
@@ -510,25 +510,25 @@ const AppState = {
             category: 'SHOES',
             color: 'WHITE',
             season: '通年',
-            image: 'assets/images/shoes_white.jpg',
+            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20140%2065%22%3E%3Cpath%20d%3D%22M15%2048%20C25%2048%2C%2035%2046%2C%2045%2040%20C55%2032%2C%2065%2022%2C%2085%2020%20C95%2019%2C%20110%2025%2C%20125%2038%20C132%2044%2C%20130%2050%2C%20120%2052%20L15%2052%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M10%2052%20L128%2052%20C132%2052%2C%20132%2058%2C%20126%2058%20L10%2058%20C6%2058%2C%206%2052%2C%2010%2052%20Z%22%20fill%3D%22%23e2e8f0%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpath%20d%3D%22M65%2026%20L80%2032%20M60%2031%20L75%2037%20M55%2036%20L70%2042%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
             isOwned: true
         },
         {
             id: 'c3',
-            name: 'ヘビーウェイト グレーパーカー',
+            name: 'ヘビーウェイト ジップパーカー',
             category: 'TOPS',
             color: 'GREY',
             season: '秋冬',
-            image: 'assets/images/sweat_grey.jpg',
+            image: 'assets/images/men/アーバングレイジップフーディ.png',
             isOwned: true
         },
         {
             id: 'c4',
-            name: 'プレミアム リラックス 白Tシャツ',
+            name: 'スカイ オックスフォードシャツ',
             category: 'TOPS',
-            color: 'WHITE',
-            season: '春夏',
-            image: 'assets/images/tshirt_white.jpg',
+            color: 'BLUE',
+            season: '通年',
+            image: 'assets/images/men/スカイオックスフォードシャツ.png',
             isOwned: true
         }
     ],
@@ -580,6 +580,7 @@ const AppState = {
 // 3. アプリケーション初期化処理
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+    migrateOldBrokenAssets();
     updateFavoriteBadges();
     updateCartBadge();
     updateAuthNavUI();
@@ -1814,10 +1815,11 @@ function renderStudioClosetList() {
     list.innerHTML = items.map(item => {
         const isWearing = isItemWearing(item);
         const colorHex = getColorHex(item.color);
+        const fallback = getCategoryFallbackImage(item.category);
 
         return `
-            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem('${item.id}', true)">
-                <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+            <div class="studio-item-card ${isWearing ? 'is-active' : '}" draggable="true" ondragstart="handleCardDragStart(event, '${item.id}', true)" onclick="toggleWearItem('${item.id}', true)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
+                <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';">
                 <div class="studio-item-card-info">
                     <div class="studio-card-cat-row">
                         <span class="studio-card-cat">${getCategoryNameJP(item.category)}</span>
@@ -1860,9 +1862,13 @@ function renderStudioBrandList() {
     if (!list) return;
 
     const filter = AppState.studioBrandFilter || 'ALL';
-    let products = (filter === 'ALL')
-        ? SAMPLE_PRODUCTS
-        : SAMPLE_PRODUCTS.filter(p => p.category === filter);
+    const gender = AppState.studioGender || 'MEN';
+
+    // 性別によるフィルタリング（MEN / WOMEN）
+    let products = SAMPLE_PRODUCTS.filter(p => !p.gender || p.gender === gender);
+    if (filter !== 'ALL') {
+        products = products.filter(p => p.category === filter);
+    }
 
     if (AppState.studioBrandFavOnly) {
         products = products.filter(p => AppState.favorites.includes(p.id));
@@ -1880,10 +1886,11 @@ function renderStudioBrandList() {
     list.innerHTML = products.map(product => {
         const isWearing = isItemWearing(product);
         const isFav = AppState.favorites.includes(product.id);
+        const fallback = getCategoryFallbackImage(product.category);
 
         return `
-            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem(${product.id}, false)">
-                <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+            <div class="studio-item-card ${isWearing ? 'is-active' : '}" draggable="true" ondragstart="handleCardDragStart(event, ${product.id}, false)" onclick="toggleWearItem(${product.id}, false)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
+                <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';">
                 <div class="studio-item-card-info">
                     <div class="studio-card-cat-row">
                         <span class="studio-card-cat">${product.category}</span>
@@ -2068,22 +2075,109 @@ function clearMannequin() {
 /**
  * マネキンステージの描画更新
  */
+// =========================================================================
+// カテゴリ別フォールバックSVG画像
+// =========================================================================
+function getCategoryFallbackImage(category) {
+    switch (category) {
+        case 'SHOES':
+            return "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20140%2065%22%3E%3Cpath%20d%3D%22M15%2048%20C25%2048%2C%2035%2046%2C%2045%2040%20C55%2032%2C%2065%2022%2C%2085%2020%20C95%2019%2C%20110%2025%2C%20125%2038%20C132%2044%2C%20130%2050%2C%20120%2052%20L15%2052%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M10%2052%20L128%2052%20C132%2052%2C%20132%2058%2C%20126%2058%20L10%2058%20C6%2058%2C%206%2052%2C%2010%2052%20Z%22%20fill%3D%22%23e2e8f0%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpath%20d%3D%22M65%2026%20L80%2032%20M60%2031%20L75%2037%20M55%2036%20L70%2042%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E";
+        case 'BOTTOMS':
+            return 'assets/images/men/ストレートレープセミフレアスラックス.png';
+        case 'OUTER':
+            return 'assets/images/men/オーバードレープダブルトレンチコート.png';
+        case 'TOPS':
+        default:
+            return 'assets/images/men/アーバングレイジップフーディ.png';
+    }
+}
+
+// 過去のlocalStorageに残っている存在しない旧画像パスを安全にマイグレーション
+function migrateOldBrokenAssets() {
+    const defaultSneaker = getCategoryFallbackImage('SHOES');
+    let closetChanged = false;
+    if (Array.isArray(AppState.myCloset)) {
+        AppState.myCloset.forEach(item => {
+            if (!item.image || item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
+                item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
+                closetChanged = true;
+            } else if (item.image.includes('shoes_white.jpg')) {
+                item.image = defaultSneaker;
+                closetChanged = true;
+            } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
+                item.image = 'assets/images/men/アーバングレイジップフーディ.png';
+                closetChanged = true;
+            } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
+                item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
+                closetChanged = true;
+            }
+        });
+    }
+    if (closetChanged) {
+        localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+    }
+
+    let outfitChanged = false;
+    if (AppState.currentOutfit) {
+        for (const slot in AppState.currentOutfit) {
+            const item = AppState.currentOutfit[slot];
+            if (item && item.image) {
+                if (item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
+                    item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
+                    outfitChanged = true;
+                } else if (item.image.includes('shoes_white.jpg')) {
+                    item.image = defaultSneaker;
+                    outfitChanged = true;
+                } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
+                    item.image = 'assets/images/men/アーバングレイジップフーディ.png';
+                    outfitChanged = true;
+                } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
+                    item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
+                    outfitChanged = true;
+                }
+            }
+        }
+    }
+    if (outfitChanged) {
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+    }
+}
+
+/**
+ * マネキンステージの描画更新（ゴーストマネキン試着機能）
+ */
 function renderMannequinStage() {
     const outfit = AppState.currentOutfit || {};
 
     const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+    const slotLabels = {
+        shoes: '＋ 靴を選ぶ',
+        bottoms: '＋ パンツをはかせる',
+        tops: '＋ トップスを着せる',
+        outer: '＋ アウターを着せる'
+    };
+
     slots.forEach(slot => {
+        const slotElem = document.getElementById(`layer-${slot}`);
         const layerContent = document.getElementById(`layer-content-${slot}`);
         const labelElem = document.getElementById(`label-${slot}`);
         const item = outfit[slot];
 
+        if (slotElem) {
+            slotElem.classList.toggle('has-item', !!(item && item.image));
+        }
+
         if (layerContent) {
             if (item && item.image) {
-                layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.src='assets/images/tshirt_white.jpg'">`;
+                const fallback = getCategoryFallbackImage(item.category);
+                layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.onerror=null;this.src='${fallback}';">`;
                 if (labelElem) labelElem.style.display = 'none';
             } else {
                 layerContent.innerHTML = '';
-                if (labelElem) labelElem.style.display = 'block';
+                if (labelElem) {
+                    labelElem.textContent = slotLabels[slot] || '＋ アイテムを選ぶ';
+                    labelElem.style.display = 'inline-flex';
+                }
             }
         }
     });
@@ -2136,6 +2230,117 @@ function renderMannequinStage() {
     const adjustPanel = document.getElementById('fitting-adjust-panel');
     if (adjustPanel && adjustPanel.style.display !== 'none') {
         syncAdjustPanelUI();
+    }
+}
+
+/**
+ * ビジュアルステージ上のスロットクリック処理
+ * 着用中の場合は脱がせる、未着用の場合はクイック選択ポップオーバーを開く
+ */
+function handleStageSlotClick(slotKey) {
+    const outfit = AppState.currentOutfit || {};
+    const item = outfit[slotKey];
+
+    if (item) {
+        // 着用中の場合：脱がす
+        unwearSlot(slotKey);
+    } else {
+        // 未着用の場合：クイック選択ポップオーバーを開く
+        openStageQuickPicker(slotKey);
+    }
+}
+
+/**
+ * ステージ内クイック選択ポップオーバーを開く
+ */
+function openStageQuickPicker(slotKey) {
+    const picker = document.getElementById('stage-quick-picker');
+    const title = document.getElementById('quick-picker-title');
+    const body = document.getElementById('quick-picker-body');
+    if (!picker || !body) return;
+
+    const catNameMap = {
+        outer: { name: 'アウター', cat: 'OUTER' },
+        tops: { name: 'トップス', cat: 'TOPS' },
+        bottoms: { name: 'パンツ', cat: 'BOTTOMS' },
+        shoes: { name: '靴', cat: 'SHOES' }
+    };
+    const catInfo = catNameMap[slotKey] || { name: 'アイテム', cat: 'ALL' };
+    if (title) title.textContent = `${catInfo.name}を選択して試着`;
+
+    // 候補アイテムを抽出（手持ち服 ＋ ブランド商品）
+    const myItems = AppState.myCloset.filter(c => c.category === catInfo.cat);
+    const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat && (!p.gender || p.gender === AppState.studioGender));
+
+    let html = '';
+    if (myItems.length === 0 && brandItems.length === 0) {
+        html = '<p style="grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 0.75rem; padding: 12px;">選択できるアイテムがありません</p>';
+    } else {
+        myItems.forEach(item => {
+            const fb = getCategoryFallbackImage(item.category);
+            html += `
+                <div class="quick-picker-card" onclick="toggleWearItem('${item.id}', true); closeStageQuickPicker();" title="${item.name}">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='${fb}';">
+                    <div class="quick-picker-card-name">${item.name}</div>
+                    <span style="font-size: 0.6rem; color: #0284c7; font-weight: 600;">[手持ち]</span>
+                </div>
+            `;
+        });
+        brandItems.forEach(p => {
+            const fb = getCategoryFallbackImage(p.category);
+            html += `
+                <div class="quick-picker-card" onclick="toggleWearItem(${p.id}, false); closeStageQuickPicker();" title="${p.name}">
+                    <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src='${fb}';">
+                    <div class="quick-picker-card-name">${p.name}</div>
+                    <span style="font-size: 0.6rem; color: #e11d48; font-weight: 600;">¥${p.price.toLocaleString()}</span>
+                </div>
+            `;
+        });
+    }
+
+    body.innerHTML = html;
+    picker.style.display = 'block';
+
+    // 左・右カラムのフィルターも連動してそのカテゴリに切り替え
+    handleStudioClosetFilter(catInfo.cat);
+    handleStudioBrandFilter(catInfo.cat);
+}
+
+function closeStageQuickPicker() {
+    const picker = document.getElementById('stage-quick-picker');
+    if (picker) picker.style.display = 'none';
+}
+
+// ドラッグ＆ドロップ試着機能
+function handleCardDragStart(event, itemId, isOwned) {
+    event.dataTransfer.setData('text/plain', JSON.stringify({ itemId, isOwned }));
+    event.dataTransfer.effectAllowed = 'copy';
+}
+
+function handleStageDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    const box = document.getElementById('mannequin-stage-box');
+    if (box) box.classList.add('is-dragover');
+}
+
+function handleStageDragLeave(event) {
+    const box = document.getElementById('mannequin-stage-box');
+    if (box) box.classList.remove('is-dragover');
+}
+
+function handleStageDrop(event) {
+    event.preventDefault();
+    const box = document.getElementById('mannequin-stage-box');
+    if (box) box.classList.remove('is-dragover');
+
+    try {
+        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        if (data && data.itemId !== undefined) {
+            toggleWearItem(data.itemId, !!data.isOwned);
+        }
+    } catch (e) {
+        console.error('Drop error:', e);
     }
 }
 
@@ -2468,15 +2673,13 @@ function resetFittingOffsets() {
  */
 function setMannequinGender(gender) {
     AppState.studioGender = gender;
-    document.getElementById('btn-gender-men').classList.toggle('active', gender === 'MEN');
-    document.getElementById('btn-gender-women').classList.toggle('active', gender === 'WOMEN');
+    const btnMen = document.getElementById('btn-gender-men');
+    const btnWomen = document.getElementById('btn-gender-women');
+    if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
+    if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
 
-    // マネキンSVGのプロポーション切り替え
-    const torso = document.querySelector('#torso-group');
-    if (torso) {
-        torso.style.transform = (gender === 'WOMEN') ? 'scale(0.95)' : 'none';
-        torso.style.transformOrigin = 'center 120px';
-    }
+    // ブランド商品リストを性別に連動して再描画
+    renderStudioBrandList();
 
     showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
 }
@@ -3093,3 +3296,12 @@ window.stepBrandSize = stepBrandSize;
 
 
 
+window.handleStageSlotClick = handleStageSlotClick;
+window.openStageQuickPicker = openStageQuickPicker;
+window.closeStageQuickPicker = closeStageQuickPicker;
+window.handleCardDragStart = handleCardDragStart;
+window.handleStageDragOver = handleStageDragOver;
+window.handleStageDragLeave = handleStageDragLeave;
+window.handleStageDrop = handleStageDrop;
+window.getCategoryFallbackImage = getCategoryFallbackImage;
+window.migrateOldBrokenAssets = migrateOldBrokenAssets;
