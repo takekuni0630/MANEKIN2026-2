@@ -534,6 +534,7 @@ const AppState = {
     ],
     // マネキン現在着用スロット
     currentOutfit: JSON.parse(localStorage.getItem('manekin_current_outfit')) || {
+        hat: null,
         outer: null,
         tops: null,
         bottoms: null,
@@ -564,10 +565,11 @@ const AppState = {
     studioMobileView: 'mannequin',
     activeAdjustSlot: 'tops',
     fittingOffsets: JSON.parse(localStorage.getItem('manekin_fitting_offsets')) || {
-        tops: { x: 0, y: 0, scale: 100 },
-        outer: { x: 0, y: 0, scale: 100 },
-        bottoms: { x: 0, y: 0, scale: 100 },
-        shoes: { x: 0, y: 0, scale: 100 }
+        hat: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
+        tops: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
+        outer: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
+        bottoms: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
+        shoes: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 }
     },
     userBodyProfile: JSON.parse(localStorage.getItem('manekin_body_profile')) || {
         height: 172,
@@ -580,6 +582,32 @@ const AppState = {
 // 3. アプリケーション初期化処理
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+    // 帽子スロット・設定の安全な初期化
+    if (!AppState.currentOutfit || typeof AppState.currentOutfit !== 'object') {
+        AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+    } else if (!('hat' in AppState.currentOutfit)) {
+        AppState.currentOutfit.hat = null;
+    }
+    if (!AppState.fittingOffsets || typeof AppState.fittingOffsets !== 'object') {
+        AppState.fittingOffsets = {};
+    }
+    if (!AppState.fittingOffsets.hat) {
+        AppState.fittingOffsets.hat = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
+    }
+    // 帽子アイテムが未登録の場合は初期アイテムとして自動追加（すぐ試着可能）
+    if (Array.isArray(AppState.myCloset) && !AppState.myCloset.some(item => item && (item.category === 'HAT' || item.category === 'HATS'))) {
+        AppState.myCloset.push({
+            id: 'c5',
+            name: 'クラシック コットンキャップ',
+            category: 'HAT',
+            color: 'BLACK',
+            season: '通年',
+            image: PRESET_CLOSET_PRESETS['black_cap'] ? PRESET_CLOSET_PRESETS['black_cap'].image : '',
+            isOwned: true
+        });
+        localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+    }
+
     updateFavoriteBadges();
     updateCartBadge();
     updateAuthNavUI();
@@ -1590,6 +1618,13 @@ function setupEventListeners() {
 
 // クイック選択用プリセット画像マッピング
 const PRESET_CLOSET_PRESETS = {
+    'black_cap': {
+        name: 'クラシック コットンキャップ',
+        category: 'HAT',
+        color: 'BLACK',
+        season: '通年',
+        image: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22180%22%20text-anchor%3D%22middle%22%20fill%3D%22%23888888%22%20font-size%3D%2212%22%20font-family%3D%22sans-serif%22%20letter-spacing%3D%222%22%20font-weight%3D%22600%22%3ECLASSIC%20CAP%3C%2Ftext%3E%3C%2Fsvg%3E'
+    },
     'black_pants': {
         name: '黒ワイドスラックス',
         category: 'BOTTOMS',
@@ -2025,6 +2060,7 @@ function getSlotKeyByCategory(category) {
         case 'TOPS': return 'tops';
         case 'BOTTOMS': return 'bottoms';
         case 'SHOES': return 'shoes';
+        case 'HAT': case 'HATS': case 'CAP': return 'hat';
         default: return 'tops';
     }
 }
@@ -2051,6 +2087,7 @@ function unwearSlot(slotKey) {
  */
 function clearMannequin() {
     AppState.currentOutfit = {
+        hat: null,
         outer: null,
         tops: null,
         bottoms: null,
@@ -2071,7 +2108,7 @@ function clearMannequin() {
 function renderMannequinStage() {
     const outfit = AppState.currentOutfit || {};
 
-    const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+    const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
     slots.forEach(slot => {
         const layerContent = document.getElementById(`layer-content-${slot}`);
         const labelElem = document.getElementById(`label-${slot}`);
@@ -2145,7 +2182,7 @@ function renderMannequinStage() {
  */
 function applyFittingOffsets() {
     const offsets = AppState.fittingOffsets || {};
-    const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+    const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
     const outfit = AppState.currentOutfit || {};
 
     slots.forEach(slot => {
@@ -2532,6 +2569,7 @@ function updateAIStylingComment() {
     const hasTops = !!outfit.tops;
     const hasOuter = !!outfit.outer;
     const hasShoes = !!outfit.shoes;
+    const hasHat = !!outfit.hat;
 
     // カラーパレット抽出
     const colors = wornItems.map(item => item.color || 'BLACK');
@@ -2578,6 +2616,12 @@ function updateAIStylingComment() {
         comment = `「${singleItem.name}」を着用中。美しいカッティングが際立っています。さらに相性の良い${hasTops ? 'パンツや靴' : 'トップスやアウター'}を組み合わせると、全体のトータルバランスを診断できます。`;
         tags = ['#シルエット重視', '#スタイリング途中'];
         score = 90;
+    }
+
+    // 帽子のアクセント診断
+    if (hasHat && outfit.hat) {
+        comment += ` 頭元の「${outfit.hat.name}」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
+        if (!tags.includes('#アクセント小物')) tags.push('#アクセント小物');
     }
 
     // DOMへ反映
@@ -2882,6 +2926,8 @@ function handleAddClosetItem(e) {
             image = PRESET_CLOSET_PRESETS['white_sneakers'].image;
         } else if (category === 'OUTER') {
             image = 'assets/images/jacket_black.jpg';
+        } else if (category === 'HAT') {
+            image = PRESET_CLOSET_PRESETS['black_cap'] ? PRESET_CLOSET_PRESETS['black_cap'].image : '';
         } else {
             image = 'assets/images/tshirt_white.jpg';
         }
@@ -2978,6 +3024,7 @@ function getCategoryNameJP(cat) {
         case 'TOPS': return 'トップス';
         case 'BOTTOMS': return 'パンツ';
         case 'SHOES': return '靴';
+        case 'HAT': case 'HATS': case 'CAP': return '帽子';
         default: return cat;
     }
 }
