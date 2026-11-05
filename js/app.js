@@ -1719,6 +1719,16 @@ function renderManekinStudio(activeTab = 'create') {
     }
 }
 
+// 販売商品向け5段階サイズ定義（左からXS、S、M、L、XL）
+const BRAND_SIZE_LIST = ['XS', 'S', 'M', 'L', 'XL'];
+const BRAND_SIZE_SCALES = {
+    'XS': 90,   // 90% (タイト)
+    'S':  95,   // 95% (スリム)
+    'M':  100,  // 100% (標準)
+    'L':  105,  // 105% (ゆったり)
+    'XL': 110   // 110% (ワイド)
+};
+
 // --------------------------------------------------------------------------
 // 15.1 マイクローゼット（手持ち服）の描画 & 操作
 // --------------------------------------------------------------------------
@@ -2121,22 +2131,44 @@ function renderMannequinStage() {
 
     // 服の位置・サイズ微調整オフセットを適用
     applyFittingOffsets();
+
+    // 微調整パネルが開いていればUIを再同期（着せ替え時の即時反映）
+    const adjustPanel = document.getElementById('fitting-adjust-panel');
+    if (adjustPanel && adjustPanel.style.display !== 'none') {
+        syncAdjustPanelUI();
+    }
 }
 
 /**
  * 服の位置・サイズ微調整オフセットを各レイヤーに適用
+ * 販売商品はXS〜XLの5段階サイズに応じたスケールを適用し、手持ち服は自由なカスタム倍率を適用
  */
 function applyFittingOffsets() {
     const offsets = AppState.fittingOffsets || {};
     const slots = ['shoes', 'bottoms', 'tops', 'outer'];
+    const outfit = AppState.currentOutfit || {};
 
     slots.forEach(slot => {
         const layerElem = document.getElementById(`layer-${slot}`);
         if (!layerElem) return;
         const off = offsets[slot] || { x: 0, y: 0, scale: 100 };
+        const item = outfit[slot];
+
+        let effectiveScale = 100;
+        if (item && !item.isOwned) {
+            // 販売されている服: XS〜XLの5段階サイズに応じたスケール（自由な数値変更不可）
+            const bSize = off.brandSize || item.size || 'M';
+            effectiveScale = BRAND_SIZE_SCALES[bSize] || 100;
+        } else if (item && item.isOwned) {
+            // 手持ちの服: スライダーによる自由な拡大縮小スケール
+            effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
+        } else {
+            effectiveScale = off.scale || 100;
+        }
+
         layerElem.style.setProperty('--offset-x', `${off.x || 0}px`);
         layerElem.style.setProperty('--offset-y', `${off.y || 0}px`);
-        layerElem.style.setProperty('--scale', (off.scale || 100) / 100);
+        layerElem.style.setProperty('--scale', effectiveScale / 100);
     });
 }
 
@@ -2169,41 +2201,204 @@ function switchAdjustSlot(slotKey) {
 }
 
 /**
- * スライダーUIの値を現在のオフセットに同期
+ * スライダーUIの値を現在の服種別（販売商品 vs 手持ち服）およびオフセットに同期
  */
 function syncAdjustPanelUI() {
     const slotKey = AppState.activeAdjustSlot || 'tops';
     const offsets = AppState.fittingOffsets || {};
-    const off = offsets[slotKey] || { x: 0, y: 0, scale: 100 };
+    const off = offsets[slotKey] || { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
+    const outfit = AppState.currentOutfit || {};
+    const item = outfit[slotKey];
 
+    // UI要素の取得
     const sliderY = document.getElementById('slider-adjust-y');
     const sliderX = document.getElementById('slider-adjust-x');
-    const sliderScale = document.getElementById('slider-adjust-scale');
-
     const valY = document.getElementById('val-adjust-y');
     const valX = document.getElementById('val-adjust-x');
+
+    const badgeElem = document.getElementById('adjust-item-badge');
+    const nameElem = document.getElementById('adjust-item-name');
+    const descElem = document.getElementById('adjust-item-type-desc');
+    const rowBrand = document.getElementById('adjust-row-scale-brand');
+    const rowFree = document.getElementById('adjust-row-scale-free');
+    const hintElem = document.getElementById('adjust-hint-text');
+
+    const sliderBrandSize = document.getElementById('slider-adjust-brand-size');
+    const valBrandSize = document.getElementById('val-adjust-brand-size');
+    const btnBrandMinus = document.getElementById('btn-brand-size-minus');
+    const btnBrandPlus = document.getElementById('btn-brand-size-plus');
+
+    const sliderScale = document.getElementById('slider-adjust-scale');
     const valScale = document.getElementById('val-adjust-scale');
 
+    // 共通: 上下・左右位置の反映
     if (sliderY) sliderY.value = off.y || 0;
     if (sliderX) sliderX.value = off.x || 0;
-    if (sliderScale) sliderScale.value = off.scale || 100;
-
     if (valY) valY.textContent = `${off.y > 0 ? '+' : ''}${off.y || 0}px`;
     if (valX) valX.textContent = `${off.x > 0 ? '+' : ''}${off.x || 0}px`;
-    if (valScale) valScale.textContent = `${off.scale || 100}%`;
+
+    // 着用服の種別判別
+    if (!item) {
+        // 未着用状態
+        if (badgeElem) {
+            badgeElem.className = 'adjust-item-tag empty';
+            badgeElem.textContent = '未着用';
+        }
+        if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
+        if (descElem) descElem.textContent = '服を着せると調整可能';
+
+        // 未着用時は販売商品サイズUIを非活性表示
+        if (rowBrand) rowBrand.style.display = 'flex';
+        if (rowFree) rowFree.style.display = 'none';
+        if (sliderBrandSize) sliderBrandSize.disabled = true;
+        if (btnBrandMinus) btnBrandMinus.disabled = true;
+        if (btnBrandPlus) btnBrandPlus.disabled = true;
+        if (sliderY) sliderY.disabled = true;
+        if (sliderX) sliderX.disabled = true;
+        if (hintElem) hintElem.textContent = '💡 クローゼットまたは商品一覧から服を選んでマネキンに試着してください';
+        return;
+    }
+
+    // 服が着用されている場合は操作可能に戻す
+    if (sliderY) sliderY.disabled = false;
+    if (sliderX) sliderX.disabled = false;
+    if (sliderBrandSize) sliderBrandSize.disabled = false;
+
+    if (!item.isOwned) {
+        // =====================================================================
+        // 【1. 販売されている服】
+        // ・大きさの調整をXS・S・M・L・XLの5段階から選択する方式
+        // ・スライダーの左からXS、S、M、L、XLの順に表示
+        // ・自由な数値による拡大・縮小はできない
+        // =====================================================================
+        if (badgeElem) {
+            badgeElem.className = 'adjust-item-tag brand';
+            badgeElem.textContent = '🏷️ 販売商品';
+        }
+        if (nameElem) nameElem.textContent = item.name;
+        if (descElem) descElem.textContent = '規格サイズ（XS〜XL）';
+
+        if (rowBrand) rowBrand.style.display = 'flex';
+        if (rowFree) rowFree.style.display = 'none';
+
+        const currentSize = off.brandSize || item.size || 'M';
+        const sizeIdx = BRAND_SIZE_LIST.indexOf(currentSize);
+        const validIdx = (sizeIdx >= 0) ? sizeIdx : 2; // デフォルトM (index 2)
+
+        if (sliderBrandSize) sliderBrandSize.value = validIdx;
+        if (valBrandSize) valBrandSize.textContent = BRAND_SIZE_LIST[validIdx];
+
+        // 目盛りのアクティブ表示更新
+        document.querySelectorAll('#brand-size-ticks .brand-size-tick').forEach(tick => {
+            const tIdx = parseInt(tick.getAttribute('data-size-idx'), 10);
+            tick.classList.toggle('active', tIdx === validIdx);
+        });
+
+        if (btnBrandMinus) btnBrandMinus.disabled = (validIdx <= 0);
+        if (btnBrandPlus) btnBrandPlus.disabled = (validIdx >= BRAND_SIZE_LIST.length - 1);
+
+        if (hintElem) hintElem.textContent = '💡 販売商品はXS〜XLのサイズ規格でマネキン上の表示サイズが変わります（自動保存）';
+
+    } else {
+        // =====================================================================
+        // 【2. 手持ちの服】
+        // ・スライダーで自由に拡大・縮小できる仕様を維持（70%〜140%）
+        // ・上下位置（Y）と左右位置（X）の調整機能も維持
+        // =====================================================================
+        if (badgeElem) {
+            badgeElem.className = 'adjust-item-tag closet';
+            badgeElem.textContent = '👕 マイクローゼット';
+        }
+        if (nameElem) nameElem.textContent = item.name;
+        if (descElem) descElem.textContent = '自由サイズ調整（見た目補正）';
+
+        if (rowBrand) rowBrand.style.display = 'none';
+        if (rowFree) rowFree.style.display = 'flex';
+
+        const currentScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
+        if (sliderScale) sliderScale.value = currentScale;
+        if (valScale) valScale.textContent = `${currentScale}%`;
+
+        if (hintElem) hintElem.textContent = '💡 手持ちの服はブランドによって実寸が異なるため、見た目の大きさを自由に調整できます（自動保存）';
+    }
 }
 
 /**
- * スライダー変更時の処理
+ * 販売商品用: 5段階サイズ選択（XS・S・M・L・XL）変更処理
+ */
+function handleBrandSizeInput(val) {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    if (!AppState.fittingOffsets[slotKey]) {
+        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
+    }
+
+    const idx = parseInt(val, 10);
+    const clampedIdx = Math.max(0, Math.min(BRAND_SIZE_LIST.length - 1, idx));
+    const sizeName = BRAND_SIZE_LIST[clampedIdx];
+    const targetScale = BRAND_SIZE_SCALES[sizeName] || 100;
+
+    // オフセット状態に記録
+    AppState.fittingOffsets[slotKey].brandSize = sizeName;
+    AppState.fittingOffsets[slotKey].scale = targetScale;
+
+    // 着用中アイテムのサイズ情報も同期
+    if (AppState.currentOutfit && AppState.currentOutfit[slotKey]) {
+        AppState.currentOutfit[slotKey].size = sizeName;
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+    }
+
+    // UI表示更新
+    const slider = document.getElementById('slider-adjust-brand-size');
+    if (slider) slider.value = clampedIdx;
+
+    const valElem = document.getElementById('val-adjust-brand-size');
+    if (valElem) valElem.textContent = sizeName;
+
+    document.querySelectorAll('#brand-size-ticks .brand-size-tick').forEach(tick => {
+        const tIdx = parseInt(tick.getAttribute('data-size-idx'), 10);
+        tick.classList.toggle('active', tIdx === clampedIdx);
+    });
+
+    const btnMinus = document.getElementById('btn-brand-size-minus');
+    const btnPlus = document.getElementById('btn-brand-size-plus');
+    if (btnMinus) btnMinus.disabled = (clampedIdx <= 0);
+    if (btnPlus) btnPlus.disabled = (clampedIdx >= BRAND_SIZE_LIST.length - 1);
+
+    // マネキン上の服の表示サイズを即座に更新
+    applyFittingOffsets();
+
+    // ローカルストレージ保存
+    localStorage.setItem('manekin_fitting_offsets', JSON.stringify(AppState.fittingOffsets));
+}
+
+/**
+ * 販売商品用: 1段階サイズ増減ステップ（－ / ＋）
+ */
+function stepBrandSize(delta) {
+    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const off = (AppState.fittingOffsets && AppState.fittingOffsets[slotKey]) || {};
+    const outfit = AppState.currentOutfit || {};
+    const item = outfit[slotKey];
+    const currentSize = off.brandSize || (item && item.size) || 'M';
+    const currentIdx = BRAND_SIZE_LIST.indexOf(currentSize);
+    const baseIdx = (currentIdx >= 0) ? currentIdx : 2;
+    handleBrandSizeInput(baseIdx + delta);
+}
+
+/**
+ * 手持ち服および位置の微調整スライダー変更時処理
  */
 function handleAdjustInput(prop, val) {
     const slotKey = AppState.activeAdjustSlot || 'tops';
     if (!AppState.fittingOffsets[slotKey]) {
-        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
 
     const numVal = parseInt(val, 10);
     AppState.fittingOffsets[slotKey][prop] = numVal;
+    if (prop === 'scale') {
+        AppState.fittingOffsets[slotKey].customScale = numVal;
+    }
 
     // UI表示更新
     if (prop === 'y') {
@@ -2230,7 +2425,7 @@ function handleAdjustInput(prop, val) {
 function stepAdjust(prop, delta) {
     const slotKey = AppState.activeAdjustSlot || 'tops';
     if (!AppState.fittingOffsets[slotKey]) {
-        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+        AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
 
     let current = AppState.fittingOffsets[slotKey][prop];
@@ -2249,7 +2444,19 @@ function stepAdjust(prop, delta) {
  */
 function resetFittingOffsets() {
     const slotKey = AppState.activeAdjustSlot || 'tops';
-    AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100 };
+    AppState.fittingOffsets[slotKey] = {
+        x: 0,
+        y: 0,
+        scale: 100,
+        brandSize: 'M',
+        customScale: 100
+    };
+
+    if (AppState.currentOutfit && AppState.currentOutfit[slotKey] && !AppState.currentOutfit[slotKey].isOwned) {
+        AppState.currentOutfit[slotKey].size = 'M';
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+    }
+
     syncAdjustPanelUI();
     applyFittingOffsets();
     localStorage.setItem('manekin_fitting_offsets', JSON.stringify(AppState.fittingOffsets));
@@ -2530,8 +2737,13 @@ function addCurrentBrandItemsToCart() {
         return;
     }
 
+    const offsets = AppState.fittingOffsets || {};
     brandItems.forEach(item => {
-        const existing = AppState.cart.find(c => c.id === item.id);
+        const slotKey = getSlotKeyByCategory(item.category);
+        const off = offsets[slotKey] || {};
+        const chosenSize = item.size || off.brandSize || 'M';
+
+        const existing = AppState.cart.find(c => c.id === item.id && c.size === chosenSize);
         if (existing) {
             existing.quantity += 1;
         } else {
@@ -2539,7 +2751,7 @@ function addCurrentBrandItemsToCart() {
                 id: item.id,
                 name: item.name,
                 color: item.color || 'BLACK',
-                size: 'M',
+                size: chosenSize,
                 price: item.price || 0,
                 quantity: 1,
                 image: item.image
@@ -2876,6 +3088,8 @@ window.handleAdjustInput = handleAdjustInput;
 window.stepAdjust = stepAdjust;
 window.resetFittingOffsets = resetFittingOffsets;
 window.applyFittingOffsets = applyFittingOffsets;
+window.handleBrandSizeInput = handleBrandSizeInput;
+window.stepBrandSize = stepBrandSize;
 
 
 

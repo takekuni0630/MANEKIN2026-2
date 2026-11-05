@@ -3599,6 +3599,129 @@ button {
     font-size: 0.65rem;
     color: #94a3b8;
 }
+/* 対象アイテム判別ステータスバー */
+.adjust-item-status {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+.adjust-item-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.adjust-item-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.adjust-item-tag.brand {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+}
+
+.adjust-item-tag.closet {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.adjust-item-tag.empty {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+.adjust-item-name {
+    font-weight: 600;
+    color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 130px;
+}
+
+.adjust-item-type-desc {
+    font-size: 0.65rem;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+/* 販売商品用 5段階サイズスライダー */
+.adjust-slider-row-brand .brand-slider-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    padding-top: 2px;
+}
+
+.brand-size-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+    margin-top: 4px;
+}
+
+.brand-size-tick {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #94a3b8;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+    text-align: center;
+    width: 24px;
+    padding: 1px 0;
+    border-radius: 3px;
+}
+
+.brand-size-tick:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+.brand-size-tick.active {
+    color: #ffffff;
+    background: #0f172a;
+    font-weight: 700;
+    transform: scale(1.05);
+}
+
+.brand-size-badge {
+    background: #0f172a;
+    color: #ffffff !important;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+    min-width: 26px;
+    text-align: center;
+}
+
+/* 無効化（未着用）状態 */
+.adjust-sliders-body.disabled-mode {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 
 /* 着用中スロットチップバー */
 .wearing-slots-bar {

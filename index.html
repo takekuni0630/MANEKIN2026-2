@@ -1188,6 +1188,15 @@
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
 
+                                    <!-- 対象アイテム状態インジケーター（販売商品／マイクローゼット判別） -->
+                                    <div class="adjust-item-status" id="adjust-item-status">
+                                        <div class="adjust-item-meta-left">
+                                            <span class="adjust-item-tag brand" id="adjust-item-badge">販売商品</span>
+                                            <span class="adjust-item-name" id="adjust-item-name">未着用</span>
+                                        </div>
+                                        <span class="adjust-item-type-desc" id="adjust-item-type-desc">XS〜XL規格サイズ</span>
+                                    </div>
+
                                     <!-- スライダー操作群 -->
                                     <div class="adjust-sliders-body">
                                         <!-- 上下位置 (Y Offset) -->
@@ -1224,10 +1233,36 @@
                                             </div>
                                         </div>
 
-                                        <!-- 大きさ・拡大縮小 (Scale) -->
-                                        <div class="adjust-slider-row">
+                                        <!-- 【販売されている服】XS〜XLの5段階サイズ選択スライダー -->
+                                        <div class="adjust-slider-row adjust-slider-row-brand" id="adjust-row-scale-brand">
                                             <div class="slider-meta">
-                                                <span class="slider-name">大きさ (サイズ)</span>
+                                                <span class="slider-name">商品サイズ</span>
+                                                <span class="slider-val brand-size-badge" id="val-adjust-brand-size">M</span>
+                                            </div>
+                                            <div class="slider-input-wrap slider-brand-wrap">
+                                                <button type="button" class="btn-step" id="btn-brand-size-minus"
+                                                    onclick="stepBrandSize(-1)" title="1サイズ小さく">－</button>
+                                                <div class="brand-slider-container">
+                                                    <input type="range" class="adjust-range adjust-range-brand" id="slider-adjust-brand-size"
+                                                        min="0" max="4" value="2" step="1"
+                                                        oninput="handleBrandSizeInput(this.value)">
+                                                    <div class="brand-size-ticks" id="brand-size-ticks">
+                                                        <span class="brand-size-tick" data-size-idx="0" onclick="handleBrandSizeInput(0)">XS</span>
+                                                        <span class="brand-size-tick" data-size-idx="1" onclick="handleBrandSizeInput(1)">S</span>
+                                                        <span class="brand-size-tick active" data-size-idx="2" onclick="handleBrandSizeInput(2)">M</span>
+                                                        <span class="brand-size-tick" data-size-idx="3" onclick="handleBrandSizeInput(3)">L</span>
+                                                        <span class="brand-size-tick" data-size-idx="4" onclick="handleBrandSizeInput(4)">XL</span>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn-step" id="btn-brand-size-plus"
+                                                    onclick="stepBrandSize(1)" title="1サイズ大きく">＋</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 【手持ちの服】自由な拡大・縮小スライダー (Scale: 70%〜140%) -->
+                                        <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free" style="display: none;">
+                                            <div class="slider-meta">
+                                                <span class="slider-name">見た目サイズ</span>
                                                 <span class="slider-val" id="val-adjust-scale">100%</span>
                                             </div>
                                             <div class="slider-input-wrap">
