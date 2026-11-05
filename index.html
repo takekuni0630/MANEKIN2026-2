@@ -972,6 +972,8 @@
                     <div class="closet-filter-bar" id="pane-closet-filter-bar">
                         <button class="filter-pill active" data-cat="ALL" onclick="handlePaneClosetFilter('ALL')">ALL
                             (すべて)</button>
+                        <button class="filter-pill" data-cat="HAT"
+                            onclick="handlePaneClosetFilter('HAT')">帽子 (ハット/キャップ)</button>
                         <button class="filter-pill" data-cat="OUTER"
                             onclick="handlePaneClosetFilter('OUTER')">アウター</button>
                         <button class="filter-pill" data-cat="TOPS"
@@ -1034,6 +1036,8 @@
                             <div class="mini-filter-bar" id="col-closet-filter">
                                 <button class="mini-chip active" data-cat="ALL"
                                     onclick="handleStudioClosetFilter('ALL')">ALL</button>
+                                <button class="mini-chip" data-cat="HAT"
+                                    onclick="handleStudioClosetFilter('HAT')">帽子</button>
                                 <button class="mini-chip" data-cat="OUTER"
                                     onclick="handleStudioClosetFilter('OUTER')">アウター</button>
                                 <button class="mini-chip" data-cat="TOPS"
@@ -1171,6 +1175,11 @@
                                     </div>
                                     <div class="quick-picker-body" id="quick-picker-body">
                                     </div>
+                                    <!-- 5. 帽子レイヤー -->
+                                    <div class="layer-slot layer-hat" id="layer-hat">
+                                        <div class="layer-content" id="layer-content-hat"></div>
+                                        <div class="slot-empty-label" id="label-hat">帽子 (未選択)</div>
+                                    </div>
                                 </div>
 
                                 <!-- 服の位置・サイズ微調整コントロールパネル -->
@@ -1190,6 +1199,8 @@
 
                                     <!-- 調整対象カテゴリタブ -->
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
+                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="hat"
+                                            onclick="switchAdjustSlot('hat')">帽子</button>
                                         <button type="button" class="adjust-tab-btn active" data-adjust-slot="tops"
                                             onclick="switchAdjustSlot('tops')">トップス</button>
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="outer"
@@ -1587,6 +1598,8 @@
                         <div class="preset-img-selector">
                             <span class="preset-label">クイック写真:</span>
                             <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('black_cap', 'クラシック ベースボールキャップ')">黒キャップ</button>
+                            <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒パンツ</button>
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('white_sneakers', '白レザースニーカー')">白スニーカー</button>
@@ -1611,6 +1624,10 @@
                     <div class="form-group">
                         <label class="form-label">カテゴリ <span class="required">*</span></label>
                         <div class="category-radio-grid">
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="HAT" required>
+                                <span>帽子 (キャップ/ハット/ニット帽)</span>
+                            </label>
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="TOPS" required>
                                 <span>トップス (Tシャツ/ニット/パーカー)</span>
