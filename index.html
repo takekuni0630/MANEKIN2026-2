@@ -1,4 +1,4 @@
-﻿<!-- ドキュメントタイプをHTML5として宣言 -->
+<!-- ドキュメントタイプをHTML5として宣言 -->
 <!DOCTYPE html>
 <!-- 言語設定を日本語に指定 -->
 <html lang="ja">
@@ -278,7 +278,7 @@
                     <div class="filter-group" id="category-filter-group">
                         <button class="filter-btn active" data-category="ALL">ALL (すべて)</button>
                         <button class="filter-btn" data-category="TOPS">TOPS (トップス)</button>
-                        <button class="filter-btn" data-category="BOTTOMS">BOTTOMS (パンツ)</button>
+                        <button class="filter-btn" data-category="BOTTOMS">BOTTOMS (ボトムス)</button>
                         <button class="filter-btn" data-category="OUTER">OUTER (アウター)</button>
                     </div>
 
@@ -922,8 +922,8 @@
                     <!-- AI本日のレコメンドバナー -->
                     <div class="studio-recommend-banner">
                         <div class="banner-badge">TODAY'S AI STYLING</div>
-                        <h3 class="banner-title">気温20℃・秋晴れに映える「手持ち黒パンツ × ダブルトレンチコート」</h3>
-                        <p class="banner-desc">あなたのマイクローゼット「黒ワイドパンツ」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
+                        <h3 class="banner-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
+                        <p class="banner-desc">あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
                             ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
                         <div class="banner-actions">
                             <button class="btn btn-primary"
@@ -979,7 +979,7 @@
                         <button class="filter-pill" data-cat="TOPS"
                             onclick="handlePaneClosetFilter('TOPS')">トップス</button>
                         <button class="filter-pill" data-cat="BOTTOMS"
-                            onclick="handlePaneClosetFilter('BOTTOMS')">パンツ</button>
+                            onclick="handlePaneClosetFilter('BOTTOMS')">ボトムス</button>
                         <button class="filter-pill" data-cat="SHOES" onclick="handlePaneClosetFilter('SHOES')">靴
                             (シューズ)</button>
                     </div>
@@ -1043,7 +1043,7 @@
                                 <button class="mini-chip" data-cat="TOPS"
                                     onclick="handleStudioClosetFilter('TOPS')">トップス</button>
                                 <button class="mini-chip" data-cat="BOTTOMS"
-                                    onclick="handleStudioClosetFilter('BOTTOMS')">パンツ</button>
+                                    onclick="handleStudioClosetFilter('BOTTOMS')">ボトムス</button>
                                 <button class="mini-chip" data-cat="SHOES"
                                     onclick="handleStudioClosetFilter('SHOES')">靴</button>
                             </div>
@@ -1091,11 +1091,6 @@
 
                             <!-- ビジュアルステージ -->
                             <div class="mannequin-stage-box" id="mannequin-stage-box" ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)" ondrop="handleStageDrop(event)">
-                                <!-- ステージ操作ガイダンス -->
-                                <div class="stage-guide-hint">
-                                    <span>💡 各スロットをクリックするか、左右の服をクリック・ドラッグして試着できます</span>
-                                </div>
-
                                 <!-- マネキン本体と重ね着レイヤー群 -->
                                 <div class="mannequin-model-wrap" id="mannequin-model-wrap">
                                     <!-- 直立クロームスタンド仕様（ゴーストマネキン表示・マネキン本体は非表示） -->
@@ -1144,44 +1139,28 @@
                                         </g>
                                     </svg>
 
-                                    <!-- 4層のバーチャル試着レイヤー（クリック操作・着せ替え・脱衣対応） -->
+                                    <!-- 4層のバーチャル試着レイヤー（服・ボトムスの自然な重ね合わせ） -->
                                     <!-- 1. 靴レイヤー -->
-                                    <div class="layer-slot layer-shoes" id="layer-shoes" onclick="handleStageSlotClick('shoes')" title="クリックして靴を選択">
+                                    <div class="layer-slot layer-shoes" id="layer-shoes">
                                         <div class="layer-content" id="layer-content-shoes"></div>
-                                        <div class="slot-empty-label" id="label-shoes">＋ 靴を選ぶ</div>
                                     </div>
-                                    <!-- 2. パンツレイヤー -->
-                                    <div class="layer-slot layer-bottoms" id="layer-bottoms" onclick="handleStageSlotClick('bottoms')" title="クリックしてパンツを選択">
+                                    <!-- 2. ボトムスレイヤー -->
+                                    <div class="layer-slot layer-bottoms" id="layer-bottoms">
                                         <div class="layer-content" id="layer-content-bottoms"></div>
-                                        <div class="slot-empty-label" id="label-bottoms">＋ パンツをはかせる</div>
                                     </div>
                                     <!-- 3. トップスレイヤー -->
-                                    <div class="layer-slot layer-tops" id="layer-tops" onclick="handleStageSlotClick('tops')" title="クリックしてトップスを選択">
+                                    <div class="layer-slot layer-tops" id="layer-tops">
                                         <div class="layer-content" id="layer-content-tops"></div>
-                                        <div class="slot-empty-label" id="label-tops">＋ トップスを着せる</div>
                                     </div>
                                     <!-- 4. アウターレイヤー -->
-                                    <div class="layer-slot layer-outer" id="layer-outer" onclick="handleStageSlotClick('outer')" title="クリックしてアウターを選択">
+                                    <div class="layer-slot layer-outer" id="layer-outer">
                                         <div class="layer-content" id="layer-content-outer"></div>
-                                        <div class="slot-empty-label" id="label-outer">＋ アウターを着せる</div>
-                                    </div>
-                                </div>
-
-                                <!-- クイックアイテム選択ポップオーバー -->
-                                <div class="stage-quick-picker" id="stage-quick-picker" style="display: none;">
-                                    <div class="quick-picker-header">
-                                        <span class="quick-picker-title" id="quick-picker-title">アイテムを選択</span>
-                                        <button type="button" class="quick-picker-close" onclick="closeStageQuickPicker()">&times;</button>
-                                    </div>
-                                    <div class="quick-picker-body" id="quick-picker-body">
                                     </div>
                                     <!-- 5. 帽子レイヤー -->
                                     <div class="layer-slot layer-hat" id="layer-hat">
                                         <div class="layer-content" id="layer-content-hat"></div>
-                                        <div class="slot-empty-label" id="label-hat">帽子 (未選択)</div>
                                     </div>
                                 </div>
-
                                 <!-- 服の位置・サイズ微調整コントロールパネル -->
                                 <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
                                     <div class="adjust-panel-header">
@@ -1201,12 +1180,12 @@
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="hat"
                                             onclick="switchAdjustSlot('hat')">帽子</button>
-                                        <button type="button" class="adjust-tab-btn active" data-adjust-slot="tops"
-                                            onclick="switchAdjustSlot('tops')">トップス</button>
-                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="outer"
+                                        <button type="button" class="adjust-tab-btn active" data-adjust-slot="outer"
                                             onclick="switchAdjustSlot('outer')">アウター</button>
+                                        <button type="button" class="adjust-tab-btn" data-adjust-slot="tops"
+                                            onclick="switchAdjustSlot('tops')">トップス</button>
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="bottoms"
-                                            onclick="switchAdjustSlot('bottoms')">パンツ</button>
+                                            onclick="switchAdjustSlot('bottoms')">ボトムス</button>
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="shoes"
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
@@ -1357,7 +1336,7 @@
                                 <button class="mini-chip" data-brand-cat="TOPS"
                                     onclick="handleStudioBrandFilter('TOPS')">トップス</button>
                                 <button class="mini-chip" data-brand-cat="BOTTOMS"
-                                    onclick="handleStudioBrandFilter('BOTTOMS')">パンツ</button>
+                                    onclick="handleStudioBrandFilter('BOTTOMS')">ボトムス</button>
                             </div>
 
                             <!-- ブランド商品リスト -->
@@ -1600,7 +1579,7 @@
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('black_cap', 'クラシック ベースボールキャップ')">黒キャップ</button>
                             <button type="button" class="preset-img-btn"
-                                onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒パンツ</button>
+                                onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒ボトムス</button>
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('white_sneakers', '白レザースニーカー')">白スニーカー</button>
                             <button type="button" class="preset-img-btn"
@@ -1616,7 +1595,7 @@
                     <div class="form-group">
                         <label class="form-label" for="closet-item-name">服の名前・ブランド <span
                                 class="required">*</span></label>
-                        <input type="text" id="closet-item-name" class="form-input" placeholder="例: 黒ワイドタックパンツ、白スニーカー"
+                        <input type="text" id="closet-item-name" class="form-input" placeholder="例: 黒ワイドタックスラックス、白スニーカー"
                             required>
                     </div>
 
@@ -1634,7 +1613,7 @@
                             </label>
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="BOTTOMS" required checked>
-                                <span>パンツ (スラックス/デニム/スウェット)</span>
+                                <span>ボトムス (スラックス/デニム/スウェット)</span>
                             </label>
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="OUTER" required>

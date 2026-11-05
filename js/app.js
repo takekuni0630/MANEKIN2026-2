@@ -530,6 +530,24 @@ const AppState = {
             season: '通年',
             image: 'assets/images/men/スカイオックスフォードシャツ.png',
             isOwned: true
+        },
+        {
+            id: 'c5',
+            name: 'クラシック コットンキャップ',
+            category: 'HAT',
+            color: 'BLACK',
+            season: '通年',
+            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
+            isOwned: true
+        },
+        {
+            id: 'c6',
+            name: 'ウォッシュド バケットハット',
+            category: 'HAT',
+            color: 'CHARCOAL',
+            season: '通年',
+            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20140%22%3E%3Cpath%20d%3D%22M20%20110%20C20%20110%2040%2095%2060%2090%20C75%2086%20125%2086%20140%2090%20C160%2095%20180%20110%20180%20110%20C150%20125%2050%20125%2020%20110%20Z%22%20fill%3D%22%23262626%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C58%2060%2065%2035%20100%2035%20C135%2035%20142%2060%20142%2090%20Z%22%20fill%3D%22%231a1a1a%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C75%2096%20125%2096%20142%2090%22%20stroke%3D%22%23333333%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
+            isOwned: true
         }
     ],
     // マネキン現在着用スロット
@@ -546,13 +564,13 @@ const AppState = {
             id: 'outfit-sample-1',
             title: '秋の通学・デイリーコーデ',
             date: '2026/10/26 15:20',
-            comment: '黒パンツとグレーパーカーの組み合わせは落ち着いた印象を与えます。白スニーカーがアクセントとなりバランスの良いカジュアルコーデです。',
+            comment: '黒ボトムスとグレーパーカーの組み合わせは落ち着いた印象を与えます。白スニーカーがアクセントとなりバランスの良いカジュアルコーデです。',
             tags: ['#キレイめカジュアル', '#通学デイリー', '#モノトーン+1'],
             score: 95,
             items: {
-                bottoms: { id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/pants_black.jpg' },
+                bottoms: { id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/men/ストレートレープセミフレアスラックス.png' },
                 shoes: { id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: 'assets/images/shoes_white.jpg' },
-                tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'ASH GREY', isOwned: false, price: 3490, image: 'assets/images/sweat_grey.jpg' }
+                tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'ASH GREY', isOwned: false, price: 3490, image: 'assets/images/men/アーバングレイジップフーディ.png' }
             }
         }
     ],
@@ -563,7 +581,7 @@ const AppState = {
     studioBrandFilter: 'ALL',
     studioBrandFavOnly: false,
     studioMobileView: 'mannequin',
-    activeAdjustSlot: 'tops',
+    activeAdjustSlot: 'outer',
     fittingOffsets: JSON.parse(localStorage.getItem('manekin_fitting_offsets')) || {
         hat: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
         tops: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
@@ -971,10 +989,13 @@ function handleSizeSelect(chipEl, sizeName) {
 // 7. カート・購入手続き管理（CHECKOUT）
 // --------------------------------------------------------------------------
 function updateCartBadge() {
-    const totalCount = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (!AppState.cart || !Array.isArray(AppState.cart)) {
+        AppState.cart = [];
+    }
+    const totalCount = AppState.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     const cartBadge = document.getElementById('header-cart-badge');
     if (cartBadge) {
-        cartBadge.textContent = totalCount;
+        cartBadge.textContent = isNaN(totalCount) ? 0 : totalCount;
     }
 }
 
@@ -1605,7 +1626,7 @@ const PRESET_CLOSET_PRESETS = {
         category: 'BOTTOMS',
         color: 'BLACK',
         season: '通年',
-        image: 'assets/images/pants_black.jpg'
+        image: 'assets/images/men/ストレートレープセミフレアスラックス.png'
     },
     'white_sneakers': {
         name: '白レザースニーカー',
@@ -1619,21 +1640,21 @@ const PRESET_CLOSET_PRESETS = {
         category: 'TOPS',
         color: 'GREY',
         season: '秋冬',
-        image: 'assets/images/sweat_grey.jpg'
+        image: 'assets/images/men/アーバングレイジップフーディ.png'
     },
     'white_tshirt': {
         name: 'プレミアム リラックス 白Tシャツ',
         category: 'TOPS',
         color: 'WHITE',
         season: '春夏',
-        image: 'assets/images/tshirt_white.jpg'
+        image: 'assets/images/men/スカイオックスフォードシャツ.png'
     },
     'denim_jacket': {
         name: 'オーバーサイズ デニムジャケット',
         category: 'OUTER',
         color: 'BLUE',
         season: '春秋',
-        image: 'assets/images/jacket_black.jpg'
+        image: 'assets/images/men/リラックスダブルブレストテーラードジャケット.png'
     }
 };
 
@@ -1732,11 +1753,11 @@ function renderManekinStudio(activeTab = 'create') {
 // 販売商品向け5段階サイズ定義（左からXS、S、M、L、XL）
 const BRAND_SIZE_LIST = ['XS', 'S', 'M', 'L', 'XL'];
 const BRAND_SIZE_SCALES = {
-    'XS': 90,   // 90% (タイト)
-    'S': 95,   // 95% (スリム)
+    'XS': 88,   // 88% (タイト)
+    'S': 94,    // 94% (スリム)
     'M': 100,  // 100% (標準)
-    'L': 105,  // 105% (ゆったり)
-    'XL': 110   // 110% (ワイド)
+    'L': 106,   // 106% (ゆったり)
+    'XL': 112   // 112% (ワイド)
 };
 
 // --------------------------------------------------------------------------
@@ -1774,7 +1795,7 @@ function renderPaneClosetGrid() {
         return `
             <div class="closet-card ${isWearing ? 'is-wearing' : ''}">
                 <div class="closet-card-thumb-wrap">
-                    <img src="${item.image}" alt="${item.name}" class="closet-card-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                    <img src="${item.image}" alt="${item.name}" class="closet-card-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="closet-badge-owned">手持ち服</span>
                     ${isWearing ? '<span class="closet-badge-wearing">● 着用中</span>' : ''}
                 </div>
@@ -1827,8 +1848,8 @@ function renderStudioClosetList() {
         const fallback = getCategoryFallbackImage(item.category);
 
         return `
-            <div class="studio-item-card ${isWearing ? 'is-active' : '}" draggable="true" ondragstart="handleCardDragStart(event, '${ item.id } ', true)" onclick="toggleWearItem('${ item.id } ', true)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
-            < img src = "${item.image}" alt = "${item.name}" class="studio-item-card-img" onerror = "this.onerror=null;this.src='${fallback}';" >
+            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, '${item.id}', true)" onclick="toggleWearItem('${item.id}', true)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
+            <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';" >
                 <div class="studio-item-card-info">
                     <div class="studio-card-cat-row">
                         <span class="studio-card-cat">${getCategoryNameJP(item.category)}</span>
@@ -1837,8 +1858,8 @@ function renderStudioClosetList() {
                     <div class="studio-card-name" title="${item.name}">${item.name}</div>
                     <div class="studio-card-sub">${item.season || '通年'}</div>
                 </div>
-                ${ isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : '' }
-            </div >
+                ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
+            </div>
             `;
     }).join('');
 }
@@ -1885,9 +1906,9 @@ function renderStudioBrandList() {
 
     if (products.length === 0) {
         list.innerHTML = `
-            < div style = "text-align: center; padding: 30px 10px; color: var(--color-gray-medium);" >
+            <div style="text-align: center; padding: 30px 10px; color: var(--color-gray-medium);" >
                 <p style="font-size: 0.85rem;">該当するアイテムがありません</p>
-            </div >
+            </div>
             `;
         return;
     }
@@ -1898,7 +1919,7 @@ function renderStudioBrandList() {
         const fallback = getCategoryFallbackImage(product.category);
 
         return `
-            < div class="studio-item-card ${isWearing ? 'is-active' : '}" draggable = "true" ondragstart = "handleCardDragStart(event, ${product.id}, false)" onclick = "toggleWearItem(${product.id}, false)" title = "${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}" >
+            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, ${product.id}, false)" onclick="toggleWearItem(${product.id}, false)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}" >
                 <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';">
                     <div class="studio-item-card-info">
                         <div class="studio-card-cat-row">
@@ -1938,12 +1959,12 @@ function renderStudioFavoritesGrid() {
 
     if (favProducts.length === 0) {
         grid.innerHTML = `
-            < div class="closet-empty-card" >
+            <div class="closet-empty-card" >
                 <div class="closet-empty-icon">♥</div>
                 <h3 class="closet-empty-title">お気に入りに登録されたアイテムはありません</h3>
                 <p class="closet-empty-desc">商品一覧でお気に入り（ハート）を登録すると、ここに一覧表示されワンクリックでマネキンに着せ替えることができます。</p>
                 <a href="#items" class="btn btn-primary">商品コレクションを見る</a>
-            </div >
+            </div>
             `;
         return;
     }
@@ -1951,9 +1972,9 @@ function renderStudioFavoritesGrid() {
     grid.innerHTML = favProducts.map(product => {
         const isWearing = isItemWearing(product);
         return `
-            < article class="product-card" data - id="${product.id}" >
+            <article class="product-card" data - id="${product.id}" >
                 <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
-                    <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+                    <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="badge-new" style="background: var(--color-black);">試着する</span>
                 </div>
                 <div class="product-info">
@@ -1964,7 +1985,7 @@ function renderStudioFavoritesGrid() {
                         ${isWearing ? '試着中 (スタジオを開く)' : 'マネキンに着せて試着する'}
                     </button>
                 </div>
-            </article >
+            </article>
             `;
     }).join('');
 }
@@ -1974,6 +1995,7 @@ function renderStudioFavoritesGrid() {
 // --------------------------------------------------------------------------
 
 /**
+ * 
  * アイテムが現在マネキンに着用されているか判定
  */
 function isItemWearing(item) {
@@ -2008,7 +2030,7 @@ function toggleWearItem(itemId, isOwned) {
     if (currentWorn && String(currentWorn.id) === String(targetItem.id)) {
         // すでに着用中なら脱がす
         AppState.currentOutfit[slotKey] = null;
-        showToastNotification(`「${ targetItem.name }」を外しました`);
+        showToastNotification(`「${targetItem.name}」を外しました`);
     } else {
         // スロットに着用
         AppState.currentOutfit[slotKey] = {
@@ -2020,7 +2042,8 @@ function toggleWearItem(itemId, isOwned) {
             image: targetItem.image,
             isOwned: !!isOwned
         };
-        showToastNotification(`「${ targetItem.name }」をマネキンに試着しました`);
+        showToastNotification(`「${targetItem.name}」をマネキンに試着しました`);
+        AppState.activeAdjustSlot = slotKey;
     }
 
     localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
@@ -2054,7 +2077,7 @@ function unwearSlot(slotKey) {
         const name = AppState.currentOutfit[slotKey].name;
         AppState.currentOutfit[slotKey] = null;
         localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
-        showToastNotification(`「${ name }」を外しました`);
+        showToastNotification(`「${name}」を外しました`);
 
         renderMannequinStage();
         renderStudioClosetList();
@@ -2097,6 +2120,8 @@ function getCategoryFallbackImage(category) {
             return 'assets/images/men/ストレートレープセミフレアスラックス.png';
         case 'OUTER':
             return 'assets/images/men/オーバードレープダブルトレンチコート.png';
+        case 'HAT': case 'HATS': case 'CAP':
+            return "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E";
         case 'TOPS':
         default:
             return 'assets/images/men/アーバングレイジップフーディ.png';
@@ -2124,12 +2149,39 @@ function migrateOldBrokenAssets() {
             }
         });
     }
+    if (Array.isArray(AppState.myCloset) && !AppState.myCloset.some(item => item && (item.category === 'HAT' || item.category === 'CAP'))) {
+        AppState.myCloset.push({
+            id: 'c5',
+            name: 'クラシック コットンキャップ',
+            category: 'HAT',
+            color: 'BLACK',
+            season: '通年',
+            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
+            isOwned: true
+        });
+        AppState.myCloset.push({
+            id: 'c6',
+            name: 'ウォッシュド バケットハット',
+            category: 'HAT',
+            color: 'CHARCOAL',
+            season: '通年',
+            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20140%22%3E%3Cpath%20d%3D%22M20%20110%20C20%20110%2040%2095%2060%2090%20C75%2086%20125%2086%20140%2090%20C160%2095%20180%20110%20180%20110%20C150%20125%2050%20125%2020%20110%20Z%22%20fill%3D%22%23262626%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C58%2060%2065%2035%20100%2035%20C135%2035%20142%2060%20142%2090%20Z%22%20fill%3D%22%231a1a1a%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C75%2096%20125%2096%20142%2090%22%20stroke%3D%22%23333333%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
+            isOwned: true
+        });
+        closetChanged = true;
+    }
     if (closetChanged) {
         localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
     }
 
     let outfitChanged = false;
     if (AppState.currentOutfit) {
+        for (const slotKey in AppState.currentOutfit) {
+            if (slotKey.startsWith("data:image")) {
+                delete AppState.currentOutfit[slotKey];
+                outfitChanged = true;
+            }
+        }
         for (const slot in AppState.currentOutfit) {
             const item = AppState.currentOutfit[slot];
             if (item && item.image) {
@@ -2159,19 +2211,11 @@ function migrateOldBrokenAssets() {
  */
 function renderMannequinStage() {
     const outfit = AppState.currentOutfit || {};
-
-    const slots = ['shoes', 'bottoms', 'tops', 'outer'];
-    const slotLabels = {
-        shoes: '＋ 靴を選ぶ',
-        bottoms: '＋ パンツをはかせる',
-        tops: '＋ トップスを着せる',
-        outer: '＋ アウターを着せる'
-    };
+    const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
 
     slots.forEach(slot => {
-        const slotElem = document.getElementById(`layer - ${ slot } `);
-        const layerContent = document.getElementById(`layer - content - ${ slot } `);
-        const labelElem = document.getElementById(`label - ${ slot } `);
+        const slotElem = document.getElementById(`layer-${slot}`);
+        const layerContent = document.getElementById(`layer-content-${slot}`);
         const item = outfit[slot];
 
         if (slotElem) {
@@ -2181,14 +2225,9 @@ function renderMannequinStage() {
         if (layerContent) {
             if (item && item.image) {
                 const fallback = getCategoryFallbackImage(item.category);
-                layerContent.innerHTML = `< img src = "${item.image}" alt = "${item.name}" class="layer-img" onerror = "this.onerror=null;this.src='${fallback}';" > `;
-                if (labelElem) labelElem.style.display = 'none';
+                layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.onerror=null;this.src='${fallback}';">`;
             } else {
                 layerContent.innerHTML = '';
-                if (labelElem) {
-                    labelElem.textContent = slotLabels[slot] || '＋ アイテムを選ぶ';
-                    labelElem.style.display = 'inline-flex';
-                }
             }
         }
     });
@@ -2201,12 +2240,14 @@ function renderMannequinStage() {
             const item = outfit[slotKey];
             if (item) {
                 const badgeLabel = item.isOwned ? '手持ち' : 'ブランド';
+                const isFreeSlot = (slotKey === 'shoes' || slotKey === 'hat');
+                const sizeBadge = (!item.isOwned && item.size && !isFreeSlot) ? ` [${item.size}]` : '';
                 chipsHtml.push(`
-            < span class="wearing-chip" >
-                        <span>${getCategoryNameJP(item.category)}: ${item.name} (${badgeLabel})</span>
+                    <span class="wearing-chip">
+                        <span>${getCategoryNameJP(item.category)}: ${item.name}${sizeBadge} (${badgeLabel})</span>
                         <button class="wearing-chip-del" onclick="unwearSlot('${slotKey}')" title="脱がせる">×</button>
-                    </span >
-            `);
+                    </span>
+                `);
             }
         }
         slotsBar.innerHTML = chipsHtml.join('');
@@ -2224,10 +2265,10 @@ function renderMannequinStage() {
     }
 
     const countElem = document.getElementById('brand-sum-count');
-    if (countElem) countElem.textContent = `${ brandCount } 点`;
+    if (countElem) countElem.textContent = `${brandCount}点`;
 
     const priceElem = document.getElementById('brand-sum-price');
-    if (priceElem) priceElem.textContent = `¥${ brandPrice.toLocaleString() } `;
+    if (priceElem) priceElem.textContent = `¥${brandPrice.toLocaleString()}`;
 
     const cartBtn = document.getElementById('btn-add-brand-to-cart');
     if (cartBtn) {
@@ -2237,17 +2278,13 @@ function renderMannequinStage() {
     // 服の位置・サイズ微調整オフセットを適用
     applyFittingOffsets();
 
-    // 微調整パネルが開いていればUIを再同期（着せ替え時の即時反映）
+    // 微調整パネルが開いていればUIを再同期
     const adjustPanel = document.getElementById('fitting-adjust-panel');
     if (adjustPanel && adjustPanel.style.display !== 'none') {
         syncAdjustPanelUI();
     }
 }
 
-/**
- * ビジュアルステージ上のスロットクリック処理
- * 着用中の場合は脱がせる、未着用の場合はクイック選択ポップオーバーを開く
- */
 function handleStageSlotClick(slotKey) {
     const outfit = AppState.currentOutfit || {};
     const item = outfit[slotKey];
@@ -2273,11 +2310,12 @@ function openStageQuickPicker(slotKey) {
     const catNameMap = {
         outer: { name: 'アウター', cat: 'OUTER' },
         tops: { name: 'トップス', cat: 'TOPS' },
-        bottoms: { name: 'パンツ', cat: 'BOTTOMS' },
-        shoes: { name: '靴', cat: 'SHOES' }
+        bottoms: { name: 'ボトムス', cat: 'BOTTOMS' },
+        shoes: { name: '靴', cat: 'SHOES' },
+        hat: { name: '帽子', cat: 'HAT' }
     };
     const catInfo = catNameMap[slotKey] || { name: 'アイテム', cat: 'ALL' };
-    if (title) title.textContent = `${ catInfo.name } を選択して試着`;
+    if (title) title.textContent = `${catInfo.name} を選択して試着`;
 
     // 候補アイテムを抽出（手持ち服 ＋ ブランド商品）
     const myItems = AppState.myCloset.filter(c => c.category === catInfo.cat);
@@ -2290,7 +2328,7 @@ function openStageQuickPicker(slotKey) {
         myItems.forEach(item => {
             const fb = getCategoryFallbackImage(item.category);
             html += `
-            < div class="quick-picker-card" onclick = "toggleWearItem('${item.id}', true); closeStageQuickPicker();" title = "${item.name}" >
+            <div class="quick-picker-card" onclick="toggleWearItem('${item.id}', true); closeStageQuickPicker();" title="${item.name}" >
                 <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='${fb}';">
                     <div class="quick-picker-card-name">${item.name}</div>
                     <span style="font-size: 0.6rem; color: #0284c7; font-weight: 600;">[手持ち]</span>
@@ -2300,7 +2338,7 @@ function openStageQuickPicker(slotKey) {
         brandItems.forEach(p => {
             const fb = getCategoryFallbackImage(p.category);
             html += `
-            < div class="quick-picker-card" onclick = "toggleWearItem(${p.id}, false); closeStageQuickPicker();" title = "${p.name}" >
+            <div class="quick-picker-card" onclick="toggleWearItem(${p.id}, false); closeStageQuickPicker();" title="${p.name}" >
                 <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src='${fb}';">
                     <div class="quick-picker-card-name">${p.name}</div>
                     <span style="font-size: 0.6rem; color: #e11d48; font-weight: 600;">¥${p.price.toLocaleString()}</span>
@@ -2361,29 +2399,30 @@ function handleStageDrop(event) {
  */
 function applyFittingOffsets() {
     const offsets = AppState.fittingOffsets || {};
-    const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
+    const slots = ['outer', 'tops', 'bottoms', 'shoes', 'hat'];
     const outfit = AppState.currentOutfit || {};
 
     slots.forEach(slot => {
-        const layerElem = document.getElementById(`layer - ${ slot } `);
+        const layerElem = document.getElementById(`layer-${slot}`);
         if (!layerElem) return;
-        const off = offsets[slot] || { x: 0, y: 0, scale: 100 };
+        const off = offsets[slot] || { x: 0, y: 0, scale: 100, brandSize: 'M' };
         const item = outfit[slot];
 
         let effectiveScale = 100;
-        if (item && !item.isOwned) {
-            // 販売されている服: XS〜XLの5段階サイズに応じたスケール（自由な数値変更不可）
+        const isFreeScaleSlot = (slot === 'shoes' || slot === 'hat');
+        if (!isFreeScaleSlot && item && !item.isOwned) {
+            // 販売されている服（アウター・トップス・ボトムス）: XS〜XLの5段階サイズ
             const bSize = off.brandSize || item.size || 'M';
             effectiveScale = BRAND_SIZE_SCALES[bSize] || 100;
-        } else if (item && item.isOwned) {
-            // 手持ちの服: スライダーによる自由な拡大縮小スケール
+        } else if (item && (item.isOwned || isFreeScaleSlot)) {
+            // 帽子・靴、および手持ちの服: スライダーによる自由な拡大縮小スケール (70%〜140%)
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
         } else {
-            effectiveScale = off.scale || 100;
+            effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
         }
 
-        layerElem.style.setProperty('--offset-x', `${ off.x || 0 } px`);
-        layerElem.style.setProperty('--offset-y', `${ off.y || 0 } px`);
+        layerElem.style.setProperty('--offset-x', `${off.x || 0}px`);
+        layerElem.style.setProperty('--offset-y', `${off.y || 0}px`);
         layerElem.style.setProperty('--scale', effectiveScale / 100);
     });
 }
@@ -2420,11 +2459,16 @@ function switchAdjustSlot(slotKey) {
  * スライダーUIの値を現在の服種別（販売商品 vs 手持ち服）およびオフセットに同期
  */
 function syncAdjustPanelUI() {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+    // 微調整タブボタンのアクティブ表示を同期
+    document.querySelectorAll('#adjust-slot-tabs .adjust-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-adjust-slot') === slotKey);
+    });
     const offsets = AppState.fittingOffsets || {};
     const off = offsets[slotKey] || { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     const outfit = AppState.currentOutfit || {};
     const item = outfit[slotKey];
+    const isFreeScaleSlot = (slotKey === 'shoes' || slotKey === 'hat');
 
     // UI要素の取得
     const sliderY = document.getElementById('slider-adjust-y');
@@ -2437,7 +2481,7 @@ function syncAdjustPanelUI() {
     const descElem = document.getElementById('adjust-item-type-desc');
     const rowBrand = document.getElementById('adjust-row-scale-brand');
     const rowFree = document.getElementById('adjust-row-scale-free');
-    const hintElem = document.getElementById('adjust-hint-text');
+    const hintElem = document.querySelector('.adjust-hint') || document.getElementById('adjust-hint-text');
 
     const sliderBrandSize = document.getElementById('slider-adjust-brand-size');
     const valBrandSize = document.getElementById('val-adjust-brand-size');
@@ -2450,42 +2494,73 @@ function syncAdjustPanelUI() {
     // 共通: 上下・左右位置の反映
     if (sliderY) sliderY.value = off.y || 0;
     if (sliderX) sliderX.value = off.x || 0;
-    if (valY) valY.textContent = `${ off.y > 0 ? '+' : '' }${ off.y || 0 } px`;
-    if (valX) valX.textContent = `${ off.x > 0 ? '+' : '' }${ off.x || 0 } px`;
+    if (valY) valY.textContent = `${off.y > 0 ? '+' : ''}${off.y || 0}px`;
+    if (valX) valX.textContent = `${off.x > 0 ? '+' : ''}${off.x || 0}px`;
 
-    // 着用服の種別判別
+    // 1. 未着用状態
     if (!item) {
-        // 未着用状態
         if (badgeElem) {
             badgeElem.className = 'adjust-item-tag empty';
             badgeElem.textContent = '未着用';
         }
-        if (nameElem) nameElem.textContent = `${ getCategoryNameJP(slotKey.toUpperCase()) }（未着用）`;
-        if (descElem) descElem.textContent = '服を着せると調整可能';
+        if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
+        if (descElem) descElem.textContent = isFreeScaleSlot ? '自由サイズ調整（70%〜140%）' : '試着すると調整可能';
 
-        // 未着用時は販売商品サイズUIを非活性表示
-        if (rowBrand) rowBrand.style.display = 'flex';
-        if (rowFree) rowFree.style.display = 'none';
-        if (sliderBrandSize) sliderBrandSize.disabled = true;
-        if (btnBrandMinus) btnBrandMinus.disabled = true;
-        if (btnBrandPlus) btnBrandPlus.disabled = true;
         if (sliderY) sliderY.disabled = true;
         if (sliderX) sliderX.disabled = true;
-        if (hintElem) hintElem.textContent = '💡 クローゼットまたは商品一覧から服を選んでマネキンに試着してください';
+
+        if (isFreeScaleSlot) {
+            // 帽子・靴は未着用でも自由サイズUIを表示（XS〜XLの服規格ではなく自由拡縮）
+            if (rowBrand) rowBrand.style.display = 'none';
+            if (rowFree) rowFree.style.display = 'flex';
+            if (sliderScale) {
+                sliderScale.disabled = true;
+                sliderScale.value = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
+            }
+            if (valScale) valScale.textContent = `${(off.customScale !== undefined) ? off.customScale : (off.scale || 100)}%`;
+            if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}をクローゼットから着用すると、マネキンに合わせてサイズ（70%〜140%）や位置を自由に微調整できます`;
+        } else {
+            // 服（アウター・トップス・ボトムス）は規格サイズUIを表示（非活性）
+            if (rowBrand) rowBrand.style.display = 'flex';
+            if (rowFree) rowFree.style.display = 'none';
+            if (sliderBrandSize) sliderBrandSize.disabled = true;
+            if (btnBrandMinus) btnBrandMinus.disabled = true;
+            if (btnBrandPlus) btnBrandPlus.disabled = true;
+            if (hintElem) hintElem.textContent = '💡 クローゼットまたは商品一覧から服を選んでマネキンに試着してください';
+        }
         return;
     }
 
-    // 服が着用されている場合は操作可能に戻す
+    // 2. 着用中：操作可能に戻す
     if (sliderY) sliderY.disabled = false;
     if (sliderX) sliderX.disabled = false;
     if (sliderBrandSize) sliderBrandSize.disabled = false;
+    if (sliderScale) sliderScale.disabled = false;
 
-    if (!item.isOwned) {
+    if (isFreeScaleSlot) {
         // =====================================================================
-        // 【1. 販売されている服】
-        // ・大きさの調整をXS・S・M・L・XLの5段階から選択する方式
-        // ・スライダーの左からXS、S、M、L、XLの順に表示
-        // ・自由な数値による拡大・縮小はできない
+        // 【帽子・靴: 常に自由サイズ調整（70%〜140%）】
+        // 帽子と靴は衣類のXS〜XL規格ではなく、頭の形や足元に合わせて自由にサイズ・位置を微調整できる
+        // =====================================================================
+        if (badgeElem) {
+            badgeElem.className = 'adjust-item-tag closet';
+            badgeElem.textContent = slotKey === 'hat' ? '🧢 帽子' : '👟 靴';
+        }
+        if (nameElem) nameElem.textContent = item.name;
+        if (descElem) descElem.textContent = '自由サイズ調整（70%〜140%）';
+
+        if (rowBrand) rowBrand.style.display = 'none';
+        if (rowFree) rowFree.style.display = 'flex';
+
+        const currentScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
+        if (sliderScale) sliderScale.value = currentScale;
+        if (valScale) valScale.textContent = `${currentScale}%`;
+
+        if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}はスライダーで大きさを70%〜140%まで自由に拡大・縮小できます（自動保存）`;
+
+    } else if (!item.isOwned) {
+        // =====================================================================
+        // 【販売されている服（アウター・トップス・ボトムス）: XS〜XLの5段階サイズ】
         // =====================================================================
         if (badgeElem) {
             badgeElem.className = 'adjust-item-tag brand';
@@ -2499,7 +2574,7 @@ function syncAdjustPanelUI() {
 
         const currentSize = off.brandSize || item.size || 'M';
         const sizeIdx = BRAND_SIZE_LIST.indexOf(currentSize);
-        const validIdx = (sizeIdx >= 0) ? sizeIdx : 2; // デフォルトM (index 2)
+        const validIdx = (sizeIdx >= 0) ? sizeIdx : 2;
 
         if (sliderBrandSize) sliderBrandSize.value = validIdx;
         if (valBrandSize) valBrandSize.textContent = BRAND_SIZE_LIST[validIdx];
@@ -2517,9 +2592,7 @@ function syncAdjustPanelUI() {
 
     } else {
         // =====================================================================
-        // 【2. 手持ちの服】
-        // ・スライダーで自由に拡大・縮小できる仕様を維持（70%〜140%）
-        // ・上下位置（Y）と左右位置（X）の調整機能も維持
+        // 【手持ちの服（アウター・トップス・ボトムス）: 自由サイズ調整】
         // =====================================================================
         if (badgeElem) {
             badgeElem.className = 'adjust-item-tag closet';
@@ -2533,7 +2606,7 @@ function syncAdjustPanelUI() {
 
         const currentScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
         if (sliderScale) sliderScale.value = currentScale;
-        if (valScale) valScale.textContent = `${ currentScale }% `;
+        if (valScale) valScale.textContent = `${currentScale}%`;
 
         if (hintElem) hintElem.textContent = '💡 手持ちの服はブランドによって実寸が異なるため、見た目の大きさを自由に調整できます（自動保存）';
     }
@@ -2543,7 +2616,10 @@ function syncAdjustPanelUI() {
  * 販売商品用: 5段階サイズ選択（XS・S・M・L・XL）変更処理
  */
 function handleBrandSizeInput(val) {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+    // 帽子と靴はXS〜XL規格サイズではなく自由拡大縮小のためガード
+    if (slotKey === 'shoes' || slotKey === 'hat') return;
+
     if (!AppState.fittingOffsets[slotKey]) {
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
@@ -2591,7 +2667,9 @@ function handleBrandSizeInput(val) {
  * 販売商品用: 1段階サイズ増減ステップ（－ / ＋）
  */
 function stepBrandSize(delta) {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+    if (slotKey === 'shoes' || slotKey === 'hat') return;
+
     const off = (AppState.fittingOffsets && AppState.fittingOffsets[slotKey]) || {};
     const outfit = AppState.currentOutfit || {};
     const item = outfit[slotKey];
@@ -2605,7 +2683,8 @@ function stepBrandSize(delta) {
  * 手持ち服および位置の微調整スライダー変更時処理
  */
 function handleAdjustInput(prop, val) {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+
     if (!AppState.fittingOffsets[slotKey]) {
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
@@ -2619,13 +2698,13 @@ function handleAdjustInput(prop, val) {
     // UI表示更新
     if (prop === 'y') {
         const valElem = document.getElementById('val-adjust-y');
-        if (valElem) valElem.textContent = `${ numVal > 0 ? '+' : '' }${ numVal } px`;
+        if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
     } else if (prop === 'x') {
         const valElem = document.getElementById('val-adjust-x');
-        if (valElem) valElem.textContent = `${ numVal > 0 ? '+' : '' }${ numVal } px`;
+        if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
     } else if (prop === 'scale') {
         const valElem = document.getElementById('val-adjust-scale');
-        if (valElem) valElem.textContent = `${ numVal }% `;
+        if (valElem) valElem.textContent = `${numVal}%`;
     }
 
     // 画面のマネキン服へ即座に反映
@@ -2639,7 +2718,8 @@ function handleAdjustInput(prop, val) {
  * 微調整ボタン（▲▼◀▶＋－）クリック時の増減
  */
 function stepAdjust(prop, delta) {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+
     if (!AppState.fittingOffsets[slotKey]) {
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
@@ -2651,7 +2731,7 @@ function stepAdjust(prop, delta) {
     const nextVal = current + delta;
     handleAdjustInput(prop, nextVal);
 
-    const slider = document.getElementById(`slider - adjust - ${ prop } `);
+    const slider = document.getElementById(`slider-adjust-${prop}`);
     if (slider) slider.value = nextVal;
 }
 
@@ -2659,7 +2739,8 @@ function stepAdjust(prop, delta) {
  * オフセット初期化リセット
  */
 function resetFittingOffsets() {
-    const slotKey = AppState.activeAdjustSlot || 'tops';
+    const slotKey = AppState.activeAdjustSlot || 'outer';
+
     AppState.fittingOffsets[slotKey] = {
         x: 0,
         y: 0,
@@ -2676,7 +2757,7 @@ function resetFittingOffsets() {
     syncAdjustPanelUI();
     applyFittingOffsets();
     localStorage.setItem('manekin_fitting_offsets', JSON.stringify(AppState.fittingOffsets));
-    showToastNotification(`「${ getCategoryNameJP(slotKey.toUpperCase()) }」の位置とサイズをリセットしました`);
+    showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
 }
 
 /**
@@ -2692,7 +2773,7 @@ function setMannequinGender(gender) {
     // ブランド商品リストを性別に連動して再描画
     renderStudioBrandList();
 
-    showToastNotification(`マネキンモデルを「${ gender }」に切り替えました`);
+    showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
 }
 
 /**
@@ -2754,7 +2835,7 @@ function updateAIStylingComment() {
 
     if (dotsElem) {
         dotsElem.innerHTML = uniqueColors.map(c => `
-            < span class="palette-dot" style = "background-color: ${getColorHex(c)};" title = "${c}" ></span >
+            <span class="palette-dot" style="background-color: ${getColorHex(c)};" title="${c}" ></span>
                 `).join('');
     }
 
@@ -2763,11 +2844,11 @@ function updateAIStylingComment() {
     let tags = [];
     let score = 95;
 
-    // パターン1: 黒パンツ + 白スニーカー + パーカー/トップス（要件例の完全再現）
+    // パターン1: 黒ボトムス + 白スニーカー + パーカー/トップス（要件例の完全再現）
     if (hasBottoms && hasShoes && outfit.bottoms.color === 'BLACK' && outfit.shoes.color === 'WHITE' && hasTops) {
-        comment = `「${ outfit.bottoms.name }」と「${ outfit.tops.name }」の組み合わせは落ち着いた印象を与えます。足元の「${ outfit.shoes.name }」がアクセントとなり、視線が自然に抜けるバランスの良いカジュアルコーデです。`;
+        comment = `「${outfit.bottoms.name}」と「${outfit.tops.name}」の組み合わせは落ち着いた印象を与えます。足元の「${outfit.shoes.name}」がアクセントとなり、視線が自然に抜けるバランスの良いカジュアルコーデです。`;
         if (hasOuter) {
-            comment += ` さらに「${ outfit.outer.name }」を羽織ることで、程よい大人の上品さとこなれ感がプラスされます。`;
+            comment += ` さらに「${outfit.outer.name}」を羽織ることで、程よい大人の上品さとこなれ感がプラスされます。`;
             tags = ['#大人の品格', '#モノトーン+1', '#Aラインシルエット'];
             score = 98;
         } else {
@@ -2777,36 +2858,36 @@ function updateAIStylingComment() {
     }
     // パターン2: アウターがある全身コーデ
     else if (hasOuter && hasBottoms) {
-        comment = `「${ outfit.outer.name }」の優美なドレープ感が全体のシルエットを引き締めています。ボトムスに「${ outfit.bottoms.name }」を合わせることで、現代的で清潔感のあるミニマルな装いに仕上がっています。`;
+        comment = `「${outfit.outer.name}」の優美なドレープ感が全体のシルエットを引き締めています。ボトムスに「${outfit.bottoms.name}」を合わせることで、現代的で清潔感のあるミニマルな装いに仕上がっています。`;
         tags = ['#スマートシルエット', '#都会派モード', '#大人の休日'];
         score = 96;
     }
     // パターン3: トップス + ボトムス
     else if (hasTops && hasBottoms) {
-        comment = `「${ outfit.tops.name }」と「${ outfit.bottoms.name }」の明度バランスが非常に美しく調和しています。手持ち服の日常感にブランドの上質さが加わり、抜け感のある洗練されたスタイルです。`;
+        comment = `「${outfit.tops.name}」と「${outfit.bottoms.name}」の明度バランスが非常に美しく調和しています。手持ち服の日常感にブランドの上質さが加わり、抜け感のある洗練されたスタイルです。`;
         tags = ['#黄金バランス', '#デイリーシック', '#着回し自在'];
         score = 94;
     }
     // パターン4: 単品試着
     else {
         const singleItem = wornItems[0];
-        comment = `「${ singleItem.name }」を着用中。美しいカッティングが際立っています。さらに相性の良い${ hasTops ? 'パンツや靴' : 'トップスやアウター' } を組み合わせると、全体のトータルバランスを診断できます。`;
+        comment = `「${singleItem.name}」を着用中。美しいカッティングが際立っています。さらに相性の良い${hasTops ? 'ボトムスや靴' : 'トップスやアウター'} を組み合わせると、全体のトータルバランスを診断できます。`;
         tags = ['#シルエット重視', '#スタイリング途中'];
         score = 90;
     }
 
     // 帽子のアクセント診断
     if (hasHat && outfit.hat) {
-        comment += ` 頭元の「${ outfit.hat.name }」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
+        comment += ` 頭元の「${outfit.hat.name}」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
         if (!tags.includes('#アクセント小物')) tags.push('#アクセント小物');
     }
 
     // DOMへ反映
     if (commentElem) commentElem.textContent = comment;
     if (tagsElem) {
-        tagsElem.innerHTML = tags.map(t => `< span class="ai-tag" > ${ t }</span > `).join('');
+        tagsElem.innerHTML = tags.map(t => `<span class="ai-tag" > ${t}</span> `).join('');
     }
-    if (scoreValElem) scoreValElem.textContent = `${ score } 点`;
+    if (scoreValElem) scoreValElem.textContent = `${score} 点`;
     if (scoreStarsElem) scoreStarsElem.textContent = '★★★★★';
 }
 
@@ -2851,7 +2932,7 @@ function handleSaveOutfit(e) {
     AppState.savedOutfits.unshift(newOutfit);
     localStorage.setItem('manekin_saved_outfits', JSON.stringify(AppState.savedOutfits));
 
-    showToastNotification(`「${ title }」を保存しました！`);
+    showToastNotification(`「${title}」を保存しました！`);
     if (input) input.value = '';
 
     // バッジ等の更新
@@ -2867,12 +2948,12 @@ function renderSavedOutfitsGrid() {
 
     if (AppState.savedOutfits.length === 0) {
         grid.innerHTML = `
-            < div class="closet-empty-card" >
+            <div class="closet-empty-card" >
                 <div class="closet-empty-icon">📖</div>
                 <h3 class="closet-empty-title">保存したコーディネートはありません</h3>
                 <p class="closet-empty-desc">コーデ作成スタジオで組み合わせを作り、名前を付けて保存するとここにルックブックとしてストックされます。</p>
                 <button class="btn btn-primary" onclick="switchStudioTab('create')">コーデを作成する</button>
-            </div >
+            </div>
             `;
         return;
     }
@@ -2882,14 +2963,14 @@ function renderSavedOutfitsGrid() {
         const itemList = Object.values(items).filter(Boolean);
 
         const stripsHtml = itemList.map(it => `
-            < div class="saved-strip-item" title = "${it.name}" >
-                <img src="${it.image}" alt="${it.name}" class="saved-strip-img" onerror="this.src='assets/images/tshirt_white.jpg'">
+            <div class="saved-strip-item" title="${it.name}" >
+                <img src="${it.image}" alt="${it.name}" class="saved-strip-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="saved-strip-tag">${it.isOwned ? '手持ち' : 'ブランド'}</span>
                 </div>
         `).join('');
 
         return `
-            < div class="saved-outfit-card" >
+            <div class="saved-outfit-card" >
                 <div class="saved-outfit-header">
                     <div>
                         <h4 class="saved-outfit-title">${outfit.title}</h4>
@@ -2910,7 +2991,7 @@ function renderSavedOutfitsGrid() {
                         このコーデをマネキンに再現
                     </button>
                 </div>
-            </div >
+            </div>
             `;
     }).join('');
 }
@@ -2925,7 +3006,7 @@ function restoreOutfit(outfitId) {
     AppState.currentOutfit = JSON.parse(JSON.stringify(target.items));
     localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
 
-    showToastNotification(`「${ target.title }」をマネキンに復元しました`);
+    showToastNotification(`「${target.title}」をマネキンに復元しました`);
     switchStudioTab('create');
 }
 
@@ -2950,6 +3031,9 @@ function deleteSavedOutfit(outfitId) {
  * 着用中のブランド商品をショッピングカートへ一括追加
  */
 function addCurrentBrandItemsToCart() {
+    if (!AppState.cart || !Array.isArray(AppState.cart)) {
+        AppState.cart = [];
+    }
     const outfit = AppState.currentOutfit || {};
     const brandItems = Object.values(outfit).filter(it => it && !it.isOwned);
 
@@ -2960,29 +3044,30 @@ function addCurrentBrandItemsToCart() {
 
     const offsets = AppState.fittingOffsets || {};
     brandItems.forEach(item => {
-        const slotKey = getSlotKeyByCategory(item.category);
+        if (!item) return;
+        const slotKey = getSlotKeyByCategory(item.category) || 'tops';
         const off = offsets[slotKey] || {};
         const chosenSize = item.size || off.brandSize || 'M';
 
-        const existing = AppState.cart.find(c => c.id === item.id && c.size === chosenSize);
+        const existing = AppState.cart.find(c => c && c.id === item.id && c.size === chosenSize);
         if (existing) {
-            existing.quantity += 1;
+            existing.quantity = (existing.quantity || 1) + 1;
         } else {
             AppState.cart.push({
                 id: item.id,
-                name: item.name,
+                name: item.name || '商品',
                 color: item.color || 'BLACK',
                 size: chosenSize,
                 price: item.price || 0,
                 quantity: 1,
-                image: item.image
+                image: item.image || getCategoryFallbackImage(item.category)
             });
         }
     });
 
     localStorage.setItem('manekin_cart', JSON.stringify(AppState.cart));
     updateCartBadge();
-    showToastNotification(`試着中のブランドアイテム（${ brandItems.length } 点）をカートに追加しました！`);
+    showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しました！`);
 }
 
 // --------------------------------------------------------------------------
@@ -3038,7 +3123,7 @@ function selectPresetImage(presetKey, presetName) {
     const nameInput = document.getElementById('closet-item-name');
     if (nameInput) nameInput.value = preset.name;
 
-    const catRadio = document.querySelector(`input[name = "closet_category"][value = "${preset.category}"]`);
+    const catRadio = document.querySelector(`input[name="closet_category"][value="${preset.category}"]`);
     if (catRadio) catRadio.checked = true;
 
     const colorSelect = document.getElementById('closet-item-color');
@@ -3098,15 +3183,15 @@ function handleAddClosetItem(e) {
     let image = currentClosetUploadDataUrl;
     if (!image) {
         if (category === 'BOTTOMS') {
-            image = 'assets/images/pants_black.jpg';
+            image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
         } else if (category === 'SHOES') {
             image = PRESET_CLOSET_PRESETS['white_sneakers'].image;
         } else if (category === 'OUTER') {
-            image = 'assets/images/jacket_black.jpg';
+            image = 'assets/images/men/リラックスダブルブレストテーラードジャケット.png';
         } else if (category === 'HAT') {
             image = PRESET_CLOSET_PRESETS['black_cap'] ? PRESET_CLOSET_PRESETS['black_cap'].image : '';
         } else {
-            image = 'assets/images/tshirt_white.jpg';
+            image = 'assets/images/men/スカイオックスフォードシャツ.png';
         }
     }
 
@@ -3123,7 +3208,7 @@ function handleAddClosetItem(e) {
     AppState.myCloset.unshift(newItem);
     localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
 
-    showToastNotification(`「${ name }」をマイクローゼットに登録しました！`);
+    showToastNotification(`「${name}」をマイクローゼットに登録しました！`);
     closeAddClosetModal();
 
     // 画面再描画
@@ -3155,9 +3240,9 @@ function deleteClosetItem(itemId) {
  * おすすめプリセットコーデの適用（ホームバナー用）
  */
 function applyPresetLook(lookKey) {
-    // 例: 手持ち黒パンツ + 白スニーカー + トレンチコート
+    // 例: 手持ち黒ボトムス + 白スニーカー + トレンチコート
     const blackPants = AppState.myCloset.find(c => c.category === 'BOTTOMS') || {
-        id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/pants_black.jpg'
+        id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/men/ストレートレープセミフレアスラックス.png'
     };
     const whiteSneakers = AppState.myCloset.find(c => c.category === 'SHOES') || {
         id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: 'assets/images/shoes_white.jpg'
@@ -3199,7 +3284,7 @@ function getCategoryNameJP(cat) {
     switch (cat) {
         case 'OUTER': return 'アウター';
         case 'TOPS': return 'トップス';
-        case 'BOTTOMS': return 'パンツ';
+        case 'BOTTOMS': return 'ボトムス';
         case 'SHOES': return '靴';
         case 'HAT': case 'HATS': case 'CAP': return '帽子';
         default: return cat;
@@ -3240,22 +3325,22 @@ function importOrderToCloset(orderIndex) {
 
     // カテゴリと色を推定
     let cat = 'TOPS';
-    let img = 'assets/images/tshirt_white.jpg';
+    let img = 'assets/images/men/スカイオックスフォードシャツ.png';
     let color = 'BLACK';
 
-    if (itemName.includes('パンツ') || itemName.includes('スラックス') || itemName.includes('トラウザー') || itemName.includes('デニム')) {
+    if (itemName.includes('パンツ') || itemName.includes('ボトムス') || itemName.includes('スラックス') || itemName.includes('トラウザー') || itemName.includes('デニム')) {
         cat = 'BOTTOMS';
-        img = 'assets/images/pants_black.jpg';
+        img = 'assets/images/men/ストレートレープセミフレアスラックス.png';
     } else if (itemName.includes('ジャケット') || itemName.includes('コート')) {
         cat = 'OUTER';
-        img = 'assets/images/jacket_black.jpg';
+        img = 'assets/images/men/リラックスダブルブレストテーラードジャケット.png';
     } else if (itemName.includes('靴') || itemName.includes('スニーカー')) {
         cat = 'SHOES';
         img = PRESET_CLOSET_PRESETS['white_sneakers'].image;
         color = 'WHITE';
     } else if (itemName.includes('スウェット') || itemName.includes('パーカー')) {
         cat = 'TOPS';
-        img = 'assets/images/sweat_grey.jpg';
+        img = 'assets/images/men/アーバングレイジップフーディ.png';
         color = 'GREY';
     }
 
@@ -3272,7 +3357,7 @@ function importOrderToCloset(orderIndex) {
     AppState.myCloset.unshift(newItem);
     localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
 
-    showToastNotification(`「${ itemName }」をマイクローゼットにインポートしました！`);
+    showToastNotification(`「${itemName}」をマイクローゼットにインポートしました！`);
 
     // スタジオバッジ等の更新
     const closetBadge = document.getElementById('studio-closet-badge');
