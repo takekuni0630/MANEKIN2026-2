@@ -3376,7 +3376,8 @@ button {
     align-items: center;
     justify-content: center;
     text-align: center;
-    pointer-events: none; /* 未着用時は透過 */
+    pointer-events: none;
+    /* 未着用時は透過 */
     user-select: none;
     transition: transform 0.08s ease-out, filter 0.2s;
     border-radius: 8px;
@@ -3384,7 +3385,8 @@ button {
 
 .layer-slot.has-item {
     cursor: pointer;
-    pointer-events: auto; /* 着用時のみ操作可能 */
+    pointer-events: auto;
+    /* 着用時のみ操作可能 */
 }
 
 .layer-slot.has-item:hover {
@@ -3400,7 +3402,7 @@ button {
 }
 
 .layer-bottoms {
-    top: 200px;
+    top: 180px;
     width: 180px;
     height: 230px;
     z-index: 4;
@@ -3414,14 +3416,14 @@ button {
 }
 
 .layer-outer {
-    top: 30px;
+    top: 70px;
     width: 230px;
     height: 250px;
     z-index: 6;
 }
 
 .layer-hat {
-    top: 8px;
+    top: 55px;
     width: 125px;
     height: 75px;
     z-index: 7;
@@ -3451,6 +3453,7 @@ button {
         transform: scale(0.9);
         opacity: 0.5;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -3503,6 +3506,7 @@ button {
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -3560,7 +3564,7 @@ button {
 .quick-picker-card:hover {
     border-color: var(--color-black);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .quick-picker-card img {
@@ -3578,6 +3582,7 @@ button {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 /* 服の位置・サイズ微調整パネル */
 .fitting-adjust-panel {
     width: 100%;
@@ -3750,6 +3755,7 @@ button {
     font-size: 0.65rem;
     color: #94a3b8;
 }
+
 /* 対象アイテム判別ステータスバー */
 .adjust-item-status {
     background: #f8fafc;
