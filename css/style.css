@@ -3402,14 +3402,14 @@ button {
 }
 
 .layer-bottoms {
-    top: 180px;
+    top: 230px;
     width: 180px;
     height: 230px;
     z-index: 4;
 }
 
 .layer-tops {
-    top: 40px;
+    top: 80px;
     width: 200px;
     height: 200px;
     z-index: 5;
@@ -3423,7 +3423,7 @@ button {
 }
 
 .layer-hat {
-    top: 55px;
+    top: 40px;
     width: 125px;
     height: 75px;
     z-index: 7;
