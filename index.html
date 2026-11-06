@@ -611,12 +611,12 @@
                         <p class="auth-subtitle">会員ログイン</p>
                     </div>
 
-                    <!-- 未ログイン購入試行時の案内バナー -->
+                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
                     <div id="login-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
                         <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
-                            <span>⚠️ ご購入手続きには会員登録またはログインが必要です</span>
+                            <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
                         </div>
-                        <p style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="login-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -663,12 +663,12 @@
                         <p class="auth-subtitle">新規会員登録</p>
                     </div>
 
-                    <!-- 未ログイン購入試行時の案内バナー -->
+                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
                     <div id="reg-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
                         <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
-                            <span>⚠️ ご購入手続きには会員登録が必要です</span>
+                            <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
                         </div>
-                        <p style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="reg-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -858,10 +858,10 @@
                     </div>
                     <div class="studio-header-user">
                         <div class="user-chip">
-                            <span class="user-chip-avatar" id="studio-avatar-char">M</span>
+                            <span class="user-chip-avatar" id="studio-avatar-char">G</span>
                             <div class="user-chip-info">
-                                <span class="user-chip-name" id="studio-user-name">山田 太郎 様</span>
-                                <span class="user-chip-rank">REGULAR MEMBER</span>
+                                <span class="user-chip-name" id="studio-user-name">ゲスト 様</span>
+                                <span class="user-chip-rank" id="studio-user-rank">GUEST</span>
                             </div>
                         </div>
                     </div>
@@ -1348,7 +1348,6 @@
                             <div class="col-header">
                                 <div class="col-title-wrap">
                                     <h3 class="col-title">3. ブランド商品</h3>
-                                    <span class="col-badge brand-badge">MANEKIN</span>
                                 </div>
                                 <label class="fav-filter-toggle" title="お気に入りのみ表示">
                                     <input type="checkbox" id="brand-fav-filter-chk"
@@ -1475,15 +1474,15 @@
                             <h3 class="profile-section-title">基本会員情報</h3>
                             <div class="profile-field-row">
                                 <span class="profile-label">お名前:</span>
-                                <strong class="profile-val" id="prof-display-name">山田 太郎 様</strong>
+                                <strong class="profile-val" id="prof-display-name">ゲスト 様</strong>
                             </div>
                             <div class="profile-field-row">
                                 <span class="profile-label">メールアドレス:</span>
-                                <span class="profile-val" id="prof-display-email">demo@manekin.com</span>
+                                <span class="profile-val" id="prof-display-email">未ログイン</span>
                             </div>
                             <div class="profile-field-row">
                                 <span class="profile-label">会員ステータス:</span>
-                                <span class="membership-badge">REGULAR MEMBER (AI機能解放済み)</span>
+                                <span class="membership-badge" id="prof-display-rank">GUEST</span>
                             </div>
                         </div>
 

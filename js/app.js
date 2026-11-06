@@ -62,7 +62,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "たっぷりとした身幅とラグランスリーブが生み出す優美な落ち感が魅力。撥水性と防風性を備えた高密度ギャバジン素材を使用し、クラシックなディテールを削ぎ落とした現代的なオーバーサイズトレンチ。",
-        colors: ["CHARCOAL", "BLACK", "DARK BROWN"],
+        colors: ["CHARCOAL"],
         sizes: ["M", "L", "XL"],
         material: "ポリエステル 70%, レーヨン 28%, ポリウレタン 2%",
         sku: "MNK-2026-M01"
@@ -78,7 +78,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "リラックスしたサイジングと、端正なダブルプレストデザインが融合したテーラードジャケット。滑らかなウールブレンド素材を使用し、肩パッドを排すことでカーディガン感覚で羽織れる軽やかさを実現しました。ドレスシーンからカジュアルダウンまで、幅広いスタイリングに洗練されたムードを加えます。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        colors: ["BLACK"],
         sizes: ["S", "M", "L", "XL"],
         material: "ウール 50%、ポリエステル 48%、ポリウレタン 2%",
         sku: "MNK-2026-M02"
@@ -94,7 +94,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "上品な光沢感としっとりとした質感が魅力の、ミニマルなシングル仕立てのレザージャケット。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        colors: ["BLACK"],
         sizes: ["S", "M", "L", "XL"],
         material: "ウール 50%、ポリエステル 48%、ポリウレタン 2%",
         sku: "MNK-2026-M02"
@@ -110,7 +110,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "温かみのあるウォーム感豊かなボア素材に、存在感のある赤と黒のバッファローチェックを落とし込んだジップアップジャケット。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        colors: ["RED CHECK"],
         sizes: ["S", "M", "L", "XL"],
         material: "ウール 50%、ポリエステル 48%、ポリウレタン 2%",
         sku: "MNK-2026-M02"
@@ -126,7 +126,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "",
-        colors: ["HEATHER GREY", "CHARCOAL", "BLACK", "BROWN"],
+        colors: ["HEATHER GREY"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%（裏パイル仕立て）",
         sku: "MNK-2026-M03"
@@ -142,7 +142,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "",
-        colors: ["OFF WHITE", "BLACK", "NAVY", "TERRACOTTA"],
+        colors: ["CHARCOAL"],
         sizes: ["S", "M", "L", "XL"],
         material: "エクストラファインメリノウール 100%",
         sku: "MNK-2026-M04"
@@ -158,7 +158,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "爽やかな水色のストライプシャツ。",
-        colors: ["WHITE", "STRIPE BLUE", "CHARCOAL"],
+        colors: ["STRIPE BLUE"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 100%",
         sku: "MNK-2026-M07"
@@ -174,7 +174,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "深みのあるワインカラーが上品さを演出する、大人のベーシックニット。",
-        colors: ["CHARCOAL", "OFF WHITE", "BLACK", "BLUE"],
+        colors: ["WINE"],
         sizes: ["S", "M", "L", "XL"],
         material: "レーヨン 55%, ポリエステル 45%",
         sku: "MNK-2026-M06"
@@ -190,7 +190,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "膝位置をわずかに高く設定し、裾にかけて自然に広がる美脚シルエットスラックス。センタープレスが半永久的に保たれるクリース加工を施し、スタイルアップを約束します。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        colors: ["BLACK"],
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 100%",
         sku: "MNK-2026-M09"
@@ -206,7 +206,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "膝付近のジップ切り替えによりショーツとしても着用可能な、クリーンなライトグレーの2WAYナイロンカーゴパンツ。",
-        colors: ["BLACK", "CHARCOAL", "NAVY"],
+        colors: ["LIGHT GREY"],
         sizes: ["S", "M", "L", "XL"],
         material: "ポリエステル 100%",
         sku: "MNK-2026-M09"
@@ -222,7 +222,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "立体裁断による緩やかなカーブラインが現代的。",
-        colors: ["OLIVE", "BLACK", "CHARCOAL"],
+        colors: ["OLIVE"],
         sizes: ["S", "M", "L", "XL"],
         material: "綿 80%, リネン 20%",
         sku: "MNK-2026-M10"
@@ -238,7 +238,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "しましま模様なのでシマウマ気分で日常生活が送れます。",
-        colors: ["BLACK", "NAVY", "CHARCOAL"],
+        colors: ["STRIPE BLACK"],
         sizes: ["M", "L"],
         material: "ポリエステル 100%",
         sku: "MNK-2026-M12"
@@ -258,7 +258,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "軽くて暖かいシェルパ素材を使用し、肌触りは柔らかく、見た目にも上品。高めのスタンドカラーが首元までしっかり包み込み、冷たい風を防ぎます。",
-        colors: ["OATMEAL", "BLACK", "CHARCOAL"],
+        colors: ["OATMEAL"],
         sizes: ["S", "M", "L"],
         material: "ポリエステル 100%",
         sku: "MNK-2026-W13"
@@ -274,7 +274,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "細かなチェック柄が特徴の軽量パフジャケット。しっかり暖かい中綿仕様で、冬の外出でも快適。高めのスタンドカラーと袖口のゴムで冷気を防ぎ、デイリーに使いやすい一着。",
-        colors: ["BLACK", "CHARCOAL", "OFF WHITE"],
+        colors: ["BLACK"],
         sizes: ["S", "M", "L"],
         material: "ポリエステル 100%",
         sku: "MNK-2026-W14"
@@ -290,7 +290,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "首元を包み込むスタンドカラーとマットな質感の生地が、都会的で洗練された印象を与える中綿パフジャケット。",
-        colors: ["BLACK", "IVORY", "CHARCOAL"],
+        colors: ["IVORY"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
         sku: "MNK-2026-W15"
@@ -306,7 +306,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "レザーの質感とボア襟が特徴のジャケット。暖かく、冬のアウターとして使いやすい一着。フロントのジップとフラップポケットで、機能性とデザインを両立。",
-        colors: ["BLACK", "IVORY", "CHARCOAL"],
+        colors: ["BLACK"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
         sku: "MNK-2026-W15"
@@ -322,7 +322,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "ふんわりとした毛足の長いシャギー素材が心地よく、上品なネイビーとゆるめのオーバーサイズシルエットで抜け感のあるニットプルオーバー。",
-        colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
+        colors: ["ICE BLUE"],
         sizes: ["S", "M", "L"],
         material: "表地: ポリエステル 100%, 中綿: リサイクルダウン 90%, フェザー 10%",
         sku: "MNK-2026-W16"
@@ -339,7 +339,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "しっかりとした肉厚感と、ドロップショルダーのゆったりシルエットで洗練された雰囲気に仕上がる万能スウェットプルオーバー。",
-        colors: ["OFF WHITE", "CHARCOAL", "ICE BLUE", "BLACK"],
+        colors: ["OFF WHITE"],
         sizes: ["S", "M", "L"],
         material: "ウール 85%, カシミヤ 15%",
         sku: "MNK-2026-W17"
@@ -355,7 +355,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "味のあるヴィンテージ加工とシックなブラウンカラーが魅力的で、羽織るだけでこなれ感を演出できるオーバーサイズジップパーカー。",
-        colors: ["HEATHER GREY", "BLACK", "MOCHA BROWN"],
+        colors: ["MOCHA BROWN"],
         sizes: ["S", "M", "L"],
         material: "綿 100%",
         sku: "MNK-2026-W18"
@@ -371,7 +371,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "程よい透け感のあるシアー素材とキュートなドット柄が印象的な、ヘンリーネックデザインのクロップド丈長袖カットソー。",
-        colors: ["WHITE", "BLACK", "CHARCOAL"],
+        colors: ["WHITE"],
         sizes: ["S", "M", "L"],
         material: "スビンコットン 100%",
         sku: "MNK-2026-W19"
@@ -387,7 +387,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "タックの立体的なドレープとハイウエストが魅力の、上品できれいめに履ける濃紺デニムトラウザー。",
-        colors: ["CHARCOAL", "BLACK", "ECRU"],
+        colors: ["INDIGO"],
         sizes: ["S", "M", "L"],
         material: "ポリエステル 65%, レーヨン 35%",
         sku: "MNK-2026-W21"
@@ -403,7 +403,7 @@ const SAMPLE_PRODUCTS = [
         isNew: false,
         isFeatured: false,
         description: "綺麗なドレープ感はそのままに、爽やかなブリーチ加工で抜け感をプラスしたライトブルーデニム。",
-        colors: ["BLACK", "CHARCOAL", "BROWN"],
+        colors: ["LIGHT INDIGO"],
         sizes: ["S", "M", "L"],
         material: "ポリエステル 95%, ポリウレタン 5%",
         sku: "MNK-2026-W22"
@@ -419,7 +419,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: false,
         description: "落ち着いた迷彩柄と圧倒的なスーパーワイドシルエットで、コーデの主役になるストリートデニム。",
-        colors: ["VINTAGE BLUE", "BLACK", "WHITE"],
+        colors: ["CAMOUFLAGE"],
         sizes: ["S", "M", "L"],
         material: "コットン 100%（12ozセルビッジ調デニム）",
         sku: "MNK-2026-W23"
@@ -435,7 +435,7 @@ const SAMPLE_PRODUCTS = [
         isNew: true,
         isFeatured: true,
         description: "ウエストゴムで楽な履き心地ながら、フロントタックでスラックス風にキレイ見えするスウェットパンツ。",
-        colors: ["BLACK", "CHARCOAL", "MOCHA"],
+        colors: ["CHARCOAL"],
         sizes: ["S", "M"],
         material: "レーヨン 60%, ナイロン 40%",
         sku: "MNK-2026-W24"
@@ -459,8 +459,8 @@ const AppState = {
     orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [],
     selectedCategory: "ALL",
     selectedSort: "default",
-    // 未ログイン購入試行時のチェックアウト復帰フラグ
-    pendingCheckoutRedirect: false,
+    // 未ログイン時のアクセス制御復帰ターゲット ('checkout' または 'manekin')
+    pendingAuthTarget: null,
 
     // =========================================================================
     // ■ AIコーデシミュレーション（MANEKIN AI STUDIO）状態管理
@@ -530,22 +530,8 @@ const AppState = {
         bottoms: null,
         shoes: null
     },
-    // 保存したコーデ一覧（ルックブック）
-    savedOutfits: JSON.parse(localStorage.getItem('manekin_saved_outfits')) || [
-        {
-            id: 'outfit-sample-1',
-            title: '秋の通学・デイリーコーデ',
-            date: '2026/10/26 15:20',
-            comment: '黒ボトムスとグレーパーカーの組み合わせは落ち着いた印象を与えます。白スニーカーがアクセントとなりバランスの良いカジュアルコーデです。',
-            tags: ['#キレイめカジュアル', '#通学デイリー', '#モノトーン+1'],
-            score: 95,
-            items: {
-                bottoms: { id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/men/ストレートレープセミフレアスラックス.png' },
-                shoes: { id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: 'assets/images/shoes_white.jpg' },
-                tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'ASH GREY', isOwned: false, price: 3490, image: 'assets/images/men/アーバングレイジップフーディ.png' }
-            }
-        }
-    ],
+    // 保存したコーデ一覧（ルックブック）（初期値は0件）
+    savedOutfits: JSON.parse(localStorage.getItem('manekin_saved_outfits')) || [],
     // スタジオ内のUI状態
     studioActiveTab: 'create',
     studioGender: 'MEN',
@@ -662,15 +648,13 @@ function handleRouting() {
         case '#login':
             showView('view-login');
             highlightNavLink('login');
-            const loginAlert = document.getElementById('login-checkout-notice');
-            if (loginAlert) loginAlert.style.display = AppState.pendingCheckoutRedirect ? 'block' : 'none';
+            updateAuthNoticeBanner();
             break;
 
         case '#register':
             showView('view-register');
             highlightNavLink('register');
-            const regAlert = document.getElementById('reg-checkout-notice');
-            if (regAlert) regAlert.style.display = AppState.pendingCheckoutRedirect ? 'block' : 'none';
+            updateAuthNoticeBanner();
             break;
 
         case '#mypage':
@@ -682,6 +666,12 @@ function handleRouting() {
 
         case '#manekin':
         case '#manekin-studio':
+            if (!AppState.currentUser) {
+                AppState.pendingAuthTarget = 'manekin';
+                showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
+                window.location.hash = '#login';
+                return;
+            }
             showView('view-manekin-studio');
             highlightNavLink('manekin-studio');
             renderManekinStudio(AppState.studioActiveTab || 'create');
@@ -694,6 +684,38 @@ function handleRouting() {
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateAuthNoticeBanner() {
+    const loginAlert = document.getElementById('login-checkout-notice');
+    const regAlert = document.getElementById('reg-checkout-notice');
+    const loginTitle = document.getElementById('login-notice-title');
+    const loginDesc = document.getElementById('login-notice-desc');
+    const regTitle = document.getElementById('reg-notice-title');
+    const regDesc = document.getElementById('reg-notice-desc');
+
+    if (AppState.pendingAuthTarget === 'manekin') {
+        if (loginAlert) loginAlert.style.display = 'block';
+        if (regAlert) regAlert.style.display = 'block';
+        const titleText = '⚠️ MANEKIN AIスタジオのご利用には会員登録またはログインが必要です';
+        const descText = 'バーチャル試着やAIコーデ診断機能をご利用いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にMANEKINスタジオへ移動します。';
+        if (loginTitle) loginTitle.textContent = titleText;
+        if (loginDesc) loginDesc.innerHTML = descText;
+        if (regTitle) regTitle.textContent = titleText;
+        if (regDesc) regDesc.innerHTML = descText;
+    } else if (AppState.pendingAuthTarget === 'checkout') {
+        if (loginAlert) loginAlert.style.display = 'block';
+        if (regAlert) regAlert.style.display = 'block';
+        const titleText = '⚠️ ご購入手続きには会員登録またはログインが必要です';
+        const descText = '商品をご購入いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。';
+        if (loginTitle) loginTitle.textContent = titleText;
+        if (loginDesc) loginDesc.innerHTML = descText;
+        if (regTitle) regTitle.textContent = titleText;
+        if (regDesc) regDesc.innerHTML = descText;
+    } else {
+        if (loginAlert) loginAlert.style.display = 'none';
+        if (regAlert) regAlert.style.display = 'none';
+    }
 }
 
 function showView(viewId) {
@@ -1008,7 +1030,7 @@ function handleAddToCartFromDetail(productId) {
 function handleBuyNow(productId) {
     handleAddToCartFromDetail(productId);
     if (!AppState.currentUser) {
-        AppState.pendingCheckoutRedirect = true;
+        AppState.pendingAuthTarget = 'checkout';
         showToast('⚠️ ご購入には会員登録またはログインが必要です');
         window.location.hash = '#login';
         return;
@@ -1115,7 +1137,7 @@ async function handlePlaceOrder() {
 
     // 未ログインの場合は購入不可とし、ログイン・会員登録画面へ誘導
     if (!AppState.currentUser) {
-        AppState.pendingCheckoutRedirect = true;
+        AppState.pendingAuthTarget = 'checkout';
         showToast('⚠️ ご購入には会員登録またはログインが必要です');
         window.location.hash = '#login';
         return;
@@ -1477,6 +1499,7 @@ function updateAuthNavUI() {
 function handleLogout() {
     AppState.currentUser = null;
     localStorage.removeItem('manekin_user');
+    resetMannequinOutfit(true);
     showToast('ログアウトしました');
     updateAuthNavUI();
     renderMyPage();
@@ -1492,13 +1515,18 @@ function handleDemoLogin() {
     };
     AppState.currentUser = demoUser;
     localStorage.setItem('manekin_user', JSON.stringify(demoUser));
+    resetMannequinOutfit(true);
     updateAuthNavUI();
-    if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
-        AppState.pendingCheckoutRedirect = false;
-        showToast('🎉 ログイン完了！ご注文手続きへ戻ります');
+    if (AppState.pendingAuthTarget === 'manekin') {
+        AppState.pendingAuthTarget = null;
+        showToast('🎉 デモログイン完了！MANEKINスタジオへ移動します');
+        window.location.hash = '#manekin-studio';
+    } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
+        AppState.pendingAuthTarget = null;
+        showToast('🎉 デモログイン完了！ご注文手続きへ戻ります');
         window.location.hash = '#checkout';
     } else {
-        AppState.pendingCheckoutRedirect = false;
+        AppState.pendingAuthTarget = null;
         showToast('🎉 デモアカウントでログインしました！ようこそ、山田 太郎 様');
         window.location.hash = '#mypage';
     }
@@ -1554,15 +1582,20 @@ async function handleLogin(e) {
     if (loggedInUser) {
         AppState.currentUser = loggedInUser;
         localStorage.setItem('manekin_user', JSON.stringify(loggedInUser));
+        resetMannequinOutfit(true);
         updateAuthNavUI();
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
-        if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
-            AppState.pendingCheckoutRedirect = false;
+        if (AppState.pendingAuthTarget === 'manekin') {
+            AppState.pendingAuthTarget = null;
+            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name}。MANEKINスタジオへ移動します`);
+            window.location.hash = '#manekin-studio';
+        } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
+            AppState.pendingAuthTarget = null;
             showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name}。ご注文手続きへ戻ります`);
             window.location.hash = '#checkout';
         } else {
-            AppState.pendingCheckoutRedirect = false;
+            AppState.pendingAuthTarget = null;
             showToast(`🎉 ログインに成功しました！ようこそ、${loggedInUser.name}`);
             window.location.hash = '#mypage';
         }
@@ -1632,16 +1665,21 @@ async function handleRegister(e) {
     if (newUser) {
         AppState.currentUser = newUser;
         localStorage.setItem('manekin_user', JSON.stringify(newUser));
+        resetMannequinOutfit(true);
         updateAuthNavUI();
         if (nameEl) nameEl.value = '';
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
-        if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
-            AppState.pendingCheckoutRedirect = false;
+        if (AppState.pendingAuthTarget === 'manekin') {
+            AppState.pendingAuthTarget = null;
+            showToast(`🎉 会員登録完了！ようこそ、${newUser.name}。MANEKINスタジオへ進みます`);
+            window.location.hash = '#manekin-studio';
+        } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
+            AppState.pendingAuthTarget = null;
             showToast(`🎉 会員登録完了！ようこそ、${newUser.name}。ご注文手続きへ進みます`);
             window.location.hash = '#checkout';
         } else {
-            AppState.pendingCheckoutRedirect = false;
+            AppState.pendingAuthTarget = null;
             showToast(`🎉 会員登録が完了しました！ようこそ、${newUser.name}`);
             window.location.hash = '#mypage';
         }
@@ -1897,12 +1935,16 @@ function switchStudioTab(tabKey) {
 function renderManekinStudio(activeTab = 'create') {
     // ユーザー名反映
     const userNameElem = document.getElementById('studio-user-name');
-    if (userNameElem && AppState.currentUser) {
-        userNameElem.textContent = AppState.currentUser.name || '会員 様';
-    }
     const avatarCharElem = document.getElementById('studio-avatar-char');
-    if (avatarCharElem && AppState.currentUser) {
-        avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
+    const userRankElem = document.getElementById('studio-user-rank');
+    if (AppState.currentUser) {
+        if (userNameElem) userNameElem.textContent = AppState.currentUser.name || '会員 様';
+        if (avatarCharElem) avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
+        if (userRankElem) userRankElem.textContent = AppState.currentUser.rank || 'MEMBER';
+    } else {
+        if (userNameElem) userNameElem.textContent = 'ゲスト 様';
+        if (avatarCharElem) avatarCharElem.textContent = 'G';
+        if (userRankElem) userRankElem.textContent = 'GUEST';
     }
 
     // バッジ件数更新
@@ -1930,9 +1972,17 @@ function renderManekinStudio(activeTab = 'create') {
 
     // プロフィール情報反映
     const profName = document.getElementById('prof-display-name');
-    if (profName && AppState.currentUser) profName.textContent = AppState.currentUser.name;
     const profEmail = document.getElementById('prof-display-email');
-    if (profEmail && AppState.currentUser) profEmail.textContent = AppState.currentUser.email;
+    const profRank = document.getElementById('prof-display-rank');
+    if (AppState.currentUser) {
+        if (profName) profName.textContent = AppState.currentUser.name || '会員 様';
+        if (profEmail) profEmail.textContent = AppState.currentUser.email || '';
+        if (profRank) profRank.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
+    } else {
+        if (profName) profName.textContent = 'ゲスト 様';
+        if (profEmail) profEmail.textContent = '未ログイン（ログインが必要です）';
+        if (profRank) profRank.textContent = 'GUEST';
+    }
 
     // 各タブごとの描画
     switch (activeTab) {
@@ -2297,7 +2347,7 @@ function unwearSlot(slotKey) {
 /**
  * 全身クリア（すべての服を脱がす）
  */
-function clearMannequin() {
+function resetMannequinOutfit(silent = false) {
     AppState.currentOutfit = {
         hat: null,
         outer: null,
@@ -2306,12 +2356,18 @@ function clearMannequin() {
         shoes: null
     };
     localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
-    showToastNotification('マネキンの着用服をすべてクリアしました');
+    if (!silent) {
+        showToastNotification('マネキンの着用服をすべてクリアしました');
+    }
 
     renderMannequinStage();
     renderStudioClosetList();
     renderStudioBrandList();
     updateAIStylingComment();
+}
+
+function clearMannequin() {
+    resetMannequinOutfit(false);
 }
 
 /**
@@ -2382,6 +2438,29 @@ function migrateOldBrokenAssets() {
             AppState.orderHistory = cleanedOrders;
             localStorage.setItem('manekin_orders', JSON.stringify(AppState.orderHistory));
         }
+    }
+
+    // 保存したコーデの初期ダミー（秋の通学・デイリーコーデ / outfit-sample-1）を完全削除
+    if (Array.isArray(AppState.savedOutfits)) {
+        const cleanedOutfits = AppState.savedOutfits.filter(o => o && o.id !== 'outfit-sample-1');
+        if (cleanedOutfits.length !== AppState.savedOutfits.length || !localStorage.getItem('manekin_clean_saved_outfits_v1')) {
+            AppState.savedOutfits = cleanedOutfits;
+            localStorage.setItem('manekin_saved_outfits', JSON.stringify(cleanedOutfits));
+            localStorage.setItem('manekin_clean_saved_outfits_v1', 'true');
+        }
+    }
+
+    // 試着室マネキンの初期状態を完全クリア（何も着せていない未着用状態をデフォルトに）
+    if (!localStorage.getItem('manekin_clean_outfit_v2')) {
+        AppState.currentOutfit = {
+            hat: null,
+            outer: null,
+            tops: null,
+            bottoms: null,
+            shoes: null
+        };
+        localStorage.setItem('manekin_current_outfit', JSON.stringify(AppState.currentOutfit));
+        localStorage.setItem('manekin_clean_outfit_v2', 'true');
     }
 
     const defaultSneaker = getCategoryFallbackImage('SHOES');
