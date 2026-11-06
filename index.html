@@ -1,4 +1,4 @@
-﻿<!-- ドキュメントタイプをHTML5として宣言 -->
+<!-- ドキュメントタイプをHTML5として宣言 -->
 <!DOCTYPE html>
 <!-- 言語設定を日本語に指定 -->
 <html lang="ja">
@@ -414,15 +414,15 @@
                                     <div class="form-group flex-1">
                                         <label for="order-name" class="form-label">お名前（氏名） <span
                                                 class="required">*</span></label>
-                                        <input type="text" id="order-name" class="form-input" placeholder="山田 太郎"
-                                            required value="山田 太郎">
+                                        <input type="text" id="order-name" class="form-input" placeholder="例: 山田 太郎"
+                                            required>
                                         <span class="form-error" id="order-name-error"></span>
                                     </div>
                                     <div class="form-group flex-1">
                                         <label for="order-phone" class="form-label">電話番号 <span
                                                 class="required">*</span></label>
                                         <input type="tel" id="order-phone" class="form-input"
-                                            placeholder="090-1234-5678" required value="090-1234-5678">
+                                            placeholder="例: 090-1234-5678" required>
                                         <span class="form-error" id="order-phone-error"></span>
                                     </div>
                                 </div>
@@ -431,7 +431,7 @@
                                     <label for="order-email" class="form-label">メールアドレス（注文確認メール送付先） <span
                                             class="required">*</span></label>
                                     <input type="email" id="order-email" class="form-input"
-                                        placeholder="example@manekin.com" required value="demo@manekin.com">
+                                        placeholder="例: example@manekin.com" required>
                                     <span class="form-error" id="order-email-error"></span>
                                 </div>
 
@@ -439,14 +439,14 @@
                                     <div class="form-group flex-1">
                                         <label for="order-postal" class="form-label">郵便番号 <span
                                                 class="required">*</span></label>
-                                        <input type="text" id="order-postal" class="form-input" placeholder="150-0001"
-                                            required value="150-0001">
+                                        <input type="text" id="order-postal" class="form-input" placeholder="例: 150-0001"
+                                            required>
                                     </div>
                                     <div class="form-group flex-2">
                                         <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
                                                 class="required">*</span></label>
                                         <input type="text" id="order-address" class="form-input"
-                                            placeholder="東京都渋谷区神宮前1-1-1 MANEKINビル 4F" required value="東京都渋谷区神宮前1-1-1">
+                                            placeholder="例: 東京都渋谷区神宮前1-1-1 MANEKINビル 4F" required>
                                         <span class="form-error" id="order-address-error"></span>
                                     </div>
                                 </div>
@@ -493,18 +493,16 @@
                                     <div class="credit-card-inputs" id="credit-card-subform">
                                         <div class="form-group">
                                             <label class="form-label">カード番号</label>
-                                            <input type="text" class="form-input" placeholder="4123 4567 8901 2345"
-                                                value="**** **** **** 8821">
+                                            <input type="text" class="form-input" placeholder="例: 4123 4567 8901 2345">
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group flex-1">
                                                 <label class="form-label">有効期限 (月/年)</label>
-                                                <input type="text" class="form-input" placeholder="MM/YY" value="08/29">
+                                                <input type="text" class="form-input" placeholder="例: 08/29">
                                             </div>
                                             <div class="form-group flex-1">
                                                 <label class="form-label">セキュリティコード</label>
-                                                <input type="password" class="form-input" placeholder="CVC / CVV"
-                                                    value="***">
+                                                <input type="password" class="form-input" placeholder="例: 123">
                                             </div>
                                         </div>
                                     </div>
@@ -613,6 +611,17 @@
                         <p class="auth-subtitle">会員ログイン</p>
                     </div>
 
+                    <!-- 未ログイン購入試行時の案内バナー -->
+                    <div id="login-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                            <span>⚠️ ご購入手続きには会員登録またはログインが必要です</span>
+                        </div>
+                        <p style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                            商品をご購入いただくにはアカウントが必要となります。<br>
+                            ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
+                        </p>
+                    </div>
+
                     <form id="login-form" class="auth-form" novalidate>
                         <div class="form-group">
                             <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
@@ -652,6 +661,17 @@
                     <div class="auth-header">
                         <h1 class="auth-title">REGISTER</h1>
                         <p class="auth-subtitle">新規会員登録</p>
+                    </div>
+
+                    <!-- 未ログイン購入試行時の案内バナー -->
+                    <div id="reg-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                            <span>⚠️ ご購入手続きには会員登録が必要です</span>
+                        </div>
+                        <p style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                            商品をご購入いただくにはアカウントが必要となります。<br>
+                            新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
+                        </p>
                     </div>
 
                     <form id="register-form" class="auth-form" novalidate>
@@ -704,19 +724,19 @@
                 <div class="mypage-header-card">
                     <div class="user-profile-info">
                         <div class="user-avatar-circle">
-                            <span id="mypage-avatar-initial">M</span>
+                            <span id="mypage-avatar-initial">G</span>
                         </div>
                         <div class="user-text-details">
                             <div class="user-title-row">
-                                <h1 class="user-display-name" id="mypage-user-name">山田 太郎 様</h1>
-                                <span class="membership-badge">REGULAR MEMBER</span>
+                                <h1 class="user-display-name" id="mypage-user-name">ゲスト 様</h1>
+                                <span class="membership-badge" id="mypage-user-rank">GUEST</span>
                             </div>
-                            <p class="user-display-email" id="mypage-user-email">demo@manekin.com</p>
+                            <p class="user-display-email" id="mypage-user-email">ログインしていません</p>
                         </div>
                     </div>
-                    <!-- ログアウトボタン -->
-                    <div class="mypage-actions">
-                        <button class="btn btn-outline-sm" id="logout-btn">ログアウト</button>
+                    <!-- アクションボタン（ログイン / ログアウト） -->
+                    <div class="mypage-actions" id="mypage-actions-wrapper">
+                        <a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>
                     </div>
                 </div>
 
@@ -724,7 +744,7 @@
                 <div class="mypage-stats-grid">
                     <div class="stat-card">
                         <span class="stat-label">保有ポイント</span>
-                        <span class="stat-value">1,250 <span class="stat-unit">pt</span></span>
+                        <span class="stat-value" id="mypage-points">0 <span class="stat-unit">pt</span></span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-label">お気に入りアイテム</span>
@@ -745,9 +765,14 @@
 
                 <!-- タブ1: 購入履歴（【要件】購入ボタンを押して購入が完了した商品の一覧を表示） -->
                 <div class="mypage-tab-content active" id="tab-orders">
-                    <div class="orders-section-header">
-                        <h3 class="orders-subheading">ご注文履歴一覧</h3>
-                        <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
+                    <div class="orders-section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 class="orders-subheading">ご注文履歴一覧</h3>
+                            <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()" style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;" title="テスト注文履歴をリセットして0件にします">
+                            履歴をすべて初期化 (0件にする)
+                        </button>
                     </div>
                     <div class="orders-table-wrapper">
                         <table class="orders-table">
@@ -761,7 +786,11 @@
                                 </tr>
                             </thead>
                             <tbody id="orders-table-body">
-                                <!-- JavaScriptで最新の購入履歴を動的描画 -->
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
+                                        購入履歴はまだありません。商品をお選びいただき購入手続きをお試しください。
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

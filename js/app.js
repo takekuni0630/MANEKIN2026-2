@@ -446,49 +446,21 @@ const SAMPLE_PRODUCTS = [
 // 2. アプリケーション状態管理（State）
 // --------------------------------------------------------------------------
 const AppState = {
-    // お気に入り登録IDリスト
-    favorites: JSON.parse(localStorage.getItem('manekin_favorites')) || [1, 2],
-    // ログイン中の会員情報
-    currentUser: JSON.parse(localStorage.getItem('manekin_user')) || {
-        id: 1,
-        name: "山田 太郎 様",
-        email: "demo@manekin.com",
-        rank: "REGULAR MEMBER"
-    },
-    // ショッピングカート内アイテム
-    cart: JSON.parse(localStorage.getItem('manekin_cart')) || [
-        {
-            id: 1,
-            name: "プレミアム コットン リラックス Tシャツ",
-            color: "WHITE",
-            size: "L",
-            price: 2990,
-            quantity: 1,
-            image: "assets/images/tshirt_white.jpg"
-        }
-    ],
+    // お気に入り登録IDリスト（初期値は0件）
+    favorites: JSON.parse(localStorage.getItem('manekin_favorites')) || [],
+    // ログイン中の会員情報（初期値は未ログイン）
+    currentUser: JSON.parse(localStorage.getItem('manekin_user')) || null,
+    // ショッピングカート内アイテム（初期値は0件）
+    cart: JSON.parse(localStorage.getItem('manekin_cart')) || [],
     currentDetailId: 1,
     selectedColor: "WHITE",
     selectedSize: "M",
-    // 注文履歴データ
-    orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [
-        {
-            order_no: "ORD-2026-0982",
-            date: "2026/10/18 14:30",
-            items_summary: "プレミアム コットン リラックス Tシャツ (WHITE / L) × 2",
-            total_amount: 5980,
-            status: "配達完了"
-        },
-        {
-            order_no: "ORD-2026-0851",
-            date: "2026/09/25 11:20",
-            items_summary: "スマート テーラード ジャケット (BLACK / M) × 1",
-            total_amount: 9990,
-            status: "配達完了"
-        }
-    ],
+    // 注文履歴データ（初期値は0件）
+    orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [],
     selectedCategory: "ALL",
     selectedSort: "default",
+    // 未ログイン購入試行時のチェックアウト復帰フラグ
+    pendingCheckoutRedirect: false,
 
     // =========================================================================
     // ■ AIコーデシミュレーション（MANEKIN AI STUDIO）状態管理
@@ -690,17 +662,22 @@ function handleRouting() {
         case '#login':
             showView('view-login');
             highlightNavLink('login');
+            const loginAlert = document.getElementById('login-checkout-notice');
+            if (loginAlert) loginAlert.style.display = AppState.pendingCheckoutRedirect ? 'block' : 'none';
             break;
 
         case '#register':
             showView('view-register');
             highlightNavLink('register');
+            const regAlert = document.getElementById('reg-checkout-notice');
+            if (regAlert) regAlert.style.display = AppState.pendingCheckoutRedirect ? 'block' : 'none';
             break;
 
         case '#mypage':
             showView('view-mypage');
             highlightNavLink('mypage');
             renderMyPage();
+            syncOrdersFromBackend();
             break;
 
         case '#manekin':
@@ -1030,6 +1007,12 @@ function handleAddToCartFromDetail(productId) {
 
 function handleBuyNow(productId) {
     handleAddToCartFromDetail(productId);
+    if (!AppState.currentUser) {
+        AppState.pendingCheckoutRedirect = true;
+        showToast('⚠️ ご購入には会員登録またはログインが必要です');
+        window.location.hash = '#login';
+        return;
+    }
     window.location.hash = '#checkout';
 }
 
@@ -1114,11 +1097,27 @@ function renderCheckoutPage() {
     if (shippingEl) shippingEl.textContent = shipping === 0 ? "無料 (5,000円以上)" : `¥${shipping.toLocaleString()}`;
     if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
     if (totalEl) totalEl.textContent = `¥${total.toLocaleString()}`;
+
+    // ログイン中の場合はお届け先のお名前・メールアドレスを自動反映（空の場合のみ）
+    if (AppState.currentUser) {
+        const nameInput = document.getElementById('order-name');
+        const emailInput = document.getElementById('order-email');
+        if (nameInput && !nameInput.value) nameInput.value = AppState.currentUser.name || '';
+        if (emailInput && !emailInput.value) emailInput.value = AppState.currentUser.email || '';
+    }
 }
 
 async function handlePlaceOrder() {
     if (AppState.cart.length === 0) {
         showToast('バッグに商品が入っていません');
+        return;
+    }
+
+    // 未ログインの場合は購入不可とし、ログイン・会員登録画面へ誘導
+    if (!AppState.currentUser) {
+        AppState.pendingCheckoutRedirect = true;
+        showToast('⚠️ ご購入には会員登録またはログインが必要です');
+        window.location.hash = '#login';
         return;
     }
 
@@ -1130,11 +1129,11 @@ async function handlePlaceOrder() {
     const deliveryTimeInput = document.getElementById('order-delivery-time');
     const paymentRadio = document.querySelector('input[name="payment_method"]:checked');
 
-    const customerName = nameInput ? nameInput.value.trim() : "山田 太郎";
-    const phone = phoneInput ? phoneInput.value.trim() : "090-1234-5678";
-    const email = emailInput ? emailInput.value.trim() : "demo@manekin.com";
-    const postal = postalInput ? postalInput.value.trim() : "150-0001";
-    const address = addressInput ? addressInput.value.trim() : "東京都渋谷区神宮前1-1-1";
+    const customerName = nameInput ? nameInput.value.trim() : "";
+    const phone = phoneInput ? phoneInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
+    const postal = postalInput ? postalInput.value.trim() : "";
+    const address = addressInput ? addressInput.value.trim() : "";
     const deliveryTime = deliveryTimeInput ? deliveryTimeInput.value : "指定なし";
     const paymentMethod = paymentRadio ? paymentRadio.value : "クレジットカード";
 
@@ -1235,9 +1234,16 @@ async function syncOrdersFromBackend() {
         const response = await fetch(`${apiBase}/api/orders`);
         if (response.ok) {
             const data = await response.json();
-            if (data.orders && data.orders.length > 0) {
-                AppState.orderHistory = data.orders;
-                localStorage.setItem('manekin_orders', JSON.stringify(data.orders));
+            if (data.orders && Array.isArray(data.orders)) {
+                // 初期ダミー（プレミアム コットン リラックス Tシャツのみの旧注文など）をフィルタ
+                const validOrders = data.orders.filter(o => {
+                    if (!o) return false;
+                    const summary = (o.items_summary || "");
+                    const isLegacyTshirt = summary.includes("プレミアム コットン リラックス Tシャツ") || summary.includes("リラックス Tシャツ") || summary.includes("item_tshirt");
+                    return !isLegacyTshirt && o.order_no !== "ORD-2026-0982" && o.order_no !== "ORD-2026-0851";
+                });
+                AppState.orderHistory = validOrders;
+                localStorage.setItem('manekin_orders', JSON.stringify(validOrders));
                 renderMyPage();
             }
         }
@@ -1246,26 +1252,67 @@ async function syncOrdersFromBackend() {
     }
 }
 
+async function handleClearOrderHistory() {
+    if (!confirm('ご注文履歴をすべて初期化して、まだ何も注文していない初期状態（0件）にしますか？')) return;
+
+    AppState.orderHistory = [];
+    localStorage.setItem('manekin_orders', JSON.stringify([]));
+
+    try {
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        await fetch(`${apiBase}/api/orders`, { method: 'DELETE' });
+    } catch (e) {
+        console.warn('Backend orders delete failed', e);
+    }
+
+    renderMyPage();
+    showToast('ご注文履歴をすべて初期化しました（0件）');
+}
+
 function renderMyPage() {
     const userNameEl = document.getElementById('mypage-user-name');
     const userEmailEl = document.getElementById('mypage-user-email');
     const avatarEl = document.getElementById('mypage-avatar-initial');
+    const rankEl = document.getElementById('mypage-user-rank');
+    const pointsEl = document.getElementById('mypage-points');
+    const actionsWrapper = document.getElementById('mypage-actions-wrapper');
     const ordersTbody = document.getElementById('orders-table-body');
     const orderCountEl = document.getElementById('mypage-order-count');
+    const mypageFavCount = document.getElementById('mypage-fav-count');
     const mypageFavGrid = document.getElementById('mypage-fav-grid');
 
     if (AppState.currentUser) {
-        userNameEl.textContent = AppState.currentUser.name;
-        userEmailEl.textContent = AppState.currentUser.email;
-        avatarEl.textContent = AppState.currentUser.name.charAt(0);
+        if (userNameEl) userNameEl.textContent = AppState.currentUser.name || '会員 様';
+        if (userEmailEl) userEmailEl.textContent = AppState.currentUser.email || '';
+        if (avatarEl) avatarEl.textContent = (AppState.currentUser.name || 'M').charAt(0);
+        if (rankEl) rankEl.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
+        if (pointsEl) pointsEl.innerHTML = `${(AppState.currentUser.points || 0).toLocaleString()} <span class="stat-unit">pt</span>`;
+        if (actionsWrapper) {
+            actionsWrapper.innerHTML = '<button class="btn btn-outline-sm" id="logout-btn" onclick="handleLogout()">ログアウト</button>';
+        }
+    } else {
+        if (userNameEl) userNameEl.textContent = 'ゲスト 様';
+        if (userEmailEl) userEmailEl.textContent = 'ログインしていません';
+        if (avatarEl) avatarEl.textContent = 'G';
+        if (rankEl) rankEl.textContent = 'GUEST';
+        if (pointsEl) pointsEl.innerHTML = `0 <span class="stat-unit">pt</span>`;
+        if (actionsWrapper) {
+            actionsWrapper.innerHTML = '<a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>';
+        }
     }
 
     if (orderCountEl) {
-        orderCountEl.innerHTML = `${AppState.orderHistory.length} <span class="stat-unit">回</span>`;
+        const orderCount = Array.isArray(AppState.orderHistory) ? AppState.orderHistory.length : 0;
+        orderCountEl.innerHTML = `${orderCount} <span class="stat-unit">回</span>`;
+    }
+
+    if (mypageFavCount) {
+        const favCount = Array.isArray(AppState.favorites) ? AppState.favorites.length : 0;
+        mypageFavCount.innerHTML = `${favCount} <span class="stat-unit">点</span>`;
     }
 
     if (ordersTbody) {
-        if (AppState.orderHistory.length === 0) {
+        if (!AppState.orderHistory || AppState.orderHistory.length === 0) {
             ordersTbody.innerHTML = `
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
@@ -1292,7 +1339,8 @@ function renderMyPage() {
     }
 
     if (mypageFavGrid) {
-        const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+        const favList = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+        const favoriteItems = SAMPLE_PRODUCTS.filter(p => favList.includes(p.id));
         if (favoriteItems.length === 0) {
             mypageFavGrid.innerHTML = '<p style="grid-column: 1/-1; padding: 24px; color: #777;">お気に入り登録された商品はありません。</p>';
         } else {
@@ -1431,6 +1479,7 @@ function handleLogout() {
     localStorage.removeItem('manekin_user');
     showToast('ログアウトしました');
     updateAuthNavUI();
+    renderMyPage();
     window.location.hash = '#home';
 }
 
@@ -1443,9 +1492,160 @@ function handleDemoLogin() {
     };
     AppState.currentUser = demoUser;
     localStorage.setItem('manekin_user', JSON.stringify(demoUser));
-    showToast('デモアカウントでログインしました');
     updateAuthNavUI();
-    window.location.hash = '#mypage';
+    if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
+        AppState.pendingCheckoutRedirect = false;
+        showToast('🎉 ログイン完了！ご注文手続きへ戻ります');
+        window.location.hash = '#checkout';
+    } else {
+        AppState.pendingCheckoutRedirect = false;
+        showToast('🎉 デモアカウントでログインしました！ようこそ、山田 太郎 様');
+        window.location.hash = '#mypage';
+    }
+}
+
+async function handleLogin(e) {
+    if (e) e.preventDefault();
+    const emailEl = document.getElementById('login-email');
+    const passEl = document.getElementById('login-password');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const password = passEl ? passEl.value.trim() : '';
+
+    if (!email) {
+        showToast('メールアドレスを入力してください');
+        if (emailEl) emailEl.focus();
+        return;
+    }
+    if (!password) {
+        showToast('パスワードを入力してください');
+        if (passEl) passEl.focus();
+        return;
+    }
+
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    let loggedInUser = null;
+
+    try {
+        const response = await fetch(`${apiBase}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            loggedInUser = data.user;
+        } else {
+            const errData = await response.json().catch(() => ({}));
+            showToast(errData.message || 'メールアドレスまたはパスワードが正しくありません');
+            return;
+        }
+    } catch (err) {
+        // バックエンドオフ時のローカルフォールバック
+        const namePart = email.split('@')[0] || '会員';
+        loggedInUser = {
+            id: Date.now(),
+            name: `${namePart} 様`,
+            email: email,
+            rank: 'REGULAR MEMBER'
+        };
+    }
+
+    if (loggedInUser) {
+        AppState.currentUser = loggedInUser;
+        localStorage.setItem('manekin_user', JSON.stringify(loggedInUser));
+        updateAuthNavUI();
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
+            AppState.pendingCheckoutRedirect = false;
+            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name}。ご注文手続きへ戻ります`);
+            window.location.hash = '#checkout';
+        } else {
+            AppState.pendingCheckoutRedirect = false;
+            showToast(`🎉 ログインに成功しました！ようこそ、${loggedInUser.name}`);
+            window.location.hash = '#mypage';
+        }
+    }
+}
+
+async function handleRegister(e) {
+    if (e) e.preventDefault();
+    const nameEl = document.getElementById('reg-name');
+    const emailEl = document.getElementById('reg-email');
+    const passEl = document.getElementById('reg-password');
+    const agreeEl = document.getElementById('reg-agree');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const password = passEl ? passEl.value.trim() : '';
+    const isAgree = agreeEl ? agreeEl.checked : true;
+
+    if (!name) {
+        showToast('氏名を入力してください');
+        if (nameEl) nameEl.focus();
+        return;
+    }
+    if (!email) {
+        showToast('メールアドレスを入力してください');
+        if (emailEl) emailEl.focus();
+        return;
+    }
+    if (!password || password.length < 4) {
+        showToast('パスワードは4文字以上で入力してください');
+        if (passEl) passEl.focus();
+        return;
+    }
+    if (!isAgree) {
+        showToast('利用規約およびプライバシーポリシーに同意してください');
+        return;
+    }
+
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    let newUser = null;
+
+    try {
+        const response = await fetch(`${apiBase}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            newUser = data.user;
+        } else {
+            const errData = await response.json().catch(() => ({}));
+            showToast(errData.message || '会員登録に失敗しました');
+            return;
+        }
+    } catch (err) {
+        // バックエンドオフ時のローカルフォールバック
+        newUser = {
+            id: Date.now(),
+            name: `${name} 様`,
+            email: email,
+            rank: 'REGULAR MEMBER'
+        };
+    }
+
+    if (newUser) {
+        AppState.currentUser = newUser;
+        localStorage.setItem('manekin_user', JSON.stringify(newUser));
+        updateAuthNavUI();
+        if (nameEl) nameEl.value = '';
+        if (emailEl) emailEl.value = '';
+        if (passEl) passEl.value = '';
+        if (AppState.pendingCheckoutRedirect && AppState.cart && AppState.cart.length > 0) {
+            AppState.pendingCheckoutRedirect = false;
+            showToast(`🎉 会員登録完了！ようこそ、${newUser.name}。ご注文手続きへ進みます`);
+            window.location.hash = '#checkout';
+        } else {
+            AppState.pendingCheckoutRedirect = false;
+            showToast(`🎉 会員登録が完了しました！ようこそ、${newUser.name}`);
+            window.location.hash = '#mypage';
+        }
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -1574,6 +1774,12 @@ function setupEventListeners() {
 
     const demoBtn = document.getElementById('demo-login-btn');
     if (demoBtn) demoBtn.addEventListener('click', handleDemoLogin);
+
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
@@ -2132,6 +2338,52 @@ function getCategoryFallbackImage(category) {
 
 // 過去のlocalStorageに残っている存在しない旧画像パスを安全にマイグレーション
 function migrateOldBrokenAssets() {
+    // 過去のlocalStorageに残っている初期値ダミーデータ（お気に入り、初期カート、初期ユーザー）を一括クリーンアップ
+    if (!localStorage.getItem('manekin_clean_initial_v2')) {
+        // 1. お気に入りの初期ダミー（[1, 2] や [1]）を空にリセット
+        if (JSON.stringify(AppState.favorites) === JSON.stringify([1, 2]) || JSON.stringify(AppState.favorites) === JSON.stringify([1])) {
+            AppState.favorites = [];
+            localStorage.setItem('manekin_favorites', JSON.stringify([]));
+        }
+        // 2. カートの初期ダミー商品を空にリセット
+        if (Array.isArray(AppState.cart) && AppState.cart.length === 1 && AppState.cart[0].id === 1) {
+            AppState.cart = [];
+            localStorage.setItem('manekin_cart', JSON.stringify([]));
+        }
+        // 3. 初期ダミーユーザー（山田 太郎 様 / demo@manekin.com）を未ログイン状態にリセット
+        if (AppState.currentUser && AppState.currentUser.name === "山田 太郎 様" && AppState.currentUser.email === "demo@manekin.com") {
+            AppState.currentUser = null;
+            localStorage.removeItem('manekin_user');
+        }
+        localStorage.setItem('manekin_clean_initial_v2', 'true');
+    }
+
+    // 注文履歴の初期ダミー（プレミアムコットンリラックスTシャツ等）を完全リセットして0件にする
+    if (!localStorage.getItem('manekin_clean_orders_v3')) {
+        AppState.orderHistory = [];
+        localStorage.setItem('manekin_orders', JSON.stringify([]));
+        try {
+            const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+            fetch(`${apiBase}/api/orders`, { method: 'DELETE' }).catch(() => {});
+        } catch (e) {}
+        localStorage.setItem('manekin_clean_orders_v3', 'true');
+    }
+
+    // 初期サンプル注文データやTシャツ履歴のクリーンアップ（誤認防止のため初期値ダミー注文を完全削除）
+    if (Array.isArray(AppState.orderHistory)) {
+        const cleanedOrders = AppState.orderHistory.filter(o => {
+            if (!o) return false;
+            if (o.order_no === "ORD-2026-0982" || o.order_no === "ORD-2026-0851") return false;
+            const summary = (o.items_summary || "");
+            const isTshirt = summary.includes("プレミアム コットン リラックス Tシャツ") || summary.includes("リラックス Tシャツ") || summary.includes("item_tshirt");
+            return !isTshirt;
+        });
+        if (cleanedOrders.length !== AppState.orderHistory.length) {
+            AppState.orderHistory = cleanedOrders;
+            localStorage.setItem('manekin_orders', JSON.stringify(AppState.orderHistory));
+        }
+    }
+
     const defaultSneaker = getCategoryFallbackImage('SHOES');
     let closetChanged = false;
     if (Array.isArray(AppState.myCloset)) {

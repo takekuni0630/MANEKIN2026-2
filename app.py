@@ -283,6 +283,31 @@ def get_orders():
         conn.close()
 
 
+@app.route('/api/orders', methods=['DELETE'])
+def clear_orders():
+    """
+    全注文履歴をリセット（MySQL内のordersおよびorder_itemsを完全クリア）するエンドポイント
+    """
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            # 外部キー整合性を保つため order_items から先に削除
+            cursor.execute("DELETE FROM `order_items`;")
+            cursor.execute("DELETE FROM `orders`;")
+        conn.commit()
+        print("[i] MySQL内の注文履歴をすべてリセットしました。")
+        return jsonify({"status": "success", "message": "全注文履歴を初期化しました。"}), 200
+    except Exception as e:
+        conn.rollback()
+        print(f"[!] 注文履歴リセットエラー: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
 # ==============================================================================
 # 3. 会員・認証関連 API (AUTH)
 # ==============================================================================
