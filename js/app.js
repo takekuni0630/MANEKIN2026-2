@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 // MANEKIN FASHION - フロントエンド JavaScript (app.js)
 // ==========================================================================
 //
@@ -1168,10 +1168,11 @@ async function handlePlaceOrder() {
         items: AppState.cart
     };
 
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
     let confirmedOrder = null;
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/orders', {
+        const response = await fetch(`${apiBase}/api/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderPayload)
@@ -1230,7 +1231,8 @@ async function handlePlaceOrder() {
 // --------------------------------------------------------------------------
 async function syncOrdersFromBackend() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/orders');
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        const response = await fetch(`${apiBase}/api/orders`);
         if (response.ok) {
             const data = await response.json();
             if (data.orders && data.orders.length > 0) {
