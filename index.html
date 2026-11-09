@@ -176,6 +176,11 @@
                     <p class="hero-subheading">2026 SPRING / SUMMER COLLECTION</p>
                     <h1 class="hero-heading">研ぎ澄まされたシンプルを日常に。</h1>
                     <p class="hero-description">誰にでも自然と馴染み、着る人の個性を引き立てる。時代を超えて愛される、上質なベーシックウェアを展開します。</p>
+                    <h1 class="hero-heading"><span class="keep-phrase">研ぎ澄まされたシンプルを</span><span
+                            class="keep-phrase">日常に。</span></h1>
+                    <p class="hero-description"><span class="keep-phrase">誰にでも自然と馴染み、</span><span
+                            class="keep-phrase">着る人の個性を引き立てる。</span><span class="keep-phrase">時代を超えて愛される、</span><span
+                            class="keep-phrase">上質なベーシックウェアを展開します。</span></p>
                     <div class="hero-buttons">
                         <!-- 商品一覧への誘導ボタン -->
                         <a href="#items" class="btn btn-primary">COLLECTION ALL</a>
@@ -191,6 +196,8 @@
                 <div class="section-header text-center">
                     <p class="section-en-title">BRAND CONCEPT</p>
                     <h2 class="section-jp-title">MANEKIN FASHION について</h2>
+                    <h2 class="section-jp-title"><span class="keep-phrase">MANEKIN FASHION</span> <span
+                            class="keep-phrase">について</span></h2>
                     <div class="section-divider"></div>
                 </div>
                 <!-- コンセプト本文エリア -->
@@ -234,10 +241,20 @@
                     <div class="teaser-content">
                         <span class="teaser-tag">NEW FEATURE - 会員限定 AIコーデシミュレーション</span>
                         <h3 class="teaser-title">手持ち服 × ブランド商品 バーチャル試着スタジオ</h3>
+                        <span class="teaser-tag"><span class="keep-phrase">NEW FEATURE - 会員限定</span> <span
+                                class="keep-phrase">AIコーデシミュレーション</span></span>
+                        <h3 class="teaser-title"><span class="keep-phrase">手持ち服 × ブランド商品</span> <span
+                                class="keep-phrase">バーチャル試着スタジオ</span></h3>
                         <p class="teaser-text">
                             あなたの「マイクローゼット」とMANEKINの最新アイテムを組み合わせ、AIスタイリストがリアルタイムでコーデ診断。試着から即購入までシームレスに体験できます。</p>
                         <a href="#manekin-studio" class="btn btn-teaser" id="banner-manekin-btn">AIコーデシミュレーションを始める
                             &rarr;</a>
+                        <span class="keep-phrase">あなたの「マイクローゼット」と</span><span
+                            class="keep-phrase">MANEKINの最新アイテムを組み合わせ、</span><span
+                            class="keep-phrase">AIスタイリストがリアルタイムでコーデ診断。</span><span
+                            class="keep-phrase">試着から即購入までシームレスに体験できます。</span></p>
+                        <a href="#manekin-studio" class="btn btn-teaser text-nowrap"
+                            id="banner-manekin-btn">AIコーデシミュレーションを始める &rarr;</a>
                     </div>
                 </div>
             </section>
@@ -248,8 +265,10 @@
                     <div class="section-title-wrap">
                         <p class="section-en-title">NEW ARRIVALS</p>
                         <h2 class="section-jp-title">新着コレクション</h2>
+                        <h2 class="section-jp-title text-nowrap">新着コレクション</h2>
                     </div>
                     <a href="#new-items" class="view-more-link">新着一覧を見る &rarr;</a>
+                    <a href="#new-items" class="view-more-link text-nowrap">新着一覧を見る &rarr;</a>
                 </div>
                 <!-- 新着商品を表示するグリッドコンテナ（JSで動的描画） -->
                 <div class="product-grid" id="home-new-grid">
@@ -439,8 +458,8 @@
                                     <div class="form-group flex-1">
                                         <label for="order-postal" class="form-label">郵便番号 <span
                                                 class="required">*</span></label>
-                                        <input type="text" id="order-postal" class="form-input" placeholder="例: 150-0001"
-                                            required>
+                                        <input type="text" id="order-postal" class="form-input"
+                                            placeholder="例: 150-0001" required>
                                     </div>
                                     <div class="form-group flex-2">
                                         <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
@@ -612,11 +631,14 @@
                     </div>
 
                     <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
-                    <div id="login-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                    <div id="login-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
                             <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
                         </div>
-                        <p id="login-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="login-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -664,11 +686,14 @@
                     </div>
 
                     <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
-                    <div id="reg-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                    <div id="reg-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
                             <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
                         </div>
-                        <p id="reg-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="reg-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -765,12 +790,15 @@
 
                 <!-- タブ1: 購入履歴（【要件】購入ボタンを押して購入が完了した商品の一覧を表示） -->
                 <div class="mypage-tab-content active" id="tab-orders">
-                    <div class="orders-section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                    <div class="orders-section-header"
+                        style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
                         <div>
                             <h3 class="orders-subheading">ご注文履歴一覧</h3>
                             <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
                         </div>
-                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()" style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;" title="テスト注文履歴をリセットして0件にします">
+                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
+                            style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
+                            title="テスト注文履歴をリセットして0件にします">
                             履歴をすべて初期化 (0件にする)
                         </button>
                     </div>
@@ -844,6 +872,7 @@
                 <!-- ページパンくずナビ -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>MANEKIN AI STUDIO (会員限定コーデシミュレーション)</span>
+                    <a href="#home">HOME</a> &gt; <span>MANEKIN STUDIO</span>
                 </div>
 
                 <!-- スタジオヘッダー -->
@@ -1714,6 +1743,9 @@
                     <p class="footer-concept-text">
                         研ぎ澄まされたシンプルを日常に。<br>
                         20代〜30代に向けたニュースタンダードウェアを展開する、モダンアパレルECストアです。
+                        <span class="keep-phrase">研ぎ澄まされたシンプルを日常に。</span><br>
+                        <span class="keep-phrase">20代〜30代に向けたニュースタンダードウェアを展開する、</span><span
+                            class="keep-phrase">モダンアパレルECストアです。</span>
                     </p>
                 </div>
                 <div class="footer-links-column">
@@ -1725,6 +1757,12 @@
                         <li><a href="#favorites">FAVORITE (お気に入り)</a></li>
                         <li><a href="#checkout">CHECKOUT (ご購入)</a></li>
                         <li><a href="#manekin-studio">MANEKIN (AIコーデ機能)</a></li>
+                        <li><a href="#home"><span class="text-nowrap">HOME (トップ)</span></a></li>
+                        <li><a href="#items"><span class="text-nowrap">ITEM (全商品)</span></a></li>
+                        <li><a href="#new-items"><span class="text-nowrap">NEW ITEM (新作)</span></a></li>
+                        <li><a href="#favorites"><span class="text-nowrap">FAVORITE (お気に入り)</span></a></li>
+                        <li><a href="#checkout"><span class="text-nowrap">CHECKOUT (ご購入)</span></a></li>
+                        <li><a href="#manekin-studio"><span class="text-nowrap">MANEKIN (AI機能)</span></a></li>
                     </ul>
                 </div>
                 <div class="footer-links-column">
@@ -1734,6 +1772,10 @@
                         <li><a href="#checkout">ショッピングバッグ</a></li>
                         <li><a href="#login">ログイン</a></li>
                         <li><a href="#register">新規会員登録</a></li>
+                        <li><a href="#mypage"><span class="text-nowrap">マイページ</span></a></li>
+                        <li><a href="#checkout"><span class="text-nowrap">ショッピングバッグ</span></a></li>
+                        <li><a href="#login"><span class="text-nowrap">ログイン</span></a></li>
+                        <li><a href="#register"><span class="text-nowrap">新規会員登録</span></a></li>
                     </ul>
                 </div>
                 <div class="footer-links-column">
@@ -1744,6 +1786,12 @@
                         <li><a href="javascript:void(0)">返品・交換ポリシー</a></li>
                         <li><a href="javascript:void(0)">プライバシーポリシー</a></li>
                         <li><a href="javascript:void(0)">特定商取引法に基づく表記</a></li>
+                        <li><a href="javascript:void(0)"><span class="text-nowrap">ご利用ガイド</span></a></li>
+                        <li><a href="javascript:void(0)"><span class="keep-phrase">配送・送料について</span> <small
+                                    class="text-muted">(5,000円以上無料)</small></a></li>
+                        <li><a href="javascript:void(0)"><span class="text-nowrap">返品・交換ポリシー</span></a></li>
+                        <li><a href="javascript:void(0)"><span class="text-nowrap">プライバシーポリシー</span></a></li>
+                        <li><a href="javascript:void(0)"><span class="text-nowrap">特定商取引法に基づく表記</span></a></li>
                     </ul>
                 </div>
             </div>

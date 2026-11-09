@@ -1120,13 +1120,7 @@ function renderCheckoutPage() {
     if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
     if (totalEl) totalEl.textContent = `¥${total.toLocaleString()}`;
 
-    // ログイン中の場合はお届け先のお名前・メールアドレスを自動反映（空の場合のみ）
-    if (AppState.currentUser) {
-        const nameInput = document.getElementById('order-name');
-        const emailInput = document.getElementById('order-email');
-        if (nameInput && !nameInput.value) nameInput.value = AppState.currentUser.name || '';
-        if (emailInput && !emailInput.value) emailInput.value = AppState.currentUser.email || '';
-    }
+    // お届け先情報は初期状態では固定値を入力せず、プレースホルダー（例の薄文字）のみ表示
 }
 
 async function handlePlaceOrder() {
@@ -2420,8 +2414,8 @@ function migrateOldBrokenAssets() {
         localStorage.setItem('manekin_orders', JSON.stringify([]));
         try {
             const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-            fetch(`${apiBase}/api/orders`, { method: 'DELETE' }).catch(() => {});
-        } catch (e) {}
+            fetch(`${apiBase}/api/orders`, { method: 'DELETE' }).catch(() => { });
+        } catch (e) { }
         localStorage.setItem('manekin_clean_orders_v3', 'true');
     }
 
