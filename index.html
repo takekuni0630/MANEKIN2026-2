@@ -1540,6 +1540,9 @@
                                 onchange="handleClosetImageSelect(event)">
                             <div class="upload-preview" id="closet-img-preview" style="display: none;">
                                 <img src="" alt="プレビュー" id="closet-preview-img">
+                                <span class="preview-badge-transparent" id="preview-badge-transparent" style="display: none;">
+                                    ✨ 背景透過済み
+                                </span>
                                 <span class="upload-change-text">タップして写真を変更</span>
                             </div>
                             <div class="upload-placeholder" id="closet-img-placeholder">
@@ -1551,6 +1554,34 @@
                                 </svg>
                                 <span class="upload-main-text">写真を選択・撮影する</span>
                                 <span class="upload-sub-text">または、以下のクイック写真から選ぶこともできます</span>
+                            </div>
+
+                            <!-- AI背景切り抜き中オーバーレイ -->
+                            <div class="ai-processing-overlay" id="ai-processing-overlay" style="display: none;" onclick="event.stopPropagation()">
+                                <div class="ai-spinner"></div>
+                                <span class="ai-status-title">🪄 AIが服の背景を透過中...</span>
+                                <span class="ai-status-subtitle" id="ai-status-subtitle">服の輪郭を解析しています</span>
+                                <div class="ai-progress-track">
+                                    <div class="ai-progress-fill" id="ai-progress-fill"></div>
+                                </div>
+                                <span class="ai-progress-percent" id="ai-progress-percent">0%</span>
+                                <span class="ai-hint-small">※完全無料・端末内AI（ブラウザ完結）で高速処理</span>
+                            </div>
+                        </div>
+
+                        <!-- AI背景削除ツールバー -->
+                        <div class="ai-cutout-toolbar">
+                            <label class="ai-toggle-label" title="写真選択時に自動で背景を透明にします（完全無料・ブラウザ完結型AI）">
+                                <input type="checkbox" id="check-auto-remove-bg" checked>
+                                <span class="ai-toggle-text">✨ <strong>AIで背景を自動透過する</strong> <span class="ai-free-badge">無料・端末内AI</span></span>
+                            </label>
+                            <div class="ai-action-btns" id="ai-action-btns" style="display: none;">
+                                <button type="button" class="btn-ai-action" id="btn-re-remove-bg" onclick="triggerManualBgRemoval()" title="現在の写真をAIで背景透過する">
+                                    🪄 背景を透過
+                                </button>
+                                <button type="button" class="btn-ai-action" id="btn-restore-original" onclick="restoreOriginalUploadImage()" title="元の写真に戻す">
+                                    ↺ 元写真に戻す
+                                </button>
                             </div>
                         </div>
 
@@ -1706,6 +1737,19 @@
             </div>
         </div>
     </footer>
+
+    <!-- ブラウザ完結型AI背景削除（@imgly/background-removal: 完全無料・APIキー不要） -->
+    <script type="module">
+        try {
+            const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+            window.imglyRemoveBackground = removeBackground;
+            window.imglyAiReady = true;
+            console.log('✨ [@imgly/background-removal] AI背景削除モジュールを準備しました');
+        } catch (e) {
+            console.warn('⚠️ AI背景削除モジュールの初期ロードに失敗しました（オフラインまたは制限環境）:', e);
+            window.imglyAiReady = false;
+        }
+    </script>
 
     <!-- JavaScriptアプリケーションロジックファイルの読み込み -->
     <script src="js/app.js?v=20261109_fav"></script>

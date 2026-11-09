@@ -1908,6 +1908,8 @@ const PRESET_CLOSET_PRESETS = {
 };
 
 let currentClosetUploadDataUrl = '';
+let originalClosetUploadDataUrl = '';
+let isCurrentUploadTransparent = false;
 
 /**
  * スタジオ内のサブタブ切り替え
@@ -3452,12 +3454,184 @@ function closeAddClosetModal() {
         modal.classList.remove('active');
     }
     currentClosetUploadDataUrl = '';
+    originalClosetUploadDataUrl = '';
+    isCurrentUploadTransparent = false;
+
     const preview = document.getElementById('closet-img-preview');
     const placeholder = document.getElementById('closet-img-placeholder');
-    if (preview) preview.style.display = 'none';
+    const badgeTrans = document.getElementById('preview-badge-transparent');
+    const actionBtns = document.getElementById('ai-action-btns');
+    const overlay = document.getElementById('ai-processing-overlay');
+
+    if (preview) {
+        preview.style.display = 'none';
+        preview.classList.remove('is-transparent');
+    }
+    if (badgeTrans) badgeTrans.style.display = 'none';
+    if (actionBtns) actionBtns.style.display = 'none';
+    if (overlay) overlay.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
+
     const form = document.getElementById('form-add-closet');
     if (form) form.reset();
+}
+
+/**
+ * 画像リサイズ前処理（AI処理の高速化・メモリ節約）
+ */
+function resizeImageForAi(imageSource, maxDim = 1024) {
+    if (typeof Image === 'undefined') return Promise.resolve(imageSource);
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+            if (width <= maxDim && height <= maxDim) {
+                resolve(imageSource);
+                return;
+            }
+            if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+            } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+                resolve(blob || imageSource);
+            }, 'image/png');
+        };
+        img.onerror = () => resolve(imageSource);
+
+        if (typeof imageSource === 'string') {
+            img.src = imageSource;
+        } else if (imageSource instanceof Blob) {
+            img.src = URL.createObjectURL(imageSource);
+        } else {
+            resolve(imageSource);
+        }
+    });
+}
+
+/**
+ * ブラウザ完結型AI背景削除コア処理（@imgly/background-removal）
+ */
+async function runAiBackgroundRemoval(imageSource) {
+    // グローバルまたは動的インポートでモジュール取得
+    let removeBgFunc = window.imglyRemoveBackground;
+    if (!removeBgFunc) {
+        try {
+            const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+            removeBgFunc = mod.removeBackground;
+            window.imglyRemoveBackground = removeBgFunc;
+            window.imglyAiReady = true;
+        } catch (e) {
+            console.error('AIモジュール読み込みエラー:', e);
+            throw new Error('AI背景削除モジュールをロードできませんでした。ネットワーク接続を確認してください。');
+        }
+    }
+
+    const overlay = document.getElementById('ai-processing-overlay');
+    const progressFill = document.getElementById('ai-progress-fill');
+    const progressPct = document.getElementById('ai-progress-percent');
+    const subtitle = document.getElementById('ai-status-subtitle');
+
+    if (overlay) overlay.style.display = 'flex';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressPct) progressPct.textContent = '0%';
+    if (subtitle) subtitle.textContent = 'AIモデルを初期化中...';
+
+    // 高解像度画像の場合は1024pxにリサイズして高速化
+    const resizedSource = await resizeImageForAi(imageSource, 1024);
+
+    const config = {
+        model: 'small', // small: 約40MBの軽量モデル。服の輪郭切り抜きに十分な精度で高速
+        progress: (key, current, total) => {
+            if (total > 0) {
+                const pct = Math.min(100, Math.round((current / total) * 100));
+                if (progressFill) progressFill.style.width = `${pct}%`;
+                if (progressPct) progressPct.textContent = `${pct}%`;
+                if (subtitle) {
+                    if (key.includes('model') || key.includes('onnx')) {
+                        subtitle.textContent = `AIモデル読込中... (${pct}%)`;
+                    } else {
+                        subtitle.textContent = `服の輪郭をAI解析・透過処理中... (${pct}%)`;
+                    }
+                }
+            }
+        }
+    };
+
+    try {
+        const outputBlob = await removeBgFunc(resizedSource, config);
+        if (overlay) overlay.style.display = 'none';
+        return outputBlob;
+    } catch (err) {
+        if (overlay) overlay.style.display = 'none';
+        throw err;
+    }
+}
+
+/**
+ * プレビュー表示の更新ヘルパー
+ */
+function updateClosetPreviewUI(imgUrl, isTransparent = false) {
+    const preview = document.getElementById('closet-img-preview');
+    const previewImg = document.getElementById('closet-preview-img');
+    const placeholder = document.getElementById('closet-img-placeholder');
+    const badgeTrans = document.getElementById('preview-badge-transparent');
+    const actionBtns = document.getElementById('ai-action-btns');
+
+    if (preview && previewImg && placeholder) {
+        previewImg.src = imgUrl;
+        preview.style.display = 'flex';
+        placeholder.style.display = 'none';
+
+        if (isTransparent) {
+            preview.classList.add('is-transparent');
+            if (badgeTrans) badgeTrans.style.display = 'block';
+        } else {
+            preview.classList.remove('is-transparent');
+            if (badgeTrans) badgeTrans.style.display = 'none';
+        }
+
+        if (actionBtns) {
+            actionBtns.style.display = 'flex';
+            const btnReRemove = document.getElementById('btn-re-remove-bg');
+            const btnRestore = document.getElementById('btn-restore-original');
+            if (btnReRemove) btnReRemove.style.display = isTransparent ? 'none' : 'inline-block';
+            if (btnRestore) btnRestore.style.display = isTransparent ? 'inline-block' : 'none';
+        }
+    }
+}
+
+/**
+ * AIによる背景削除の実行とプレビュー反映
+ */
+async function processClosetImageWithAi(source) {
+    try {
+        const blob = await runAiBackgroundRemoval(source);
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            currentClosetUploadDataUrl = evt.target.result;
+            isCurrentUploadTransparent = true;
+            updateClosetPreviewUI(currentClosetUploadDataUrl, true);
+            showToastNotification('✨ AIが服の背景を綺麗に切り抜きました！');
+        };
+        reader.readAsDataURL(blob);
+    } catch (err) {
+        console.warn('AI背景削除に失敗、元画像を使用:', err);
+        currentClosetUploadDataUrl = originalClosetUploadDataUrl;
+        isCurrentUploadTransparent = false;
+        updateClosetPreviewUI(currentClosetUploadDataUrl, false);
+        showToastNotification('AI背景切り抜きをスキップし、元の写真を設定しました');
+    }
 }
 
 /**
@@ -3467,17 +3641,11 @@ function selectPresetImage(presetKey, presetName) {
     const preset = PRESET_CLOSET_PRESETS[presetKey];
     if (!preset) return;
 
+    originalClosetUploadDataUrl = preset.image;
     currentClosetUploadDataUrl = preset.image;
+    isCurrentUploadTransparent = false;
 
-    const preview = document.getElementById('closet-img-preview');
-    const previewImg = document.getElementById('closet-preview-img');
-    const placeholder = document.getElementById('closet-img-placeholder');
-
-    if (preview && previewImg && placeholder) {
-        previewImg.src = preset.image;
-        preview.style.display = 'flex';
-        placeholder.style.display = 'none';
-    }
+    updateClosetPreviewUI(preset.image, false);
 
     const nameInput = document.getElementById('closet-item-name');
     if (nameInput) nameInput.value = preset.name;
@@ -3493,26 +3661,54 @@ function selectPresetImage(presetKey, presetName) {
 }
 
 /**
- * ファイル選択プレビュー
+ * ファイル選択プレビュー（AI背景削除連動）
  */
 function handleClosetImageSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function (evt) {
+    reader.onload = async function (evt) {
+        originalClosetUploadDataUrl = evt.target.result;
         currentClosetUploadDataUrl = evt.target.result;
-        const preview = document.getElementById('closet-img-preview');
-        const previewImg = document.getElementById('closet-preview-img');
-        const placeholder = document.getElementById('closet-img-placeholder');
+        isCurrentUploadTransparent = false;
 
-        if (preview && previewImg && placeholder) {
-            previewImg.src = currentClosetUploadDataUrl;
-            preview.style.display = 'flex';
-            placeholder.style.display = 'none';
+        const autoRemove = document.getElementById('check-auto-remove-bg')?.checked;
+
+        if (autoRemove) {
+            // 自動でAI背景削除を実行
+            updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+            await processClosetImageWithAi(file);
+        } else {
+            // 通常の元写真表示
+            updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+            showToastNotification('服の写真を読み込みました');
         }
     };
     reader.readAsDataURL(file);
+}
+
+/**
+ * 手動で「🪄 背景を透過」ボタンをクリックした時
+ */
+async function triggerManualBgRemoval() {
+    const target = originalClosetUploadDataUrl || currentClosetUploadDataUrl;
+    if (!target) {
+        showToastNotification('先に服の写真を選択してください');
+        return;
+    }
+    await processClosetImageWithAi(target);
+}
+
+/**
+ * 「↺ 元写真に戻す」ボタンをクリックした時
+ */
+function restoreOriginalUploadImage() {
+    if (!originalClosetUploadDataUrl) return;
+    currentClosetUploadDataUrl = originalClosetUploadDataUrl;
+    isCurrentUploadTransparent = false;
+    updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+    showToastNotification('元の写真に戻しました');
 }
 
 /**
@@ -3758,6 +3954,8 @@ window.resetFittingOffsets = resetFittingOffsets;
 window.applyFittingOffsets = applyFittingOffsets;
 window.handleBrandSizeInput = handleBrandSizeInput;
 window.stepBrandSize = stepBrandSize;
+window.triggerManualBgRemoval = triggerManualBgRemoval;
+window.restoreOriginalUploadImage = restoreOriginalUploadImage;
 
 
 

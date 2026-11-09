@@ -4425,7 +4425,9 @@ button {
     cursor: pointer;
     background: var(--color-gray-bg);
     transition: all var(--transition-fast);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
 .closet-upload-box:hover {
@@ -4473,6 +4475,178 @@ button {
     font-size: 0.75rem;
     color: var(--color-gray-medium);
     text-decoration: underline;
+}
+
+/* AI背景削除用ツールバー & アクション */
+.ai-cutout-toolbar {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ai-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ai-toggle-label input[type="checkbox"] {
+    accent-color: #0f172a;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.ai-free-badge {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.ai-action-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-ai-action {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-ai-action:hover {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
+/* AI背景処理中オーバーレイ */
+.ai-processing-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 20;
+    text-align: center;
+    backdrop-filter: blur(2px);
+}
+
+.ai-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #0284c7;
+    border-radius: 50%;
+    animation: spin-ai-cutout 0.8s linear infinite;
+    margin-bottom: 8px;
+}
+
+@keyframes spin-ai-cutout {
+    to { transform: rotate(360deg); }
+}
+
+.ai-status-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.ai-status-subtitle {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.ai-progress-track {
+    width: 80%;
+    max-width: 200px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.ai-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    transition: width 0.2s ease;
+}
+
+.ai-progress-percent {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0284c7;
+    font-variant-numeric: tabular-nums;
+}
+
+.ai-hint-small {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* 透過写真プレビュー用の市松模様背景 */
+.upload-preview.is-transparent {
+    position: relative;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    background-image: 
+        linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+        linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+        linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+    background-size: 14px 14px;
+    background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
+}
+
+.upload-preview.is-transparent img {
+    background: transparent;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
+}
+
+.preview-badge-transparent {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .preset-img-selector {
