@@ -1723,6 +1723,7 @@ function openMobileDrawer() {
     if (drawer && overlay) {
         drawer.classList.add('open');
         overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 }
 
@@ -1732,6 +1733,7 @@ function closeMobileDrawer() {
     if (drawer && overlay) {
         drawer.classList.remove('open');
         overlay.classList.remove('active');
+        document.body.style.overflow = '';
     }
 }
 
