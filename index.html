@@ -439,8 +439,8 @@
                                     <div class="form-group flex-1">
                                         <label for="order-postal" class="form-label">郵便番号 <span
                                                 class="required">*</span></label>
-                                        <input type="text" id="order-postal" class="form-input" placeholder="例: 150-0001"
-                                            required>
+                                        <input type="text" id="order-postal" class="form-input"
+                                            placeholder="例: 150-0001" required>
                                     </div>
                                     <div class="form-group flex-2">
                                         <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
@@ -612,11 +612,14 @@
                     </div>
 
                     <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
-                    <div id="login-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                    <div id="login-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
                             <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
                         </div>
-                        <p id="login-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="login-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -664,11 +667,14 @@
                     </div>
 
                     <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
-                    <div id="reg-checkout-notice" class="auth-checkout-alert" style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                    <div id="reg-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
                             <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
                         </div>
-                        <p id="reg-notice-desc" style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                        <p id="reg-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
                             新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
                         </p>
@@ -765,12 +771,15 @@
 
                 <!-- タブ1: 購入履歴（【要件】購入ボタンを押して購入が完了した商品の一覧を表示） -->
                 <div class="mypage-tab-content active" id="tab-orders">
-                    <div class="orders-section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                    <div class="orders-section-header"
+                        style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
                         <div>
                             <h3 class="orders-subheading">ご注文履歴一覧</h3>
                             <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
                         </div>
-                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()" style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;" title="テスト注文履歴をリセットして0件にします">
+                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
+                            style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
+                            title="テスト注文履歴をリセットして0件にします">
                             履歴をすべて初期化 (0件にする)
                         </button>
                     </div>

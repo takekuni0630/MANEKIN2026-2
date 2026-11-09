@@ -2420,8 +2420,8 @@ function migrateOldBrokenAssets() {
         localStorage.setItem('manekin_orders', JSON.stringify([]));
         try {
             const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-            fetch(`${apiBase}/api/orders`, { method: 'DELETE' }).catch(() => {});
-        } catch (e) {}
+            fetch(`${apiBase}/api/orders`, { method: 'DELETE' }).catch(() => { });
+        } catch (e) { }
         localStorage.setItem('manekin_clean_orders_v3', 'true');
     }
 
