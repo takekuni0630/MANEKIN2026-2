@@ -22,7 +22,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <!-- サイト共通のスタイルシートを読み込み -->
-    <link rel="stylesheet" href="css/style.css?v=20261109_2">
+    <link rel="stylesheet" href="css/style.css?v=20261109_3">
     <!-- ヘッダーメタ情報エリアの終了 -->
 </head>
 <!-- ページ本体ボディの開始 -->
@@ -937,13 +937,7 @@
                         <span>保存したコーデ</span>
                         <span class="tab-badge" id="studio-saved-badge">0</span>
                     </button>
-                    <button class="studio-tab-btn" data-studio-tab="profile" onclick="switchStudioTab('profile')">
-                        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>プロフィール・体型</span>
-                    </button>
+
                 </nav>
 
                 <!-- ============================== -->
@@ -1485,75 +1479,7 @@
                     </div>
                 </div>
 
-                <!-- ============================== -->
-                <!-- パネル6: プロフィール・体型設定    -->
-                <!-- ============================== -->
-                <div class="studio-pane" id="studio-pane-profile">
-                    <div class="pane-action-bar">
-                        <div class="pane-action-left">
-                            <h2 class="pane-title">プロフィール & 体型カスタマイズ</h2>
-                            <p class="pane-desc">あなたの体型データや好みのテイストを設定することで、マネキンのシルエットやAIの提案精度が向上します。</p>
-                        </div>
-                    </div>
 
-                    <div class="profile-settings-layout">
-                        <!-- 会員情報カード -->
-                        <div class="profile-card">
-                            <h3 class="profile-section-title">基本会員情報</h3>
-                            <div class="profile-field-row">
-                                <span class="profile-label">お名前:</span>
-                                <strong class="profile-val" id="prof-display-name">ゲスト 様</strong>
-                            </div>
-                            <div class="profile-field-row">
-                                <span class="profile-label">メールアドレス:</span>
-                                <span class="profile-val" id="prof-display-email">未ログイン</span>
-                            </div>
-                            <div class="profile-field-row">
-                                <span class="profile-label">会員ステータス:</span>
-                                <span class="membership-badge" id="prof-display-rank">GUEST</span>
-                            </div>
-                        </div>
-
-                        <!-- 将来拡張：体型設定フォーム -->
-                        <div class="profile-card">
-                            <h3 class="profile-section-title">
-                                体型反映・シルエット設定 <span class="future-tag">NEXT FEATURE</span>
-                            </h3>
-                            <p class="text-muted mb-3">マネキンのプロポーション比率をお客様の体型に近づけるためのパラメータです。</p>
-
-                            <form id="body-profile-form" onsubmit="handleSaveBodyProfile(event)">
-                                <div class="form-row">
-                                    <div class="form-group flex-1">
-                                        <label class="form-label" for="body-height">身長 (cm)</label>
-                                        <input type="number" id="body-height" class="form-input" min="140" max="210"
-                                            value="172">
-                                    </div>
-                                    <div class="form-group flex-1">
-                                        <label class="form-label" for="body-type">体型タイプ</label>
-                                        <select id="body-type" class="form-input">
-                                            <option value="SLIM">スリム・細身</option>
-                                            <option value="REGULAR" selected>標準 (スタンダード)</option>
-                                            <option value="ATHLETIC">アスリート・がっしり</option>
-                                            <option value="RELAXED">ゆったり・リラックス</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="style-taste">好みのスタイリングテイスト</label>
-                                    <select id="style-taste" class="form-input">
-                                        <option value="MINIMAL" selected>ミニマル・シンプル（モノトーン中心）</option>
-                                        <option value="CASUAL">クリーンカジュアル（日常・通学向け）</option>
-                                        <option value="DRESS">スマートドレス・きれいめ（デート・外出向け）</option>
-                                        <option value="OVERSIZED">モード・ストリート（オーバーサイズ中心）</option>
-                                    </select>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary btn-sm">体型・好みの設定を保存する</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
