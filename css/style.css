@@ -4620,15 +4620,60 @@ button {
 /* モバイル向け基本骨格・レイアウト変更を一元的に定義（480px以下も自動継承）    */
 /* -------------------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
+    /* --- 1. 基本設定・レイアウト・セーフエリア（iPhone全機種対応） --- */
     :root {
         --header-height: 64px;
     }
 
-    .main-content {
-        margin-top: 64px;
+    html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
-    /* ナビゲーション: スマホ用ハンバーガーメニューへ切り替え */
+    .container {
+        width: 100%;
+        max-width: 100%;
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+        box-sizing: border-box;
+    }
+
+    .main-content {
+        margin-top: 64px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .page-container {
+        padding-top: 20px;
+        padding-bottom: 50px;
+    }
+
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-size: clamp(1.25rem, 4.5vw, 1.45rem);
+    }
+
+    .page-subtitle {
+        font-size: 0.82rem;
+    }
+
+    .page-breadcrumb {
+        font-size: 0.75rem;
+        margin-bottom: 16px;
+    }
+
+    /* --- 2. ヘッダー & ナビゲーション --- */
+    .header-container {
+        padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+    }
+
     .desktop-nav {
         display: none !important;
     }
@@ -4637,14 +4682,42 @@ button {
         display: flex !important;
     }
 
-    /* ヒーローセクション */
+    .logo-text {
+        font-size: 1.25rem;
+        letter-spacing: 0.12em;
+    }
+
+    .logo-subtext {
+        font-size: 0.55rem;
+        letter-spacing: 0.2em;
+    }
+
+    .tool-icon-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    /* --- 3. ヒーローセクション（iPhone全機種でボタン横並び・文字落ち防止） --- */
     .hero-section {
-        height: 65vh;
-        min-height: 420px;
+        height: 60vh;
+        min-height: 400px;
+    }
+
+    .hero-content {
+        padding: 0 16px;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hero-subheading {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        margin-bottom: 10px;
     }
 
     .hero-heading {
-        font-size: clamp(1.6rem, 5vw, 2.2rem);
+        font-size: clamp(1.45rem, 5.2vw, 1.95rem);
         line-height: 1.35;
         letter-spacing: 0.04em;
         margin-bottom: 14px;
@@ -4653,39 +4726,42 @@ button {
     }
 
     .hero-description {
-        font-size: 0.88rem;
+        font-size: clamp(0.82rem, 2.5vw, 0.88rem);
         line-height: 1.65;
-        margin-bottom: 24px;
+        margin-bottom: 22px;
     }
 
     .hero-buttons {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        gap: 12px;
+        gap: 10px;
         width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
     }
 
     .hero-buttons .btn {
-        padding: 12px 20px;
-        font-size: 0.85rem;
+        padding: 11px 16px;
+        font-size: 0.82rem;
         flex: 1;
-        max-width: 180px;
+        max-width: 175px;
+        white-space: nowrap;
+        text-align: center;
     }
 
-    /* 見出し & タイポグラフィ（「ン」落ち防止・一行化） */
-        /* コンセプトグリッドの1カラム化（画面突き抜け・左寄り防止） */
+    /* --- 4. ブランドコンセプト & 見出しタイポグラフィ --- */
     .concept-grid {
         grid-template-columns: 1fr !important;
-        gap: 20px !important;
+        gap: 16px !important;
     }
 
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        gap: 12px;
-        margin-bottom: 24px;
+        gap: 10px;
+        margin-bottom: 22px;
     }
 
     .section-title-wrap {
@@ -4693,47 +4769,47 @@ button {
         flex: 1;
     }
 
-    .section-jp-title {
-        font-size: 1.4rem;
+    .section-en-title {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
     }
 
-    .section-jp-title.text-nowrap {
-        font-size: clamp(1.18rem, 4vw, 1.4rem);
-        white-space: nowrap;
+    .section-jp-title {
+        font-size: clamp(1.25rem, 4.5vw, 1.4rem);
         letter-spacing: 0.02em;
     }
 
+    .section-jp-title.text-nowrap {
+        white-space: nowrap;
+    }
+
     .view-more-link.text-nowrap {
+        font-size: 0.8rem;
         white-space: nowrap;
         flex-shrink: 0;
-        font-size: 0.8rem;
     }
 
-    .section-en-title {
-        font-size: 0.72rem;
-    }
-
-    /* 黒背景バナー（AIコーデシミュレーション） */
+    /* --- 5. 次世代MANEKIN告知バナー --- */
     .manekin-teaser-banner {
-        padding: 30px 20px;
+        padding: 26px 18px;
         border-radius: 8px;
     }
 
     .teaser-tag {
-        font-size: 0.74rem;
-        margin-bottom: 10px;
+        font-size: 0.72rem;
+        margin-bottom: 8px;
     }
 
     .teaser-title {
-        font-size: clamp(1.2rem, 4vw, 1.45rem);
+        font-size: clamp(1.15rem, 4.2vw, 1.4rem);
         line-height: 1.35;
         margin-bottom: 12px;
     }
 
     .teaser-text {
-        font-size: 0.86rem;
-        line-height: 1.75;
-        margin-bottom: 20px;
+        font-size: 0.84rem;
+        line-height: 1.7;
+        margin-bottom: 18px;
     }
 
     .btn-teaser {
@@ -4742,34 +4818,78 @@ button {
         margin: 0 auto;
         justify-content: center;
         font-size: 0.84rem;
-        padding: 12px 18px;
+        padding: 12px 16px;
         white-space: nowrap;
+        display: flex;
     }
 
-    /* 商品グリッド: モバイル2列 */
+    /* --- 6. 商品グリッド（全iPhoneで美しい2列レイアウト） --- */
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px 10px;
+        gap: 14px 10px;
+    }
+
+    .product-info {
+        padding-top: 8px;
+    }
+
+    .product-category {
+        font-size: 0.68rem;
+        margin-bottom: 2px;
     }
 
     .product-name {
-        font-size: 0.85rem;
+        font-size: 0.84rem;
         line-height: 1.35;
         max-height: 2.7em;
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        margin-bottom: 4px;
     }
 
-    /* 商品詳細: 1カラム化 */
+    .product-price {
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .fav-btn {
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+    }
+
+    .fav-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .badge-new {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+        top: 6px;
+        left: 6px;
+    }
+
+    /* --- 7. 商品詳細ページ --- */
     .item-detail-layout {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 20px;
     }
 
     .detail-gallery {
         position: static;
+    }
+
+    .detail-title {
+        font-size: 1.3rem;
+        line-height: 1.35;
+    }
+
+    .detail-price {
+        font-size: 1.45rem;
     }
 
     .detail-actions {
@@ -4780,6 +4900,7 @@ button {
     .detail-actions .btn {
         width: 100%;
         padding: 13px 20px;
+        font-size: 0.9rem;
     }
 
     .catalog-controls {
@@ -4792,10 +4913,10 @@ button {
         display: none;
     }
 
-    /* チェックアウト & カート商品行: スマホ向けグリッドレイアウト */
+    /* --- 8. チェックアウト & カート --- */
     .checkout-layout {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 20px;
     }
 
     .payment-options-grid {
@@ -4805,6 +4926,25 @@ button {
     .form-row {
         flex-direction: column;
         gap: 12px;
+    }
+
+    .checkout-stepper {
+        margin-bottom: 20px;
+        padding: 0 4px;
+    }
+
+    .step-num {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    .step-text {
+        font-size: 0.68rem;
+    }
+
+    .step-line {
+        margin: 0 6px 14px;
     }
 
     .checkout-section-card {
@@ -4872,10 +5012,30 @@ button {
         min-width: 18px;
     }
 
-    /* マイページ */
+    /* --- 9. マイページ & 注文履歴テーブル（突き破り・余白防止徹底） --- */
     .auth-card {
-        padding: 28px 18px;
+        padding: 26px 16px;
         margin: 20px auto;
+        border-radius: 8px;
+    }
+
+    .auth-title {
+        font-size: 1.35rem;
+    }
+
+    .mypage-container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .mypage-header-card {
+        padding: 20px 16px;
+    }
+
+    .mypage-user-name {
+        font-size: 1.25rem;
     }
 
     .mypage-stats-grid {
@@ -4883,83 +5043,141 @@ button {
         gap: 12px;
     }
 
-    /* MANEKINスタジオ: モバイルタブ切り替え化 */
-    .studio-workspace-grid {
-        grid-template-columns: 1fr;
+    .mypage-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
     }
 
-    .studio-mobile-tabs {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 5px;
-        margin-bottom: 14px;
+    .mypage-tabs::-webkit-scrollbar {
+        display: none;
     }
 
-    .mobile-tab-btn {
-        white-space: nowrap !important;
-        font-size: 0.74rem;
-        padding: 8px 3px;
-        text-align: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        letter-spacing: -0.01em;
+    .mypage-tab-btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
+    .mypage-tab-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .orders-section-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+        margin-bottom: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .orders-subheading {
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .orders-info-text {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+
+    .orders-table-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--color-gray-light);
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: block;
+        margin-bottom: 24px;
+    }
+
+    .orders-table {
+        width: 100%;
+        min-width: 520px;
+        font-size: 0.8rem;
+        border-collapse: collapse;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 10px 12px;
+        white-space: nowrap;
+        font-size: 0.78rem;
+    }
+
+    .orders-table td:nth-child(3) {
+        white-space: normal;
+        min-width: 150px;
+    }
+
+    /* --- 10. MANEKIN AI STUDIO（マネキン試着室・ダッシュボード） --- */
     .studio-container {
         padding: 16px 12px 60px;
         max-width: 100%;
         overflow-x: hidden;
-    }
-
-    .studio-workspace-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0;
-    }
-
-    .studio-col {
-        display: none !important;
-        width: 100% !important;
-        padding: 14px 12px;
-    }
-
-    .studio-col.mobile-active {
-        display: block !important;
-        width: 100% !important;
-    }
-
-    /* マネキン試着室をスマホ画面いっぱいに大きく表示 */
-    .mannequin-stage-box {
-        min-height: 520px;
-        width: 100%;
-        padding: 16px 12px;
-    }
-
-    .mannequin-model-wrap {
-        width: 260px;
-        height: 460px;
-        margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .studio-header-card {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
-        padding: 20px;
+        gap: 14px;
+        padding: 18px 16px;
+        margin-bottom: 16px;
+    }
+
+    .studio-title {
+        font-size: 1.25rem;
+    }
+
+    .studio-nav-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+        margin-bottom: 16px;
+    }
+
+    .studio-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .studio-tab-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* ダッシュボード: スタッツ & クイックカード（縦並び・文字崩れ防止） */
+    .studio-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 18px !important;
     }
 
     .studio-recommend-banner {
-        padding: 24px 20px;
+        padding: 22px 18px;
     }
 
     .category-radio-grid {
         grid-template-columns: 1fr;
-    }
-
-    /* クイックカード・スタッツを縦並びに変更（テキストボックスの縦長潰れ・見切れ解消） */
-    .studio-stats-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-        margin-bottom: 20px !important;
     }
 
     .studio-quick-cards {
@@ -4992,7 +5210,173 @@ button {
         margin: 0;
     }
 
-    /* プロフィール & 体型設定: 見切れ防止・少し小さくスッキリ表示 */
+    /* コーデ作成: 3カラムをモバイルタブに切り替え */
+    .studio-workspace-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    .studio-mobile-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .mobile-tab-btn {
+        white-space: nowrap !important;
+        font-size: 0.74rem;
+        padding: 8px 3px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: -0.01em;
+    }
+
+    .studio-col {
+        display: none !important;
+        width: 100% !important;
+        padding: 14px 12px;
+        box-sizing: border-box;
+    }
+
+    .studio-col.mobile-active {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    /* 試着室ツールバー: 横1行を維持（iPhone全機種対応） */
+    .mannequin-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mannequin-toolbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stage-tag {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+    }
+
+    .btn-toolbar-adjust {
+        font-size: 0.68rem;
+        padding: 4px 6px;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .btn-toolbar-adjust svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .btn-gender {
+        padding: 3px 6px;
+        font-size: 0.68rem;
+        white-space: nowrap;
+    }
+
+    .btn-toolbar-clear {
+        font-size: 0.68rem;
+        padding: 4px 6px;
+        gap: 2px;
+        white-space: nowrap;
+    }
+
+    .btn-toolbar-clear svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* マネキン試着室: iPhoneの縦長画面に合わせた迫力ある大きさ */
+    .mannequin-stage-box {
+        min-height: 480px;
+        width: 100%;
+        padding: 14px 10px;
+        box-sizing: border-box;
+    }
+
+    .mannequin-model-wrap {
+        width: 240px;
+        height: 430px;
+        margin: 0 auto;
+    }
+
+    /* AIコメントカード: 1行化 & 余白確保 */
+    .ai-comment-card {
+        padding: 18px 16px;
+    }
+
+    .ai-comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+
+    .ai-header-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .ai-label {
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .ai-engine-tag {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+        white-space: nowrap;
+    }
+
+    .ai-header-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .ai-score-label {
+        font-size: 0.76rem;
+        white-space: nowrap;
+    }
+
+    .ai-score-val {
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    .ai-comment-text {
+        font-size: 0.88rem;
+        line-height: 1.75;
+        margin: 10px 0 14px;
+    }
+
+    /* プロフィール & 体型設定: 見切れ防止・スッキリ配置 */
     .profile-settings-layout {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
@@ -5062,552 +5446,10 @@ button {
         margin-top: 6px !important;
     }
 
-    /* フッター: ★ デスクトップ版の構成を忠実に反映！
-       上段にブランド情報、下段にデスクトップ版と同じ「NAVIGATION」「MEMBERSHIP」「HELP & INFO」の3列が均等に横並び */
-    .footer-top {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px 16px;
-        padding-bottom: 36px;
-    }
-
-    .footer-brand-column {
-        grid-column: 1 / -1;
-        max-width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 20px;
-        margin-bottom: 4px;
-    }
-
-    .footer-concept-text {
-        max-width: 100%;
-    }
-
-    .footer-bottom {
-        padding-top: 28px;
-    }
-}
-
-/* -------------------------------------------------------------------------- */
-/* D. スマートフォン特化 (max-width: 480px)                                   */
-/* デスクトップ版のスタイリッシュな設定・文字位置をスマホ幅にそのまま反映     */
-/* -------------------------------------------------------------------------- */
-@media screen and (max-width: 480px) {
-
-    /* 基本余白・ヘッダー */
-    .container {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .header-container {
-        padding: 0 16px;
-    }
-
-    .logo-text {
-        font-size: 1.2rem;
-        letter-spacing: 0.12em;
-    }
-
-    .logo-subtext {
-        font-size: 0.55rem;
-        letter-spacing: 0.2em;
-    }
-
-    .tool-icon-btn {
-        width: 36px;
-        height: 36px;
-    }
-
-    /* ヒーローセクション: デスクトップ版と同じ中央配置・横並びボタンを維持 */
-    .hero-section {
-        height: 60vh;
-        min-height: 400px;
-    }
-
-    .hero-content {
-        padding: 0 16px;
-        text-align: center;
-    }
-
-    .hero-subheading {
-        font-size: 0.75rem;
-        letter-spacing: 0.2em;
-        margin-bottom: 10px;
-    }
-
-    .hero-heading {
-        font-size: 1.6rem;
-        line-height: 1.35;
-        letter-spacing: 0.04em;
-        margin-bottom: 14px;
-        word-break: keep-all;
-        overflow-wrap: break-word;
-    }
-
-    .hero-description {
-        font-size: 0.84rem;
-        line-height: 1.65;
-        margin-bottom: 22px;
-    }
-
-    .hero-buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-    }
-
-    .hero-buttons .btn {
-        padding: 11px 18px;
-        font-size: 0.82rem;
-        flex: 1;
-        max-width: 180px;
-    }
-
-    /* 見出し・タイポグラフィ: デスクトップ版の中央揃え設定を維持 */
-    .section-header {
-        margin-bottom: 24px;
-    }
-
-    .section-jp-title {
-        font-size: 1.35rem;
-    }
-
-    .section-en-title {
-        font-size: 0.7rem;
-    }
-
-    .page-container {
-        padding-top: 20px;
-        padding-bottom: 50px;
-    }
-
-    .page-header {
-        margin-bottom: 24px;
-    }
-
-    .page-title {
-        font-size: 1.4rem;
-    }
-
-    .page-subtitle {
-        font-size: 0.82rem;
-    }
-
-    .page-breadcrumb {
-        font-size: 0.75rem;
-        margin-bottom: 16px;
-    }
-
-    /* 商品グリッド・カード（2列表示） */
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px 10px;
-    }
-
-    .product-info {
-        padding-top: 8px;
-    }
-
-    .product-category {
-        font-size: 0.68rem;
-        margin-bottom: 2px;
-    }
-
-    .product-name {
-        font-size: 0.84rem;
-        line-height: 1.35;
-        max-height: 2.7em;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        margin-bottom: 4px;
-    }
-
-    .product-price {
-        font-size: 0.9rem;
-        font-weight: 700;
-    }
-
-    .fav-btn {
-        width: 32px;
-        height: 32px;
-        top: 6px;
-        right: 6px;
-    }
-
-    .fav-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .badge-new {
-        font-size: 0.6rem;
-        padding: 2px 6px;
-        top: 6px;
-        left: 6px;
-    }
-
-    /* 商品詳細 */
-    .item-detail-layout {
-        gap: 20px;
-    }
-
-    .detail-title {
-        font-size: 1.3rem;
-        line-height: 1.35;
-    }
-
-    .detail-price {
-        font-size: 1.45rem;
-    }
-
-    .detail-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .detail-actions .btn {
-        width: 100%;
-        padding: 13px 20px;
-        font-size: 0.9rem;
-    }
-
-    /* チェックアウト・カート */
-    .checkout-stepper {
-        margin-bottom: 20px;
-        padding: 0 4px;
-    }
-
-    .step-num {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
-    }
-
-    .step-text {
-        font-size: 0.68rem;
-    }
-
-    .step-line {
-        margin: 0 6px 14px;
-    }
-
-    .checkout-section-card {
-        padding: 20px 14px;
-    }
-
-    .checkout-section-title {
-        font-size: 1.1rem;
-    }
-
-    .cart-item-row {
-        padding: 12px 10px;
-        gap: 12px;
-    }
-
-    .cart-item-thumb {
-        width: 56px;
-        height: 72px;
-    }
-
-    .cart-item-name {
-        font-size: 0.88rem;
-    }
-
-    .cart-item-meta {
-        font-size: 0.76rem;
-    }
-
-    /* マイページ */
-    .auth-card {
-        padding: 28px 18px;
-        margin: 20px auto;
-        border-radius: 8px;
-    }
-
-    .auth-title {
-        font-size: 1.35rem;
-    }
-
-    .mypage-header-card {
-        padding: 20px 16px;
-    }
-
-    .mypage-user-name {
-        font-size: 1.25rem;
-    }
-
-    .mypage-tabs {
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .mypage-tab-btn {
-        padding: 10px 14px;
-        font-size: 0.85rem;
-    }
-
-    /* MANEKIN AI STUDIO */
-    .studio-container {
-        padding: 16px 12px 60px;
-    }
-
-    .studio-header-card {
-        padding: 16px 14px;
-        margin-bottom: 16px;
-    }
-
-    .studio-title {
-        font-size: 1.25rem;
-    }
-
-    /* 試着室ツールバー: 横一行を完全に維持 */
-    .mannequin-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 4px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 8px;
-        margin-bottom: 10px;
-        scrollbar-width: none;
-    }
-
-    .mannequin-toolbar::-webkit-scrollbar {
-        display: none;
-    }
-
-    .stage-tag {
-        font-size: 0.85rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .toolbar-right {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        flex-wrap: nowrap;
-        flex-shrink: 0;
-    }
-
-    .btn-toolbar-adjust {
-        font-size: 0.68rem;
-        padding: 4px 6px;
-        gap: 3px;
-        white-space: nowrap;
-    }
-
-    .btn-toolbar-adjust svg {
-        width: 12px;
-        height: 12px;
-    }
-
-    .btn-gender {
-        padding: 3px 6px;
-        font-size: 0.68rem;
-        white-space: nowrap;
-    }
-
-    .btn-toolbar-clear {
-        font-size: 0.68rem;
-        padding: 4px 6px;
-        gap: 2px;
-        white-space: nowrap;
-    }
-
-    .btn-toolbar-clear svg {
-        width: 12px;
-        height: 12px;
-    }
-
-    .mannequin-stage-box {
-        min-height: 460px;
-        padding: 12px 8px;
-    }
-
-    .mannequin-model-wrap {
-        width: 230px;
-        height: 410px;
-    }
-
-    /* AIコメントカード: ヘッダー1行化 & 余白確保 */
-    .ai-comment-card {
-        padding: 20px 18px;
-    }
-
-    .ai-comment-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: nowrap;
-    }
-
-    .ai-header-left {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        min-width: 0;
-    }
-
-    .ai-label {
-        font-size: 0.78rem;
-        white-space: nowrap;
-    }
-
-    .ai-engine-tag {
-        font-size: 0.6rem;
-        padding: 1px 4px;
-        white-space: nowrap;
-    }
-
-    .ai-header-right {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .ai-score-label {
-        font-size: 0.76rem;
-        white-space: nowrap;
-    }
-
-    .ai-score-val {
-        font-size: 0.95rem;
-        white-space: nowrap;
-    }
-
-    .ai-comment-text {
-        font-size: 0.9rem;
-        line-height: 1.8;
-        margin: 10px 0 14px;
-    }
-
-    /* プロフィール & 体型設定: 1カラム・コンパクト化 */
-    .profile-settings-layout {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        max-width: 520px;
-        margin: 0 auto;
-    }
-
-    .profile-card {
-        padding: 18px 18px;
-    }
-
-    .profile-section-title {
-        font-size: 1rem;
-        margin-bottom: 12px;
-    }
-
-    .profile-field-row {
-        padding: 7px 0;
-        font-size: 0.85rem;
-    }
-
-    /* マイページ・注文履歴テーブルのスマホ対応（ラッパー内スクロール保証 & 画面突き破り防止） */
-    .mypage-container {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    .mypage-tab-content {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    .orders-section-header {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 12px;
-        margin-bottom: 16px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .orders-subheading {
-        font-size: 1.05rem;
-        font-weight: 700;
-    }
-
-    .orders-info-text {
-        font-size: 0.8rem;
-        line-height: 1.5;
-    }
-
-    .orders-table-wrapper {
-        width: 100% !important;
-        max-width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-        border: 1px solid var(--color-gray-light);
-        border-radius: 4px;
-        box-sizing: border-box;
-        display: block;
-        margin-bottom: 24px;
-    }
-
-    .orders-table {
-        width: 100%;
-        min-width: 520px;
-        font-size: 0.8rem;
-        border-collapse: collapse;
-    }
-
-    .orders-table th,
-    .orders-table td {
-        padding: 10px 12px;
-        white-space: nowrap;
-        font-size: 0.78rem;
-    }
-
-    .orders-table td:nth-child(3) {
-        white-space: normal;
-        min-width: 150px;
-    }
-
-    /* タブナビゲーションの横スクロール保証（画面幅突き破り防止） */
-    .mypage-tabs,
-    .studio-nav-tabs {
-        width: 100% !important;
-        max-width: 100% !important;
-        display: flex;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        box-sizing: border-box;
-    }
-
-    .mypage-tabs::-webkit-scrollbar,
-    .studio-nav-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .studio-tab-btn {
-        flex-shrink: 0;
-        white-space: nowrap;
-    }
-
-        /* フッター: ★ スマホ・モバイルで文字崩れ・右ズレを起こさない美しい2列＋全幅構成
-       上段: ブランドロゴ & コンセプト文（全幅）
-       中段: NAVIGATION（左列 1fr） & MEMBERSHIP（右列 1fr）
-       下段: HELP & INFO（全幅、2列グリッドでゆったり美しく配置） */
+    /* --- 11. フッター（★ iPhone全機種対応 2列＋全幅構成・右余白完全根絶） --- */
     .site-footer {
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
         overflow-x: hidden;
         padding-top: 44px;
@@ -5618,8 +5460,8 @@ button {
     .footer-container {
         width: 100% !important;
         max-width: 100% !important;
-        padding-left: 20px !important;
-        padding-right: 20px !important;
+        padding-left: max(16px, env(safe-area-inset-left)) !important;
+        padding-right: max(16px, env(safe-area-inset-right)) !important;
         box-sizing: border-box !important;
     }
 
@@ -5709,5 +5551,36 @@ button {
         font-size: 0.7rem;
         line-height: 1.5;
         color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* E. 超小型スマートフォン（iPhone SE 第1世代など 画面幅360px以下）の微調整      */
+/* -------------------------------------------------------------------------- */
+@media screen and (max-width: 360px) {
+    .hero-heading {
+        font-size: 1.35rem;
+    }
+
+    .hero-buttons .btn {
+        padding: 10px 8px;
+        font-size: 0.75rem;
+    }
+
+    .product-grid {
+        gap: 10px 8px;
+    }
+
+    .product-name {
+        font-size: 0.78rem;
+    }
+
+    .product-price {
+        font-size: 0.85rem;
+    }
+
+    .mannequin-model-wrap {
+        width: 210px;
+        height: 380px;
     }
 }
