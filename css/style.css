@@ -5359,23 +5359,32 @@ button {
         height: 12px;
     }
 
-    /* マネキン試着室: スマホ画面に美しくフィットするコンパクトサイズ */
+    /* マネキン試着室（ビジュアルステージ）: スマホ1画面にスッキリ収まるコンパクトサイズ */
     .mannequin-stage-box {
-        min-height: 370px !important;
+        min-height: 320px !important;
         width: 100%;
-        padding: 10px 8px !important;
+        padding: 8px 6px !important;
         box-sizing: border-box;
     }
 
     .mannequin-model-wrap {
-        width: 195px !important;
-        height: 350px !important;
+        width: 170px !important;
+        height: 300px !important;
         margin: 0 auto;
     }
 
     .stage-brand-summary {
-        padding: 10px 12px;
-        margin-top: 8px;
+        padding: 8px 10px;
+        margin-top: 6px;
+    }
+
+    .brand-sum-info {
+        font-size: 0.82rem;
+    }
+
+    .btn-sm {
+        padding: 9px 14px;
+        font-size: 0.82rem;
     }
 
     /* ▼ AIコメントカード & コーディネート保存カード: コンパクト化 & 見切れ防止徹底 */
@@ -5774,12 +5783,12 @@ button {
     }
 
     .mannequin-stage-box {
-        min-height: 330px !important;
-        padding: 8px 6px !important;
+        min-height: 290px !important;
+        padding: 6px 4px !important;
     }
 
     .mannequin-model-wrap {
-        width: 175px !important;
-        height: 310px !important;
+        width: 155px !important;
+        height: 275px !important;
     }
 }
