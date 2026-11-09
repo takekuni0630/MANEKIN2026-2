@@ -4670,12 +4670,14 @@ button {
 /* モバイル向け基本骨格・レイアウト変更を一元的に定義（480px以下も自動継承）    */
 /* -------------------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
+
     /* --- 1. 基本設定・レイアウト・セーフエリア（iPhone全機種対応） --- */
     :root {
         --header-height: 64px;
     }
 
-    html, body {
+    html,
+    body {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
