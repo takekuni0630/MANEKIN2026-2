@@ -22,7 +22,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <!-- サイト共通のスタイルシートを読み込み -->
-    <link rel="stylesheet" href="css/style.css?v=20261109_3">
+    <link rel="stylesheet" href="css/style.css?v=20261109_fav">
     <!-- ヘッダーメタ情報エリアの終了 -->
 </head>
 <!-- ページ本体ボディの開始 -->
@@ -1067,7 +1067,8 @@
                             onclick="switchMobileStudioView('closet')">手持ちの服 (<span
                                 id="mob-closet-cnt">0</span>)</button>
                         <button class="mobile-tab-btn" data-mobile-view="brand"
-                            onclick="switchMobileStudioView('brand')">ブランド商品</button>
+                            onclick="switchMobileStudioView('brand')">ブランド商品 (<span
+                                id="mob-brand-fav-cnt">0</span>)</button>
                     </div>
 
                     <!-- 3カラム・シミュレーションスタジオグリッド -->
@@ -1371,13 +1372,9 @@
                             <div class="col-header">
                                 <div class="col-title-wrap">
                                     <h3 class="col-title">3. ブランド商品</h3>
+                                    <span class="col-badge col-badge-fav">お気に入り</span>
                                 </div>
-                                <label class="fav-filter-toggle" title="お気に入りのみ表示">
-                                    <input type="checkbox" id="brand-fav-filter-chk"
-                                        onchange="toggleBrandFavFilter(this)">
-                                    <span class="fav-heart-icon">♥</span>
-                                    <span class="fav-text">お気に入りのみ</span>
-                                </label>
+                                <a href="#items" class="btn btn-outline-xs" title="商品一覧でお気に入り商品を探す">+ 探す</a>
                             </div>
 
                             <!-- フィルターチップ -->
@@ -1711,7 +1708,7 @@
     </footer>
 
     <!-- JavaScriptアプリケーションロジックファイルの読み込み -->
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20261109_fav"></script>
 </body>
 
 </html>

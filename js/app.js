@@ -1386,6 +1386,9 @@ function handleToggleFavorite(productId) {
     updateFavoriteBadges();
     syncAllFavoriteButtons(productId, isAdded);
 
+    // スタジオ画面のブランドお気に入り一覧も即時同期
+    renderStudioBrandList();
+
     if (window.location.hash === '#favorites') {
         renderFavoriteProducts();
     }
@@ -1431,10 +1434,14 @@ function updateFavoriteBadges() {
     const navBadge = document.getElementById('nav-fav-badge');
     const iconBadge = document.getElementById('icon-fav-badge');
     const mypageFavCount = document.getElementById('mypage-fav-count');
+    const studioFavBadge = document.getElementById('studio-fav-badge');
+    const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
 
     if (navBadge) navBadge.textContent = count;
     if (iconBadge) iconBadge.textContent = count;
     if (mypageFavCount) mypageFavCount.innerHTML = `${count} <span class="stat-unit">点</span>`;
+    if (studioFavBadge) studioFavBadge.textContent = count;
+    if (mobBrandFavCnt) mobBrandFavCnt.textContent = count;
 }
 
 function renderFavoriteProducts() {
@@ -1956,6 +1963,9 @@ function renderManekinStudio(activeTab = 'create') {
     const mobClosetCnt = document.getElementById('mob-closet-cnt');
     if (mobClosetCnt) mobClosetCnt.textContent = AppState.myCloset.length;
 
+    const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
+    if (mobBrandFavCnt) mobBrandFavCnt.textContent = AppState.favorites.length;
+
     // ホームサマリーの数値
     const homeCloset = document.getElementById('home-stat-closet');
     if (homeCloset) homeCloset.innerHTML = `${AppState.myCloset.length} <small>点</small>`;
@@ -2139,7 +2149,7 @@ function handleStudioClosetFilter(cat) {
 // --------------------------------------------------------------------------
 
 /**
- * スタジオ内（右カラム）のブランド商品リスト描画
+ * スタジオ内（右カラム）のブランド商品リスト描画（お気に入りに登録された服のみ表示）
  */
 function renderStudioBrandList() {
     const list = document.getElementById('studio-brand-list');
@@ -2148,43 +2158,63 @@ function renderStudioBrandList() {
     const filter = AppState.studioBrandFilter || 'ALL';
     const gender = AppState.studioGender || 'MEN';
 
+    // お気に入りに登録されているブランド商品のみを抽出
+    const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.includes(p.id));
+
+    // モバイル用タブのカウント更新
+    const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
+    if (mobBrandFavCnt) {
+        mobBrandFavCnt.textContent = allFavProducts.length;
+    }
+
     // 性別によるフィルタリング（MEN / WOMEN）
-    let products = SAMPLE_PRODUCTS.filter(p => !p.gender || p.gender === gender);
+    let products = allFavProducts.filter(p => !p.gender || p.gender === gender);
     if (filter !== 'ALL') {
         products = products.filter(p => p.category === filter);
     }
 
-    if (AppState.studioBrandFavOnly) {
-        products = products.filter(p => AppState.favorites.includes(p.id));
+    // お気に入りアイテムが1件も登録されていない場合
+    if (allFavProducts.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 40px 16px; color: var(--color-gray-medium);">
+                <div style="font-size: 2rem; margin-bottom: 8px; color: var(--color-accent); opacity: 0.85;">♥</div>
+                <p style="font-size: 0.88rem; font-weight: 600; color: var(--color-black); margin-bottom: 6px;">お気に入りの服がありません</p>
+                <p style="font-size: 0.78rem; line-height: 1.5; margin-bottom: 14px;">商品一覧でハート（♥）を押してお気に入り登録すると、ここに表示されてマネキンに試着できます。</p>
+                <a href="#items" class="btn btn-outline-xs" style="display: inline-block; padding: 6px 16px; font-size: 0.75rem;">商品一覧を見に行く</a>
+            </div>
+        `;
+        return;
     }
 
+    // お気に入りは登録されているが、現在の性別やカテゴリフィルターに合致しない場合
     if (products.length === 0) {
         list.innerHTML = `
-            <div style="text-align: center; padding: 30px 10px; color: var(--color-gray-medium);" >
-                <p style="font-size: 0.85rem;">該当するアイテムがありません</p>
+            <div style="text-align: center; padding: 36px 12px; color: var(--color-gray-medium);">
+                <p style="font-size: 0.85rem; font-weight: 600; color: var(--color-dark); margin-bottom: 6px;">該当するお気に入りアイテムがありません</p>
+                <p style="font-size: 0.75rem; color: var(--color-gray-medium); line-height: 1.4;">他のカテゴリまたはマネキンの性別（${gender === 'MEN' ? 'WOMEN' : 'MEN'}）をお試しください。</p>
             </div>
-            `;
+        `;
         return;
     }
 
     list.innerHTML = products.map(product => {
         const isWearing = isItemWearing(product);
-        const isFav = AppState.favorites.includes(product.id);
         const fallback = getCategoryFallbackImage(product.category);
 
         return `
-            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, ${product.id}, false)" onclick="toggleWearItem(${product.id}, false)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}" >
+            <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, ${product.id}, false)" onclick="toggleWearItem(${product.id}, false)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
                 <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';">
-                    <div class="studio-item-card-info">
-                        <div class="studio-card-cat-row">
-                            <span class="studio-card-cat">${product.category}</span>
-                            ${isFav ? '<span style="color: var(--color-accent); font-size: 0.7rem;">♥</span>' : ''}
-                        </div>
-                        <div class="studio-card-name" title="${product.name}">${product.name}</div>
-                        <div class="studio-card-sub">¥${product.price.toLocaleString()}</div>
+                <div class="studio-item-card-info">
+                    <div class="studio-card-cat-row">
+                        <span class="studio-card-cat">${product.category}</span>
+                        <span style="color: var(--color-accent); font-size: 0.75rem;" title="お気に入り登録済み">♥</span>
                     </div>
-                    ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
+                    <div class="studio-card-name" title="${product.name}">${product.name}</div>
+                    <div class="studio-card-sub">¥${product.price.toLocaleString()}</div>
                 </div>
+                ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
+            </div>
         `;
     }).join('');
 }

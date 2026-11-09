@@ -3072,6 +3072,12 @@ button {
     color: #ffffff;
 }
 
+.col-badge.col-badge-fav {
+    background: rgba(224, 86, 36, 0.08);
+    color: var(--color-accent);
+    border: 1px solid rgba(224, 86, 36, 0.25);
+}
+
 .btn-outline-xs {
     font-size: 0.75rem;
     font-weight: 600;
