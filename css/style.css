@@ -4929,6 +4929,113 @@ button {
         grid-template-columns: 1fr;
     }
 
+    /* クイックカード・スタッツを縦並びに変更（テキストボックスの縦長潰れ・見切れ解消） */
+    .studio-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .studio-quick-cards {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .quick-card {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        padding: 16px 18px;
+        gap: 16px;
+    }
+
+    .quick-card-icon {
+        font-size: 1.6rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .quick-card-title {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+
+    .quick-card-desc {
+        font-size: 0.78rem;
+        line-height: 1.45;
+        margin: 0;
+    }
+
+    /* プロフィール & 体型設定: 見切れ防止・少し小さくスッキリ表示 */
+    .profile-settings-layout {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    .profile-card {
+        padding: 16px 14px !important;
+        box-sizing: border-box !important;
+    }
+
+    .profile-section-title {
+        font-size: 0.98rem !important;
+        margin-bottom: 12px !important;
+        padding-bottom: 6px !important;
+    }
+
+    .profile-field-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 7px 0 !important;
+        font-size: 0.82rem !important;
+        gap: 8px !important;
+    }
+
+    .profile-label {
+        font-size: 0.8rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    .profile-val {
+        font-size: 0.82rem !important;
+        word-break: break-all !important;
+        text-align: right !important;
+    }
+
+    .membership-badge {
+        font-size: 0.62rem !important;
+        padding: 2px 7px !important;
+    }
+
+    .pane-title {
+        font-size: 1.2rem !important;
+    }
+
+    .pane-desc {
+        font-size: 0.8rem !important;
+        margin-bottom: 16px !important;
+    }
+
+    #body-profile-form .form-label {
+        font-size: 0.78rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    #body-profile-form .form-input {
+        padding: 8px 10px !important;
+        font-size: 0.85rem !important;
+    }
+
+    #body-profile-form .btn {
+        padding: 10px 16px !important;
+        font-size: 0.82rem !important;
+        width: 100% !important;
+        margin-top: 6px !important;
+    }
+
     /* フッター: ★ デスクトップ版の構成を忠実に反映！
        上段にブランド情報、下段にデスクトップ版と同じ「NAVIGATION」「MEMBERSHIP」「HELP & INFO」の3列が均等に横並び */
     .footer-top {
@@ -5432,97 +5539,5 @@ button {
         font-size: 0.7rem;
         line-height: 1.5;
         color: rgba(255, 255, 255, 0.5);
-    }
-}
-
-/* -------------------------------------------------------------------------- */
-/* C. スマートフォン小型画面微調整 (max-width: 480px)                         */
-/* 768pxの基本構造を継承し、文字サイズと余白の縮小差分のみをシンプルに記述   */
-/* -------------------------------------------------------------------------- */
-@media screen and (max-width: 480px) {
-    .container {
-        padding-left: 14px;
-        padding-right: 14px;
-    }
-
-    .header-container {
-        padding: 0 14px;
-    }
-
-    .logo-text {
-        font-size: 1.15rem;
-    }
-
-    .tool-icon-btn {
-        width: 34px;
-        height: 34px;
-    }
-
-    .hero-section {
-        height: 60vh;
-        min-height: 380px;
-    }
-
-    .hero-heading {
-        font-size: 1.5rem;
-    }
-
-    .hero-description {
-        font-size: 0.82rem;
-    }
-
-    .hero-buttons .btn {
-        padding: 10px 14px;
-        font-size: 0.8rem;
-    }
-
-    .section-jp-title.text-nowrap {
-        font-size: 1.15rem;
-    }
-
-    .view-more-link.text-nowrap {
-        font-size: 0.75rem;
-    }
-
-    .page-title {
-        font-size: 1.35rem;
-    }
-
-    .cart-item-row {
-        grid-template-columns: 52px 1fr;
-        padding: 10px 8px;
-    }
-
-    .cart-item-thumb {
-        width: 52px;
-        height: 68px;
-    }
-
-    .mobile-tab-btn {
-        font-size: 0.7rem;
-        padding: 8px 2px;
-    }
-
-    .btn-toolbar-adjust {
-        font-size: 0.64rem;
-        padding: 3px 5px;
-    }
-
-    .btn-gender {
-        font-size: 0.64rem;
-        padding: 3px 5px;
-    }
-
-    .btn-toolbar-clear {
-        font-size: 0.64rem;
-        padding: 3px 5px;
-    }
-
-    .profile-card {
-        padding: 16px 14px;
-    }
-
-    .footer-top {
-        gap: 20px 12px;
     }
 }
