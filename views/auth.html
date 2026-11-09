@@ -1,0 +1,118 @@
+<!-- ========================================================================== -->
+<!-- MANEKIN FASHION - 認証 (ログイン & 新規会員登録) (auth.html) -->
+<!-- ========================================================================== -->
+
+        <section class="page-view" id="view-login">
+            <div class="container page-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1 class="auth-title">LOGIN</h1>
+                        <p class="auth-subtitle">会員ログイン</p>
+                    </div>
+
+                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
+                    <div id="login-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                            <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
+                        </div>
+                        <p id="login-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                            商品をご購入いただくにはアカウントが必要となります。<br>
+                            ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
+                        </p>
+                    </div>
+
+                    <form id="login-form" class="auth-form" novalidate>
+                        <div class="form-group">
+                            <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com"
+                                required>
+                            <span class="form-error" id="login-email-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <input type="password" id="login-password" class="form-input" placeholder="8文字以上の半角英数字"
+                                required>
+                            <span class="form-error" id="login-password-error"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">ログインする</button>
+
+                        <button type="button" class="btn btn-secondary btn-block demo-login-btn" id="demo-login-btn">
+                            テストアカウントで簡単ログイン
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p class="auth-switch-text">アカウントをお持ちでないですか？</p>
+                        <a href="#register" class="auth-link">新規会員登録はこちら &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 8. 会員登録ページビュー (REGISTER)              -->
+        <!-- ============================================== -->
+        <section class="page-view" id="view-register">
+            <div class="container page-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1 class="auth-title">REGISTER</h1>
+                        <p class="auth-subtitle">新規会員登録</p>
+                    </div>
+
+                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
+                    <div id="reg-checkout-notice" class="auth-checkout-alert"
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                            <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
+                        </div>
+                        <p id="reg-notice-desc"
+                            style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
+                            商品をご購入いただくにはアカウントが必要となります。<br>
+                            新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。
+                        </p>
+                    </div>
+
+                    <form id="register-form" class="auth-form" novalidate>
+                        <div class="form-group">
+                            <label for="reg-name" class="form-label">氏名 <span class="required">*</span></label>
+                            <input type="text" id="reg-name" class="form-input" placeholder="山田 太郎" required>
+                            <span class="form-error" id="reg-name-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <input type="email" id="reg-email" class="form-input" placeholder="example@manekin.com"
+                                required>
+                            <span class="form-error" id="reg-email-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <input type="password" id="reg-password" class="form-input" placeholder="8文字以上の半角英数字"
+                                required>
+                            <span class="form-error" id="reg-password-error"></span>
+                        </div>
+
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="reg-agree" class="form-checkbox" required checked>
+                            <label for="reg-agree" class="checkbox-label">利用規約およびプライバシーポリシーに同意します</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">会員登録を完了する</button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p class="auth-switch-text">すでにアカウントをお持ちですか？</p>
+                        <a href="#login" class="auth-link">ログインはこちら &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+

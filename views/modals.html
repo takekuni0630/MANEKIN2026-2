@@ -1,0 +1,206 @@
+<!-- ========================================================================== -->
+<!-- MANEKIN FASHION - モーダル群 (手持ち服登録モーダル・共通モーダル) (modals.html) -->
+<!-- ========================================================================== -->
+
+    <!-- ============================================== -->
+    <!-- MANEKIN機能クリック時の「開発中」モーダル      -->
+    <!-- ============================================== -->
+    <div class="modal-backdrop" id="manekin-modal" role="dialog" aria-modal="true"
+        aria-labelledby="modal-manekin-title">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <span class="modal-badge">FUTURE FEATURE</span>
+                <button class="modal-close-btn" id="modal-close-btn" aria-label="閉じる">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="modal-icon-wrap">
+                    <svg class="modal-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="modal-title" id="modal-manekin-title">開発中</h2>
+                <p class="modal-subtext">MANEKIN AI COORDINATE & VIRTUAL CLOSET</p>
+                <p class="modal-description">
+                    ご期待ありがとうございます。<br>
+                    <strong>「MANEKIN」機能</strong>は、Pythonバックエンドによる<br>
+                    <strong>「3Dマネキン試着」</strong>、<strong>「マイクローゼット管理」</strong>、<strong>「AIコーデ提案」</strong><br>
+                    を統合した会員限定の次世代スタイリングサービスです。<br>
+                    現在、順次実装を進めております。公開まで今しばらくお待ちください。
+                </p>
+                <button class="btn btn-primary" id="modal-ok-btn">了解しました</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- マイクローゼット：手持ち服登録モーダル          -->
+    <!-- ============================================== -->
+    <div class="modal-backdrop" id="modal-add-closet" role="dialog" aria-modal="true"
+        aria-labelledby="modal-add-closet-title">
+        <div class="modal-dialog modal-dialog-closet">
+            <div class="modal-header">
+                <span class="modal-badge">MY CLOSET</span>
+                <button class="modal-close-btn" onclick="closeAddClosetModal()" aria-label="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h2 class="modal-title" id="modal-add-closet-title">手持ちの服を登録する</h2>
+                <p class="modal-subtext">登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。</p>
+
+                <form id="form-add-closet" onsubmit="handleAddClosetItem(event)">
+                    <!-- 写真・画像登録エリア -->
+                    <div class="form-group">
+                        <label class="form-label">服の写真（画像） <span class="required">*</span></label>
+                        <div class="closet-upload-box" id="closet-upload-box"
+                            onclick="document.getElementById('closet-file-input').click()">
+                            <input type="file" id="closet-file-input" accept="image/*" style="display: none;"
+                                onchange="handleClosetImageSelect(event)">
+                            <div class="upload-preview" id="closet-img-preview" style="display: none;">
+                                <img src="" alt="プレビュー" id="closet-preview-img">
+                                <span class="preview-badge-transparent" id="preview-badge-transparent" style="display: none;">
+                                    ✨ 背景透過済み
+                                </span>
+                                <span class="upload-change-text">タップして写真を変更</span>
+                            </div>
+                            <div class="upload-placeholder" id="closet-img-placeholder">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="upload-main-text">写真を選択・撮影する</span>
+                                <span class="upload-sub-text">または、以下のクイック写真から選ぶこともできます</span>
+                            </div>
+
+                            <!-- AI背景切り抜き中オーバーレイ -->
+                            <div class="ai-processing-overlay" id="ai-processing-overlay" style="display: none;" onclick="event.stopPropagation()">
+                                <div class="ai-spinner"></div>
+                                <span class="ai-status-title">🪄 AIが服の背景を透過中...</span>
+                                <span class="ai-status-subtitle" id="ai-status-subtitle">服の輪郭を解析しています</span>
+                                <div class="ai-progress-track">
+                                    <div class="ai-progress-fill" id="ai-progress-fill"></div>
+                                </div>
+                                <span class="ai-progress-percent" id="ai-progress-percent">0%</span>
+                                <span class="ai-hint-small">※完全無料・端末内AI（ブラウザ完結）で高速処理</span>
+                            </div>
+                        </div>
+
+                        <!-- AI背景削除ツールバー -->
+                        <div class="ai-cutout-toolbar">
+                            <label class="ai-toggle-label" title="写真選択時に自動で背景を透明にします（完全無料・ブラウザ完結型AI）">
+                                <input type="checkbox" id="check-auto-remove-bg" checked>
+                                <span class="ai-toggle-text">✨ <strong>AIで背景を自動透過する</strong> <span class="ai-free-badge">無料・端末内AI</span></span>
+                            </label>
+                            <div class="ai-action-btns" id="ai-action-btns" style="display: none;">
+                                <button type="button" class="btn-ai-action" id="btn-re-remove-bg" onclick="triggerManualBgRemoval()" title="現在の写真をAIで背景透過する">
+                                    🪄 背景を透過
+                                </button>
+                                <button type="button" class="btn-ai-action" id="btn-restore-original" onclick="restoreOriginalUploadImage()" title="元の写真に戻す">
+                                    ↺ 元写真に戻す
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 撮影なしでもすぐ試せるクイック画像選択 -->
+                        <div class="preset-img-selector">
+                            <span class="preset-label">クイック写真:</span>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('black_cap', 'クラシック ベースボールキャップ')">黒キャップ</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒ボトムス</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('white_sneakers', '白レザースニーカー')">白スニーカー</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('grey_hoodie', 'ヘビーウェイト グレーパーカー')">グレーパーカー</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('white_tshirt', 'リラックス 白Tシャツ')">白Tシャツ</button>
+                            <button type="button" class="preset-img-btn"
+                                onclick="selectPresetImage('denim_jacket', 'オーバーサイズ デニムジャケット')">デニムジャケット</button>
+                        </div>
+                    </div>
+
+                    <!-- 服名 -->
+                    <div class="form-group">
+                        <label class="form-label" for="closet-item-name">服の名前・ブランド <span
+                                class="required">*</span></label>
+                        <input type="text" id="closet-item-name" class="form-input" placeholder="例: 黒ワイドタックスラックス、白スニーカー"
+                            required>
+                    </div>
+
+                    <!-- カテゴリ -->
+                    <div class="form-group">
+                        <label class="form-label">カテゴリ <span class="required">*</span></label>
+                        <div class="category-radio-grid">
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="HAT" required>
+                                <span>帽子 (キャップ/ハット/ニット帽)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="TOPS" required>
+                                <span>トップス (Tシャツ/ニット/パーカー)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="BOTTOMS" required checked>
+                                <span>ボトムス (スラックス/デニム/スウェット)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="OUTER" required>
+                                <span>アウター (コート/ジャケット)</span>
+                            </label>
+                            <label class="cat-radio-label">
+                                <input type="radio" name="closet_category" value="SHOES" required>
+                                <span>靴 (スニーカー/革靴/ブーツ)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- メインカラー -->
+                        <div class="form-group flex-1">
+                            <label class="form-label" for="closet-item-color">メインの色 <span
+                                    class="required">*</span></label>
+                            <select id="closet-item-color" class="form-input" required>
+                                <option value="BLACK" selected>BLACK (ブラック・黒)</option>
+                                <option value="WHITE">WHITE (ホワイト・白)</option>
+                                <option value="CHARCOAL">CHARCOAL (チャコール・濃灰)</option>
+                                <option value="GREY">GREY (グレー・灰)</option>
+                                <option value="NAVY">NAVY (ネイビー・紺)</option>
+                                <option value="BEIGE">BEIGE (ベージュ・生成)</option>
+                                <option value="BROWN">BROWN (ブラウン・茶)</option>
+                                <option value="BLUE">BLUE (ブルー・青・デニム)</option>
+                                <option value="OTHER">OTHER (その他)</option>
+                            </select>
+                        </div>
+
+                        <!-- 季節 -->
+                        <div class="form-group flex-1">
+                            <label class="form-label" for="closet-item-season">着用季節 <span
+                                    class="required">*</span></label>
+                            <select id="closet-item-season" class="form-input" required>
+                                <option value="通年" selected>通年 (オールシーズン)</option>
+                                <option value="春">春 (Spring)</option>
+                                <option value="夏">夏 (Summer)</option>
+                                <option value="秋">秋 (Autumn)</option>
+                                <option value="冬">冬 (Winter)</option>
+                                <option value="秋冬">秋冬 (Fall/Winter)</option>
+                                <option value="春夏">春夏 (Spring/Summer)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddClosetModal()">キャンセル</button>
+                        <button type="submit" class="btn btn-primary" id="btn-closet-submit"
+                            onclick="handleAddClosetItem(event)">クローゼットに登録する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作通知用トーストメッセージコンテナ -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+

@@ -1,0 +1,1720 @@
+@charset "UTF-8";
+/* ========================================================================== */
+/* MANEKIN FASHION - EC・ショッピング機能スタイル (shop.css)
+/* ========================================================================== */
+/* --- 5. メインビジュアル（HERO） --- */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 85vh;
+    min-height: 520px;
+    max-height: 800px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 0 24px;
+    color: var(--color-white);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subheading {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-heading {
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+}
+
+.hero-description {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: 580px;
+    margin-bottom: 32px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* --- 6. 汎用ボタンコンポーネント --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: center;
+    border-radius: 0;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: 1px solid var(--color-black);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-dark);
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.btn-secondary {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    border: 1px solid var(--color-white);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    opacity: 0.95;
+    transform: translateY(-2px);
+}
+
+.btn-outline-sm {
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    border: 1px solid var(--color-black);
+    background-color: transparent;
+    color: var(--color-black);
+}
+
+.btn-outline-sm:hover {
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.btn-block {
+    width: 100%;
+    display: block;
+}
+
+/* 今すぐ購入するボタン（アンダーライン・太字） */
+.btn-buy-now {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: 1px solid var(--color-black);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 16px;
+}
+
+.btn-buy-now:hover {
+    background-color: #2b2b2b;
+    transform: translateY(-2px);
+}
+
+/* --- 7. セクション共通見出し --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 36px;
+    gap: 16px;
+}
+
+.section-title-wrap {
+    min-width: 0;
+}
+
+.section-header.text-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-en-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--color-gray-medium);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.section-jp-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-black);
+}
+
+.section-divider {
+    width: 40px;
+    height: 2px;
+    background-color: var(--color-black);
+    margin: 16px auto 0;
+}
+
+.view-more-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-black);
+    padding-bottom: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* --- 8. ブランドコンセプト（CONCEPT） --- */
+.concept-section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+}
+
+.concept-card {
+    padding: 32px 24px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    transition: transform var(--transition-fast);
+}
+
+.concept-card:hover {
+    transform: translateY(-4px);
+}
+
+.concept-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--color-gray-medium);
+    display: block;
+    margin-bottom: 12px;
+}
+
+.concept-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+}
+
+.concept-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--color-gray-dark);
+}
+
+/* --- 9. おすすめ商品 & 新作セクション --- */
+.featured-section,
+.new-arrivals-section {
+    padding-top: 40px;
+    padding-bottom: 80px;
+}
+
+/* --- 10. 商品グリッド & 商品カード --- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 20px;
+}
+
+.product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-white);
+    transition: transform var(--transition-fast);
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+}
+
+.product-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-gray-bg);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+.badge-new {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    z-index: 2;
+}
+
+.fav-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark);
+    z-index: 5;
+    box-shadow: var(--shadow-subtle);
+    transition: all var(--transition-fast);
+}
+
+.fav-btn:hover {
+    transform: scale(1.15);
+    background-color: var(--color-white);
+}
+
+.fav-btn.is-favorite {
+    color: var(--color-accent);
+}
+
+.fav-btn.is-favorite svg {
+    fill: var(--color-accent);
+}
+
+.fav-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: fill var(--transition-fast);
+}
+
+.product-info {
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-category {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.product-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-black);
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.product-name:hover {
+    color: var(--color-gray-dark);
+}
+
+.product-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-top: auto;
+}
+
+.product-price .tax {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-gray-medium);
+    margin-left: 4px;
+}
+
+/* --- 11. MANEKINティーザーバナー --- */
+.banner-section {
+    padding-top: 20px;
+    padding-bottom: 60px;
+}
+
+.manekin-teaser-banner {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    border: 1px solid #333333;
+}
+
+.teaser-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 12px;
+    margin-bottom: 16px;
+}
+
+.teaser-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.teaser-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+    margin: 0 auto 28px;
+    line-height: 1.8;
+}
+
+.btn-teaser {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-weight: 600;
+    padding: 12px 28px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-teaser:hover {
+    background-color: var(--color-gray-light);
+    transform: translateY(-2px);
+}
+
+/* --- 12. ページコンテナとパンくず --- */
+.page-container {
+    padding-top: 32px;
+    padding-bottom: 80px;
+}
+
+.page-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 24px;
+}
+
+.page-breadcrumb a:hover {
+    color: var(--color-black);
+    text-decoration: underline;
+}
+
+.page-header {
+    margin-bottom: 36px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+.page-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-gray-medium);
+}
+
+/* --- 13. カタログコントロール（フィルター & ソート） --- */
+.catalog-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--color-gray-light);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    color: var(--color-dark);
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border-color: var(--color-black);
+}
+
+.sort-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-label {
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+}
+
+.sort-select {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    cursor: pointer;
+    outline: none;
+}
+
+/* --- 14. 商品詳細ページ（ITEM DETAIL）レイアウト --- */
+.item-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+    margin-top: 16px;
+}
+
+.detail-gallery {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+}
+
+.detail-main-img-box {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: var(--color-gray-bg);
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-gray-light);
+    position: relative;
+}
+
+.detail-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.25s ease-in-out;
+}
+
+.detail-info-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-meta {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.detail-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.detail-price-box {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.detail-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.detail-tax {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    margin-left: 6px;
+}
+
+/* カラー・サイズ選択 */
+.detail-options {
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.option-group-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-selected-label {
+    font-weight: 700;
+    color: var(--color-black);
+}
+
+.color-chips,
+.size-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* カラーチップ（ボタン） */
+.color-chip {
+    padding: 8px 18px;
+    border: 2px solid var(--color-gray-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: var(--color-white);
+    color: var(--color-black);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.color-chip:hover {
+    border-color: var(--color-gray-medium);
+}
+
+.color-chip.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+/* サイズチップ（正方形ボタン） */
+.size-chip {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-gray-light);
+    font-size: 0.9rem;
+    font-weight: 700;
+    background-color: var(--color-white);
+    color: var(--color-black);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.size-chip:hover {
+    border-color: var(--color-gray-medium);
+}
+
+.size-chip.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+/* 詳細アクションボタン群 */
+.detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.btn-detail-fav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--color-black);
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: var(--color-white);
+}
+
+.btn-detail-fav.is-favorite {
+    background-color: #fff0f0;
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.btn-detail-fav.is-favorite svg {
+    fill: var(--color-accent);
+}
+
+.detail-description-box {
+    border-top: 1px solid var(--color-gray-light);
+    padding-top: 24px;
+}
+
+.detail-desc-heading {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.detail-desc-text {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--color-gray-dark);
+    margin-bottom: 20px;
+}
+
+.detail-spec-list {
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+    line-height: 2;
+}
+
+/* --- 15. 本格的な購入手続き（CHECKOUT） --- */
+.checkout-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto 36px;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--color-gray-light);
+    color: var(--color-gray-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.step-item.active .step-num {
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.step-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-medium);
+}
+
+.step-item.active .step-text {
+    color: var(--color-black);
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--color-gray-light);
+    margin: 0 12px 20px;
+}
+
+.step-line.active {
+    background-color: var(--color-black);
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+.checkout-section-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.checkout-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sec-badge {
+    width: 26px;
+    height: 26px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* カートアイテム行 */
+.checkout-cart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-gray-bg);
+    gap: 16px;
+}
+
+.cart-item-thumb {
+    width: 64px;
+    height: 80px;
+    object-fit: cover;
+    background-color: #eee;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cart-item-meta {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 4px;
+}
+
+.cart-item-price {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cart-qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-gray-light);
+    background-color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.cart-qty-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.cart-remove-btn {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* フォーム行 */
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+/* 支払い方法選択グリッド */
+.payment-method-box {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-gray-light);
+}
+
+.payment-box-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.payment-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.payment-option-label {
+    border: 2px solid var(--color-gray-light);
+    padding: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all var(--transition-fast);
+}
+
+.payment-option-label.selected {
+    border-color: var(--color-black);
+    background-color: var(--color-gray-bg);
+}
+
+.pay-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.pay-sub {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+}
+
+.credit-card-inputs {
+    background-color: var(--color-gray-bg);
+    padding: 20px;
+    border: 1px solid var(--color-gray-light);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* チェックアウト金額サマリーサイドバー */
+.checkout-summary-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 32px;
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    box-shadow: var(--shadow-subtle);
+}
+
+.summary-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.summary-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--color-gray-dark);
+}
+
+.text-muted {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+}
+
+.summary-divider {
+    height: 1px;
+    background-color: var(--color-gray-light);
+    margin: 8px 0;
+}
+
+.summary-row.total-row {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-black);
+    padding-top: 4px;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+}
+
+/* 注文確定ボタン */
+.btn-place-order {
+    padding: 18px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn-place-order:hover {
+    background-color: #222;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.order-btn-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.order-btn-sub {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+.summary-security-note {
+    font-size: 0.75rem;
+    color: var(--color-gray-medium);
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.5;
+}
+
+/* 注文完了サンクスカード */
+.order-completed-view {
+    max-width: 650px;
+    margin: 40px auto;
+}
+
+.completed-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    padding: 48px 36px;
+    box-shadow: var(--shadow-card);
+}
+
+.completed-check-icon {
+    width: 72px;
+    height: 72px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.completed-check-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.completed-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    padding: 4px 12px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.completed-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.completed-subtitle {
+    font-size: 0.95rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 28px;
+}
+
+.completed-details-box {
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.comp-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.highlight-price {
+    font-size: 1.25rem;
+    color: var(--color-black);
+}
+
+.completed-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* --- 16. お気に入り一覧（FAVORITE） --- */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    grid-column: 1 / -1;
+}
+
+.empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    color: var(--color-gray-medium);
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    font-size: 0.9rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 24px;
+}
+
+/* --- 17. 会員登録 & ログイン（AUTH） --- */
+.auth-card {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 48px 40px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    box-shadow: var(--shadow-subtle);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+
+.auth-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+.form-label .required {
+    color: var(--color-accent);
+}
+
+.form-input {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    border: 1px solid var(--color-gray-light);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.form-input:focus {
+    border-color: var(--color-black);
+}
+
+.form-error {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    min-height: 18px;
+}
+
+.form-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.form-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.demo-login-btn {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    padding: 10px;
+    border-color: var(--color-gray-light);
+}
+
+.auth-footer {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-gray-light);
+    text-align: center;
+}
+
+.auth-switch-text {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    margin-bottom: 8px;
+}
+
+.auth-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-black);
+    text-decoration: underline;
+}
+
+/* --- 18. マイページ（MYPAGE） --- */
+.mypage-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.user-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.user-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.user-display-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.membership-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.user-display-email {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
+.mypage-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    padding: 24px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.stat-unit {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--color-gray-medium);
+}
+
+.mypage-tabs {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--color-gray-light);
+    margin-bottom: 28px;
+    overflow-x: auto;
+}
+
+.mypage-tab-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-gray-medium);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+}
+
+.mypage-tab-btn.active {
+    color: var(--color-black);
+    border-bottom-color: var(--color-black);
+}
+
+.mypage-tab-content {
+    display: none;
+}
+
+.mypage-tab-content.active {
+    display: block;
+}
+
+.orders-section-header {
+    margin-bottom: 16px;
+}
+
+.orders-subheading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.orders-info-text {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+}
+
+.orders-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--color-gray-light);
+    box-sizing: border-box;
+    display: block;
+}
+
+.orders-table {
+    width: 100%;
+    min-width: 540px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.orders-table th {
+    background-color: var(--color-gray-bg);
+    padding: 14px 18px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.orders-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 2px;
+}
+
+.python-features-card {
+    padding: 32px;
+    background-color: var(--color-gray-bg);
+    border: 1px solid var(--color-gray-light);
+}
+
+.python-card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.python-card-desc {
+    font-size: 0.9rem;
+    color: var(--color-gray-dark);
+    margin-bottom: 24px;
+}
+
+.python-roadmap-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.roadmap-item {
+    padding: 20px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+}
+
+.roadmap-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    margin-bottom: 8px;
+}
+
+.roadmap-item h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.roadmap-item p {
+    font-size: 0.85rem;
+    color: var(--color-gray-medium);
+    line-height: 1.6;
+}
+
+/* --- 19. MANEKIN「開発中」モーダル --- */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.modal-backdrop.open,
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-dialog {
+    background-color: var(--color-white);
+    max-width: 480px;
+    width: 90%;
+    padding: 36px 32px;
+    position: relative;
+    box-shadow: var(--shadow-modal);
+    transform: translateY(20px);
+    transition: transform var(--transition-smooth);
+}
+
+.modal-backdrop.open .modal-dialog,
+.modal-backdrop.active .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 3px 8px;
+}
+
+.modal-close-btn {
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--color-dark);
+}
+
+.modal-icon-wrap {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-bg);
+    border-radius: 50%;
+}
+
+.modal-sparkle-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-black);
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+}
+
+.modal-subtext {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-gray-medium);
+    margin-bottom: 20px;
+}
+
+.modal-description {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--color-gray-dark);
+    margin-bottom: 28px;
+}
+
+/* --- 20. トースト通知コンポーネント --- */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4000;
+    pointer-events: none;
+}
+
+.toast-message {
+    pointer-events: auto;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 14px 24px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 260px;
+    animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast-message.toast-fadeout {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 21. フッター --- */
+.site-footer {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding-top: 64px;
+    padding-bottom: 40px;
+    margin-top: auto;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.footer-logo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.footer-concept-text {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.65);
+    max-width: 320px;
+}
+
+.footer-col-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-link-list a {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.65);
+    transition: color var(--transition-fast);
+}
+
+.footer-link-list a:hover {
+    color: var(--color-white);
+    opacity: 1;
+}
+
+.footer-bottom {
+    padding-top: 32px;
+    text-align: center;
+}
+
+.copyright {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.05em;
+}
+

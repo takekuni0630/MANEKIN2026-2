@@ -1,0 +1,139 @@
+<!-- ========================================================================== -->
+<!-- MANEKIN FASHION - ヘッダー & モバイルドロワーナビゲーション (header.html) -->
+<!-- ========================================================================== -->
+
+    <header class="site-header" id="site-header">
+        <!-- ヘッダー内部のコンテナラッパー -->
+        <div class="header-container">
+            <!-- ブランドロゴエリア（クリックでトップページへ遷移） -->
+            <a href="#home" class="brand-logo" id="brand-logo" aria-label="MANEKIN FASHION トップへ">
+                <!-- ロゴテキスト表示 -->
+                <span class="logo-text">MANEKIN</span>
+                <!-- サブロゴテキスト表示 -->
+                <span class="logo-subtext">FASHION</span>
+            </a>
+
+            <!-- デスクトップ用ナビゲーションメニューの開始 -->
+            <nav class="desktop-nav" aria-label="メインナビゲーション">
+                <!-- ナビゲーションリスト -->
+                <ul class="nav-list">
+                    <!-- HOMEリンク項目 -->
+                    <li class="nav-item">
+                        <a href="#home" class="nav-link active" data-nav="home">HOME</a>
+                    </li>
+                    <!-- MEN（メンズアイテム）リンク項目 -->
+                    <li class="nav-item">
+                        <a href="#men" class="nav-link" data-nav="men">MEN</a>
+                    </li>
+                    <!-- WOMEN（ウィメンズアイテム）リンク項目 -->
+                    <li class="nav-item">
+                        <a href="#women" class="nav-link" data-nav="women">WOMEN</a>
+                    </li>
+                    <!-- MANEKIN機能リンク項目（AIコーデシミュレーション・スタジオへ遷移） -->
+                    <li class="nav-item">
+                        <a href="#manekin-studio" class="nav-link nav-manekin-btn" id="manekin-menu-btn"
+                            data-nav="manekin-studio">
+                            MANEKIN
+                            <!-- 先端的な機能であることを示すミニタグ -->
+                            <span class="nav-tag">AI</span>
+                        </a>
+                    </li>
+                    <!-- ログインまたはマイページリンク項目（JSで動的切り替え） -->
+                    <li class="nav-item" id="nav-auth-container">
+                        <!-- 未ログイン時はLOGINリンク -->
+                        <a href="#login" class="nav-link" id="nav-auth-link" data-nav="login">LOGIN</a>
+                    </li>
+                    <!-- マイページリンク項目（常設アクセス用） -->
+                    <li class="nav-item" id="nav-mypage-container">
+                        <a href="#mypage" class="nav-link" data-nav="mypage">MYPAGE</a>
+                    </li>
+                </ul>
+                <!-- デスクトップナビゲーション終了 -->
+            </nav>
+
+            <!-- ヘッダー右側のユーザーツールアイコン群 -->
+            <div class="header-tools">
+                <!-- 【要件追加】ユーザーのツールアイコンの左側に配置する購入ボタン（ショッピングバッグ） -->
+                <!-- ショッピングカートアイコンボタン -->
+                <a href="#checkout" class="tool-icon-btn cart-icon-btn" id="header-cart-btn"
+                    aria-label="ショッピングカート / ご注文手続きへ">
+                    <!-- ショッピングカートSVGアイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <!-- カート内商品点数を表示するバッジ -->
+                    <span class="icon-badge" id="header-cart-badge">0</span>
+                </a>
+
+                <!-- お気に入りクイックアイコンボタン -->
+                <a href="#favorites" class="tool-icon-btn" aria-label="お気に入り一覧を表示">
+                    <!-- ハートアイコンSVG -->
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                    </svg>
+                    <!-- アイコン上の件数バッジ -->
+                    <span class="icon-badge" id="icon-fav-badge">0</span>
+                </a>
+
+                <!-- アカウントクイックアイコンボタン -->
+                <a href="#mypage" class="tool-icon-btn" aria-label="マイページを表示">
+                    <!-- ユーザーアイコンSVG -->
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+
+                <!-- モバイル用ハンバーガーメニューボタン -->
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開閉する">
+                    <!-- ハンバーガーの3本線アイコン -->
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
+        </div>
+        <!-- グローバルサイトヘッダーの終了 -->
+    </header>
+
+    <!-- モバイル用スライドインナビゲーションメニューの開始 -->
+    <div class="mobile-menu-drawer" id="mobile-menu-drawer">
+        <!-- ドロワー内部のコンテナ -->
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <span class="drawer-logo">MANEKIN FASHION</span>
+                <!-- 閉じるボタン -->
+                <button class="drawer-close-btn" id="drawer-close-btn" aria-label="メニューを閉じる">×</button>
+            </div>
+            <!-- モバイル用ナビリスト -->
+            <ul class="mobile-nav-list">
+                <li><a href="#home" class="mobile-nav-link" data-mobile-nav="home">HOME</a></li>
+                <li><a href="#men" class="mobile-nav-link" data-mobile-nav="men">MEN (メンズ)</a></li>
+                <li><a href="#women" class="mobile-nav-link" data-mobile-nav="women">WOMEN (ウィメンズ)</a></li>
+                <li><a href="#checkout" class="mobile-nav-link" data-mobile-nav="checkout">CART (ショッピングカート)</a></li>
+                <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
+                <li><a href="#manekin-studio" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn"
+                        data-mobile-nav="manekin-studio">MANEKIN <span class="nav-tag">AI</span></a></li>
+                <li class="mobile-divider"></li>
+                <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN
+                        (ログイン)</a></li>
+                <li><a href="#register" class="mobile-nav-link" id="mobile-register-link"
+                        data-mobile-nav="register">REGISTER (会員登録)</a></li>
+                <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE
+                        (マイページ)</a></li>
+            </ul>
+            <!-- ドロワー下部フッター情報（下まで届いて自然なプロECレイアウト） -->
+            <div class="drawer-footer">
+                <p class="drawer-footer-text">研ぎ澄まされたシンプルを日常に。<br>2026 SS COLLECTION</p>
+                <p class="drawer-copyright">&copy; 2026 MANEKIN FASHION Co., Ltd.</p>
+            </div>
+        </div>
+    </div>
+    <!-- モバイルメニューの背景オーバーレイ -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- メインコンテンツ領域の開始 -->

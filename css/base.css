@@ -1,0 +1,667 @@
+@charset "UTF-8";
+/* ========================================================================== */
+/* MANEKIN FASHION - 基本・共通スタイル (base.css)
+/* ========================================================================== */
+@charset "UTF-8";
+/* ========================================================================== */
+/* MANEKIN FASHION - メインスタイルシート (style.css)                          */
+/* UNIQLO / GU ライクなモノトーン・ミニマル・モダンECデザイン                 */
+/* ========================================================================== */
+
+/* --- 1. CSS変数・カラーパレット・フォント設計 --- */
+:root {
+    /* プライマリカラー: 純黒 */
+    --color-black: #111111;
+    /* セカンダリカラー: 濃いダークグレー */
+    --color-dark: #222222;
+    /* 本文用ミッドグレー */
+    --color-gray-dark: #444444;
+    /* 補助テキスト用グレー */
+    --color-gray-medium: #777777;
+    /* 境界線・区切り線用ライトグレー */
+    --color-gray-light: #e5e5e5;
+    /* 背景用オフホワイト */
+    --color-gray-bg: #f7f7f7;
+    /* 純白 */
+    --color-white: #ffffff;
+    /* アクセントカラー: お気に入り等のレッド */
+    --color-accent: #e53935;
+    /* MANEKIN機能用テックブラック/シルバー */
+    --color-tech: #000000;
+
+    /* 基本フォントファミリー（欧文Inter、和文Noto Sans JP） */
+    --font-primary: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* ヘッダーの高さ設定 */
+    --header-height: 72px;
+    /* 最大コンテンツ幅 */
+    --container-max-width: 1200px;
+
+    /* トランジション速度 */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* 影の定義 */
+    --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* --- 2. リセットCSSとベース要素スタイル --- */
+/* 全要素のボックスサイズ基準をボーダーボックスに統一 */
+*,
+*::before,
+*::after {
+    /* パディングやボーダーを含めて幅・高さを計算 */
+    box-sizing: border-box;
+    /* デフォルトマージンをリセット */
+    margin: 0;
+    /* デフォルトパディングをリセット */
+    padding: 0;
+}
+
+/* HTMLの基本スクロール挙動 */
+html {
+    /* 画面全体の高さを確保 */
+    height: 100%;
+    /* スムーズスクロールを有効化 */
+    scroll-behavior: smooth;
+    /* フォントサイズの基準設定 */
+    font-size: 16px;
+    /* 横スクロールのはみ出しを確実に防止 */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* bodyタグの全体基本設計 */
+body {
+    /* フォントファミリーを適用 */
+    font-family: var(--font-primary);
+    /* デフォルト文字色を黒に指定 */
+    color: var(--color-black);
+    /* サイト背景色を白に指定 */
+    background-color: var(--color-white);
+    /* 行間を美しく設定 */
+    line-height: 1.65;
+    /* テキストのアンチエイリアス処理で文字を滑らかに表示 */
+    -webkit-font-smoothing: antialiased;
+    /* Firefox用の文字滑らか設定 */
+    -moz-osx-font-smoothing: grayscale;
+    /* 横スクロールのはみ出しを防止 */
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    /* スティッキーフッター用フレックスコンテナ */
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* リンク要素の基本装飾 */
+a {
+    /* 文字色を親から継承 */
+    color: inherit;
+    /* 下線を非表示 */
+    text-decoration: none;
+    /* ホバー時の変化を滑らかに */
+    transition: opacity var(--transition-fast);
+}
+
+/* リンクホバー時の汎用効果 */
+a:hover {
+    /* やや透過してクリック可能であることを明示 */
+    opacity: 0.75;
+}
+
+/* リスト要素のスタイルリセット */
+ul,
+ol {
+    /* 点や数字のビュレットを非表示 */
+    list-style: none;
+}
+
+/* 画像要素のレスポンシブ共通設定 */
+img {
+    /* 親要素の幅を超えないように最大幅を設定 */
+    max-width: 100%;
+    /* 高さはアスペクト比を自動維持 */
+    height: auto;
+    /* 画像下の微小な隙間を解消 */
+    display: block;
+}
+
+/* ボタン要素のリセット */
+button {
+    /* 背景色を透過 */
+    background: none;
+    /* ボーダーを解除 */
+    border: none;
+    /* フォントを親から継承 */
+    font-family: inherit;
+    /* 文字サイズを継承 */
+    font-size: inherit;
+    /* マウスカーソルをポインターに変更 */
+    cursor: pointer;
+    /* 遷移効果を適用 */
+    transition: all var(--transition-fast);
+}
+
+/* コンテナクラス（幅の統一） */
+.container {
+    /* 横幅を100%に */
+    width: 100%;
+    /* 最大幅を設定 */
+    max-width: var(--container-max-width);
+    /* 最小幅リセットで突き破り防止 */
+    min-width: 0;
+    /* パディングを含める */
+    box-sizing: border-box;
+    /* 左右中央揃え */
+    margin-left: auto;
+    margin-right: auto;
+    /* 左右の内部余白 */
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* テキスト折り返し・改行制御ユーティリティ */
+.keep-phrase {
+    display: inline-block;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+/* --- 3. ヘッダーとナビゲーション --- */
+.site-header {
+    /* 画面上部に固定 */
+    position: fixed;
+    /* 上端に密着 */
+    top: 0;
+    /* 左端に密着 */
+    left: 0;
+    /* 横幅を100%に */
+    width: 100%;
+    /* ヘッダーの固定高さを指定 */
+    height: var(--header-height);
+    /* すりガラス風の白背景 */
+    background-color: rgba(255, 255, 255, 0.95);
+    /* 背景をぼかすグラスモフィズム */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 下部に極細のグレー境界線 */
+    border-bottom: 1px solid var(--color-gray-light);
+    /* 最前面に表示 */
+    z-index: 1000;
+    /* 表示変化のスムーズアニメーション */
+    transition: all var(--transition-normal);
+}
+
+/* ヘッダー内部のコンテナ */
+.header-container {
+    /* 最大幅を指定 */
+    max-width: var(--container-max-width);
+    /* 中央揃え */
+    margin: 0 auto;
+    /* 左右余白 */
+    padding: 0 24px;
+    /* 高さを100%に */
+    height: 100%;
+    /* フレックスボックスで配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 左右の要素を端と端に配置 */
+    justify-content: space-between;
+}
+
+/* ブランドロゴ */
+.brand-logo {
+    /* インラインフレックスで配置 */
+    display: inline-flex;
+    /* 縦並びに配置 */
+    flex-direction: column;
+    /* 行間を詰める */
+    line-height: 1;
+}
+
+/* ロゴのメインテキスト */
+.logo-text {
+    /* フォントサイズを大きく */
+    font-size: 1.5rem;
+    /* 極太ウェイトでUNIQLO風の存在感 */
+    font-weight: 700;
+    /* 文字間隔を広げる */
+    letter-spacing: 0.15em;
+    /* 黒文字 */
+    color: var(--color-black);
+}
+
+/* ロゴのサブテキスト */
+.logo-subtext {
+    /* 小さめのフォントサイズ */
+    font-size: 0.65rem;
+    /* 細字ウェイト */
+    font-weight: 400;
+    /* 広い文字間隔 */
+    letter-spacing: 0.35em;
+    /* グレーカラー */
+    color: var(--color-gray-medium);
+    /* 上部に少しマージン */
+    margin-top: 2px;
+}
+
+/* デスクトップナビゲーション */
+.desktop-nav {
+    /* デスクトップで表示 */
+    display: block;
+}
+
+/* ナビゲーションリスト */
+.nav-list {
+    /* フレックスボックスで横並び */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* メニュー間の間隔 */
+    gap: 28px;
+}
+
+/* ナビゲーションリンク */
+.nav-link {
+    /* フォントサイズ */
+    font-size: 0.85rem;
+    /* 中太ウェイト */
+    font-weight: 500;
+    /* 大文字変換 */
+    text-transform: uppercase;
+    /* 文字間隔 */
+    letter-spacing: 0.08em;
+    /* 文字色 */
+    color: var(--color-dark);
+    /* 内部余白 */
+    padding: 8px 0;
+    /* 相対位置指定（下線アニメーション用） */
+    position: relative;
+    /* フレックスでタグと並べる */
+    display: inline-flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 間隔 */
+    gap: 6px;
+}
+
+/* ナビリンクのアクティブ下線エフェクト用疑似要素 */
+.nav-link::after {
+    /* 空のコンテンツ */
+    content: '';
+    /* 絶対配置 */
+    position: absolute;
+    /* 下端に配置 */
+    bottom: 0;
+    /* 左端から */
+    left: 0;
+    /* 初期幅は0% */
+    width: 0;
+    /* 下線の太さ */
+    height: 2px;
+    /* 下線の色を黒に */
+    background-color: var(--color-black);
+    /* スムーズに幅を拡大するトランジション */
+    transition: width var(--transition-fast);
+}
+
+/* ホバー時およびアクティブ時の下線拡大 */
+.nav-link:hover::after,
+.nav-link.active::after {
+    /* 横幅を100%に伸長 */
+    width: 100%;
+}
+
+/* ナビゲーション内バッジ（お気に入り件数） */
+.nav-badge {
+    /* 小さめの文字サイズ */
+    font-size: 0.7rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 背景色を黒に */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 円形パディング */
+    padding: 1px 6px;
+    /* 丸み */
+    border-radius: 10px;
+    /* 縦位置調整 */
+    vertical-align: middle;
+}
+
+/* MANEKIN機能用特別タグ */
+.nav-tag {
+    /* 極小フォント */
+    font-size: 0.6rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 背景を濃いグレー */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 内部余白 */
+    padding: 2px 5px;
+    /* 角丸 */
+    border-radius: 3px;
+    /* 文字間隔 */
+    letter-spacing: 0.05em;
+}
+
+/* MANEKIN特別ボタンスタイル */
+.nav-manekin-btn {
+    /* テック感のあるボールド */
+    font-weight: 600;
+}
+
+/* ヘッダー右ツール群 */
+.header-tools {
+    /* 横並び配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* アイコン間の間隔 */
+    gap: 16px;
+}
+
+/* 【要件追加】ユーザーのツールアイコンの左側に配置する購入ボタン（BAG / カートボタン） */
+.cart-tool-btn {
+    /* フレックス配置 */
+    display: flex;
+    /* 上下中央揃え */
+    align-items: center;
+    /* 間隔 */
+    gap: 8px;
+    /* 内部パディング */
+    padding: 7px 16px;
+    /* 背景色を黒に（視認性向上） */
+    background-color: var(--color-black);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 太字 */
+    font-weight: 700;
+    /* 文字サイズ */
+    font-size: 0.82rem;
+    /* 文字間隔 */
+    letter-spacing: 0.08em;
+    /* 境界線 */
+    border: 1px solid var(--color-black);
+    /* トランジション */
+    transition: all var(--transition-fast);
+    /* 角丸なし（GU/UNIQLOスタイル） */
+    border-radius: 0;
+}
+
+/* カートボタンのホバー */
+.cart-tool-btn:hover {
+    background-color: var(--color-dark);
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+/* カートボタン内のSVGアイコン */
+.cart-tool-btn .icon-svg {
+    width: 17px;
+    height: 17px;
+    color: var(--color-white);
+}
+
+/* カート内商品点数バッジ */
+.cart-badge {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    font-size: 0.72rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0 4px;
+}
+
+/* ツールアイコンボタン */
+.tool-icon-btn {
+    /* 相対位置指定（バッジ用） */
+    position: relative;
+    /* アイコンの中央配置 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* パディング */
+    padding: 6px;
+    /* 文字色 */
+    color: var(--color-black);
+}
+
+/* SVGアイコンのサイズ統一 */
+.icon-svg {
+    /* 幅22px */
+    width: 22px;
+    /* 高さ22px */
+    height: 22px;
+    /* 遷移効果 */
+    transition: transform var(--transition-fast);
+}
+
+/* ツールアイコンホバー効果 */
+.tool-icon-btn:hover .icon-svg {
+    /* わずかに拡大 */
+    transform: scale(1.1);
+}
+
+/* アイコン上の丸いバッジ */
+.icon-badge {
+    /* 絶対配置 */
+    position: absolute;
+    /* 右上に配置 */
+    top: -2px;
+    right: -4px;
+    /* 背景色を赤に */
+    background-color: var(--color-accent);
+    /* 白文字 */
+    color: var(--color-white);
+    /* 極小フォント */
+    font-size: 0.65rem;
+    /* 太字 */
+    font-weight: 700;
+    /* 最小幅 */
+    min-width: 16px;
+    /* 高さ */
+    height: 16px;
+    /* 上下左右中央 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 円形 */
+    border-radius: 50%;
+    /* パディング */
+    padding: 0 4px;
+}
+
+/* ハンバーガーメニューボタン */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 24px;
+    height: 20px;
+    padding: 0;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-black);
+    transition: all var(--transition-fast);
+}
+
+/* モバイルドロワーメニュー（画面最下部まで100%美しくフィット） */
+.mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 100vw;
+    height: 100%;
+    height: 100dvh;
+    background-color: var(--color-white);
+    z-index: 2500;
+    transition: right var(--transition-smooth);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+.mobile-menu-drawer.open {
+    right: 0;
+}
+
+.drawer-content {
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    min-height: 100dvh;
+    box-sizing: border-box;
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.drawer-logo {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-black);
+}
+
+.drawer-close-btn {
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--color-black);
+    padding: 6px;
+    cursor: pointer;
+}
+
+.mobile-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 0 auto;
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.98rem;
+    font-weight: 600;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--color-gray-light);
+    color: var(--color-black);
+}
+
+.mobile-divider {
+    margin: 8px 0;
+    border-top: 2px solid var(--color-gray-bg);
+}
+
+/* ドロワー下部フッター情報（下まで届いて自然なプロECレイアウト） */
+.drawer-footer {
+    margin-top: auto;
+    padding-top: 28px;
+    padding-bottom: 12px;
+}
+
+.drawer-footer-text {
+    font-size: 0.8rem;
+    color: var(--color-gray-medium);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.drawer-copyright {
+    font-size: 0.72rem;
+    color: var(--color-gray-medium);
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100%;
+    height: 100dvh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+    z-index: 2400;
+}
+
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- 4. ページビュー切り替え構造（SPA） --- */
+.main-content {
+    margin-top: var(--header-height);
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.page-view {
+    display: none;
+    animation: fadeIn 0.35s ease forwards;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.page-view.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

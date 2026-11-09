@@ -1751,8 +1751,15 @@
         }
     </script>
 
-    <!-- JavaScriptアプリケーションロジックファイルの読み込み -->
-    <script src="js/app.js?v=20261109_fav"></script>
+    <!-- 分割されたJavaScriptモジュールファイルの読み込み -->
+    <!-- 1. 商品カタログ・マスターデータ定義 -->
+    <script src="js/products-data.js?v=20261109"></script>
+    <!-- 2. ECショッピング機能（カタログ、詳細、カート、マイページ、認証） -->
+    <script src="js/shop.js?v=20261109"></script>
+    <!-- 3. MANEKIN AI STUDIO（試着室、マイクローゼット、AIコメント、コーデ保存） -->
+    <script src="js/studio.js?v=20261109"></script>
+    <!-- 4. アプリケーション本体（状態管理、ルーティング、初期化、イベント登録） -->
+    <script src="js/app.js?v=20261109"></script>
 </body>
 
 </html>

@@ -1,0 +1,129 @@
+<!-- ========================================================================== -->
+<!-- MANEKIN FASHION - マイページ & ご注文履歴一覧 (mypage.html) -->
+<!-- ========================================================================== -->
+
+        <section class="page-view" id="view-mypage">
+            <div class="container page-container">
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>MYPAGE</span>
+                </div>
+
+                <!-- マイページヘッダー -->
+                <div class="mypage-header-card">
+                    <div class="user-profile-info">
+                        <div class="user-avatar-circle">
+                            <span id="mypage-avatar-initial">G</span>
+                        </div>
+                        <div class="user-text-details">
+                            <div class="user-title-row">
+                                <h1 class="user-display-name" id="mypage-user-name">ゲスト 様</h1>
+                                <span class="membership-badge" id="mypage-user-rank">GUEST</span>
+                            </div>
+                            <p class="user-display-email" id="mypage-user-email">ログインしていません</p>
+                        </div>
+                    </div>
+                    <!-- アクションボタン（ログイン / ログアウト） -->
+                    <div class="mypage-actions" id="mypage-actions-wrapper">
+                        <a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>
+                    </div>
+                </div>
+
+                <!-- マイページの統計サマリーカード -->
+                <div class="mypage-stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">保有ポイント</span>
+                        <span class="stat-value" id="mypage-points">0 <span class="stat-unit">pt</span></span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">お気に入りアイテム</span>
+                        <span class="stat-value" id="mypage-fav-count">0 <span class="stat-unit">点</span></span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">ご注文回数</span>
+                        <span class="stat-value" id="mypage-order-count">0 <span class="stat-unit">回</span></span>
+                    </div>
+                </div>
+
+                <!-- マイページのメインコンテンツタブ -->
+                <div class="mypage-tabs">
+                    <button class="mypage-tab-btn active" data-tab="orders">購入履歴 (MySQL連携)</button>
+                    <button class="mypage-tab-btn" data-tab="favorites-summary">お気に入りクイック閲覧</button>
+                    <button class="mypage-tab-btn" data-tab="python-features">Python & MySQL連携機能</button>
+                </div>
+
+                <!-- タブ1: 購入履歴（【要件】購入ボタンを押して購入が完了した商品の一覧を表示） -->
+                <div class="mypage-tab-content active" id="tab-orders">
+                    <div class="orders-section-header"
+                        style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 class="orders-subheading">ご注文履歴一覧</h3>
+                            <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
+                            style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
+                            title="テスト注文履歴をリセットして0件にします">
+                            履歴をすべて初期化 (0件にする)
+                        </button>
+                    </div>
+                    <div class="orders-table-wrapper">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>注文番号</th>
+                                    <th>注文日時</th>
+                                    <th>注文明細（商品名 / カラー / サイズ / 数量）</th>
+                                    <th>合計金額</th>
+                                    <th>配送状況</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
+                                        購入履歴はまだありません。商品をお選びいただき購入手続きをお試しください。
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- タブ2: お気に入りクイック表示 -->
+                <div class="mypage-tab-content" id="tab-favorites-summary">
+                    <div class="product-grid" id="mypage-fav-grid">
+                        <!-- お気に入りアイテムを表示 -->
+                    </div>
+                </div>
+
+                <!-- タブ3: Python & MySQL連携機能ロードマップ -->
+                <div class="mypage-tab-content" id="tab-python-features">
+                    <div class="python-features-card">
+                        <h3 class="python-card-title">【稼働中】Python & MySQL バックエンド連携機能</h3>
+                        <p class="python-card-desc">MANEKIN FASHIONでは、MySQLデータベースとPython
+                            API（Flask）により以下の機能がシームレスに連動しています。</p>
+                        <div class="python-roadmap-list">
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Active DB</span>
+                                <h4>MySQL 注文管理トランザクション</h4>
+                                <p>チェックアウト画面で確定したご注文は、MySQLの `orders` および `order_items` テーブルへ安全に永続保存されます。</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 01</span>
+                                <h4>MANEKIN機能 (バーチャルマネキン試着)</h4>
+                                <p>ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用シルエットを事前に確認できる機能です。</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 02</span>
+                                <h4>マイクローゼット機能 (手持ち服管理)</h4>
+                                <p>写真一枚で手持ちの服をデジタルクローゼット化。ブランドアイテムとの組み合わせシミュレーションが可能です。</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <span class="roadmap-badge">Feature 03</span>
+                                <h4>AIコーデ提案機能 (スマートスタイリスト)</h4>
+                                <p>本日の天気・気温・着用シーン（オフィス、デート、カフェ）に合わせた最適なコーディネートをAIが毎朝提案します。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+

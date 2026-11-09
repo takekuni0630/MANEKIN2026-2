@@ -1,0 +1,242 @@
+<!-- ========================================================================== -->
+<!-- MANEKIN FASHION - カート & ご注文手続き (CHECKOUT) (checkout.html) -->
+<!-- ========================================================================== -->
+
+        <section class="page-view" id="view-checkout">
+            <div class="container page-container">
+                <div class="page-breadcrumb">
+                    <a href="#home">HOME</a> &gt; <span>CHECKOUT (ご購入手続き)</span>
+                </div>
+                <div class="page-header text-center">
+                    <h1 class="page-title">SHOPPING BAG & CHECKOUT</h1>
+                    <p class="page-subtitle">ご注文内容のご確認とお届け先・お支払い情報の入力</p>
+                </div>
+
+                <!-- チェックアウトステップナビゲーション -->
+                <div class="checkout-stepper">
+                    <div class="step-item active">
+                        <span class="step-num">1</span>
+                        <span class="step-text">注文商品</span>
+                    </div>
+                    <div class="step-line active"></div>
+                    <div class="step-item active">
+                        <span class="step-num">2</span>
+                        <span class="step-text">お届け先・決済</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step-item">
+                        <span class="step-num">3</span>
+                        <span class="step-text">注文確定</span>
+                    </div>
+                </div>
+
+                <!-- チェックアウトメイン領域（2カラム構造） -->
+                <div class="checkout-layout" id="checkout-layout-main">
+                    <!-- 左カラム: 注文商品一覧 ＆ お届け先・決済フォーム -->
+                    <div class="checkout-form-column">
+                        <!-- セクション1: カート内商品の確認 -->
+                        <div class="checkout-section-card">
+                            <h2 class="checkout-section-title">
+                                <span class="sec-badge">1</span> 注文商品一覧
+                            </h2>
+                            <div class="checkout-cart-list" id="checkout-cart-list">
+                                <!-- JavaScriptでカート内アイテムを描画 -->
+                            </div>
+                        </div>
+
+                        <!-- セクション2: お届け先情報の入力 -->
+                        <div class="checkout-section-card">
+                            <h2 class="checkout-section-title">
+                                <span class="sec-badge">2</span> お届け先情報
+                            </h2>
+                            <form id="checkout-form" class="checkout-form" novalidate>
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="order-name" class="form-label">お名前（氏名） <span
+                                                class="required">*</span></label>
+                                        <input type="text" id="order-name" class="form-input" placeholder="例: 山田 太郎"
+                                            required>
+                                        <span class="form-error" id="order-name-error"></span>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="order-phone" class="form-label">電話番号 <span
+                                                class="required">*</span></label>
+                                        <input type="tel" id="order-phone" class="form-input"
+                                            placeholder="例: 090-1234-5678" required>
+                                        <span class="form-error" id="order-phone-error"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="order-email" class="form-label">メールアドレス（注文確認メール送付先） <span
+                                            class="required">*</span></label>
+                                    <input type="email" id="order-email" class="form-input"
+                                        placeholder="例: example@manekin.com" required>
+                                    <span class="form-error" id="order-email-error"></span>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="order-postal" class="form-label">郵便番号 <span
+                                                class="required">*</span></label>
+                                        <input type="text" id="order-postal" class="form-input"
+                                            placeholder="例: 150-0001" required>
+                                    </div>
+                                    <div class="form-group flex-2">
+                                        <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
+                                                class="required">*</span></label>
+                                        <input type="text" id="order-address" class="form-input"
+                                            placeholder="例: 東京都渋谷区神宮前1-1-1 MANEKINビル 4F" required>
+                                        <span class="form-error" id="order-address-error"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="order-delivery-time" class="form-label">配送希望時間帯</label>
+                                    <select id="order-delivery-time" class="form-input">
+                                        <option value="指定なし">指定なし（最短でお届け）</option>
+                                        <option value="午前中 (8:00〜12:00)">午前中 (8:00〜12:00)</option>
+                                        <option value="14:00〜16:00">14:00〜16:00</option>
+                                        <option value="16:00〜18:00">16:00〜18:00</option>
+                                        <option value="18:00〜20:00">18:00〜20:00</option>
+                                        <option value="19:00〜21:00">19:00〜21:00</option>
+                                    </select>
+                                </div>
+
+                                <!-- セクション3: お支払い方法の選択 -->
+                                <div class="payment-method-box">
+                                    <h3 class="payment-box-title">お支払い方法の選択 <span class="required">*</span></h3>
+                                    <div class="payment-options-grid">
+                                        <label class="payment-option-label selected">
+                                            <input type="radio" name="payment_method" value="クレジットカード" checked>
+                                            <span class="pay-name">クレジットカード</span>
+                                            <span class="pay-sub">VISA / JCB / MASTER / AMEX</span>
+                                        </label>
+                                        <label class="payment-option-label">
+                                            <input type="radio" name="payment_method" value="PayPay">
+                                            <span class="pay-name">PayPay (オンライン決済)</span>
+                                            <span class="pay-sub">残高・クレジット決済</span>
+                                        </label>
+                                        <label class="payment-option-label">
+                                            <input type="radio" name="payment_method" value="あと払い (Paidy)">
+                                            <span class="pay-name">あと払い (Paidy)</span>
+                                            <span class="pay-sub">翌月コンビニ・口座振替</span>
+                                        </label>
+                                        <label class="payment-option-label">
+                                            <input type="radio" name="payment_method" value="代金引換">
+                                            <span class="pay-name">代金引換</span>
+                                            <span class="pay-sub">商品受け取り時にお支払い</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- クレジットカード入力模擬フォーム -->
+                                    <div class="credit-card-inputs" id="credit-card-subform">
+                                        <div class="form-group">
+                                            <label class="form-label">カード番号</label>
+                                            <input type="text" class="form-input" placeholder="例: 4123 4567 8901 2345">
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group flex-1">
+                                                <label class="form-label">有効期限 (月/年)</label>
+                                                <input type="text" class="form-input" placeholder="例: 08/29">
+                                            </div>
+                                            <div class="form-group flex-1">
+                                                <label class="form-label">セキュリティコード</label>
+                                                <input type="password" class="form-input" placeholder="例: 123">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 右カラム: 注文金額サマリー ＆ 注文確定ボタン -->
+                    <div class="checkout-summary-column">
+                        <div class="checkout-summary-card">
+                            <h3 class="summary-card-title">ご請求内容</h3>
+                            <div class="summary-rows">
+                                <div class="summary-row">
+                                    <span>商品合計</span>
+                                    <span id="checkout-subtotal">¥0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>配送料 <small class="text-muted">(5,000円以上で無料)</small></span>
+                                    <span id="checkout-shipping">¥550</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>消費税 (10% 内税)</span>
+                                    <span id="checkout-tax">¥0</span>
+                                </div>
+                                <div class="summary-divider"></div>
+                                <div class="summary-row total-row">
+                                    <span class="total-label">お支払い合計 (税込)</span>
+                                    <span class="total-amount" id="checkout-total">¥0</span>
+                                </div>
+                            </div>
+
+                            <!-- 【要件追加】注文を確定するボタン -->
+                            <button type="button" class="btn btn-primary btn-block btn-place-order"
+                                id="btn-place-order">
+                                <span class="order-btn-text">注文を確定する</span>
+                                <span class="order-btn-sub">（Python & MySQLへ保存されます）</span>
+                            </button>
+
+                            <p class="summary-security-note">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                SSL暗号化通信により、お客様の個人情報は安全に保護されます。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 注文完了（サンクス）ビュー（注文確定後に表示） -->
+                <div class="order-completed-view" id="order-completed-view" style="display: none;">
+                    <div class="completed-card text-center">
+                        <div class="completed-check-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <span class="completed-badge">ORDER COMPLETED</span>
+                        <h2 class="completed-title">ご注文が確定いたしました！</h2>
+                        <p class="completed-subtitle">MANEKIN FASHION をご利用いただき、誠にありがとうございます。</p>
+
+                        <div class="completed-details-box">
+                            <div class="comp-row">
+                                <span class="comp-label">注文管理番号:</span>
+                                <strong class="comp-value" id="comp-order-no">ORD-20261028-XXXX</strong>
+                            </div>
+                            <div class="comp-row">
+                                <span class="comp-label">ご注文日時:</span>
+                                <span class="comp-value" id="comp-order-date">2026/10/28</span>
+                            </div>
+                            <div class="comp-row">
+                                <span class="comp-label">お届け先:</span>
+                                <span class="comp-value" id="comp-order-address">東京都渋谷区</span>
+                            </div>
+                            <div class="comp-row">
+                                <span class="comp-label">お支払い合計:</span>
+                                <strong class="comp-value highlight-price" id="comp-order-total">¥0</strong>
+                            </div>
+                            <div class="comp-row">
+                                <span class="comp-label">データベース連携:</span>
+                                <span class="comp-value status-badge">MySQL (manekin_db) 保存完了</span>
+                            </div>
+                        </div>
+
+                        <div class="completed-actions">
+                            <a href="#mypage" class="btn btn-primary"
+                                onclick="window.location.hash='#mypage'">マイページの購入履歴を確認する</a>
+                            <a href="#items" class="btn btn-secondary"
+                                onclick="window.location.hash='#items'">買い物を続ける</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
