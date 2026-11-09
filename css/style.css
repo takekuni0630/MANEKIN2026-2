@@ -5359,18 +5359,23 @@ button {
         height: 12px;
     }
 
-    /* マネキン試着室: iPhoneの縦長画面に合わせた迫力ある大きさ */
+    /* マネキン試着室: スマホ画面に美しくフィットするコンパクトサイズ */
     .mannequin-stage-box {
-        min-height: 480px;
+        min-height: 370px !important;
         width: 100%;
-        padding: 14px 10px;
+        padding: 10px 8px !important;
         box-sizing: border-box;
     }
 
     .mannequin-model-wrap {
-        width: 240px;
-        height: 430px;
+        width: 195px !important;
+        height: 350px !important;
         margin: 0 auto;
+    }
+
+    .stage-brand-summary {
+        padding: 10px 12px;
+        margin-top: 8px;
     }
 
     /* ▼ AIコメントカード & コーディネート保存カード: コンパクト化 & 見切れ防止徹底 */
@@ -5768,8 +5773,13 @@ button {
         font-size: 0.85rem;
     }
 
+    .mannequin-stage-box {
+        min-height: 330px !important;
+        padding: 8px 6px !important;
+    }
+
     .mannequin-model-wrap {
-        width: 210px;
-        height: 380px;
+        width: 175px !important;
+        height: 310px !important;
     }
 }
