@@ -65,6 +65,10 @@ html {
     scroll-behavior: smooth;
     /* フォントサイズの基準設定 */
     font-size: 16px;
+    /* 横スクロールのはみ出しを確実に防止 */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 /* bodyタグの全体基本設計 */
@@ -83,6 +87,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
     /* 横スクロールのはみ出しを防止 */
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
     /* スティッキーフッター用フレックスコンテナ */
     min-height: 100%;
     display: flex;
@@ -140,8 +146,14 @@ button {
 
 /* コンテナクラス（幅の統一） */
 .container {
+    /* 横幅を100%に */
+    width: 100%;
     /* 最大幅を設定 */
     max-width: var(--container-max-width);
+    /* 最小幅リセットで突き破り防止 */
+    min-width: 0;
+    /* パディングを含める */
+    box-sizing: border-box;
     /* 左右中央揃え */
     margin-left: auto;
     margin-right: auto;
@@ -567,12 +579,18 @@ button {
     display: flex;
     flex-direction: column;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .page-view {
     display: none;
     animation: fadeIn 0.35s ease forwards;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .page-view.active {
@@ -2002,12 +2020,18 @@ button {
 }
 
 .orders-table-wrapper {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--color-gray-light);
+    box-sizing: border-box;
+    display: block;
 }
 
 .orders-table {
     width: 100%;
+    min-width: 540px;
     border-collapse: collapse;
     text-align: left;
     font-size: 0.9rem;
@@ -5489,14 +5513,114 @@ button {
         font-size: 0.85rem;
     }
 
-    /* フッター: ★ スマホ・モバイルで文字崩れ・右ズレを起こさない美しい2列＋全幅構成
+    /* マイページ・注文履歴テーブルのスマホ対応（ラッパー内スクロール保証 & 画面突き破り防止） */
+    .mypage-container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .mypage-tab-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .orders-section-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px;
+        margin-bottom: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .orders-subheading {
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .orders-info-text {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+
+    .orders-table-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--color-gray-light);
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: block;
+        margin-bottom: 24px;
+    }
+
+    .orders-table {
+        width: 100%;
+        min-width: 520px;
+        font-size: 0.8rem;
+        border-collapse: collapse;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 10px 12px;
+        white-space: nowrap;
+        font-size: 0.78rem;
+    }
+
+    .orders-table td:nth-child(3) {
+        white-space: normal;
+        min-width: 150px;
+    }
+
+    /* タブナビゲーションの横スクロール保証（画面幅突き破り防止） */
+    .mypage-tabs,
+    .studio-nav-tabs {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        box-sizing: border-box;
+    }
+
+    .mypage-tabs::-webkit-scrollbar,
+    .studio-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .studio-tab-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+        /* フッター: ★ スマホ・モバイルで文字崩れ・右ズレを起こさない美しい2列＋全幅構成
        上段: ブランドロゴ & コンセプト文（全幅）
        中段: NAVIGATION（左列 1fr） & MEMBERSHIP（右列 1fr）
        下段: HELP & INFO（全幅、2列グリッドでゆったり美しく配置） */
     .site-footer {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden;
         padding-top: 44px;
         padding-bottom: max(32px, env(safe-area-inset-bottom));
         margin-top: auto;
+    }
+
+    .footer-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        box-sizing: border-box !important;
     }
 
     .footer-top {
