@@ -4000,23 +4000,25 @@ button {
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .ai-score-label {
-    font-size: 0.76rem;
+    font-size: 0.8rem;
     color: var(--color-gray-medium);
+    white-space: nowrap;
 }
 
 .ai-score-stars {
-    color: #111111;
-    font-size: 0.8rem;
-    letter-spacing: 2px;
+    display: none !important;
 }
 
 .ai-score-val {
-    font-size: 0.88rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--color-black);
+    white-space: nowrap;
 }
 
 .ai-comment-body {
@@ -5410,9 +5412,53 @@ button {
         height: 410px;
     }
 
-    /* AIコメントカード: ゆったり余裕をもたせる */
+    /* AIコメントカード: ヘッダー1行化 & 余白確保 */
     .ai-comment-card {
         padding: 20px 18px;
+    }
+
+    .ai-comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+
+    .ai-header-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .ai-label {
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .ai-engine-tag {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+        white-space: nowrap;
+    }
+
+    .ai-header-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .ai-score-label {
+        font-size: 0.76rem;
+        white-space: nowrap;
+    }
+
+    .ai-score-val {
+        font-size: 0.95rem;
+        white-space: nowrap;
     }
 
     .ai-comment-text {

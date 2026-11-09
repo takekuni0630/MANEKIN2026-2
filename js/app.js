@@ -3146,7 +3146,7 @@ function updateAIStylingComment() {
         if (tagsElem) tagsElem.innerHTML = '<span class="ai-tag">#試着待ち</span>';
         if (dotsElem) dotsElem.innerHTML = '';
         if (scoreValElem) scoreValElem.textContent = '--点';
-        if (scoreStarsElem) scoreStarsElem.textContent = '☆☆☆☆☆';
+        if (scoreStarsElem) scoreStarsElem.textContent = '';
         return;
     }
 
@@ -3214,8 +3214,8 @@ function updateAIStylingComment() {
     if (tagsElem) {
         tagsElem.innerHTML = tags.map(t => `<span class="ai-tag" > ${t}</span> `).join('');
     }
-    if (scoreValElem) scoreValElem.textContent = `${score} 点`;
-    if (scoreStarsElem) scoreStarsElem.textContent = '★★★★★';
+    if (scoreValElem) scoreValElem.textContent = `${score}点`;
+    if (scoreStarsElem) scoreStarsElem.textContent = '';
 }
 
 // --------------------------------------------------------------------------
