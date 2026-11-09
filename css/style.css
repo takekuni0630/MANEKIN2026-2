@@ -5371,59 +5371,196 @@ button {
         margin: 0 auto;
     }
 
-    /* AIコメントカード: 1行化 & 余白確保 */
+    /* ▼ AIコメントカード & コーディネート保存カード: コンパクト化 & 見切れ防止徹底 */
+    .studio-bottom-panel {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 1. AIスタイリングコメントカード */
     .ai-comment-card {
-        padding: 18px 16px;
+        padding: 14px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        border-radius: 6px;
     }
 
     .ai-comment-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
         flex-wrap: nowrap;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--color-gray-light);
     }
 
     .ai-header-left {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
         min-width: 0;
     }
 
+    .ai-sparkle-dot {
+        width: 6px;
+        height: 6px;
+        flex-shrink: 0;
+    }
+
     .ai-label {
-        font-size: 0.78rem;
+        font-size: 0.7rem;
+        font-weight: 700;
         white-space: nowrap;
+        letter-spacing: 0.02em;
     }
 
     .ai-engine-tag {
-        font-size: 0.6rem;
-        padding: 1px 4px;
+        font-size: 0.54rem;
+        padding: 1px 3px;
         white-space: nowrap;
+        border-radius: 3px;
     }
 
     .ai-header-right {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         white-space: nowrap;
         flex-shrink: 0;
     }
 
     .ai-score-label {
-        font-size: 0.76rem;
+        font-size: 0.68rem;
         white-space: nowrap;
+        color: var(--color-gray-medium);
     }
 
     .ai-score-val {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
+        font-weight: 700;
         white-space: nowrap;
+        color: var(--color-black);
     }
 
     .ai-comment-text {
-        font-size: 0.88rem;
-        line-height: 1.75;
-        margin: 10px 0 14px;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        margin: 8px 0 10px;
+        color: var(--color-gray-dark);
+        word-break: break-word;
+    }
+
+    .ai-meta-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--color-gray-light);
+    }
+
+    .ai-tags-wrap {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .ai-tag {
+        font-size: 0.66rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+    }
+
+    .ai-palette-wrap {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .palette-label {
+        font-size: 0.66rem;
+        white-space: nowrap;
+    }
+
+    .palette-dots {
+        display: flex;
+        gap: 3px;
+    }
+
+    .palette-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* 2. コーディネートを保存カード */
+    .outfit-save-card {
+        padding: 14px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        border-radius: 6px;
+    }
+
+    .save-card-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .save-card-desc {
+        font-size: 0.74rem;
+        line-height: 1.45;
+        margin-bottom: 8px;
+        color: var(--color-gray-medium);
+        word-break: break-word;
+    }
+
+    .preset-name-chips {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .preset-chip {
+        font-size: 0.66rem;
+        padding: 2px 7px;
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    .save-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .outfit-name-input {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .save-outfit-btn {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        gap: 6px;
+    }
+
+    .save-outfit-btn svg {
+        width: 14px;
+        height: 14px;
     }
 
     /* プロフィール & 体型設定: 見切れ防止・スッキリ配置 */
