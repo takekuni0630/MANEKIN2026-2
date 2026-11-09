@@ -5368,18 +5368,19 @@ button {
         height: 12px;
     }
 
-    /* マネキン試着室: スマホ画面に美しくフィットするコンパクトサイズ */
+    /* マネキン試着室: 床プレートと服のプロポーションを完全同期（デスクトップ版と同一の黄金比） */
     .mannequin-stage-box {
-        min-height: 370px !important;
+        min-height: 540px !important;
         width: 100%;
-        padding: 10px 8px !important;
+        padding: 14px 10px 12px !important;
         box-sizing: border-box;
     }
 
     .mannequin-model-wrap {
-        width: 195px !important;
-        height: 350px !important;
+        width: 280px !important;
+        height: 480px !important;
         margin: 0 auto;
+        max-width: 100%;
     }
 
     .stage-brand-summary {
@@ -5783,12 +5784,15 @@ button {
     }
 
     .mannequin-stage-box {
-        min-height: 330px !important;
-        padding: 8px 6px !important;
+        min-height: 480px !important;
+        padding: 10px 6px !important;
     }
 
     .mannequin-model-wrap {
-        width: 175px !important;
-        height: 310px !important;
+        width: 280px !important;
+        height: 480px !important;
+        transform: scale(0.88);
+        transform-origin: center top;
+        margin-bottom: -55px;
     }
 }
