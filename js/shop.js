@@ -950,7 +950,7 @@ async function handleSyncAllToMySQL() {
             }
         }
 
-        // 5. 会員ポイント・体型プロフィールの同期
+        // 5. 会員ポイントの同期
         if (AppState.currentUser) {
             try {
                 await fetch(`${apiBase}/api/user/sync`, {
@@ -958,10 +958,7 @@ async function handleSyncAllToMySQL() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         user_id: userId,
-                        points: getUserPoints(),
-                        height: AppState.userBodyProfile ? AppState.userBodyProfile.height : 172,
-                        bodyType: AppState.userBodyProfile ? AppState.userBodyProfile.bodyType : 'REGULAR',
-                        styleTaste: AppState.userBodyProfile ? AppState.userBodyProfile.styleTaste : 'MINIMAL'
+                        points: getUserPoints()
                     })
                 });
             } catch (e) {}
@@ -1310,12 +1307,6 @@ async function handleLogin(e) {
 
     if (loggedInUser) {
         loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 1000;
-        if (loggedInUser.body_height && AppState.userBodyProfile) {
-            AppState.userBodyProfile.height = loggedInUser.body_height;
-            AppState.userBodyProfile.bodyType = loggedInUser.body_type || 'REGULAR';
-            AppState.userBodyProfile.styleTaste = loggedInUser.style_taste || 'MINIMAL';
-            localStorage.setItem('manekin_body_profile', JSON.stringify(AppState.userBodyProfile));
-        }
         AppState.currentUser = loggedInUser;
         localStorage.setItem('manekin_user', JSON.stringify(loggedInUser));
         resetMannequinOutfit(true);

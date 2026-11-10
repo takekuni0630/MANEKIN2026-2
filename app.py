@@ -434,10 +434,7 @@ def register_user():
                 "name": name,
                 "email": email,
                 "rank": "REGULAR MEMBER",
-                "points": 1000,
-                "body_height": 172,
-                "body_type": "REGULAR",
-                "style_taste": "MINIMAL"
+                "points": 1000
             }
         }), 201
 
@@ -451,7 +448,7 @@ def register_user():
 @app.route('/api/auth/login', methods=['POST'])
 def login_user():
     """
-    会員ログイン認証を行うエンドポイント（ポイント・体型情報も取得）
+    会員ログイン認証を行うエンドポイント（ポイント情報も取得）
     """
     req = request.get_json() or {}
     email = req.get('email', '').strip()
@@ -463,7 +460,7 @@ def login_user():
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT `id`, `name`, `email`, `rank`, `points`, `body_height`, `body_type`, `style_taste` FROM `users` WHERE `email` = %s AND `password_hash` = %s;", (email, password))
+            cursor.execute("SELECT `id`, `name`, `email`, `rank`, `points` FROM `users` WHERE `email` = %s AND `password_hash` = %s;", (email, password))
             user = cursor.fetchone()
             if not user:
                 return jsonify({"status": "error", "message": "メールアドレスまたはパスワードが正しくありません。"}), 401
@@ -486,7 +483,7 @@ def login_user():
 @app.route('/api/user/sync', methods=['POST'])
 def sync_user_data():
     """
-    ユーザーの保有ポイントや体型プロフィール設定をMySQLに同期保存
+    ユーザーの保有ポイントをMySQLに同期保存
     """
     req = request.get_json() or {}
     user_id = req.get('user_id')
@@ -494,9 +491,6 @@ def sync_user_data():
         return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
 
     points = req.get('points')
-    body_height = req.get('height')
-    body_type = req.get('bodyType')
-    style_taste = req.get('styleTaste')
 
     conn = get_db_connection()
     if not conn:
@@ -504,28 +498,11 @@ def sync_user_data():
 
     try:
         with conn.cursor() as cursor:
-            updates = []
-            params = []
             if points is not None:
-                updates.append("`points` = %s")
-                params.append(int(points))
-            if body_height is not None:
-                updates.append("`body_height` = %s")
-                params.append(int(body_height))
-            if body_type is not None:
-                updates.append("`body_type` = %s")
-                params.append(str(body_type))
-            if style_taste is not None:
-                updates.append("`style_taste` = %s")
-                params.append(str(style_taste))
-
-            if updates:
-                params.append(user_id)
-                sql = f"UPDATE `users` SET {', '.join(updates)} WHERE `id` = %s;"
-                cursor.execute(sql, tuple(params))
+                cursor.execute("UPDATE `users` SET `points` = %s WHERE `id` = %s;", (int(points), user_id))
                 conn.commit()
 
-        return jsonify({"status": "success", "message": "会員情報をMySQLに保存しました。"}), 200
+        return jsonify({"status": "success", "message": "会員ポイントをMySQLに保存しました。"}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500

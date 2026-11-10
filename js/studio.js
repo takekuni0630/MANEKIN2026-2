@@ -2504,7 +2504,7 @@ function applyPresetLook(lookKey) {
 }
 
 /**
- * 体型プロフィールの保存 (MySQL連携)
+ * 体型プロフィールの保存（マネキンシミュレーション用ローカル設定）
  */
 function handleSaveBodyProfile(e) {
     e.preventDefault();
@@ -2514,21 +2514,6 @@ function handleSaveBodyProfile(e) {
 
     AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
     localStorage.setItem('manekin_body_profile', JSON.stringify(AppState.userBodyProfile));
-
-    // MySQLに体型設定を同期
-    if (AppState.currentUser) {
-        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-        fetch(`${apiBase}/api/user/sync`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: AppState.currentUser.id,
-                height: height,
-                bodyType: type,
-                styleTaste: taste
-            })
-        }).catch(() => {});
-    }
 
     showToastNotification('体型および好みの設定を保存しました');
 }
