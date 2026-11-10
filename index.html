@@ -1585,6 +1585,21 @@
                             </div>
                         </div>
 
+                        <!-- AIアイテム形状診断結果カード（アウター/ボトムス/トップス/靴/帽子のみ保存可） -->
+                        <div class="ai-diagnosis-card" id="ai-diagnosis-card" style="display: none;">
+                            <div class="ai-diagnosis-header">
+                                <span class="ai-diagnosis-badge" id="ai-diag-badge">
+                                    <span class="ai-diag-spinner" id="ai-diag-spinner"></span>
+                                    <span id="ai-diag-badge-text">AI形状診断中...</span>
+                                </span>
+                                <span class="ai-diag-confidence" id="ai-diag-confidence"></span>
+                            </div>
+                            <div class="ai-diagnosis-body">
+                                <p class="ai-diag-title" id="ai-diag-title"></p>
+                                <p class="ai-diag-desc" id="ai-diag-desc"></p>
+                            </div>
+                        </div>
+
                         <!-- 撮影なしでもすぐ試せるクイック画像選択 -->
                         <div class="preset-img-selector">
                             <span class="preset-label">クイック写真:</span>
@@ -1750,6 +1765,10 @@
             window.imglyAiReady = false;
         }
     </script>
+
+    <!-- AIファッション形状・アイテム判定用軽量モデル (TensorFlow.js + MobileNet) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 分割されたJavaScriptモジュールファイルの読み込み -->
     <!-- 1. 商品カタログ・マスターデータ定義 -->

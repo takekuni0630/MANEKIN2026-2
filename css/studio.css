@@ -2354,6 +2354,117 @@
 }
 
 /* ========================================================================== */
+/* 21-b. AI形状・アイテム診断結果カード（アウター/ボトムス/トップス/靴/帽子） */
+/* ========================================================================== */
+.ai-diagnosis-card {
+    margin: 12px 0 16px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #111827;
+    transition: all 0.25s ease;
+}
+
+.ai-diagnosis-card.is-analyzing {
+    border-left-color: #6366f1;
+    background: #f5f7ff;
+}
+
+.ai-diagnosis-card.is-valid {
+    border-left-color: #10b981;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.ai-diagnosis-card.is-invalid {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.ai-diagnosis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.ai-diagnosis-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #111827;
+    color: #ffffff;
+}
+
+.ai-diagnosis-card.is-valid .ai-diagnosis-badge {
+    background: #059669;
+}
+
+.ai-diagnosis-card.is-invalid .ai-diagnosis-badge {
+    background: #dc2626;
+}
+
+.ai-diag-confidence {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #059669;
+    font-variant-numeric: tabular-nums;
+}
+
+.ai-diagnosis-card.is-invalid .ai-diag-confidence {
+    color: #dc2626;
+}
+
+.ai-diagnosis-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ai-diag-title {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.ai-diagnosis-card.is-invalid .ai-diag-title {
+    color: #991b1b;
+}
+
+.ai-diag-desc {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #4b5563;
+}
+
+.ai-diagnosis-card.is-invalid .ai-diag-desc {
+    color: #b91c1c;
+}
+
+.ai-diag-spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: ai-diag-spin 0.8s linear infinite;
+}
+
+@keyframes ai-diag-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================================================== */
 /* 22. 洗練されたレスポンシブ画面設計（無駄な重複を排除したカスケード設計）     */
 /* デスクトップの美しさを継承し、タブレット・スマホ全サイズで滑らかにフィット   */
 /* ========================================================================== */

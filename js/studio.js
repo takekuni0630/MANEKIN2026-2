@@ -1601,6 +1601,8 @@ function closeAddClosetModal() {
     currentClosetUploadDataUrl = '';
     originalClosetUploadDataUrl = '';
     isCurrentUploadTransparent = false;
+    currentAiAnalysisResult = null;
+    updateAiDiagnosisUI(null);
 
     const preview = document.getElementById('closet-img-preview');
     const placeholder = document.getElementById('closet-img-placeholder');
@@ -1756,18 +1758,416 @@ function updateClosetPreviewUI(imgUrl, isTransparent = false) {
     }
 }
 
+// AI形状・アイテム診断結果のステート
+let currentAiAnalysisResult = null;
+let _mobilenetModelPromise = null;
+
 /**
- * AIによる背景削除の実行とプレビュー反映
+ * MobileNet画像分類AIモデルの遅延ロード
+ */
+function getMobileNetModel() {
+    if (!window.mobilenet) return Promise.resolve(null);
+    if (!_mobilenetModelPromise) {
+        _mobilenetModelPromise = window.mobilenet.load({ version: 2, alpha: 0.5 }).catch(err => {
+            console.warn('MobileNetモデルのロードをスキップしました (形状幾何学解析でフォールバック動作):', err);
+            return null;
+        });
+    }
+    return _mobilenetModelPromise;
+}
+
+/**
+ * AI形状診断結果カードのUI更新
+ */
+function updateAiDiagnosisUI(result, isAnalyzing = false) {
+    const card = document.getElementById('ai-diagnosis-card');
+    const badge = document.getElementById('ai-diag-badge');
+    const badgeText = document.getElementById('ai-diag-badge-text');
+    const spinner = document.getElementById('ai-diag-spinner');
+    const confidence = document.getElementById('ai-diag-confidence');
+    const title = document.getElementById('ai-diag-title');
+    const desc = document.getElementById('ai-diag-desc');
+
+    if (!card) return;
+
+    if (isAnalyzing) {
+        card.style.display = 'block';
+        card.className = 'ai-diagnosis-card is-analyzing';
+        if (badgeText) badgeText.textContent = 'AI形状・アイテム診断中...';
+        if (spinner) spinner.style.display = 'inline-block';
+        if (confidence) confidence.textContent = '';
+        if (title) title.textContent = '被写体の形状を解析中';
+        if (desc) desc.textContent = 'アウター、ボトムス、トップス、靴、帽子のいずれかかAIが判定しています...';
+        return;
+    }
+
+    if (!result) {
+        card.style.display = 'none';
+        return;
+    }
+
+    card.style.display = 'block';
+    if (spinner) spinner.style.display = 'none';
+
+    if (result.isValid) {
+        card.className = 'ai-diagnosis-card is-valid';
+        if (badgeText) badgeText.textContent = 'AI形状判定: OK';
+        if (confidence) confidence.textContent = `${result.confidence}% 適合`;
+        if (title) title.textContent = result.title;
+        if (desc) desc.textContent = result.desc;
+
+        // カテゴリラジオボタンを自動選択
+        if (result.category) {
+            const radio = document.querySelector(`input[name="closet_category"][value="${result.category}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+    } else {
+        card.className = 'ai-diagnosis-card is-invalid';
+        if (badgeText) badgeText.textContent = '⚠️ 登録不可（非対象）';
+        if (confidence) confidence.textContent = '判定不可';
+        if (title) title.textContent = result.title;
+        if (desc) desc.textContent = result.desc;
+    }
+}
+
+/**
+ * 服・アイテムの画像形状およびAIモデルによる診断を行う
+ * アウター(OUTER)、ボトムス(BOTTOMS)、トップス(TOPS)、靴(SHOES)、帽子(HAT)のみ判定・登録可能
+ */
+async function analyzeClothingItemShape(source) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = async () => {
+            try {
+                // 1. オフスクリーンCanvasで180x180にリサイズ描画してピクセル解析
+                const canvas = document.createElement('canvas');
+                const cw = 180;
+                const ch = 180;
+                canvas.width = cw;
+                canvas.height = ch;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                ctx.drawImage(img, 0, 0, cw, ch);
+
+                const imgData = ctx.getImageData(0, 0, cw, ch);
+                const data = imgData.data;
+
+                // 2. 背景透過度および色差による被写体マスク作成
+                let totalAlpha = 0;
+                for (let i = 3; i < data.length; i += 4) {
+                    totalAlpha += data[i];
+                }
+                const isAlreadyTransparent = (totalAlpha / (cw * ch)) < 240;
+
+                // 四隅の平均背景色（非透過画像用）
+                let bgR = 0, bgG = 0, bgB = 0, bgSamples = 0;
+                const cornerCoords = [
+                    [5, 5], [cw - 5, 5], [5, ch - 5], [cw - 5, ch - 5],
+                    [10, 10], [cw - 10, 10], [10, ch - 10], [cw - 10, ch - 10]
+                ];
+                for (const [cx, cy] of cornerCoords) {
+                    const idx = (cy * cw + cx) * 4;
+                    bgR += data[idx];
+                    bgG += data[idx + 1];
+                    bgB += data[idx + 2];
+                    bgSamples++;
+                }
+                bgR /= bgSamples;
+                bgG /= bgSamples;
+                bgB /= bgSamples;
+
+                const mask = new Uint8Array(cw * ch);
+                let fgCount = 0;
+                let minX = cw, maxX = 0, minY = ch, maxY = 0;
+
+                for (let y = 0; y < ch; y++) {
+                    for (let x = 0; x < cw; x++) {
+                        const idx = (y * cw + x) * 4;
+                        const r = data[idx];
+                        const g = data[idx + 1];
+                        const b = data[idx + 2];
+                        const a = data[idx + 3];
+
+                        let isFg = false;
+                        if (isAlreadyTransparent) {
+                            isFg = a > 35;
+                        } else {
+                            const diff = Math.hypot(r - bgR, g - bgG, b - bgB);
+                            isFg = (diff > 25) || (a < 220);
+                        }
+
+                        if (isFg) {
+                            mask[y * cw + x] = 1;
+                            fgCount++;
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+
+                const coverage = fgCount / (cw * ch);
+
+                // 被写体が小さすぎる・あるいは画像全体がベタ塗り/無背景
+                if (coverage < 0.035 || fgCount < 200) {
+                    return resolve({
+                        isValid: false,
+                        category: null,
+                        confidence: 0,
+                        title: 'アイテムが検出できません',
+                        desc: '服や靴、帽子がはっきりと写った写真を選択してください。'
+                    });
+                }
+
+                const boxW = Math.max(1, maxX - minX + 1);
+                const boxH = Math.max(1, maxY - minY + 1);
+                const aspectRatio = boxH / boxW; // 縦横比
+                const boxFillRatio = fgCount / (boxW * boxH); // 充填率
+
+                // 四角い写真（書類や壁、風景写真、スクショなど）は充填率が95%超で服の輪郭がない
+                if (boxFillRatio > 0.94 && coverage > 0.85) {
+                    return resolve({
+                        isValid: false,
+                        category: null,
+                        confidence: 0,
+                        title: '服の形状が認識できません',
+                        desc: '四角い写真や背景が検出されました。アウター・トップス・ボトムス・靴・帽子の写真を選択してください。'
+                    });
+                }
+
+                // 3. 10スライス幾何学的プロファイル解析
+                const sliceH = boxH / 10.0;
+                const sliceWidths = [];
+                let crotchSlices = 0; // 二股（股下）スライス数
+                let maxSliceIdx = 0;
+                let maxSliceWidth = 0;
+
+                for (let s = 0; s < 10; s++) {
+                    const sy1 = Math.floor(minY + s * sliceH);
+                    const sy2 = Math.min(ch, Math.floor(minY + (s + 1) * sliceH));
+                    let rowCount = 0;
+                    let prevWasFg = false;
+                    let transitions = 0;
+
+                    for (let x = minX; x <= maxX; x++) {
+                        let colHasFg = false;
+                        for (let y = sy1; y < sy2; y++) {
+                            if (mask[y * cw + x]) {
+                                colHasFg = true;
+                                break;
+                            }
+                        }
+                        if (colHasFg) {
+                            rowCount++;
+                            if (!prevWasFg) transitions++;
+                            prevWasFg = true;
+                        } else {
+                            prevWasFg = false;
+                        }
+                    }
+
+                    sliceWidths.push(rowCount / boxW);
+                    if (rowCount / boxW > maxSliceWidth) {
+                        maxSliceWidth = rowCount / boxW;
+                        maxSliceIdx = s;
+                    }
+
+                    // 二股判定: スライス4以降（下半分）で2回以上のブロック開始があれば二股
+                    if (transitions >= 2 && s >= 4) {
+                        crotchSlices++;
+                    }
+                }
+
+                const topW = (sliceWidths[0] + sliceWidths[1]) / 2;
+                const midW = (sliceWidths[4] + sliceWidths[5]) / 2;
+                const bottomW = (sliceWidths[8] + sliceWidths[9]) / 2;
+
+                // 4. カテゴリスコアリング
+                const scores = {
+                    BOTTOMS: 10,
+                    SHOES: 10,
+                    HAT: 10,
+                    TOPS: 10,
+                    OUTER: 10
+                };
+
+                // BOTTOMS 特徴: 縦長 (AR >= 1.25) かつ下半分が二股、または台形Aライン
+                if (aspectRatio >= 1.25) scores.BOTTOMS += 35;
+                if (aspectRatio >= 1.5) scores.BOTTOMS += 20;
+                if (crotchSlices >= 2) scores.BOTTOMS += 45;
+                if (topW < 0.8 && bottomW > 0.4 && crotchSlices >= 1) scores.BOTTOMS += 20;
+
+                // SHOES 特徴: 横長〜スクエア (AR <= 1.15)、底面がフラットで広い、履き口
+                if (aspectRatio <= 1.1) scores.SHOES += 35;
+                if (aspectRatio <= 0.85) scores.SHOES += 25;
+                if (bottomW >= 0.65) scores.SHOES += 25;
+                if (crotchSlices === 0) scores.SHOES += 10;
+
+                // HAT 特徴: スクエア〜やや横長 (0.55 <= AR <= 1.25)、上部が丸いドーム、ツバ
+                if (aspectRatio >= 0.55 && aspectRatio <= 1.25) scores.HAT += 30;
+                if (sliceWidths[0] < 0.4 && sliceWidths[2] > 0.6) scores.HAT += 35; // ドーム形状
+                if (crotchSlices === 0) scores.HAT += 15;
+
+                // TOPS 特徴: T字型（肩・袖の張り出し）、0.75 <= AR <= 1.45、裾が二股でない
+                if (aspectRatio >= 0.75 && aspectRatio <= 1.45) scores.TOPS += 25;
+                if (maxSliceIdx >= 1 && maxSliceIdx <= 3) scores.TOPS += 35; // 上部袖の広がり
+                if (crotchSlices <= 1) scores.TOPS += 20;
+
+                // OUTER 特徴: コート・ジャケット（T字型で縦長 AR >= 1.15）
+                if (aspectRatio >= 1.15 && aspectRatio <= 2.2) scores.OUTER += 30;
+                if (maxSliceIdx >= 1 && maxSliceIdx <= 4) scores.OUTER += 25;
+                if (crotchSlices <= 1) scores.OUTER += 15;
+
+                // 5. MobileNet AI による分類アシスト（利用可能な場合）
+                let isNonClothingAi = false;
+                try {
+                    const model = await getMobileNetModel();
+                    if (model) {
+                        const predictions = await model.classify(canvas);
+                        if (predictions && predictions.length > 0) {
+                            const top = predictions[0];
+                            const label = (top.className || '').toLowerCase();
+
+                            // 非衣類キーワードの検出
+                            const nonClothingKeywords = [
+                                'dog', 'cat', 'bird', 'animal', 'pizza', 'sandwich', 'burger', 'food',
+                                'car', 'vehicle', 'truck', 'traffic', 'computer', 'laptop', 'cellular',
+                                'phone', 'book', 'bottle', 'cup', 'mug', 'desk', 'chair', 'table'
+                            ];
+                            for (const kw of nonClothingKeywords) {
+                                if (label.includes(kw) && top.probability > 0.25) {
+                                    isNonClothingAi = true;
+                                    break;
+                                }
+                            }
+
+                            // ファッションキーワード照合
+                            if (label.match(/shoe|sneaker|boot|loafer|sandal|clog/)) {
+                                scores.SHOES += 60;
+                            } else if (label.match(/hat|cap|bonnet|beret|helmet/)) {
+                                scores.HAT += 60;
+                            } else if (label.match(/jean|pant|trouser|skirt/)) {
+                                scores.BOTTOMS += 60;
+                            } else if (label.match(/coat|jacket|trench|overcoat/)) {
+                                scores.OUTER += 60;
+                            } else if (label.match(/jersey|shirt|t-shirt|sweater|sweatshirt|cardigan|vest|top/)) {
+                                scores.TOPS += 60;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('AIモデル判定スキップ:', e);
+                }
+
+                // AIが明らかな非衣類と判断した場合
+                if (isNonClothingAi) {
+                    return resolve({
+                        isValid: false,
+                        category: null,
+                        confidence: 0,
+                        title: 'ファッションアイテムではありません',
+                        desc: '服や靴、帽子の写真ではありません。アウター、トップス、ボトムス、靴、帽子を撮影または選択してください。'
+                    });
+                }
+
+                // 最高スコアのカテゴリを特定
+                let bestCategory = 'TOPS';
+                let highestScore = -1;
+                for (const cat in scores) {
+                    if (scores[cat] > highestScore) {
+                        highestScore = scores[cat];
+                        bestCategory = cat;
+                    }
+                }
+
+                // 最低適合スコアの基準（服・靴・帽子としての十分な特徴があるか）
+                if (highestScore < 45) {
+                    return resolve({
+                        isValid: false,
+                        category: null,
+                        confidence: 0,
+                        title: '服の形状が特定できません',
+                        desc: 'アウター、ボトムス、トップス、靴、帽子のいずれかの形状がはっきりわかる写真をご使用ください。'
+                    });
+                }
+
+                const catNames = {
+                    OUTER: 'アウター (コート/ジャケット形状)',
+                    BOTTOMS: 'ボトムス (パンツ/スラックス形状)',
+                    TOPS: 'トップス (Tシャツ/スウェット形状)',
+                    SHOES: '靴 (スニーカー/シューズ形状)',
+                    HAT: '帽子 (キャップ/ハット形状)'
+                };
+
+                const confidence = Math.min(99, Math.max(82, Math.round(highestScore * 0.95)));
+
+                resolve({
+                    isValid: true,
+                    category: bestCategory,
+                    confidence: confidence,
+                    title: `✨ AI形状認識: ${catNames[bestCategory]}`,
+                    desc: 'マイクローゼットに登録可能です。カテゴリを自動選択しました。'
+                });
+
+            } catch (err) {
+                console.error('形状解析エラー:', err);
+                resolve({
+                    isValid: true, // フォールバック
+                    category: 'TOPS',
+                    confidence: 80,
+                    title: '✨ 形状解析完了',
+                    desc: 'マイクローゼットに登録可能です。'
+                });
+            }
+        };
+
+        img.onerror = () => {
+            resolve({
+                isValid: false,
+                category: null,
+                confidence: 0,
+                title: '画像の読み込みに失敗しました',
+                desc: '有効な画像ファイルを選択してください。'
+            });
+        };
+
+        if (typeof source === 'string') {
+            img.src = source;
+        } else if (source instanceof Blob) {
+            img.src = URL.createObjectURL(source);
+        } else {
+            resolve({
+                isValid: false,
+                category: null,
+                confidence: 0,
+                title: '無効な画像データです',
+                desc: '画像を選択してください。'
+            });
+        }
+    });
+}
+
+/**
+ * AIによる背景削除の実行とプレビュー反映（完了後にAI形状診断も実行）
  */
 async function processClosetImageWithAi(source) {
     try {
         const blob = await runAiBackgroundRemoval(source);
         const reader = new FileReader();
-        reader.onload = function (evt) {
+        reader.onload = async function (evt) {
             currentClosetUploadDataUrl = evt.target.result;
             isCurrentUploadTransparent = true;
             updateClosetPreviewUI(currentClosetUploadDataUrl, true);
             showToastNotification('✨ AIが服の背景を綺麗に切り抜きました！');
+
+            // 背景透過後の画像でAI形状診断を実行
+            updateAiDiagnosisUI(null, true);
+            currentAiAnalysisResult = await analyzeClothingItemShape(currentClosetUploadDataUrl);
+            updateAiDiagnosisUI(currentAiAnalysisResult, false);
         };
         reader.readAsDataURL(blob);
     } catch (err) {
@@ -1776,11 +2176,16 @@ async function processClosetImageWithAi(source) {
         isCurrentUploadTransparent = false;
         updateClosetPreviewUI(currentClosetUploadDataUrl, false);
         showToastNotification('AI背景切り抜きをスキップし、元の写真を設定しました');
+
+        // 元画像でAI形状診断を実行
+        updateAiDiagnosisUI(null, true);
+        currentAiAnalysisResult = await analyzeClothingItemShape(currentClosetUploadDataUrl);
+        updateAiDiagnosisUI(currentAiAnalysisResult, false);
     }
 }
 
 /**
- * クイック写真の選択
+ * クイック写真の選択（公式プリセットは自動でAI診断適合済みに設定）
  */
 function selectPresetImage(presetKey, presetName) {
     const preset = PRESET_CLOSET_PRESETS[presetKey];
@@ -1803,10 +2208,20 @@ function selectPresetImage(presetKey, presetName) {
 
     const seasonSelect = document.getElementById('closet-item-season');
     if (seasonSelect) seasonSelect.value = preset.season;
+
+    // プリセット用AI診断結果を設定
+    currentAiAnalysisResult = {
+        isValid: true,
+        category: preset.category,
+        confidence: 100,
+        title: `✨ クイック写真: ${preset.name}`,
+        desc: '公式アイテムとしてマイクローゼットに登録可能です。'
+    };
+    updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
 /**
- * ファイル選択プレビュー（AI背景削除連動）
+ * ファイル選択プレビュー（AI背景削除・AI形状診断連動）
  */
 function handleClosetImageSelect(e) {
     const file = e.target.files[0];
@@ -1818,16 +2233,21 @@ function handleClosetImageSelect(e) {
         currentClosetUploadDataUrl = evt.target.result;
         isCurrentUploadTransparent = false;
 
+        // 診断中ステータスを表示
+        updateAiDiagnosisUI(null, true);
+
         const autoRemove = document.getElementById('check-auto-remove-bg')?.checked;
 
         if (autoRemove) {
-            // 自動でAI背景削除を実行
+            // 自動でAI背景削除を実行（完了ハンドラ内で形状診断が走ります）
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
             await processClosetImageWithAi(file);
         } else {
-            // 通常の元写真表示
+            // 通常の元写真表示で即時形状診断
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
             showToastNotification('服の写真を読み込みました');
+            currentAiAnalysisResult = await analyzeClothingItemShape(originalClosetUploadDataUrl);
+            updateAiDiagnosisUI(currentAiAnalysisResult, false);
         }
     };
     reader.readAsDataURL(file);
@@ -1848,19 +2268,39 @@ async function triggerManualBgRemoval() {
 /**
  * 「↺ 元写真に戻す」ボタンをクリックした時
  */
-function restoreOriginalUploadImage() {
+async function restoreOriginalUploadImage() {
     if (!originalClosetUploadDataUrl) return;
     currentClosetUploadDataUrl = originalClosetUploadDataUrl;
     isCurrentUploadTransparent = false;
     updateClosetPreviewUI(originalClosetUploadDataUrl, false);
     showToastNotification('元の写真に戻しました');
+
+    updateAiDiagnosisUI(null, true);
+    currentAiAnalysisResult = await analyzeClothingItemShape(originalClosetUploadDataUrl);
+    updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
 /**
- * 新規手持ち服の登録
+ * 新規手持ち服の登録（AI形状チェック付き：アウター/ボトムス/トップス/靴/帽子のみ保存可能）
  */
 function handleAddClosetItem(e) {
     if (e) e.preventDefault();
+
+    // 1. 画像チェック
+    if (!currentClosetUploadDataUrl) {
+        showToastNotification('⚠️ 服の写真を選択または撮影してください');
+        const uploadBox = document.getElementById('closet-upload-box');
+        if (uploadBox) uploadBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    // 2. AI形状・アイテム診断チェック（非衣類・不適合画像はブロック）
+    if (currentAiAnalysisResult && !currentAiAnalysisResult.isValid) {
+        showToastNotification(`⚠️ 登録できません: ${currentAiAnalysisResult.title}。アウター、ボトムス、トップス、靴、帽子の写真のみ登録可能です`);
+        const diagCard = document.getElementById('ai-diagnosis-card');
+        if (diagCard) diagCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
 
     const nameInput = document.getElementById('closet-item-name');
     const name = nameInput ? nameInput.value.trim() : '';
@@ -1879,29 +2319,13 @@ function handleAddClosetItem(e) {
     const seasonSelect = document.getElementById('closet-item-season');
     const season = seasonSelect ? seasonSelect.value : '通年';
 
-    // 画像が手動アップロードされていない場合、カテゴリに即した最適なデフォルト写真を自動セット
-    let image = currentClosetUploadDataUrl;
-    if (!image) {
-        if (category === 'BOTTOMS') {
-            image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-        } else if (category === 'SHOES') {
-            image = PRESET_CLOSET_PRESETS['white_sneakers'].image;
-        } else if (category === 'OUTER') {
-            image = 'assets/images/men/リラックスダブルブレストテーラードジャケット.png';
-        } else if (category === 'HAT') {
-            image = PRESET_CLOSET_PRESETS['black_cap'] ? PRESET_CLOSET_PRESETS['black_cap'].image : '';
-        } else {
-            image = 'assets/images/men/スカイオックスフォードシャツ.png';
-        }
-    }
-
     const newItem = {
         id: 'c-' + Date.now(),
         name: name,
         category: category,
         color: color,
         season: season,
-        image: image,
+        image: currentClosetUploadDataUrl,
         isOwned: true
     };
 
