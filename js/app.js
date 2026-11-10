@@ -127,6 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCatalogProducts();
     renderNewItems();
     syncOrdersFromBackend();
+    if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
+    if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
+    if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
     handleRouting();
 });
 
@@ -222,6 +225,7 @@ function handleRouting() {
             highlightNavLink('mypage');
             renderMyPage();
             syncOrdersFromBackend();
+            if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
             break;
 
         case '#manekin':
@@ -234,6 +238,8 @@ function handleRouting() {
             }
             showView('view-manekin-studio');
             highlightNavLink('manekin-studio');
+            if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
+            if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
             renderManekinStudio(AppState.studioActiveTab || 'create');
             break;
 
@@ -461,3 +467,7 @@ window.handleUseAllPoints = handleUseAllPoints;
 window.handleResetPoints = handleResetPoints;
 window.getUserPoints = getUserPoints;
 window.setUserPoints = setUserPoints;
+window.syncClosetFromBackend = syncClosetFromBackend;
+window.syncFavoritesFromBackend = syncFavoritesFromBackend;
+window.syncOutfitsFromBackend = syncOutfitsFromBackend;
+window.handleSyncAllToMySQL = handleSyncAllToMySQL;

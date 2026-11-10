@@ -1410,7 +1410,7 @@ function applyPresetName(name) {
 }
 
 /**
- * コーデの保存処理
+ * コーデの保存処理 (MySQL連携)
  */
 function handleSaveOutfit(e) {
     if (e) e.preventDefault();
@@ -1437,6 +1437,21 @@ function handleSaveOutfit(e) {
 
     AppState.savedOutfits.unshift(newOutfit);
     localStorage.setItem('manekin_saved_outfits', JSON.stringify(AppState.savedOutfits));
+
+    // MySQLに保存
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    fetch(`${apiBase}/api/outfits/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: AppState.currentUser ? AppState.currentUser.id : 1,
+            id: newOutfit.id,
+            title: newOutfit.title,
+            date: newOutfit.date,
+            comment: newOutfit.comment,
+            items: newOutfit.items
+        })
+    }).catch(err => console.warn('MySQLコーデ保存オフライン:', err));
 
     showToastNotification(`「${title}」を保存しました！`);
     if (input) input.value = '';
@@ -1517,16 +1532,45 @@ function restoreOutfit(outfitId) {
 }
 
 /**
- * 保存コーデの削除
+ * 保存コーデの削除 (MySQL連携)
  */
 function deleteSavedOutfit(outfitId) {
     if (confirm('この保存コーディネートを削除しますか？')) {
         AppState.savedOutfits = AppState.savedOutfits.filter(o => o.id !== outfitId);
         localStorage.setItem('manekin_saved_outfits', JSON.stringify(AppState.savedOutfits));
+
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        fetch(`${apiBase}/api/outfits/delete/${outfitId}`, { method: 'DELETE' })
+            .catch(err => console.warn('MySQLコーデ削除オフライン:', err));
+
         showToastNotification('コーディネートを削除しました');
         renderSavedOutfitsGrid();
         renderManekinStudio(AppState.studioActiveTab);
     }
+}
+
+/**
+ * MySQLから保存済みコーデを同期取得
+ */
+async function syncOutfitsFromBackend() {
+    try {
+        const userId = AppState.currentUser ? AppState.currentUser.id : 1;
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        const res = await fetch(`${apiBase}/api/outfits/${userId}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.outfits) && data.outfits.length > 0) {
+                const merged = [...data.outfits];
+                AppState.savedOutfits.forEach(local => {
+                    if (!merged.some(m => String(m.id) === String(local.id))) {
+                        merged.push(local);
+                    }
+                });
+                AppState.savedOutfits = merged;
+                localStorage.setItem('manekin_saved_outfits', JSON.stringify(merged));
+            }
+        }
+    } catch (e) {}
 }
 
 // --------------------------------------------------------------------------
@@ -2332,7 +2376,31 @@ function handleAddClosetItem(e) {
     AppState.myCloset.unshift(newItem);
     localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
 
-    showToastNotification(`「${name}」をマイクローゼットに登録しました！`);
+    // MySQL (closet_items テーブル) にも即座に保存
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    fetch(`${apiBase}/api/closet/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: AppState.currentUser ? AppState.currentUser.id : 1,
+            id: newItem.id,
+            name: newItem.name,
+            category: newItem.category,
+            color: newItem.color,
+            season: newItem.season,
+            image: newItem.image,
+            isOwned: true,
+            isPurchased: false
+        })
+    }).then(res => res.json()).then(data => {
+        if (data.status === 'success') {
+            console.log('✨ [MySQL] マイクローゼットにアイテムを保存しました:', data);
+        }
+    }).catch(err => {
+        console.warn('MySQLクローゼット保存はオフライン（ローカルストレージに保存済み）:', err);
+    });
+
+    showToastNotification(`「${name}」をマイクローゼット(MySQL)に登録しました！`);
     closeAddClosetModal();
 
     // 画面再描画
@@ -2355,8 +2423,58 @@ function deleteClosetItem(itemId) {
         AppState.myCloset = AppState.myCloset.filter(c => String(c.id) !== String(itemId));
         localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
 
+        // MySQL からも削除
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        fetch(`${apiBase}/api/closet/delete/${itemId}`, { method: 'DELETE' })
+            .catch(err => console.warn('MySQLクローゼット削除オフライン:', err));
+
         showToastNotification('手持ちの服を削除しました');
         renderManekinStudio(AppState.studioActiveTab);
+    }
+}
+
+/**
+ * MySQLからマイクローゼットのアイテムを同期取得
+ */
+async function syncClosetFromBackend() {
+    try {
+        const userId = AppState.currentUser ? AppState.currentUser.id : 1;
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        const res = await fetch(`${apiBase}/api/closet/${userId}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.closet_items && Array.isArray(data.closet_items) && data.closet_items.length > 0) {
+                // MySQLから取得したアイテムをマージ
+                const mysqlItems = data.closet_items.map(it => ({
+                    id: it.item_uid || it.id,
+                    productId: it.product_id,
+                    name: it.name,
+                    category: it.category,
+                    color: it.color,
+                    season: it.season || '通年',
+                    image: it.image || it.image_url,
+                    isOwned: Boolean(it.is_owned),
+                    isPurchased: Boolean(it.is_purchased),
+                    price: it.price || 0,
+                    purchaseDate: it.purchase_date
+                }));
+
+                // 既存のローカルアイテムと重複なしでマージ
+                const merged = [...mysqlItems];
+                AppState.myCloset.forEach(localItem => {
+                    const exists = merged.some(m => String(m.id) === String(localItem.id) || (m.name === localItem.name && m.color === localItem.color));
+                    if (!exists) {
+                        merged.push(localItem);
+                    }
+                });
+
+                AppState.myCloset = merged;
+                localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+                console.log(`✨ [MySQL] マイクローゼット同期完了: ${merged.length} 点`);
+            }
+        }
+    } catch (e) {
+        console.log('MySQLクローゼット同期待機中 (ローカルストレージを使用)');
     }
 }
 
@@ -2386,7 +2504,7 @@ function applyPresetLook(lookKey) {
 }
 
 /**
- * 体型プロフィールの保存
+ * 体型プロフィールの保存 (MySQL連携)
  */
 function handleSaveBodyProfile(e) {
     e.preventDefault();
@@ -2396,6 +2514,21 @@ function handleSaveBodyProfile(e) {
 
     AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
     localStorage.setItem('manekin_body_profile', JSON.stringify(AppState.userBodyProfile));
+
+    // MySQLに体型設定を同期
+    if (AppState.currentUser) {
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        fetch(`${apiBase}/api/user/sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: AppState.currentUser.id,
+                height: height,
+                bodyType: type,
+                styleTaste: taste
+            })
+        }).catch(() => {});
+    }
 
     showToastNotification('体型および好みの設定を保存しました');
 }
@@ -2435,56 +2568,6 @@ function showToastNotification(message) {
     }
 }
 
-/**
- * 購入履歴からマイクローゼットへインポートする連携機能
- */
-function importOrderToCloset(orderIndex) {
-    const order = AppState.orderHistory[orderIndex];
-    if (!order) return;
-
-    const rawSummary = order.items_summary || "購入アイテム";
-    // 商品名部分を抽出
-    let itemName = rawSummary.split('(')[0].trim();
-    if (!itemName) itemName = "購入アイテム";
-
-    // カテゴリと色を推定
-    let cat = 'TOPS';
-    let img = 'assets/images/men/スカイオックスフォードシャツ.png';
-    let color = 'BLACK';
-
-    if (itemName.includes('パンツ') || itemName.includes('ボトムス') || itemName.includes('スラックス') || itemName.includes('トラウザー') || itemName.includes('デニム')) {
-        cat = 'BOTTOMS';
-        img = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-    } else if (itemName.includes('ジャケット') || itemName.includes('コート')) {
-        cat = 'OUTER';
-        img = 'assets/images/men/リラックスダブルブレストテーラードジャケット.png';
-    } else if (itemName.includes('靴') || itemName.includes('スニーカー')) {
-        cat = 'SHOES';
-        img = PRESET_CLOSET_PRESETS['white_sneakers'].image;
-        color = 'WHITE';
-    } else if (itemName.includes('スウェット') || itemName.includes('パーカー')) {
-        cat = 'TOPS';
-        img = 'assets/images/men/アーバングレイジップフーディ.png';
-        color = 'GREY';
-    }
-
-    const newItem = {
-        id: 'c-order-' + Date.now(),
-        name: itemName,
-        category: cat,
-        color: color,
-        season: '通年',
-        image: img,
-        isOwned: true
-    };
-
-    AppState.myCloset.unshift(newItem);
-    localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
-
-    showToastNotification(`「${itemName}」をマイクローゼットにインポートしました！`);
-
-    // スタジオバッジ等の更新
-    const closetBadge = document.getElementById('studio-closet-badge');
-    if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
-}
+window.syncClosetFromBackend = syncClosetFromBackend;
+window.syncOutfitsFromBackend = syncOutfitsFromBackend;
 

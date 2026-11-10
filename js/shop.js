@@ -522,34 +522,67 @@ function handleResetPoints() {
 /**
  * 過去の注文履歴から手動でクローゼットへ同期する
  */
-function importOrderToCloset(idx) {
+async function importOrderToCloset(idx) {
     const order = AppState.orderHistory[idx];
-    if (!order || !order.items || order.items.length === 0) return;
+    const itemsList = (order && (order.items || order.items_detail)) ? (order.items || order.items_detail) : [];
+    if (!order || itemsList.length === 0) return;
 
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    const userId = AppState.currentUser ? AppState.currentUser.id : 1;
     let added = 0;
-    order.items.forEach((it, i) => {
-        const exists = AppState.myCloset.some(c => c.name === it.name && c.color === it.color);
+
+    for (let i = 0; i < itemsList.length; i++) {
+        const it = itemsList[i];
+        const itName = it.name || it.product_name || '購入商品';
+        const itColor = it.color || 'BLACK';
+        const itId = it.id || it.product_id || Date.now();
+        const itImg = it.image || it.image_url || 'assets/images/men/スカイオックスフォードシャツ.png';
+        const itPrice = it.price || it.unit_price || 0;
+
+        const exists = AppState.myCloset.some(c => c.name === itName && c.color === itColor);
         if (!exists) {
-            AppState.myCloset.unshift({
-                id: 'purchased-' + (it.id || Date.now()) + '-' + i,
-                productId: it.id,
-                name: it.name,
+            const newItem = {
+                id: 'purchased-' + itId + '-' + i + '-' + Date.now(),
+                productId: itId,
+                name: itName,
                 category: it.category || 'TOPS',
-                color: it.color || 'BLACK',
+                color: itColor,
                 season: '通年',
-                image: it.image,
+                image: itImg,
                 isOwned: true,
                 isPurchased: true,
-                price: it.price,
-                purchaseDate: order.date
-            });
+                price: itPrice,
+                purchaseDate: order.date || ''
+            };
+            AppState.myCloset.unshift(newItem);
             added++;
+
+            try {
+                await fetch(`${apiBase}/api/closet/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        id: newItem.id,
+                        productId: newItem.productId,
+                        name: newItem.name,
+                        category: newItem.category,
+                        color: newItem.color,
+                        season: newItem.season,
+                        image: newItem.image,
+                        isOwned: true,
+                        isPurchased: true,
+                        price: newItem.price,
+                        purchaseDate: newItem.purchaseDate
+                    })
+                });
+            } catch (e) {}
         }
-    });
+    }
     localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
 
     if (added > 0) {
-        showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
+        showToast(`👗 注文商品をマイクローゼットに登録・MySQL保存しました（${added}点）`);
     } else {
         showToast('この注文の商品はすでにマイクローゼットに登録済みです');
     }
@@ -617,6 +650,7 @@ async function handlePlaceOrder() {
 
     const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
     let confirmedOrder = null;
+    let backendUpdatedPoints = null;
 
     try {
         const response = await fetch(`${apiBase}/api/orders`, {
@@ -628,6 +662,9 @@ async function handlePlaceOrder() {
         if (response.ok) {
             const data = await response.json();
             confirmedOrder = data.order;
+            if (data.updated_points !== undefined && data.updated_points !== null) {
+                backendUpdatedPoints = data.updated_points;
+            }
         } else {
             throw new Error("APIレスポンスエラー");
         }
@@ -640,6 +677,8 @@ async function handlePlaceOrder() {
             customer_name: customerName,
             address: address,
             total_amount: calc.netTotal,
+            used_points: calc.usedPoints,
+            earned_points: calc.earnedPoints,
             status: "注文受付・発送準備中",
             items: [...AppState.cart]
         };
@@ -650,7 +689,7 @@ async function handlePlaceOrder() {
 
     // 1. ポイント更新（利用ポイント減算 ＋ 今回獲得ポイント付与）
     const currentPts = getUserPoints();
-    const updatedPts = Math.max(0, currentPts - calc.usedPoints) + calc.earnedPoints;
+    const updatedPts = backendUpdatedPoints !== null ? backendUpdatedPoints : (Math.max(0, currentPts - calc.usedPoints) + calc.earnedPoints);
     setUserPoints(updatedPts);
 
     // 2. 【要件1】購入商品をマイクローゼットに自動保存！
@@ -708,6 +747,20 @@ async function handlePlaceOrder() {
     if (compOrderTotal) compOrderTotal.textContent = `¥${confirmedOrder.total_amount.toLocaleString()}`;
     if (compEarnedPoints) compEarnedPoints.textContent = `+${calc.earnedPoints.toLocaleString()} pt`;
     if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
+    
+    const compDbStatus = document.getElementById('comp-db-status');
+    if (compDbStatus) {
+        if (backendUpdatedPoints !== null || confirmedOrder.order_id) {
+            compDbStatus.textContent = '🟢 MySQL (manekin_db) 保存完了';
+            compDbStatus.style.background = '#dcfce7';
+            compDbStatus.style.color = '#15803d';
+        } else {
+            compDbStatus.textContent = '⚠️ LocalStorage一時保存 (Python API停止中)';
+            compDbStatus.style.background = '#fef3c7';
+            compDbStatus.style.color = '#b45309';
+        }
+    }
+
     if (closetBannerMsg && purchasedItems.length > 0) {
         closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
     }
@@ -719,11 +772,17 @@ async function handlePlaceOrder() {
 // 8. マイページ管理
 // --------------------------------------------------------------------------
 async function syncOrdersFromBackend() {
+    const statusPill = document.getElementById('mysql-status-pill');
     try {
         const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
         const response = await fetch(`${apiBase}/api/orders`);
         if (response.ok) {
             const data = await response.json();
+            if (statusPill) {
+                statusPill.textContent = '🟢 MySQL (manekin_db) 接続中';
+                statusPill.style.background = '#dcfce7';
+                statusPill.style.color = '#15803d';
+            }
             if (data.orders && Array.isArray(data.orders)) {
                 // 初期ダミー（プレミアム コットン リラックス Tシャツのみの旧注文など）をフィルタ
                 const validOrders = data.orders.filter(o => {
@@ -736,9 +795,17 @@ async function syncOrdersFromBackend() {
                 localStorage.setItem('manekin_orders', JSON.stringify(validOrders));
                 renderMyPage();
             }
+        } else {
+            throw new Error('API response not ok');
         }
     } catch (e) {
-        console.log("MySQL注文履歴の同期待機中");
+        console.log("MySQL注文履歴の同期待機中 (ローカルモード)");
+        if (statusPill) {
+            statusPill.textContent = '🟠 LocalStorage稼働中 (Python API未接続)';
+            statusPill.style.background = '#fef3c7';
+            statusPill.style.color = '#b45309';
+            statusPill.title = 'Pythonサーバー(app.py)が起動すると自動的にMySQL連携に切り替わります';
+        }
     }
 }
 
@@ -757,6 +824,163 @@ async function handleClearOrderHistory() {
 
     renderMyPage();
     showToast('ご注文履歴をすべて初期化しました（0件）');
+}
+
+/**
+ * LocalStorageに保存されている未同期データをMySQLへ一括反映する
+ */
+async function handleSyncAllToMySQL() {
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    showToast('🔄 Pythonサーバー / MySQL接続確認中...');
+
+    let syncedOrders = 0;
+    let syncedCloset = 0;
+    let syncedOutfits = 0;
+
+    try {
+        // 0. ヘルスチェック（Flask & MySQL稼働確認）
+        const healthRes = await fetch(`${apiBase}/api/health`);
+        if (!healthRes.ok) {
+            throw new Error('サーバーエラー');
+        }
+        const healthData = await healthRes.json();
+        if (healthData.mysql !== 'connected') {
+            showToast('⚠️ XAMPPでMySQLが起動していません。XAMPPコントロールパネルでMySQLをStartしてください。');
+            return;
+        }
+
+        const userId = AppState.currentUser ? AppState.currentUser.id : 1;
+
+        // 1. 注文データの同期（重複防止のため order_no と sync_mode を送信）
+        if (AppState.orderHistory && AppState.orderHistory.length > 0) {
+            for (const order of AppState.orderHistory) {
+                const itemsList = order.items || order.items_detail || [];
+                if (itemsList.length > 0) {
+                    try {
+                        const res = await fetch(`${apiBase}/api/orders`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                order_no: order.order_no,
+                                sync_mode: true,
+                                customer_name: order.customer_name || '会員 様',
+                                customer_email: order.customer_email || 'user@manekin.com',
+                                postal_code: order.postal_code || '150-0001',
+                                address: order.address || '東京都渋谷区',
+                                phone: order.phone || '090-0000-0000',
+                                payment_method: order.payment_method || 'クレジットカード',
+                                delivery_time: order.delivery_time || '指定なし',
+                                subtotal: order.subtotal || order.total_amount || 0,
+                                shipping_fee: order.shipping_fee || 0,
+                                used_points: order.used_points || 0,
+                                earned_points: order.earned_points || 0,
+                                total_amount: order.total_amount || 0,
+                                user_id: userId,
+                                items: itemsList
+                            })
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (!d.already_exists) syncedOrders++;
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+
+        // 2. マイクローゼットの同期
+        if (AppState.myCloset && AppState.myCloset.length > 0) {
+            for (const item of AppState.myCloset) {
+                try {
+                    const res = await fetch(`${apiBase}/api/closet/add`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            id: item.id,
+                            productId: item.productId || null,
+                            name: item.name,
+                            category: item.category,
+                            color: item.color,
+                            season: item.season,
+                            image: item.image,
+                            isOwned: item.isOwned,
+                            isPurchased: item.isPurchased,
+                            price: item.price || 0,
+                            purchaseDate: item.purchaseDate || ''
+                        })
+                    });
+                    if (res.ok) syncedCloset++;
+                } catch (e) {}
+            }
+        }
+
+        // 3. お気に入りの同期
+        if (AppState.favorites && AppState.favorites.length > 0) {
+            try {
+                await fetch(`${apiBase}/api/favorites/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        product_ids: AppState.favorites
+                    })
+                });
+            } catch (e) {}
+        }
+
+        // 4. 保存コーデの同期
+        if (AppState.savedOutfits && AppState.savedOutfits.length > 0) {
+            for (const outfit of AppState.savedOutfits) {
+                try {
+                    const res = await fetch(`${apiBase}/api/outfits/save`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            id: outfit.id,
+                            title: outfit.title,
+                            date: outfit.date,
+                            comment: outfit.comment,
+                            items: outfit.items
+                        })
+                    });
+                    if (res.ok) syncedOutfits++;
+                } catch (e) {}
+            }
+        }
+
+        // 5. 会員ポイント・体型プロフィールの同期
+        if (AppState.currentUser) {
+            try {
+                await fetch(`${apiBase}/api/user/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        points: getUserPoints(),
+                        height: AppState.userBodyProfile ? AppState.userBodyProfile.height : 172,
+                        bodyType: AppState.userBodyProfile ? AppState.userBodyProfile.bodyType : 'REGULAR',
+                        styleTaste: AppState.userBodyProfile ? AppState.userBodyProfile.styleTaste : 'MINIMAL'
+                    })
+                });
+            } catch (e) {}
+        }
+
+        // 6. MySQLから最新データを再取得
+        await syncOrdersFromBackend();
+        await syncFavoritesFromBackend();
+        if (typeof syncClosetFromBackend === 'function') {
+            await syncClosetFromBackend();
+        }
+        if (typeof syncOutfitsFromBackend === 'function') {
+            await syncOutfitsFromBackend();
+        }
+
+        showToast(`✨ MySQL連携完了！（新規注文:${syncedOrders}件, 服:${syncedCloset}点, コーデ:${syncedOutfits}件を保存）`);
+    } catch (err) {
+        showToast('⚠️ Pythonサーバー(ポート8080)が起動していません。start_server.bat または python app.py を起動してください');
+    }
 }
 
 function renderMyPage() {
@@ -840,8 +1064,26 @@ function renderMyPage() {
 }
 
 // --------------------------------------------------------------------------
-// 9. お気に入り機能
+// 9. お気に入り機能 (MySQL同期対応)
 // --------------------------------------------------------------------------
+async function syncFavoritesFromBackend() {
+    try {
+        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+        const userId = AppState.currentUser ? AppState.currentUser.id : '';
+        const res = await fetch(`${apiBase}/api/favorites${userId ? '?user_id=' + userId : ''}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.favorites) && data.favorites.length > 0) {
+                const merged = Array.from(new Set([...AppState.favorites, ...data.favorites]));
+                AppState.favorites = merged;
+                localStorage.setItem('manekin_favorites', JSON.stringify(merged));
+                updateFavoriteBadges();
+                if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+            }
+        }
+    } catch (e) {}
+}
+
 function handleToggleFavorite(productId) {
     const index = AppState.favorites.indexOf(productId);
     let isAdded = false;
@@ -860,8 +1102,19 @@ function handleToggleFavorite(productId) {
     updateFavoriteBadges();
     syncAllFavoriteButtons(productId, isAdded);
 
+    // MySQL (favoritesテーブル) にも即時同期
+    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    fetch(`${apiBase}/api/favorites/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            product_id: productId,
+            user_id: AppState.currentUser ? AppState.currentUser.id : 1
+        })
+    }).catch(() => {});
+
     // スタジオ画面のブランドお気に入り一覧も即時同期
-    renderStudioBrandList();
+    if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
 
     if (window.location.hash === '#favorites') {
         renderFavoriteProducts();
@@ -1057,10 +1310,23 @@ async function handleLogin(e) {
 
     if (loggedInUser) {
         loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 1000;
+        if (loggedInUser.body_height && AppState.userBodyProfile) {
+            AppState.userBodyProfile.height = loggedInUser.body_height;
+            AppState.userBodyProfile.bodyType = loggedInUser.body_type || 'REGULAR';
+            AppState.userBodyProfile.styleTaste = loggedInUser.style_taste || 'MINIMAL';
+            localStorage.setItem('manekin_body_profile', JSON.stringify(AppState.userBodyProfile));
+        }
         AppState.currentUser = loggedInUser;
         localStorage.setItem('manekin_user', JSON.stringify(loggedInUser));
         resetMannequinOutfit(true);
         updateAuthNavUI();
+
+        // ログインしたユーザーのデータをMySQLから同期
+        syncOrdersFromBackend();
+        syncFavoritesFromBackend();
+        if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
+        if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
+
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
         if (AppState.pendingAuthTarget === 'manekin') {
@@ -1145,6 +1411,12 @@ async function handleRegister(e) {
         localStorage.setItem('manekin_user', JSON.stringify(newUser));
         resetMannequinOutfit(true);
         updateAuthNavUI();
+
+        syncOrdersFromBackend();
+        syncFavoritesFromBackend();
+        if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
+        if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
+
         if (nameEl) nameEl.value = '';
         if (emailEl) emailEl.value = '';
         if (passEl) passEl.value = '';
@@ -1228,5 +1500,9 @@ window.handlePointsInputChange = handlePointsInputChange;
 window.handleUseAllPoints = handleUseAllPoints;
 window.handleResetPoints = handleResetPoints;
 window.importOrderToCloset = importOrderToCloset;
+window.handleSyncAllToMySQL = handleSyncAllToMySQL;
+window.syncOrdersFromBackend = syncOrdersFromBackend;
+window.syncFavoritesFromBackend = syncFavoritesFromBackend;
+window.handleClearOrderHistory = handleClearOrderHistory;
 
 // --------------------------------------------------------------------------

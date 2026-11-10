@@ -653,7 +653,7 @@
                             </div>
                             <div class="comp-row">
                                 <span class="comp-label">データベース連携:</span>
-                                <span class="comp-value status-badge">MySQL (manekin_db) 保存完了</span>
+                                <span class="comp-value status-badge" id="comp-db-status">MySQL (manekin_db) 保存完了</span>
                             </div>
                         </div>
 
@@ -865,14 +865,24 @@
                     <div class="orders-section-header"
                         style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 class="orders-subheading">ご注文履歴一覧</h3>
+                            <h3 class="orders-subheading" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span>ご注文履歴一覧</span>
+                                <span id="mysql-status-pill" style="font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; background: #f3f4f6; color: #4b5563;">DB接続確認中...</span>
+                            </h3>
                             <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
                         </div>
-                        <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
-                            style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
-                            title="テスト注文履歴をリセットして0件にします">
-                            履歴をすべて初期化 (0件にする)
-                        </button>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-outline-xs" onclick="handleSyncAllToMySQL()"
+                                style="font-size: 0.75rem; padding: 5px 12px; color: #111; border-color: #111; font-weight: 600;"
+                                title="LocalStorageの注文データ・手持ち服データをMySQLデータベースに同期します">
+                                🔄 LocalStorage ⇄ MySQL 即時同期
+                            </button>
+                            <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
+                                style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
+                                title="テスト注文履歴をリセットして0件にします">
+                                履歴をすべて初期化 (0件にする)
+                            </button>
+                        </div>
                     </div>
                     <div class="orders-table-wrapper">
                         <table class="orders-table">
