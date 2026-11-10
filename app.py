@@ -161,7 +161,8 @@ def create_order():
 
     # 送料計算（5,000円以上は送料無料、未満は全国一律550円）
     shipping_fee = 0 if subtotal >= 5000 else 550
-    total_amount = subtotal + shipping_fee
+    used_points = int(req.get('used_points', 0))
+    total_amount = max(0, subtotal + shipping_fee - used_points)
 
     # ユニークな注文番号の生成（例: ORD-20261028-A7X9）
     today_str = datetime.now().strftime('%Y%m%d')
@@ -351,7 +352,8 @@ def register_user():
                 "id": user_id,
                 "name": name,
                 "email": email,
-                "rank": "REGULAR MEMBER"
+                "rank": "REGULAR MEMBER",
+                "points": 1000
             }
         }), 201
 

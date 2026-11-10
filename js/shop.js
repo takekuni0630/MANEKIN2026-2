@@ -381,17 +381,178 @@ function renderCheckoutPage() {
         `).join('');
     }
 
+    // チェックアウト時のポイントと金額サマリーを計算・初期化
+    updateCheckoutCalculations();
+}
+
+// ==============================================================================
+// 7. ポイント管理 & チェックアウト計算（1pt = 1円）
+// ==============================================================================
+
+// ユーザーの保有ポイント取得ヘルパー
+function getUserPoints() {
+    if (!AppState.currentUser) return 0;
+    if (AppState.currentUser.points === undefined || AppState.currentUser.points === null) {
+        AppState.currentUser.points = 1000; // 初期ボーナス付与
+        localStorage.setItem('manekin_user', JSON.stringify(AppState.currentUser));
+    }
+    return AppState.currentUser.points;
+}
+
+// ユーザーの保有ポイント更新ヘルパー
+function setUserPoints(points) {
+    if (!AppState.currentUser) return;
+    AppState.currentUser.points = Math.max(0, points);
+    localStorage.setItem('manekin_user', JSON.stringify(AppState.currentUser));
+
+    // マイページ等の表示もリアルタイム更新
+    const mypagePoints = document.getElementById('mypage-points');
+    if (mypagePoints) {
+        mypagePoints.innerHTML = `${AppState.currentUser.points.toLocaleString()} <span class="stat-unit">pt</span>`;
+    }
+}
+
+// チェックアウト時のポイント利用入力ステート
+let checkoutUsedPoints = 0;
+
+/**
+ * チェックアウトサマリー計算・更新ヘルパー
+ */
+function updateCheckoutCalculations() {
+    const subtotalEl = document.getElementById('checkout-subtotal');
+    const shippingEl = document.getElementById('checkout-shipping');
+    const taxEl = document.getElementById('checkout-tax');
+    const totalEl = document.getElementById('checkout-total');
+    const pointDiscountRow = document.getElementById('checkout-point-discount-row');
+    const pointDiscountEl = document.getElementById('checkout-point-discount');
+    const earnedPointsEl = document.getElementById('checkout-earned-points');
+    const userPointsEl = document.getElementById('checkout-user-points');
+    const pointInput = document.getElementById('checkout-use-points');
+    const pointMessage = document.getElementById('checkout-point-message');
+
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shipping = subtotal >= 5000 ? 0 : 550;
-    const tax = Math.round(subtotal * 0.1);
-    const total = subtotal + shipping;
+    const grossTotal = subtotal + shipping;
+
+    const availablePoints = getUserPoints();
+    if (userPointsEl) userPointsEl.textContent = availablePoints.toLocaleString();
+
+    // 利用可能ポイント上限（保有ポイントと支払合計の小さい方）
+    const maxUsable = Math.min(availablePoints, grossTotal);
+
+    if (checkoutUsedPoints > maxUsable) {
+        checkoutUsedPoints = maxUsable;
+    }
+    if (checkoutUsedPoints < 0) {
+        checkoutUsedPoints = 0;
+    }
+
+    if (pointInput && document.activeElement !== pointInput) {
+        pointInput.value = checkoutUsedPoints > 0 ? checkoutUsedPoints : '';
+    }
+
+    const netTotal = Math.max(0, grossTotal - checkoutUsedPoints);
+    const tax = Math.round(netTotal * 10 / 110);
+
+    // 今回獲得ポイント: 実質支払い金額の1%（端数切り捨て、購入額があれば最低1pt）
+    const earnedPoints = netTotal > 0 ? Math.max(1, Math.floor(netTotal * 0.01)) : 0;
 
     if (subtotalEl) subtotalEl.textContent = `¥${subtotal.toLocaleString()}`;
     if (shippingEl) shippingEl.textContent = shipping === 0 ? "無料 (5,000円以上)" : `¥${shipping.toLocaleString()}`;
     if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
-    if (totalEl) totalEl.textContent = `¥${total.toLocaleString()}`;
+    if (totalEl) totalEl.textContent = `¥${netTotal.toLocaleString()}`;
 
-    // お届け先情報は初期状態では固定値を入力せず、プレースホルダー（例の薄文字）のみ表示
+    if (pointDiscountRow && pointDiscountEl) {
+        if (checkoutUsedPoints > 0) {
+            pointDiscountRow.style.display = 'flex';
+            pointDiscountEl.textContent = `-¥${checkoutUsedPoints.toLocaleString()}`;
+        } else {
+            pointDiscountRow.style.display = 'none';
+        }
+    }
+
+    if (earnedPointsEl) {
+        earnedPointsEl.textContent = `+${earnedPoints.toLocaleString()} pt`;
+    }
+
+    if (pointMessage) {
+        if (checkoutUsedPoints > 0) {
+            pointMessage.innerHTML = `<span style="color: #059669; font-weight: 700;">✓ ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円引き）を適用中</span>（残り: ${(availablePoints - checkoutUsedPoints).toLocaleString()} pt）`;
+        } else {
+            pointMessage.textContent = '1ポイント＝1円として、今回のお買い物代金にそのままご利用いただけます。';
+        }
+    }
+
+    return { subtotal, shipping, grossTotal, usedPoints: checkoutUsedPoints, netTotal, earnedPoints };
+}
+
+function handlePointsInputChange() {
+    const pointInput = document.getElementById('checkout-use-points');
+    const val = parseInt(pointInput ? pointInput.value : 0, 10) || 0;
+    checkoutUsedPoints = Math.max(0, val);
+    updateCheckoutCalculations();
+}
+
+function handleUseAllPoints() {
+    const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shipping = subtotal >= 5000 ? 0 : 550;
+    const grossTotal = subtotal + shipping;
+    const available = getUserPoints();
+
+    if (available <= 0) {
+        showToast('現在ご利用可能な保有ポイントはありません');
+        return;
+    }
+
+    checkoutUsedPoints = Math.min(available, grossTotal);
+    const pointInput = document.getElementById('checkout-use-points');
+    if (pointInput) pointInput.value = checkoutUsedPoints;
+    updateCheckoutCalculations();
+    showToast(`✨ 保有ポイントから ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円分）を適用しました`);
+}
+
+function handleResetPoints() {
+    checkoutUsedPoints = 0;
+    const pointInput = document.getElementById('checkout-use-points');
+    if (pointInput) pointInput.value = '';
+    updateCheckoutCalculations();
+    showToast('ポイント利用を取り消しました');
+}
+
+/**
+ * 過去の注文履歴から手動でクローゼットへ同期する
+ */
+function importOrderToCloset(idx) {
+    const order = AppState.orderHistory[idx];
+    if (!order || !order.items || order.items.length === 0) return;
+
+    let added = 0;
+    order.items.forEach((it, i) => {
+        const exists = AppState.myCloset.some(c => c.name === it.name && c.color === it.color);
+        if (!exists) {
+            AppState.myCloset.unshift({
+                id: 'purchased-' + (it.id || Date.now()) + '-' + i,
+                productId: it.id,
+                name: it.name,
+                category: it.category || 'TOPS',
+                color: it.color || 'BLACK',
+                season: '通年',
+                image: it.image,
+                isOwned: true,
+                isPurchased: true,
+                price: it.price,
+                purchaseDate: order.date
+            });
+            added++;
+        }
+    });
+    localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+
+    if (added > 0) {
+        showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
+    } else {
+        showToast('この注文の商品はすでにマイクローゼットに登録済みです');
+    }
 }
 
 async function handlePlaceOrder() {
@@ -435,9 +596,7 @@ async function handlePlaceOrder() {
         placeBtn.innerHTML = '<span class="order-btn-text">注文を確定中... (MySQLへ保存)</span>';
     }
 
-    const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shipping = subtotal >= 5000 ? 0 : 550;
-    const totalAmount = subtotal + shipping;
+    const calc = updateCheckoutCalculations();
 
     const orderPayload = {
         customer_name: customerName,
@@ -447,9 +606,11 @@ async function handlePlaceOrder() {
         address: address,
         payment_method: paymentMethod,
         delivery_time: deliveryTime,
-        subtotal: subtotal,
-        shipping_fee: shipping,
-        total_amount: totalAmount,
+        subtotal: calc.subtotal,
+        shipping_fee: calc.shipping,
+        used_points: calc.usedPoints,
+        total_amount: calc.netTotal,
+        earned_points: calc.earnedPoints,
         user_id: AppState.currentUser ? AppState.currentUser.id : 1,
         items: AppState.cart
     };
@@ -478,7 +639,7 @@ async function handlePlaceOrder() {
             date: new Date().toLocaleDateString('ja-JP') + " " + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
             customer_name: customerName,
             address: address,
-            total_amount: totalAmount,
+            total_amount: calc.netTotal,
             status: "注文受付・発送準備中",
             items: [...AppState.cart]
         };
@@ -487,12 +648,46 @@ async function handlePlaceOrder() {
     const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.color} / ${it.size}) × ${it.quantity}`);
     confirmedOrder.items_summary = itemSummaryList.join(", ");
 
+    // 1. ポイント更新（利用ポイント減算 ＋ 今回獲得ポイント付与）
+    const currentPts = getUserPoints();
+    const updatedPts = Math.max(0, currentPts - calc.usedPoints) + calc.earnedPoints;
+    setUserPoints(updatedPts);
+
+    // 2. 【要件1】購入商品をマイクローゼットに自動保存！
+    const purchasedItems = [...confirmedOrder.items];
+    let addedCount = 0;
+    purchasedItems.forEach((it, idx) => {
+        // 重複チェック
+        const exists = AppState.myCloset.some(c => c.name === it.name && c.color === it.color);
+        if (!exists) {
+            const newClosetItem = {
+                id: 'purchased-' + (it.id || Date.now()) + '-' + idx,
+                productId: it.id,
+                name: it.name,
+                category: it.category || 'TOPS',
+                color: it.color || 'BLACK',
+                season: '通年',
+                image: it.image,
+                isOwned: true,
+                isPurchased: true,
+                price: it.price,
+                purchaseDate: new Date().toLocaleDateString('ja-JP')
+            };
+            AppState.myCloset.unshift(newClosetItem);
+            addedCount++;
+        }
+    });
+    localStorage.setItem('manekin_my_closet', JSON.stringify(AppState.myCloset));
+
+    // 3. 注文履歴追加
     AppState.orderHistory.unshift(confirmedOrder);
     localStorage.setItem('manekin_orders', JSON.stringify(AppState.orderHistory));
 
+    // 4. カート初期化
     AppState.cart = [];
     localStorage.removeItem('manekin_cart');
     updateCartBadge();
+    checkoutUsedPoints = 0;
 
     const mainLayout = document.getElementById('checkout-layout-main');
     const completedView = document.getElementById('order-completed-view');
@@ -500,6 +695,9 @@ async function handlePlaceOrder() {
     const compOrderDate = document.getElementById('comp-order-date');
     const compOrderAddress = document.getElementById('comp-order-address');
     const compOrderTotal = document.getElementById('comp-order-total');
+    const compEarnedPoints = document.getElementById('comp-earned-points');
+    const compBalancePoints = document.getElementById('comp-balance-points');
+    const closetBannerMsg = document.getElementById('completed-closet-msg');
 
     if (mainLayout) mainLayout.style.display = 'none';
     if (completedView) completedView.style.display = 'block';
@@ -508,8 +706,13 @@ async function handlePlaceOrder() {
     if (compOrderDate) compOrderDate.textContent = confirmedOrder.date;
     if (compOrderAddress) compOrderAddress.textContent = confirmedOrder.address;
     if (compOrderTotal) compOrderTotal.textContent = `¥${confirmedOrder.total_amount.toLocaleString()}`;
+    if (compEarnedPoints) compEarnedPoints.textContent = `+${calc.earnedPoints.toLocaleString()} pt`;
+    if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
+    if (closetBannerMsg && purchasedItems.length > 0) {
+        closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
+    }
 
-    showToast('ご注文を確定しました！購入履歴に反映されました。');
+    showToast(`🎉 ご注文確定！${calc.earnedPoints}ポイントを獲得し、商品をマイクローゼットに保存しました`);
 }
 
 // --------------------------------------------------------------------------
@@ -573,7 +776,7 @@ function renderMyPage() {
         if (userEmailEl) userEmailEl.textContent = AppState.currentUser.email || '';
         if (avatarEl) avatarEl.textContent = (AppState.currentUser.name || 'M').charAt(0);
         if (rankEl) rankEl.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
-        if (pointsEl) pointsEl.innerHTML = `${(AppState.currentUser.points || 0).toLocaleString()} <span class="stat-unit">pt</span>`;
+        if (pointsEl) pointsEl.innerHTML = `${getUserPoints().toLocaleString()} <span class="stat-unit">pt</span>`;
         if (actionsWrapper) {
             actionsWrapper.innerHTML = '<button class="btn btn-outline-sm" id="logout-btn" onclick="handleLogout()">ログアウト</button>';
         }
@@ -783,7 +986,8 @@ function handleDemoLogin() {
         id: 1,
         name: "山田 太郎 様",
         email: "demo@manekin.com",
-        rank: "VIP MEMBER"
+        rank: "VIP MEMBER",
+        points: 1000
     };
     AppState.currentUser = demoUser;
     localStorage.setItem('manekin_user', JSON.stringify(demoUser));
@@ -852,6 +1056,7 @@ async function handleLogin(e) {
     }
 
     if (loggedInUser) {
+        loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 1000;
         AppState.currentUser = loggedInUser;
         localStorage.setItem('manekin_user', JSON.stringify(loggedInUser));
         resetMannequinOutfit(true);
@@ -935,6 +1140,7 @@ async function handleRegister(e) {
     }
 
     if (newUser) {
+        newUser.points = 1000; // 新規会員登録で1,000ポイント（1,000円分）プレゼント！
         AppState.currentUser = newUser;
         localStorage.setItem('manekin_user', JSON.stringify(newUser));
         resetMannequinOutfit(true);
@@ -944,15 +1150,15 @@ async function handleRegister(e) {
         if (passEl) passEl.value = '';
         if (AppState.pendingAuthTarget === 'manekin') {
             AppState.pendingAuthTarget = null;
-            showToast(`🎉 会員登録完了！ようこそ、${newUser.name}。MANEKINスタジオへ進みます`);
+            showToast(`🎉 会員登録完了！1,000ポイント（1,000円分）を進呈しました！ようこそ、${newUser.name}`);
             window.location.hash = '#manekin-studio';
         } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
             AppState.pendingAuthTarget = null;
-            showToast(`🎉 会員登録完了！ようこそ、${newUser.name}。ご注文手続きへ進みます`);
+            showToast(`🎉 会員登録完了！1,000ポイント（1,000円分）を進呈しました！ご注文手続きへ戻ります`);
             window.location.hash = '#checkout';
         } else {
             AppState.pendingAuthTarget = null;
-            showToast(`🎉 会員登録が完了しました！ようこそ、${newUser.name}`);
+            showToast(`🎉 会員登録完了！特典として 1,000 ポイント（1,000円分）をプレゼントしました！ようこそ、${newUser.name}`);
             window.location.hash = '#mypage';
         }
     }
@@ -1014,5 +1220,13 @@ function closeMobileDrawer() {
         document.body.style.overflow = '';
     }
 }
+
+// グローバル公開
+window.getUserPoints = getUserPoints;
+window.setUserPoints = setUserPoints;
+window.handlePointsInputChange = handlePointsInputChange;
+window.handleUseAllPoints = handleUseAllPoints;
+window.handleResetPoints = handleResetPoints;
+window.importOrderToCloset = importOrderToCloset;
 
 // --------------------------------------------------------------------------

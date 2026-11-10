@@ -481,7 +481,36 @@
                                     </select>
                                 </div>
 
-                                <!-- セクション3: お支払い方法の選択 -->
+                                <!-- セクション3: ポイントの利用（1pt = 1円） -->
+                                <div class="checkout-point-card" id="checkout-point-card">
+                                    <div class="checkout-point-header">
+                                        <div class="checkout-point-title">
+                                            <span class="point-sparkle">✨</span> ポイントの利用
+                                            <span class="point-rate-tag">1pt ＝ 1円分</span>
+                                        </div>
+                                        <div class="checkout-point-balance-badge">
+                                            保有ポイント: <strong id="checkout-user-points">1,000</strong> pt
+                                        </div>
+                                    </div>
+                                    <div class="checkout-point-body">
+                                        <div class="point-input-row">
+                                            <div class="point-input-group">
+                                                <input type="number" id="checkout-use-points" class="form-input point-num-input"
+                                                    placeholder="0" min="0" value="0" oninput="handlePointsInputChange()">
+                                                <span class="point-input-suffix">pt 利用</span>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-xs btn-use-all-points"
+                                                onclick="handleUseAllPoints()">全額使う</button>
+                                            <button type="button" class="btn btn-outline-xs btn-reset-points"
+                                                onclick="handleResetPoints()">取消</button>
+                                        </div>
+                                        <p class="point-help-text" id="checkout-point-message">
+                                            1ポイント＝1円として、今回のお買い物代金にそのままご利用いただけます。
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- セクション4: お支払い方法の選択 -->
                                 <div class="payment-method-box">
                                     <h3 class="payment-box-title">お支払い方法の選択 <span class="required">*</span></h3>
                                     <div class="payment-options-grid">
@@ -538,6 +567,10 @@
                                     <span>商品合計</span>
                                     <span id="checkout-subtotal">¥0</span>
                                 </div>
+                                <div class="summary-row checkout-point-discount-row" id="checkout-point-discount-row" style="display: none; color: #dc2626;">
+                                    <span>ポイント利用割引</span>
+                                    <span id="checkout-point-discount">-¥0</span>
+                                </div>
                                 <div class="summary-row">
                                     <span>配送料 <small class="text-muted">(5,000円以上で無料)</small></span>
                                     <span id="checkout-shipping">¥550</span>
@@ -551,6 +584,15 @@
                                     <span class="total-label">お支払い合計 (税込)</span>
                                     <span class="total-amount" id="checkout-total">¥0</span>
                                 </div>
+                            </div>
+
+                            <!-- 今回獲得予定ポイント（1%還元） -->
+                            <div class="checkout-earned-points-card">
+                                <div class="earned-points-header">
+                                    <span class="earned-points-label">✨ 今回獲得予定ポイント (1%還元)</span>
+                                    <strong class="earned-points-value" id="checkout-earned-points">+0 pt</strong>
+                                </div>
+                                <p class="earned-points-hint">※ご注文確定時に付与され、次回以降1pt＝1円として利用できます</p>
                             </div>
 
                             <!-- 【要件追加】注文を確定するボタン -->
@@ -601,16 +643,35 @@
                                 <span class="comp-label">お支払い合計:</span>
                                 <strong class="comp-value highlight-price" id="comp-order-total">¥0</strong>
                             </div>
+                            <div class="comp-row" id="comp-point-row">
+                                <span class="comp-label">今回獲得ポイント:</span>
+                                <strong class="comp-value text-success" id="comp-earned-points">+0 pt</strong>
+                            </div>
+                            <div class="comp-row">
+                                <span class="comp-label">現在の保有ポイント:</span>
+                                <span class="comp-value" id="comp-balance-points">1,000 pt</span>
+                            </div>
                             <div class="comp-row">
                                 <span class="comp-label">データベース連携:</span>
                                 <span class="comp-value status-badge">MySQL (manekin_db) 保存完了</span>
                             </div>
                         </div>
 
+                        <!-- 【要件追加】マイクローゼットへの自動保存通知バナー -->
+                        <div class="completed-closet-banner" id="completed-closet-banner">
+                            <div class="closet-banner-icon">👗</div>
+                            <div class="closet-banner-text">
+                                <strong>ご購入商品をマイクローゼットに自動保存しました！</strong>
+                                <p id="completed-closet-msg">購入いただいたアイテムは「MANEKIN AI STUDIO」に登録済みです。手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。</p>
+                            </div>
+                        </div>
+
                         <div class="completed-actions">
-                            <a href="#mypage" class="btn btn-primary"
-                                onclick="window.location.hash='#mypage'">マイページの購入履歴を確認する</a>
-                            <a href="#items" class="btn btn-secondary"
+                            <a href="#manekin" class="btn btn-primary"
+                                onclick="window.location.hash='#manekin'">✨ マイクローゼットで試着室を開く</a>
+                            <a href="#mypage" class="btn btn-secondary"
+                                onclick="window.location.hash='#mypage'">マイページの購入履歴を確認</a>
+                            <a href="#items" class="btn btn-outline"
                                 onclick="window.location.hash='#items'">買い物を続ける</a>
                         </div>
                     </div>
@@ -682,6 +743,18 @@
                     <div class="auth-header">
                         <h1 class="auth-title">REGISTER</h1>
                         <p class="auth-subtitle">新規会員登録</p>
+                    </div>
+
+                    <!-- 新規会員登録 特典バナー -->
+                    <div class="auth-point-banner">
+                        <div class="auth-point-badge">WELCOME GIFT</div>
+                        <div class="auth-point-content">
+                            <span class="auth-point-icon">🎁</span>
+                            <div class="auth-point-text">
+                                <strong>新規会員登録で今すぐ使える 1,000 ポイント（1,000円分）プレゼント！</strong>
+                                <p>登録完了で即座に付与され、今回・次回のお買い物で1pt＝1円としてご利用いただけます。</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
