@@ -56,6 +56,68 @@ def get_db_connection():
         return None
 
 
+def parse_user_id(raw_uid):
+    """user_idを整数として検証・変換する"""
+    if raw_uid is None or raw_uid == '':
+        return None
+    try:
+        uid = int(raw_uid)
+        return uid if uid > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
+def ensure_account_tables():
+    """
+    アカウント別永続化に必要なテーブル(cart_items, user_studio_states)の存在と
+    基本スキーマ制約をサーバー起動時に保証する
+    """
+    conn = get_db_connection()
+    if not conn:
+        return False
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS `cart_items` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `user_id` int(11) NOT NULL,
+                  `product_id` int(11) NOT NULL,
+                  `name` varchar(255) NOT NULL,
+                  `category` varchar(50) NOT NULL DEFAULT 'TOPS',
+                  `color` varchar(50) NOT NULL DEFAULT 'STANDARD',
+                  `size` varchar(20) NOT NULL DEFAULT 'M',
+                  `price` int(11) NOT NULL DEFAULT 0,
+                  `quantity` int(11) NOT NULL DEFAULT 1,
+                  `image_url` text DEFAULT NULL,
+                  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_user_cart_item` (`user_id`, `product_id`, `color`, `size`),
+                  KEY `idx_cart_user_id` (`user_id`),
+                  CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS `user_studio_states` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `user_id` int(11) NOT NULL,
+                  `current_outfit_json` longtext DEFAULT NULL,
+                  `fitting_offsets_json` longtext DEFAULT NULL,
+                  `studio_gender` varchar(16) NOT NULL DEFAULT 'MEN',
+                  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_studio_state_user` (`user_id`),
+                  CONSTRAINT `fk_studio_state_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            """)
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"[!] テーブル初期化確認エラー: {e}")
+        return False
+    finally:
+        conn.close()
+
+
 # ==============================================================================
 # 1. 商品関連 API (PRODUCTS)
 # ==============================================================================
@@ -158,13 +220,13 @@ def create_order():
     payment_method = req.get('payment_method', 'クレジットカード')
     delivery_time = req.get('delivery_time', '指定なし')
     cart_items = req.get('items', []) or req.get('items_detail', []) # カート内商品リスト
-    user_id = req.get('user_id', None)
+    user_id = parse_user_id(req.get('user_id', None))
     provided_order_no = req.get('order_no', None)
     is_sync = bool(req.get('sync_mode', False))
 
     # 入力バリデーション
     if not user_id:
-        return jsonify({"status": "error", "message": "ご注文にはログインが必要です（user_idが不足しています）。"}), 400
+        return jsonify({"status": "error", "message": "ご注文には有効な会員ログインが必要です（user_idが不足または不正です）。"}), 400
     if not customer_name or not customer_email or not address or not cart_items:
         return jsonify({"status": "error", "message": "お名前、メールアドレス、住所、注文商品は必須です。"}), 400
 
@@ -192,6 +254,10 @@ def create_order():
 
     try:
         with conn.cursor() as cursor:
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
+
             # 既存注文番号チェック（同期時の重複防止）
             if provided_order_no:
                 cursor.execute("SELECT `id`, `order_no`, `user_id` FROM `orders` WHERE `order_no` = %s;", (provided_order_no,))
@@ -271,7 +337,7 @@ def create_order():
                     today_str
                 ))
 
-            # 4. ユーザーのポイント残高を更新 (通常注文時)
+            # 4. ユーザーのポイント残高を更新 & カート(cart_items)をクリア (通常注文時)
             updated_points = None
             if user_id and not is_sync:
                 cursor.execute("SELECT `points` FROM `users` WHERE `id` = %s;", (user_id,))
@@ -280,6 +346,8 @@ def create_order():
                     curr_pts = int(u_row.get('points', 1000))
                     updated_points = max(0, curr_pts - used_points) + earned_points
                     cursor.execute("UPDATE `users` SET `points` = %s WHERE `id` = %s;", (updated_points, user_id))
+                # MySQL上のアカウント別カートから注文済み商品をクリア
+                cursor.execute("DELETE FROM `cart_items` WHERE `user_id` = %s;", (user_id,))
 
         # トランザクションコミット
         conn.commit()
@@ -323,7 +391,7 @@ def get_orders():
     """
     マイページに表示するための購入履歴一覧をMySQLから取得するエンドポイント（アカウント別フィルタ）
     """
-    user_id = request.args.get('user_id', None)
+    user_id = parse_user_id(request.args.get('user_id', None))
     if not user_id:
         return jsonify({"status": "success", "orders": []}), 200
 
@@ -379,13 +447,14 @@ def clear_orders():
     """
     指定したユーザーの注文履歴のみをリセットするエンドポイント
     """
-    user_id = request.args.get('user_id', None)
-    if not user_id:
+    raw_uid = request.args.get('user_id', None)
+    if not raw_uid:
         req = request.get_json(silent=True) or {}
-        user_id = req.get('user_id')
+        raw_uid = req.get('user_id')
+    user_id = parse_user_id(raw_uid)
 
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -545,9 +614,9 @@ def sync_user_data():
     ユーザーの保有ポイントをMySQLに同期保存
     """
     req = request.get_json() or {}
-    user_id = req.get('user_id')
+    user_id = parse_user_id(req.get('user_id'))
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
 
     points = req.get('points')
 
@@ -578,7 +647,7 @@ def get_favorites():
     """
     ログイン中アカウントのお気に入り商品IDリストをMySQLから取得するエンドポイント
     """
-    user_id = request.args.get('user_id', None)
+    user_id = parse_user_id(request.args.get('user_id', None))
     if not user_id:
         return jsonify({"status": "success", "favorites": []}), 200
 
@@ -605,10 +674,10 @@ def toggle_favorite():
     """
     req = request.get_json() or {}
     product_id = req.get('product_id')
-    user_id = req.get('user_id')
+    user_id = parse_user_id(req.get('user_id'))
 
     if not product_id or not user_id:
-        return jsonify({"status": "error", "message": "商品IDとユーザーIDが必要です。"}), 400
+        return jsonify({"status": "error", "message": "商品IDと有効なユーザーIDが必要です。"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -639,9 +708,9 @@ def sync_favorites():
     LocalStorage内のお気に入りをMySQLへ一括同期
     """
     req = request.get_json() or {}
-    user_id = req.get('user_id')
+    user_id = parse_user_id(req.get('user_id'))
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
     product_ids = req.get('product_ids', [])
 
     conn = get_db_connection()
@@ -650,13 +719,13 @@ def sync_favorites():
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT `product_id` FROM `favorites` WHERE `user_id` = %s;", (user_id,))
-            current_favs = set(r['product_id'] for r in cursor.fetchall())
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
             added = 0
             for pid in product_ids:
-                if pid not in current_favs:
-                    cursor.execute("INSERT INTO `favorites` (`user_id`, `product_id`, `created_at`) VALUES (%s, %s, NOW());", (user_id, pid))
-                    added += 1
+                cursor.execute("INSERT IGNORE INTO `favorites` (`user_id`, `product_id`, `created_at`) VALUES (%s, %s, NOW());", (user_id, int(pid)))
+                added += cursor.rowcount
         conn.commit()
         return jsonify({"status": "success", "message": f"{added} 件のお気に入りをMySQLに同期しました。"}), 200
     except Exception as e:
@@ -709,9 +778,9 @@ def save_user_outfit():
     作成したコーディネートをMySQL(saved_outfits)に保存
     """
     req = request.get_json() or {}
-    user_id = req.get('user_id')
+    user_id = parse_user_id(req.get('user_id'))
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
     outfit_uid = req.get('id') or f"outfit-{int(datetime.now().timestamp()*1000)}"
     title = req.get('title', 'マイスタイリングコーデ')
     date_str = req.get('date', datetime.now().strftime('%Y/%m/%d'))
@@ -724,6 +793,9 @@ def save_user_outfit():
 
     try:
         with conn.cursor() as cursor:
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
             insert_sql = """
             INSERT INTO `saved_outfits` (`user_id`, `outfit_uid`, `title`, `date`, `comment`, `items_json`, `created_at`)
             VALUES (%s, %s, %s, %s, %s, %s, NOW())
@@ -748,12 +820,13 @@ def delete_user_outfit(outfit_uid):
     """
     保存したコーディネートをMySQLから削除（該当アカウント分のみ削除）
     """
-    user_id = request.args.get('user_id', None)
-    if not user_id:
+    raw_uid = request.args.get('user_id', None)
+    if not raw_uid:
         req = request.get_json(silent=True) or {}
-        user_id = req.get('user_id')
+        raw_uid = req.get('user_id')
+    user_id = parse_user_id(raw_uid)
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -828,6 +901,10 @@ def manekin_virtual_try_on():
 @app.route('/api/closet/<user_id>', methods=['GET'])
 def get_user_closet(user_id):
     """会員の手持ち服リスト（デジタルクローゼット）をMySQLから取得"""
+    uid = parse_user_id(user_id)
+    if not uid:
+        return jsonify({"status": "success", "user_id": user_id, "closet_items": [], "total_items": 0}), 200
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
@@ -836,12 +913,12 @@ def get_user_closet(user_id):
         with conn.cursor() as cursor:
             cursor.execute(
                 "SELECT `id`, `user_id`, `item_uid`, `product_id`, `name`, `category`, `color`, `season`, `image_url` as `image`, `is_owned`, `is_purchased`, `price`, `purchase_date`, `created_at` FROM `closet_items` WHERE `user_id` = %s ORDER BY `id` DESC;",
-                (user_id,)
+                (uid,)
             )
             items = cursor.fetchall()
             return jsonify({
                 "status": "success",
-                "user_id": user_id,
+                "user_id": uid,
                 "closet_items": items,
                 "total_items": len(items)
             }), 200
@@ -855,9 +932,9 @@ def get_user_closet(user_id):
 def add_to_closet():
     """手持ち服または購入商品をMySQL(closet_items)に登録"""
     req = request.get_json() or {}
-    user_id = req.get('user_id')
+    user_id = parse_user_id(req.get('user_id'))
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
     name = req.get('name', '').strip()
     category = req.get('category', 'BOTTOMS')
     color = req.get('color', 'BLACK')
@@ -879,6 +956,9 @@ def add_to_closet():
 
     try:
         with conn.cursor() as cursor:
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
             insert_sql = """
             INSERT INTO `closet_items` (
                 `user_id`, `item_uid`, `product_id`, `name`, `category`, `color`,
@@ -923,12 +1003,13 @@ def add_to_closet():
 @app.route('/api/closet/delete/<item_uid>', methods=['DELETE'])
 def delete_closet_item(item_uid):
     """手持ち服をMySQL(closet_items)から削除（該当アカウント分のみ削除）"""
-    user_id = request.args.get('user_id', None)
-    if not user_id:
+    raw_uid = request.args.get('user_id', None)
+    if not raw_uid:
         req = request.get_json(silent=True) or {}
-        user_id = req.get('user_id')
+        raw_uid = req.get('user_id')
+    user_id = parse_user_id(raw_uid)
     if not user_id:
-        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -984,6 +1065,289 @@ def recommend_coordinates():
 
 
 # ==============================================================================
+# ▼▼▼【機能 4：ショッピングカート（アカウント別 MySQL 同期）】▼▼▼
+# ==============================================================================
+
+@app.route('/api/cart/<int:user_id>', methods=['GET'])
+def get_user_cart(user_id):
+    """指定アカウントのカート内商品一覧をMySQLから取得"""
+    uid = parse_user_id(user_id)
+    if not uid:
+        return jsonify({"status": "success", "items": []}), 200
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT `product_id`, `name`, `category`, `color`, `size`, `price`, `quantity`, `image_url`
+                FROM `cart_items`
+                WHERE `user_id` = %s
+                ORDER BY `id` ASC;
+                """,
+                (uid,)
+            )
+            rows = cursor.fetchall()
+            items = [
+                {
+                    "id": int(r['product_id']),
+                    "name": r['name'],
+                    "category": r['category'] or 'TOPS',
+                    "color": r['color'] or 'STANDARD',
+                    "size": r['size'] or 'M',
+                    "price": int(r['price'] or 0),
+                    "quantity": int(r['quantity'] or 1),
+                    "image": r['image_url'] or ''
+                }
+                for r in rows
+            ]
+        return jsonify({"status": "success", "user_id": uid, "items": items}), 200
+    except Exception as e:
+        print(f"[!] カート取得エラー: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/cart/sync', methods=['POST'])
+def sync_user_cart():
+    """指定アカウントのカート内容をMySQLに同期保存（全置換方式で厳密管理）"""
+    req = request.get_json() or {}
+    user_id = parse_user_id(req.get('user_id'))
+    if not user_id:
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
+
+    raw_items = req.get('items', [])
+    if not isinstance(raw_items, list):
+        return jsonify({"status": "error", "message": "itemsは配列である必要があります。"}), 400
+
+    # 同一(product_id, color, size)を集約し不正行を除外
+    merged_map = {}
+    ordered_keys = []
+    for it in raw_items:
+        if not isinstance(it, dict):
+            continue
+        pid = it.get('id', it.get('product_id'))
+        try:
+            pid_int = int(pid)
+        except (TypeError, ValueError):
+            continue
+        qty = int(it.get('quantity', 1) or 1)
+        if qty <= 0:
+            continue
+        color = str(it.get('color') or 'STANDARD')[:50]
+        size = str(it.get('size') or 'M')[:20]
+        key = (pid_int, color, size)
+        if key in merged_map:
+            merged_map[key]['quantity'] += qty
+        else:
+            ordered_keys.append(key)
+            merged_map[key] = {
+                "id": pid_int,
+                "name": str(it.get('name') or '商品')[:255],
+                "category": str(it.get('category') or 'TOPS')[:50],
+                "color": color,
+                "size": size,
+                "price": int(it.get('price') or 0),
+                "quantity": qty,
+                "image": str(it.get('image') or '')
+            }
+
+    normalized_items = [merged_map[k] for k in ordered_keys]
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
+
+            cursor.execute("DELETE FROM `cart_items` WHERE `user_id` = %s;", (user_id,))
+            if normalized_items:
+                insert_sql = """
+                INSERT INTO `cart_items` (
+                    `user_id`, `product_id`, `name`, `category`, `color`, `size`, `price`, `quantity`, `image_url`
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                """
+                for item in normalized_items:
+                    cursor.execute(insert_sql, (
+                        user_id, item['id'], item['name'], item['category'],
+                        item['color'], item['size'], item['price'], item['quantity'], item['image']
+                    ))
+        conn.commit()
+        return jsonify({
+            "status": "success",
+            "message": "カートをMySQLに同期しました。",
+            "user_id": user_id,
+            "items": normalized_items
+        }), 200
+    except Exception as e:
+        conn.rollback()
+        print(f"[!] カート保存エラー: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/cart/<int:user_id>', methods=['DELETE'])
+def clear_user_cart(user_id):
+    """指定アカウントのカートをMySQLからクリア"""
+    uid = parse_user_id(user_id)
+    if not uid:
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM `cart_items` WHERE `user_id` = %s;", (uid,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "カートをクリアしました。"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
+# ==============================================================================
+# ▼▼▼【機能 5：スタジオ試着状態（マネキン着用・微調整・性別 アカウント別同期）】▼▼▼
+# ==============================================================================
+
+DEFAULT_STUDIO_OUTFIT = {"hat": None, "outer": None, "tops": None, "bottoms": None, "shoes": None}
+DEFAULT_FITTING_OFFSETS = {
+    "hat": {"x": 0, "y": 0, "scale": 100, "brandSize": "M", "customScale": 100},
+    "tops": {"x": 0, "y": 0, "scale": 100, "brandSize": "M", "customScale": 100},
+    "outer": {"x": 0, "y": 0, "scale": 100, "brandSize": "M", "customScale": 100},
+    "bottoms": {"x": 0, "y": 0, "scale": 100, "brandSize": "M", "customScale": 100},
+    "shoes": {"x": 0, "y": 0, "scale": 100, "brandSize": "M", "customScale": 100}
+}
+
+
+@app.route('/api/studio-state/<int:user_id>', methods=['GET'])
+def get_user_studio_state(user_id):
+    """指定アカウントの現在のマネキン着用状態・位置サイズ微調整・性別設定を取得"""
+    uid = parse_user_id(user_id)
+    if not uid:
+        return jsonify({
+            "status": "success",
+            "exists": False,
+            "studio_state": {
+                "current_outfit": DEFAULT_STUDIO_OUTFIT,
+                "fitting_offsets": DEFAULT_FITTING_OFFSETS,
+                "studio_gender": "MEN"
+            }
+        }), 200
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT `current_outfit_json`, `fitting_offsets_json`, `studio_gender` FROM `user_studio_states` WHERE `user_id` = %s;",
+                (uid,)
+            )
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({
+                    "status": "success",
+                    "user_id": uid,
+                    "exists": False,
+                    "studio_state": {
+                        "current_outfit": DEFAULT_STUDIO_OUTFIT,
+                        "fitting_offsets": DEFAULT_FITTING_OFFSETS,
+                        "studio_gender": "MEN"
+                    }
+                }), 200
+
+            try:
+                outfit = json.loads(row['current_outfit_json']) if row.get('current_outfit_json') else dict(DEFAULT_STUDIO_OUTFIT)
+            except Exception:
+                outfit = dict(DEFAULT_STUDIO_OUTFIT)
+            try:
+                offsets = json.loads(row['fitting_offsets_json']) if row.get('fitting_offsets_json') else dict(DEFAULT_FITTING_OFFSETS)
+            except Exception:
+                offsets = dict(DEFAULT_FITTING_OFFSETS)
+
+            gender = row.get('studio_gender') if row.get('studio_gender') in ('MEN', 'WOMEN') else 'MEN'
+
+        return jsonify({
+            "status": "success",
+            "user_id": uid,
+            "exists": True,
+            "studio_state": {
+                "current_outfit": outfit,
+                "fitting_offsets": offsets,
+                "studio_gender": gender
+            }
+        }), 200
+    except Exception as e:
+        print(f"[!] スタジオ状態取得エラー: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/studio-state/save', methods=['POST'])
+def save_user_studio_state():
+    """指定アカウントの現在のマネキン着用状態・位置サイズ微調整・性別設定をMySQLへ保存"""
+    req = request.get_json() or {}
+    user_id = parse_user_id(req.get('user_id'))
+    if not user_id:
+        return jsonify({"status": "error", "message": "有効なuser_idが必要です。"}), 400
+
+    current_outfit = req.get('current_outfit', DEFAULT_STUDIO_OUTFIT)
+    fitting_offsets = req.get('fitting_offsets', DEFAULT_FITTING_OFFSETS)
+    studio_gender = req.get('studio_gender', 'MEN')
+    if studio_gender not in ('MEN', 'WOMEN'):
+        studio_gender = 'MEN'
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT `id` FROM `users` WHERE `id` = %s;", (user_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": "該当会員が見つかりません。"}), 404
+
+            upsert_sql = """
+            INSERT INTO `user_studio_states` (
+                `user_id`, `current_outfit_json`, `fitting_offsets_json`, `studio_gender`
+            ) VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                `current_outfit_json` = VALUES(`current_outfit_json`),
+                `fitting_offsets_json` = VALUES(`fitting_offsets_json`),
+                `studio_gender` = VALUES(`studio_gender`);
+            """
+            cursor.execute(upsert_sql, (
+                user_id,
+                json.dumps(current_outfit, ensure_ascii=False),
+                json.dumps(fitting_offsets, ensure_ascii=False),
+                studio_gender
+            ))
+        conn.commit()
+        return jsonify({"status": "success", "message": "スタジオ試着状態をMySQLに保存しました。"}), 200
+    except Exception as e:
+        conn.rollback()
+        print(f"[!] スタジオ状態保存エラー: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
+# ==============================================================================
 # 5. 静的ファイル配信・ルートハンドラ
 # ==============================================================================
 
@@ -1002,6 +1366,7 @@ def serve_static(path):
 # サーバー起動メインルーチン
 # ==============================================================================
 def main():
+    ensure_account_tables()
     port = int(os.environ.get('PORT', 8080))
     print("=" * 70)
     print("【MANEKIN FASHION バックエンドAPIサーバー (Python + MySQL) 起動中】")
@@ -1011,6 +1376,8 @@ def main():
     print("  ・商品一覧 / 詳細      : GET  /api/products , GET /api/products/<id>")
     print("  ・注文作成 / 確定      : POST /api/orders (MySQLに書き込み)")
     print("  ・購入履歴一覧        : GET  /api/orders (MySQLから取得)")
+    print("  ・カート管理          : GET/DELETE /api/cart/<user_id> , POST /api/cart/sync")
+    print("  ・スタジオ状態管理    : GET /api/studio-state/<user_id> , POST /api/studio-state/save")
     print("  ・会員登録 / ログイン  : POST /api/auth/register , POST /api/auth/login")
     print("  ・MANEKIN 3D / AI機能 : /api/manekin/* , /api/closet/* , /api/ai-coordinate/*")
     print("=" * 70)

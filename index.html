@@ -1613,7 +1613,7 @@
                 <h2 class="modal-title" id="modal-add-closet-title">手持ちの服を登録する</h2>
                 <p class="modal-subtext">登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。</p>
 
-                <form id="form-add-closet" onsubmit="handleAddClosetItem(event)">
+                <form id="form-add-closet" novalidate>
                     <!-- 写真・画像登録エリア -->
                     <div class="form-group">
                         <label class="form-label">服の写真（画像） <span class="required">*</span></label>
@@ -1772,8 +1772,7 @@
 
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeAddClosetModal()">キャンセル</button>
-                        <button type="submit" class="btn btn-primary" id="btn-closet-submit"
-                            onclick="handleAddClosetItem(event)">クローゼットに登録する</button>
+                        <button type="submit" class="btn btn-primary" id="btn-closet-submit">クローゼットに登録する</button>
                     </div>
                 </form>
             </div>
@@ -1855,13 +1854,13 @@
 
     <!-- 分割されたJavaScriptモジュールファイルの読み込み -->
     <!-- 1. 商品カタログ・マスターデータ定義 -->
-    <script src="js/products-data.js?v=20261110"></script>
+    <script src="js/products-data.js?v=20261110c"></script>
     <!-- 2. ECショッピング機能（カタログ、詳細、カート、マイページ、認証） -->
-    <script src="js/shop.js?v=20261110"></script>
+    <script src="js/shop.js?v=20261110c"></script>
     <!-- 3. MANEKIN AI STUDIO（試着室、マイクローゼット、AIコメント、コーデ保存） -->
-    <script src="js/studio.js?v=20261110"></script>
+    <script src="js/studio.js?v=20261110c"></script>
     <!-- 4. アプリケーション本体（状態管理、ルーティング、初期化、イベント登録） -->
-    <script src="js/app.js?v=20261110"></script>
+    <script src="js/app.js?v=20261110c"></script>
 </body>
 
 </html>

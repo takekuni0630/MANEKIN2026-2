@@ -53,6 +53,7 @@ function purgeLegacyGlobalStorage() {
         'manekin_saved_outfits',
         'manekin_current_outfit',
         'manekin_fitting_offsets',
+        'manekin_studio_gender',
         'manekin_body_profile',
         'manekin_clean_initial_v2',
         'manekin_clean_orders_v3',
@@ -60,6 +61,14 @@ function purgeLegacyGlobalStorage() {
         'manekin_clean_outfit_v2'
     ];
     legacyKeys.forEach(k => localStorage.removeItem(k));
+}
+
+function getApiBaseUrl() {
+    return (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+}
+
+function isServerUserId(uid) {
+    return uid !== null && uid !== undefined && /^\d+$/.test(String(uid));
 }
 
 function resetAccountScopedDomInputs(user) {
@@ -102,7 +111,15 @@ function getDefaultBodyProfile() {
 function applyAccountSession(user, options = {}) {
     purgeLegacyGlobalStorage();
 
+    // 旧アカウントの保留中デバウンス同期があれば旧ユーザーIDで即時確定させてから切替
+    if (typeof flushPendingStudioStateSync === 'function') {
+        flushPendingStudioStateSync();
+    }
+
     const wasGuest = !AppState.currentUser;
+    const guestCartSnapshot = (options.preserveGuestCart && wasGuest && Array.isArray(AppState.cart))
+        ? JSON.parse(JSON.stringify(AppState.cart))
+        : [];
     resetAccountScopedDomInputs(user || null);
 
     if (!user) {
@@ -115,7 +132,9 @@ function applyAccountSession(user, options = {}) {
         AppState.savedOutfits = [];
         AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
         AppState.fittingOffsets = getDefaultFittingOffsets();
+        AppState.studioGender = 'MEN';
         AppState.userBodyProfile = getDefaultBodyProfile();
+        if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         if (typeof updateCartBadge === 'function') updateCartBadge();
         if (typeof updateFavoriteBadges === 'function') updateFavoriteBadges();
@@ -132,13 +151,13 @@ function applyAccountSession(user, options = {}) {
     AppState.currentUser = user;
     localStorage.setItem('manekin_user', JSON.stringify(user));
 
-    if (options.preserveGuestCart && wasGuest && Array.isArray(AppState.cart) && AppState.cart.length > 0) {
+    if (guestCartSnapshot.length > 0) {
         const userCart = loadScopedData('manekin_cart', [], uid);
         const mergedCart = [...userCart];
-        AppState.cart.forEach(item => {
+        guestCartSnapshot.forEach(item => {
             const idx = mergedCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
-            if (idx > -1) mergedCart[idx].quantity += item.quantity;
-            else mergedCart.push(item);
+            if (idx > -1) mergedCart[idx].quantity += (item.quantity || 1);
+            else mergedCart.push({ ...item });
         });
         AppState.cart = mergedCart;
         saveScopedData('manekin_cart', AppState.cart, uid);
@@ -153,8 +172,10 @@ function applyAccountSession(user, options = {}) {
     AppState.savedOutfits = loadScopedData('manekin_saved_outfits', [], uid);
     AppState.currentOutfit = loadScopedData('manekin_current_outfit', { hat: null, outer: null, tops: null, bottoms: null, shoes: null }, uid);
     AppState.fittingOffsets = loadScopedData('manekin_fitting_offsets', getDefaultFittingOffsets(), uid);
+    AppState.studioGender = loadScopedData('manekin_studio_gender', 'MEN', uid);
     AppState.userBodyProfile = loadScopedData('manekin_body_profile', getDefaultBodyProfile(), uid);
 
+    if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
     if (typeof renderMannequinStage === 'function') renderMannequinStage();
     if (typeof updateCartBadge === 'function') updateCartBadge();
     if (typeof updateFavoriteBadges === 'function') updateFavoriteBadges();
@@ -166,11 +187,13 @@ function applyAccountSession(user, options = {}) {
     if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
     if (typeof renderManekinStudio === 'function') renderManekinStudio(AppState.studioActiveTab || 'create');
 
-    // MySQLからログインアカウントだけの最新データを取得
+    // MySQLからログインアカウントだけの最新データを取得（ゲストカートがある場合は安全にマージ同期）
+    syncCartFromBackend({ mergeItems: guestCartSnapshot });
     syncOrdersFromBackend();
     syncFavoritesFromBackend();
     if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
     if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
+    if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
 }
 
 // 5. 商品カード生成 & カタログ表示
@@ -427,8 +450,128 @@ function handleSizeSelect(chipEl, sizeName) {
 }
 
 // --------------------------------------------------------------------------
-// 7. カート・購入手続き管理（CHECKOUT）
+// 7. カート・購入手続き管理（CHECKOUT & MySQLアカウント別同期）
 // --------------------------------------------------------------------------
+let _cartSyncPromise = Promise.resolve();
+const _cartSyncSeqByUser = {};
+
+function getCartUserSeq(uid) {
+    return _cartSyncSeqByUser[String(uid)] || 0;
+}
+
+function bumpCartUserSeq(uid) {
+    const k = String(uid);
+    _cartSyncSeqByUser[k] = (_cartSyncSeqByUser[k] || 0) + 1;
+    return _cartSyncSeqByUser[k];
+}
+
+async function syncCartToBackend() {
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        return false;
+    }
+    const targetUserId = AppState.currentUser.id;
+    const snapshot = JSON.parse(JSON.stringify(AppState.cart || []));
+    const seq = bumpCartUserSeq(targetUserId);
+
+    const runSync = async () => {
+        if (seq !== getCartUserSeq(targetUserId)) {
+            return true;
+        }
+        try {
+            const res = await fetch(`${getApiBaseUrl()}/api/cart/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: targetUserId,
+                    items: snapshot
+                })
+            });
+            if (!res.ok) throw new Error('Cart sync failed');
+            if (seq === getCartUserSeq(targetUserId)) {
+                removeScopedData('manekin_cart_dirty', targetUserId);
+            }
+            return true;
+        } catch (e) {
+            saveScopedData('manekin_cart_dirty', true, targetUserId);
+            return false;
+        }
+    };
+
+    _cartSyncPromise = _cartSyncPromise.then(runSync, runSync);
+    return _cartSyncPromise;
+}
+
+async function syncCartFromBackend(options = {}) {
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        updateCartBadge();
+        return;
+    }
+    const targetUserId = AppState.currentUser.id;
+    const mergeItems = Array.isArray(options.mergeItems) ? options.mergeItems : [];
+    const isDirty = loadScopedData('manekin_cart_dirty', false, targetUserId) === true;
+    const fetchStartSeq = getCartUserSeq(targetUserId);
+
+    try {
+        const res = await fetch(`${getApiBaseUrl()}/api/cart/${targetUserId}`);
+        if (!res.ok) throw new Error('Cart fetch failed');
+        const data = await res.json();
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+
+        const serverItems = Array.isArray(data.items) ? data.items : [];
+        if (fetchStartSeq !== getCartUserSeq(targetUserId)) {
+            if (mergeItems.length === 0) return;
+            // ログイン直後に追加変更が走っていた場合もサーバー側既存カートを失わずに統合
+            const mergedCurrent = JSON.parse(JSON.stringify(AppState.cart || []));
+            serverItems.forEach(item => {
+                const idx = mergedCurrent.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                if (idx > -1) {
+                    mergedCurrent[idx].quantity = Math.max(mergedCurrent[idx].quantity || 1, item.quantity || 1);
+                } else {
+                    mergedCurrent.push({ ...item });
+                }
+            });
+            AppState.cart = mergedCurrent;
+            saveScopedData('manekin_cart', AppState.cart, targetUserId);
+            updateCartBadge();
+            if (window.location.hash === '#checkout' && typeof renderCheckoutPage === 'function') {
+                renderCheckoutPage();
+            }
+            await syncCartToBackend();
+            return;
+        }
+
+        let finalCart = isDirty
+            ? JSON.parse(JSON.stringify(loadScopedData('manekin_cart', [], targetUserId)))
+            : [...serverItems];
+        let needPushToServer = isDirty;
+
+        if (mergeItems.length > 0) {
+            mergeItems.forEach(item => {
+                const idx = finalCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                if (idx > -1) {
+                    finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
+                } else {
+                    finalCart.push({ ...item });
+                }
+            });
+            needPushToServer = true;
+        }
+
+        AppState.cart = finalCart;
+        saveScopedData('manekin_cart', AppState.cart, targetUserId);
+        updateCartBadge();
+        if (window.location.hash === '#checkout' && typeof renderCheckoutPage === 'function') {
+            renderCheckoutPage();
+        }
+
+        if (needPushToServer) {
+            await syncCartToBackend();
+        }
+    } catch (e) {
+        console.log('MySQLカート同期待機中 (アカウント別ローカルストレージを使用)');
+    }
+}
+
 function updateCartBadge() {
     if (!AppState.cart || !Array.isArray(AppState.cart)) {
         AppState.cart = [];
@@ -467,6 +610,7 @@ function handleAddToCartFromDetail(productId) {
 
     saveScopedData('manekin_cart', AppState.cart);
     updateCartBadge();
+    syncCartToBackend();
     showToast(`「${product.name} (${AppState.selectedColor}/${AppState.selectedSize})」をバッグに追加しました`);
 }
 
@@ -490,6 +634,7 @@ function updateCartItemQty(index, delta) {
     saveScopedData('manekin_cart', AppState.cart);
     updateCartBadge();
     renderCheckoutPage();
+    syncCartToBackend();
 }
 
 function removeCartItem(index) {
@@ -498,6 +643,7 @@ function removeCartItem(index) {
     saveScopedData('manekin_cart', AppState.cart);
     updateCartBadge();
     renderCheckoutPage();
+    syncCartToBackend();
     showToast('バッグから商品を削除しました');
 }
 
@@ -716,6 +862,7 @@ async function importOrderToCloset(idx) {
     const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
     const userId = AppState.currentUser.id;
     let added = 0;
+    if (typeof bumpClosetMutationSeq === 'function') bumpClosetMutationSeq();
 
     for (let i = 0; i < itemsList.length; i++) {
         const it = itemsList[i];
@@ -839,9 +986,14 @@ async function handlePlaceOrder() {
         items: AppState.cart
     };
 
-    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
+    const apiBase = getApiBaseUrl();
     let confirmedOrder = null;
     let backendUpdatedPoints = null;
+
+    // 進行中のカート同期が完了してから注文を送信（直前のカート同期が注文後のMySQLカートクリアを上書きしないように保護）
+    bumpCartUserSeq(targetUserId);
+    _ordersMutationSeq++;
+    try { await _cartSyncPromise; } catch (e) {}
 
     try {
         const response = await fetch(`${apiBase}/api/orders`, {
@@ -887,6 +1039,7 @@ async function handlePlaceOrder() {
     setUserPoints(updatedPts);
 
     // 2. 【要件1】購入商品をマイクローゼットに自動保存！（MySQLと同一のitem_uid生成）
+    if (typeof bumpClosetMutationSeq === 'function') bumpClosetMutationSeq();
     const purchasedItems = [...confirmedOrder.items];
     const isOfflineOrder = !!confirmedOrder.offlinePending;
     let addedCount = 0;
@@ -922,6 +1075,11 @@ async function handlePlaceOrder() {
     // 4. カート初期化
     AppState.cart = [];
     removeScopedData('manekin_cart', targetUserId);
+    if (isOfflineOrder) {
+        saveScopedData('manekin_cart_dirty', true, targetUserId);
+    } else {
+        removeScopedData('manekin_cart_dirty', targetUserId);
+    }
     updateCartBadge();
     checkoutUsedPoints = 0;
 
@@ -973,6 +1131,8 @@ async function handlePlaceOrder() {
 // --------------------------------------------------------------------------
 // 8. マイページ管理
 // --------------------------------------------------------------------------
+let _ordersMutationSeq = 0;
+
 async function syncOrdersFromBackend() {
     const statusPill = document.getElementById('mysql-status-pill');
     const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
@@ -990,10 +1150,16 @@ async function syncOrdersFromBackend() {
         }
 
         const userId = AppState.currentUser.id;
+        if (!isServerUserId(userId)) {
+            renderMyPage();
+            return;
+        }
+        const fetchStartSeq = _ordersMutationSeq;
         const response = await fetch(`${apiBase}/api/orders?user_id=${userId}`);
         if (response.ok) {
             const data = await response.json();
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
+            if (fetchStartSeq !== _ordersMutationSeq) return;
             if (statusPill) {
                 statusPill.textContent = '🟢 MySQL (manekin_db) 接続中';
                 statusPill.style.background = '#dcfce7';
@@ -1039,6 +1205,7 @@ async function handleClearOrderHistory() {
     }
     if (!confirm('現在のアカウントのご注文履歴をすべて初期化して、0件にしますか？')) return;
 
+    _ordersMutationSeq++;
     AppState.orderHistory = [];
     saveScopedData('manekin_orders', []);
 
@@ -1205,17 +1372,36 @@ async function handleSyncAllToMySQL() {
             } catch (e) {}
         }
 
+        // 5.5 カートの同期（未送信変更またはローカルカートがある場合）
+        const isCartDirty = loadScopedData('manekin_cart_dirty', false, userId) === true;
+        if (isCartDirty || (AppState.cart && AppState.cart.length > 0)) {
+            await syncCartToBackend();
+        }
+
+        // 5.6 スタジオ試着状態の同期（未送信変更または試着中・性別変更がある場合）
+        const isStudioDirty = loadScopedData('manekin_studio_dirty', false, userId) === true;
+        const hasWornItems = Object.values(AppState.currentOutfit || {}).some(Boolean);
+        if (isStudioDirty || hasWornItems || (AppState.studioGender && AppState.studioGender !== 'MEN')) {
+            if (typeof syncStudioStateToBackend === 'function') {
+                await syncStudioStateToBackend({ immediate: true });
+            }
+        }
+
         // 6. MySQLから最新データを再取得
         await syncOrdersFromBackend();
         await syncFavoritesFromBackend();
+        await syncCartFromBackend();
         if (typeof syncClosetFromBackend === 'function') {
             await syncClosetFromBackend();
         }
         if (typeof syncOutfitsFromBackend === 'function') {
             await syncOutfitsFromBackend();
         }
+        if (typeof syncStudioStateFromBackend === 'function') {
+            await syncStudioStateFromBackend();
+        }
 
-        showToast(`✨ MySQL連携完了！（新規注文:${syncedOrders}件, 服:${syncedCloset}点, コーデ:${syncedOutfits}件を保存）`);
+        showToast(`✨ MySQL連携完了！（新規注文:${syncedOrders}件, 服:${syncedCloset}点, コーデ:${syncedOutfits}件, カート/試着状態を保存）`);
     } catch (err) {
         showToast('⚠️ Pythonサーバー(ポート8080)が起動していません。start_server.bat または python app.py を起動してください');
     }
@@ -1304,18 +1490,26 @@ function renderMyPage() {
 // --------------------------------------------------------------------------
 // 9. お気に入り機能 (MySQL同期・アカウント完全分離対応)
 // --------------------------------------------------------------------------
+let _favoritesMutationSeq = 0;
+
 async function syncFavoritesFromBackend() {
     if (!AppState.currentUser || !AppState.currentUser.id) {
         updateFavoriteBadges();
         return;
     }
     const targetUserId = AppState.currentUser.id;
+    if (!isServerUserId(targetUserId)) {
+        updateFavoriteBadges();
+        return;
+    }
+    const fetchStartSeq = _favoritesMutationSeq;
     try {
         const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
         const res = await fetch(`${apiBase}/api/favorites?user_id=${targetUserId}`);
         if (res.ok) {
             const data = await res.json();
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+            if (fetchStartSeq !== _favoritesMutationSeq) return;
             if (Array.isArray(data.favorites)) {
                 AppState.favorites = data.favorites;
                 saveScopedData('manekin_favorites', AppState.favorites, targetUserId);
@@ -1332,6 +1526,7 @@ async function syncFavoritesFromBackend() {
 }
 
 function handleToggleFavorite(productId) {
+    _favoritesMutationSeq++;
     const index = AppState.favorites.indexOf(productId);
     let isAdded = false;
 
@@ -1741,6 +1936,8 @@ function closeMobileDrawer() {
 }
 
 // グローバル公開
+window.getApiBaseUrl = getApiBaseUrl;
+window.isServerUserId = isServerUserId;
 window.getScopedUserId = getScopedUserId;
 window.getScopedKey = getScopedKey;
 window.saveScopedData = saveScopedData;
@@ -1757,6 +1954,8 @@ window.handleUseAllPoints = handleUseAllPoints;
 window.handleResetPoints = handleResetPoints;
 window.importOrderToCloset = importOrderToCloset;
 window.handleSyncAllToMySQL = handleSyncAllToMySQL;
+window.syncCartToBackend = syncCartToBackend;
+window.syncCartFromBackend = syncCartFromBackend;
 window.syncOrdersFromBackend = syncOrdersFromBackend;
 window.syncFavoritesFromBackend = syncFavoritesFromBackend;
 window.handleClearOrderHistory = handleClearOrderHistory;

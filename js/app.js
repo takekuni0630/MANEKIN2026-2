@@ -54,7 +54,7 @@ const AppState = {
     savedOutfits: _initialUid ? loadScopedData('manekin_saved_outfits', [], _initialUid) : [],
     // スタジオ内のUI状態
     studioActiveTab: 'create',
-    studioGender: 'MEN',
+    studioGender: _initialUid ? loadScopedData('manekin_studio_gender', 'MEN', _initialUid) : 'MEN',
     studioClosetFilter: 'ALL',
     studioBrandFilter: 'ALL',
     studioBrandFavOnly: false,
@@ -77,10 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHomeProducts();
     renderCatalogProducts();
     renderNewItems();
+    if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
+    if (typeof syncCartFromBackend === 'function') syncCartFromBackend();
     syncOrdersFromBackend();
     if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
     if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
     if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
+    if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
     handleRouting();
 });
 
@@ -157,6 +160,7 @@ function handleRouting() {
             showView('view-checkout');
             highlightNavLink('checkout');
             renderCheckoutPage();
+            if (typeof syncCartFromBackend === 'function') syncCartFromBackend();
             break;
 
         case '#login':
@@ -191,6 +195,7 @@ function handleRouting() {
             highlightNavLink('manekin-studio');
             if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
             if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
+            if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
             renderManekinStudio(AppState.studioActiveTab || 'create');
             break;
 
@@ -418,7 +423,11 @@ window.handleUseAllPoints = handleUseAllPoints;
 window.handleResetPoints = handleResetPoints;
 window.getUserPoints = getUserPoints;
 window.setUserPoints = setUserPoints;
+window.syncCartToBackend = syncCartToBackend;
+window.syncCartFromBackend = syncCartFromBackend;
 window.syncClosetFromBackend = syncClosetFromBackend;
 window.syncFavoritesFromBackend = syncFavoritesFromBackend;
 window.syncOutfitsFromBackend = syncOutfitsFromBackend;
+window.syncStudioStateToBackend = syncStudioStateToBackend;
+window.syncStudioStateFromBackend = syncStudioStateFromBackend;
 window.handleSyncAllToMySQL = handleSyncAllToMySQL;

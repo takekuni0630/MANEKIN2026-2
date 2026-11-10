@@ -137,6 +137,9 @@ function renderManekinStudio(activeTab = 'create') {
         if (profRank) profRank.textContent = 'GUEST';
     }
 
+    // 性別ボタンUIの同期
+    syncGenderToggleUI();
+
     // 各タブごとの描画
     switch (activeTab) {
         case 'home':
@@ -478,6 +481,7 @@ function toggleWearItem(itemId, isOwned) {
     }
 
     saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    syncStudioStateToBackend({ immediate: true });
 
     // UI更新
     renderMannequinStage();
@@ -508,6 +512,7 @@ function unwearSlot(slotKey) {
         const name = AppState.currentOutfit[slotKey].name;
         AppState.currentOutfit[slotKey] = null;
         saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+        syncStudioStateToBackend({ immediate: true });
         showToastNotification(`「${name}」を外しました`);
 
         renderMannequinStage();
@@ -529,6 +534,7 @@ function resetMannequinOutfit(silent = false) {
         shoes: null
     };
     saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    syncStudioStateToBackend({ immediate: true });
     if (!silent) {
         showToastNotification('マネキンの着用服をすべてクリアしました');
     }
@@ -1085,8 +1091,9 @@ function handleBrandSizeInput(val) {
     // マネキン上の服の表示サイズを即座に更新
     applyFittingOffsets();
 
-    // スコープ付きローカルストレージ保存
+    // スコープ付きローカルストレージ保存 ＋ MySQL同期（デバウンス）
     saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
+    syncStudioStateToBackend({ immediate: false });
 }
 
 /**
@@ -1136,8 +1143,9 @@ function handleAdjustInput(prop, val) {
     // 画面のマネキン服へ即座に反映
     applyFittingOffsets();
 
-    // スコープ付きローカルストレージへ保存
+    // スコープ付きローカルストレージへ保存 ＋ MySQL同期（デバウンス）
     saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
+    syncStudioStateToBackend({ immediate: false });
 }
 
 /**
@@ -1183,7 +1191,19 @@ function resetFittingOffsets() {
     syncAdjustPanelUI();
     applyFittingOffsets();
     saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
+    syncStudioStateToBackend({ immediate: true });
     showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
+}
+
+/**
+ * 性別ボタンUIの同期
+ */
+function syncGenderToggleUI() {
+    const gender = AppState.studioGender || 'MEN';
+    const btnMen = document.getElementById('btn-gender-men');
+    const btnWomen = document.getElementById('btn-gender-women');
+    if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
+    if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
 }
 
 /**
@@ -1191,10 +1211,9 @@ function resetFittingOffsets() {
  */
 function setMannequinGender(gender) {
     AppState.studioGender = gender;
-    const btnMen = document.getElementById('btn-gender-men');
-    const btnWomen = document.getElementById('btn-gender-women');
-    if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
-    if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
+    saveScopedData('manekin_studio_gender', gender);
+    syncGenderToggleUI();
+    syncStudioStateToBackend({ immediate: true });
 
     // ブランド商品リストを性別に連動して再描画
     renderStudioBrandList();
@@ -1329,6 +1348,8 @@ function applyPresetName(name) {
     if (input) input.value = name;
 }
 
+let _outfitsMutationSeq = 0;
+
 /**
  * コーデの保存処理 (MySQL連携・アカウント分離)
  */
@@ -1353,13 +1374,15 @@ function handleSaveOutfit(e) {
     const commentElem = document.getElementById('ai-comment-text');
     const comment = commentElem ? commentElem.textContent : '';
 
+    _outfitsMutationSeq++;
     const newOutfit = {
         id: 'outfit-' + userId + '-' + Date.now(),
         user_id: userId,
         title: title,
         date: new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }),
         comment: comment,
-        items: JSON.parse(JSON.stringify(AppState.currentOutfit))
+        items: JSON.parse(JSON.stringify(AppState.currentOutfit)),
+        offlinePending: true
     };
 
     AppState.savedOutfits.unshift(newOutfit);
@@ -1380,6 +1403,8 @@ function handleSaveOutfit(e) {
         })
     }).then(res => {
         if (!res.ok) throw new Error('API Error');
+        delete newOutfit.offlinePending;
+        saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
     }).catch(err => {
         newOutfit.offlinePending = true;
         saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
@@ -1459,6 +1484,7 @@ function restoreOutfit(outfitId) {
 
     AppState.currentOutfit = JSON.parse(JSON.stringify(target.items));
     saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    syncStudioStateToBackend({ immediate: true });
 
     showToastNotification(`「${target.title}」をマネキンに復元しました`);
     switchStudioTab('create');
@@ -1474,6 +1500,7 @@ function deleteSavedOutfit(outfitId) {
     }
     const userId = AppState.currentUser.id;
     if (confirm('この保存コーディネートを削除しますか？')) {
+        _outfitsMutationSeq++;
         AppState.savedOutfits = AppState.savedOutfits.filter(o => o.id !== outfitId);
         saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
 
@@ -1496,12 +1523,17 @@ async function syncOutfitsFromBackend() {
         return;
     }
     const targetUserId = AppState.currentUser.id;
+    if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        return;
+    }
+    const fetchStartSeq = _outfitsMutationSeq;
     try {
         const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
         const res = await fetch(`${apiBase}/api/outfits/${targetUserId}`);
         if (res.ok) {
             const data = await res.json();
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+            if (fetchStartSeq !== _outfitsMutationSeq) return;
             if (Array.isArray(data.outfits)) {
                 const offlinePending = (AppState.savedOutfits || []).filter(local =>
                     local &&
@@ -1569,6 +1601,9 @@ function addCurrentBrandItemsToCart() {
 
     saveScopedData('manekin_cart', AppState.cart);
     updateCartBadge();
+    if (typeof syncCartToBackend === 'function') {
+        syncCartToBackend();
+    }
     showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しました！`);
 }
 
@@ -2276,6 +2311,12 @@ async function restoreOriginalUploadImage() {
     updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
+let _closetMutationSeq = 0;
+
+function bumpClosetMutationSeq() {
+    _closetMutationSeq++;
+}
+
 /**
  * 新規手持ち服の登録（AI形状チェック付き：アウター/ボトムス/トップス/靴/帽子のみ保存可能）
  */
@@ -2321,6 +2362,7 @@ function handleAddClosetItem(e) {
     const seasonSelect = document.getElementById('closet-item-season');
     const season = seasonSelect ? seasonSelect.value : '通年';
 
+    _closetMutationSeq++;
     const newItem = {
         id: 'c-' + userId + '-' + Date.now(),
         user_id: userId,
@@ -2329,7 +2371,8 @@ function handleAddClosetItem(e) {
         color: color,
         season: season,
         image: currentClosetUploadDataUrl,
-        isOwned: true
+        isOwned: true,
+        offlinePending: true
     };
 
     AppState.myCloset.unshift(newItem);
@@ -2356,7 +2399,11 @@ function handleAddClosetItem(e) {
         return res.json();
     }).then(data => {
         if (data.status === 'success') {
+            delete newItem.offlinePending;
+            saveScopedData('manekin_my_closet', AppState.myCloset, userId);
             console.log('✨ [MySQL] マイクローゼットにアイテムを保存しました:', data);
+        } else {
+            throw new Error(data.message || 'API Error');
         }
     }).catch(err => {
         newItem.offlinePending = true;
@@ -2382,14 +2429,20 @@ function deleteClosetItem(itemId) {
     const userId = AppState.currentUser.id;
     if (confirm('この手持ちの服をクローゼットから削除しますか？')) {
         // もし現在着用中なら脱がす
+        let wasWearingDeleted = false;
         for (const slotKey in AppState.currentOutfit) {
             if (AppState.currentOutfit[slotKey] && String(AppState.currentOutfit[slotKey].id) === String(itemId)) {
                 AppState.currentOutfit[slotKey] = null;
+                wasWearingDeleted = true;
             }
         }
         saveScopedData('manekin_current_outfit', AppState.currentOutfit, userId);
+        if (wasWearingDeleted) {
+            syncStudioStateToBackend({ immediate: true });
+        }
 
         AppState.myCloset = AppState.myCloset.filter(c => String(c.id) !== String(itemId));
+        _closetMutationSeq++;
         saveScopedData('manekin_my_closet', AppState.myCloset, userId);
 
         // MySQL からも該当アカウント分のみ削除
@@ -2411,12 +2464,17 @@ async function syncClosetFromBackend() {
         return;
     }
     const targetUserId = AppState.currentUser.id;
+    if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        return;
+    }
+    const fetchStartSeq = _closetMutationSeq;
     try {
         const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
         const res = await fetch(`${apiBase}/api/closet/${targetUserId}`);
         if (res.ok) {
             const data = await res.json();
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+            if (fetchStartSeq !== _closetMutationSeq) return;
             if (data.closet_items && Array.isArray(data.closet_items)) {
                 const mysqlItems = data.closet_items.map(it => ({
                     id: it.item_uid || it.id,
@@ -2476,15 +2534,142 @@ function applyPresetLook(lookKey) {
     const trenchCoat = SAMPLE_PRODUCTS.find(p => p.id === 1) || SAMPLE_PRODUCTS[0];
 
     AppState.currentOutfit = {
+        hat: null,
         outer: { id: trenchCoat.id, name: trenchCoat.name, category: trenchCoat.category, color: 'CHARCOAL', price: trenchCoat.price, image: trenchCoat.image, isOwned: false },
         tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'OFF WHITE', price: 3490, image: 'assets/images/men/アーバングレイジップフーディ.png', isOwned: false },
         bottoms: { id: blackPants.id, name: blackPants.name, category: blackPants.category, color: blackPants.color, isOwned: true, image: blackPants.image },
         shoes: { id: whiteSneakers.id, name: whiteSneakers.name, category: whiteSneakers.category, color: whiteSneakers.color, isOwned: true, image: whiteSneakers.image }
     };
     saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    syncStudioStateToBackend({ immediate: true });
 
     showToastNotification('AIおすすめコーデをマネキンにセットしました');
     switchStudioTab('create');
+}
+
+// --------------------------------------------------------------------------
+// 15.7.5 スタジオ試着状態（着用服・微調整・性別）のMySQLアカウント別双方向同期
+// --------------------------------------------------------------------------
+let _studioStateSyncTimer = null;
+let _studioStateSyncSeq = 0;
+
+async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot) {
+    if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        return false;
+    }
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        ? getApiBaseUrl()
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+    try {
+        const res = await fetch(`${apiBase}/api/studio-state/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: targetUserId,
+                current_outfit: outfitSnapshot,
+                fitting_offsets: offsetsSnapshot,
+                studio_gender: genderSnapshot
+            })
+        });
+        if (!res.ok) throw new Error('Studio state save failed');
+        removeScopedData('manekin_studio_dirty', targetUserId);
+        return true;
+    } catch (e) {
+        saveScopedData('manekin_studio_dirty', true, targetUserId);
+        return false;
+    }
+}
+
+function flushPendingStudioStateSync() {
+    if (!_studioStateSyncTimer) return;
+    clearTimeout(_studioStateSyncTimer);
+    _studioStateSyncTimer = null;
+
+    if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        return;
+    }
+    const targetUserId = AppState.currentUser.id;
+    const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
+    const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
+    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
+}
+
+function syncStudioStateToBackend(options = {}) {
+    if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        return Promise.resolve(false);
+    }
+    const targetUserId = AppState.currentUser.id;
+    const immediate = !!options.immediate;
+
+    if (_studioStateSyncTimer) {
+        clearTimeout(_studioStateSyncTimer);
+        _studioStateSyncTimer = null;
+    }
+
+    const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
+    const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
+    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const seq = ++_studioStateSyncSeq;
+
+    if (immediate) {
+        return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
+    }
+
+    return new Promise((resolve) => {
+        _studioStateSyncTimer = setTimeout(async () => {
+            _studioStateSyncTimer = null;
+            if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId) || seq !== _studioStateSyncSeq) {
+                resolve(false);
+                return;
+            }
+            const ok = await sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
+            resolve(ok);
+        }, 400);
+    });
+}
+
+async function syncStudioStateFromBackend() {
+    if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        return;
+    }
+    const targetUserId = AppState.currentUser.id;
+    const isDirty = loadScopedData('manekin_studio_dirty', false, targetUserId) === true;
+    const fetchStartSeq = _studioStateSyncSeq;
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        ? getApiBaseUrl()
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+
+    try {
+        const res = await fetch(`${apiBase}/api/studio-state/${targetUserId}`);
+        if (!res.ok) throw new Error('Studio state fetch failed');
+        const data = await res.json();
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+        if (fetchStartSeq !== _studioStateSyncSeq) return;
+
+        if (isDirty) {
+            await syncStudioStateToBackend({ immediate: true });
+            return;
+        }
+
+        if (data.exists && data.studio_state) {
+            AppState.currentOutfit = data.studio_state.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+            AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
+            AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
+
+            saveScopedData('manekin_current_outfit', AppState.currentOutfit, targetUserId);
+            saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets, targetUserId);
+            saveScopedData('manekin_studio_gender', AppState.studioGender, targetUserId);
+
+            syncGenderToggleUI();
+            if (typeof renderMannequinStage === 'function') renderMannequinStage();
+            if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+            if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+            if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
+        }
+    } catch (e) {
+        console.log('MySQLスタジオ状態同期待機中 (アカウント別ローカルストレージを使用)');
+    }
 }
 
 /**
@@ -2539,4 +2724,9 @@ function showToastNotification(message) {
 
 window.syncClosetFromBackend = syncClosetFromBackend;
 window.syncOutfitsFromBackend = syncOutfitsFromBackend;
+window.syncStudioStateToBackend = syncStudioStateToBackend;
+window.syncStudioStateFromBackend = syncStudioStateFromBackend;
+window.flushPendingStudioStateSync = flushPendingStudioStateSync;
+window.syncGenderToggleUI = syncGenderToggleUI;
+window.bumpClosetMutationSeq = bumpClosetMutationSeq;
 
