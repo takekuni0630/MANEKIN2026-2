@@ -3,20 +3,29 @@
 // アプリケーション全体の状態管理、ルーティング、初期化、イベント登録
 // ==========================================================================
 
-// 2. アプリケーション状態管理（State）
+// 2. アプリケーション状態管理（State - アカウント別に厳密分離）
 // --------------------------------------------------------------------------
+const _initialUser = (() => {
+    try {
+        return JSON.parse(localStorage.getItem('manekin_user')) || null;
+    } catch (e) {
+        return null;
+    }
+})();
+const _initialUid = (_initialUser && _initialUser.id) ? _initialUser.id : null;
+
 const AppState = {
-    // お気に入り登録IDリスト（初期値は0件）
-    favorites: JSON.parse(localStorage.getItem('manekin_favorites')) || [],
+    // お気に入り登録IDリスト（アカウント別、未ログイン時はゲスト専用キー）
+    favorites: loadScopedData('manekin_favorites', [], _initialUid),
     // ログイン中の会員情報（初期値は未ログイン）
-    currentUser: JSON.parse(localStorage.getItem('manekin_user')) || null,
-    // ショッピングカート内アイテム（初期値は0件）
-    cart: JSON.parse(localStorage.getItem('manekin_cart')) || [],
+    currentUser: _initialUser,
+    // ショッピングカート内アイテム（アカウント別、未ログイン時はゲスト専用キー）
+    cart: loadScopedData('manekin_cart', [], _initialUid),
     currentDetailId: 1,
     selectedColor: "WHITE",
     selectedSize: "M",
-    // 注文履歴データ（初期値は0件）
-    orderHistory: JSON.parse(localStorage.getItem('manekin_orders')) || [],
+    // 注文履歴データ（ログイン中アカウント分のみ読み込み）
+    orderHistory: _initialUid ? loadScopedData('manekin_orders', [], _initialUid) : [],
     selectedCategory: "ALL",
     selectedSort: "default",
     // 未ログイン時のアクセス制御復帰ターゲット ('checkout' または 'manekin')
@@ -25,73 +34,24 @@ const AppState = {
     // =========================================================================
     // ■ AIコーデシミュレーション（MANEKIN AI STUDIO）状態管理
     // =========================================================================
-    // マイクローゼット（手持ち服データ）
-    myCloset: JSON.parse(localStorage.getItem('manekin_my_closet')) || [
-        {
-            id: 'c1',
-            name: '黒ワイドスラックス',
-            category: 'BOTTOMS',
-            color: 'BLACK',
-            season: '通年',
-            image: 'assets/images/men/ストレートレープセミフレアスラックス.png',
-            isOwned: true
-        },
-        {
-            id: 'c2',
-            name: 'クラシック 白レザースニーカー',
-            category: 'SHOES',
-            color: 'WHITE',
-            season: '通年',
-            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20140%2065%22%3E%3Cpath%20d%3D%22M15%2048%20C25%2048%2C%2035%2046%2C%2045%2040%20C55%2032%2C%2065%2022%2C%2085%2020%20C95%2019%2C%20110%2025%2C%20125%2038%20C132%2044%2C%20130%2050%2C%20120%2052%20L15%2052%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M10%2052%20L128%2052%20C132%2052%2C%20132%2058%2C%20126%2058%20L10%2058%20C6%2058%2C%206%2052%2C%2010%2052%20Z%22%20fill%3D%22%23e2e8f0%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpath%20d%3D%22M65%2026%20L80%2032%20M60%2031%20L75%2037%20M55%2036%20L70%2042%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
-            isOwned: true
-        },
-        {
-            id: 'c3',
-            name: 'ヘビーウェイト ジップパーカー',
-            category: 'TOPS',
-            color: 'GREY',
-            season: '秋冬',
-            image: 'assets/images/men/アーバングレイジップフーディ.png',
-            isOwned: true
-        },
-        {
-            id: 'c4',
-            name: 'スカイ オックスフォードシャツ',
-            category: 'TOPS',
-            color: 'BLUE',
-            season: '通年',
-            image: 'assets/images/men/スカイオックスフォードシャツ.png',
-            isOwned: true
-        },
-        {
-            id: 'c5',
-            name: 'クラシック コットンキャップ',
-            category: 'HAT',
-            color: 'BLACK',
-            season: '通年',
-            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
-            isOwned: true
-        },
-        {
-            id: 'c6',
-            name: 'ウォッシュド バケットハット',
-            category: 'HAT',
-            color: 'CHARCOAL',
-            season: '通年',
-            image: "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20140%22%3E%3Cpath%20d%3D%22M20%20110%20C20%20110%2040%2095%2060%2090%20C75%2086%20125%2086%20140%2090%20C160%2095%20180%20110%20180%20110%20C150%20125%2050%20125%2020%20110%20Z%22%20fill%3D%22%23262626%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C58%2060%2065%2035%20100%2035%20C135%2035%20142%2060%20142%2090%20Z%22%20fill%3D%22%231a1a1a%22%2F%3E%3Cpath%20d%3D%22M58%2090%20C75%2096%20125%2096%20142%2090%22%20stroke%3D%22%23333333%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E",
-            isOwned: true
-        }
-    ],
+    // マイクローゼット（ログイン中アカウント分のみ読み込み）
+    myCloset: _initialUid ? loadScopedData('manekin_my_closet', [], _initialUid) : [],
     // マネキン現在着用スロット
-    currentOutfit: JSON.parse(localStorage.getItem('manekin_current_outfit')) || {
+    currentOutfit: _initialUid ? loadScopedData('manekin_current_outfit', {
+        hat: null,
+        outer: null,
+        tops: null,
+        bottoms: null,
+        shoes: null
+    }, _initialUid) : {
         hat: null,
         outer: null,
         tops: null,
         bottoms: null,
         shoes: null
     },
-    // 保存したコーデ一覧（ルックブック）（初期値は0件）
-    savedOutfits: JSON.parse(localStorage.getItem('manekin_saved_outfits')) || [],
+    // 保存したコーデ一覧（ルックブック：ログイン中アカウント分のみ読み込み）
+    savedOutfits: _initialUid ? loadScopedData('manekin_saved_outfits', [], _initialUid) : [],
     // スタジオ内のUI状態
     studioActiveTab: 'create',
     studioGender: 'MEN',
@@ -100,24 +60,15 @@ const AppState = {
     studioBrandFavOnly: false,
     studioMobileView: 'mannequin',
     activeAdjustSlot: 'outer',
-    fittingOffsets: JSON.parse(localStorage.getItem('manekin_fitting_offsets')) || {
-        hat: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
-        tops: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
-        outer: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
-        bottoms: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 },
-        shoes: { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 }
-    },
-    userBodyProfile: JSON.parse(localStorage.getItem('manekin_body_profile')) || {
-        height: 172,
-        bodyType: 'REGULAR',
-        styleTaste: 'MINIMAL'
-    }
+    fittingOffsets: loadScopedData('manekin_fitting_offsets', getDefaultFittingOffsets(), _initialUid),
+    userBodyProfile: loadScopedData('manekin_body_profile', getDefaultBodyProfile(), _initialUid)
 };
 
 // --------------------------------------------------------------------------
 // 3. アプリケーション初期化処理
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof purgeLegacyGlobalStorage === 'function') purgeLegacyGlobalStorage();
     migrateOldBrokenAssets();
     updateFavoriteBadges();
     updateCartBadge();

@@ -163,6 +163,8 @@ def create_order():
     is_sync = bool(req.get('sync_mode', False))
 
     # 入力バリデーション
+    if not user_id:
+        return jsonify({"status": "error", "message": "ご注文にはログインが必要です（user_idが不足しています）。"}), 400
     if not customer_name or not customer_email or not address or not cart_items:
         return jsonify({"status": "error", "message": "お名前、メールアドレス、住所、注文商品は必須です。"}), 400
 
@@ -192,15 +194,18 @@ def create_order():
         with conn.cursor() as cursor:
             # 既存注文番号チェック（同期時の重複防止）
             if provided_order_no:
-                cursor.execute("SELECT `id`, `order_no` FROM `orders` WHERE `order_no` = %s;", (provided_order_no,))
+                cursor.execute("SELECT `id`, `order_no`, `user_id` FROM `orders` WHERE `order_no` = %s;", (provided_order_no,))
                 existing_ord = cursor.fetchone()
                 if existing_ord:
-                    return jsonify({
-                        "status": "success",
-                        "message": "すでにMySQLへ登録済みの注文です。",
-                        "already_exists": True,
-                        "order": {"order_id": existing_ord['id'], "order_no": existing_ord['order_no']}
-                    }), 200
+                    if str(existing_ord.get('user_id')) == str(user_id):
+                        return jsonify({
+                            "status": "success",
+                            "message": "すでにMySQLへ登録済みの注文です。",
+                            "already_exists": True,
+                            "order": {"order_id": existing_ord['id'], "order_no": existing_ord['order_no']}
+                        }), 200
+                    # 別ユーザーの注文番号と万が一衝突した場合は新しい注文番号を再発行
+                    order_no = f"ORD-{today_str}-{''.join(random.choices(string.ascii_uppercase + string.digits, k=4))}"
 
             # 1. ordersテーブルに注文ヘッダーを挿入
             insert_order_sql = """
@@ -254,7 +259,7 @@ def create_order():
                 price = int(item.get('price', item.get('unit_price', 0)))
                 image_url = item.get('image', item.get('image_url', ''))
                 cursor.execute(insert_closet_sql, (
-                    user_id or 1,
+                    user_id,
                     item_uid,
                     p_id,
                     item.get('name', item.get('product_name', '購入商品')),
@@ -316,16 +321,20 @@ def create_order():
 @app.route('/api/orders', methods=['GET'])
 def get_orders():
     """
-    マイページに表示するための購入履歴一覧をMySQLから取得するエンドポイント
+    マイページに表示するための購入履歴一覧をMySQLから取得するエンドポイント（アカウント別フィルタ）
     """
+    user_id = request.args.get('user_id', None)
+    if not user_id:
+        return jsonify({"status": "success", "orders": []}), 200
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
 
     try:
         with conn.cursor() as cursor:
-            # 注文ヘッダーを最新順で取得
-            cursor.execute("SELECT * FROM `orders` ORDER BY `created_at` DESC;")
+            # ログインユーザーの注文ヘッダーのみを最新順で取得
+            cursor.execute("SELECT * FROM `orders` WHERE `user_id` = %s ORDER BY `created_at` DESC;", (user_id,))
             orders = cursor.fetchall()
 
             # 各注文に紐づく注文明細商品を取得して結合
@@ -368,20 +377,28 @@ def get_orders():
 @app.route('/api/orders', methods=['DELETE'])
 def clear_orders():
     """
-    全注文履歴をリセット（MySQL内のordersおよびorder_itemsを完全クリア）するエンドポイント
+    指定したユーザーの注文履歴のみをリセットするエンドポイント
     """
+    user_id = request.args.get('user_id', None)
+    if not user_id:
+        req = request.get_json(silent=True) or {}
+        user_id = req.get('user_id')
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
 
     try:
         with conn.cursor() as cursor:
-            # 外部キー整合性を保つため order_items から先に削除
-            cursor.execute("DELETE FROM `order_items`;")
-            cursor.execute("DELETE FROM `orders`;")
+            # 対象ユーザーの注文明細から先に削除
+            cursor.execute("DELETE FROM `order_items` WHERE `order_id` IN (SELECT `id` FROM `orders` WHERE `user_id` = %s);", (user_id,))
+            cursor.execute("DELETE FROM `orders` WHERE `user_id` = %s;", (user_id,))
         conn.commit()
-        print("[i] MySQL内の注文履歴をすべてリセットしました。")
-        return jsonify({"status": "success", "message": "全注文履歴を初期化しました。"}), 200
+        print(f"[i] ユーザーID {user_id} の注文履歴をMySQLからリセットしました。")
+        return jsonify({"status": "success", "message": "アカウントの注文履歴を初期化しました。"}), 200
     except Exception as e:
         conn.rollback()
         print(f"[!] 注文履歴リセットエラー: {e}")
@@ -480,6 +497,48 @@ def login_user():
         conn.close()
 
 
+@app.route('/api/auth/demo', methods=['POST'])
+def demo_login_user():
+    """
+    テストアカウント（demo@manekin.com）用の専用ログイン（既存会員とID衝突させない）
+    """
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT `id`, `name`, `email`, `rank`, `points` FROM `users` WHERE `email` = %s;",
+                ('demo@manekin.com',)
+            )
+            user = cursor.fetchone()
+            if not user:
+                cursor.execute(
+                    "INSERT INTO `users` (`name`, `email`, `password_hash`, `rank`, `points`, `created_at`) VALUES (%s, %s, %s, %s, 1000, NOW());",
+                    ('テストユーザー（デモ）', 'demo@manekin.com', 'demo1234', 'VIP MEMBER')
+                )
+                conn.commit()
+                cursor.execute(
+                    "SELECT `id`, `name`, `email`, `rank`, `points` FROM `users` WHERE `email` = %s;",
+                    ('demo@manekin.com',)
+                )
+                user = cursor.fetchone()
+            if user and user.get('points') is None:
+                user['points'] = 1000
+
+        return jsonify({
+            "status": "success",
+            "message": "テストアカウントでログインしました。",
+            "user": user
+        }), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        conn.close()
+
+
 @app.route('/api/user/sync', methods=['POST'])
 def sync_user_data():
     """
@@ -517,19 +576,19 @@ def sync_user_data():
 @app.route('/api/favorites', methods=['GET'])
 def get_favorites():
     """
-    お気に入り商品IDリストをMySQLから取得するエンドポイント
+    ログイン中アカウントのお気に入り商品IDリストをMySQLから取得するエンドポイント
     """
     user_id = request.args.get('user_id', None)
+    if not user_id:
+        return jsonify({"status": "success", "favorites": []}), 200
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "success", "favorites": []}), 200
 
     try:
         with conn.cursor() as cursor:
-            if user_id:
-                cursor.execute("SELECT `product_id` FROM `favorites` WHERE `user_id` = %s;", (user_id,))
-            else:
-                cursor.execute("SELECT `product_id` FROM `favorites`;")
+            cursor.execute("SELECT `product_id` FROM `favorites` WHERE `user_id` = %s;", (user_id,))
             rows = cursor.fetchall()
             fav_ids = list(set(r['product_id'] for r in rows))
         return jsonify({"status": "success", "favorites": fav_ids}), 200
@@ -542,14 +601,14 @@ def get_favorites():
 @app.route('/api/favorites/toggle', methods=['POST'])
 def toggle_favorite():
     """
-    お気に入りの追加・解除を切り替えるエンドポイント
+    お気に入りの追加・解除を切り替えるエンドポイント（アカウント単位）
     """
     req = request.get_json() or {}
     product_id = req.get('product_id')
-    user_id = req.get('user_id', 1)
+    user_id = req.get('user_id')
 
-    if not product_id:
-        return jsonify({"status": "error", "message": "商品IDが必要です。"}), 400
+    if not product_id or not user_id:
+        return jsonify({"status": "error", "message": "商品IDとユーザーIDが必要です。"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -557,7 +616,7 @@ def toggle_favorite():
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT `id` FROM `favorites` WHERE `product_id` = %s AND (`user_id` = %s OR `user_id` IS NULL);", (product_id, user_id))
+            cursor.execute("SELECT `id` FROM `favorites` WHERE `product_id` = %s AND `user_id` = %s;", (product_id, user_id))
             existing = cursor.fetchone()
             if existing:
                 cursor.execute("DELETE FROM `favorites` WHERE `id` = %s;", (existing['id'],))
@@ -580,7 +639,9 @@ def sync_favorites():
     LocalStorage内のお気に入りをMySQLへ一括同期
     """
     req = request.get_json() or {}
-    user_id = req.get('user_id', 1)
+    user_id = req.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
     product_ids = req.get('product_ids', [])
 
     conn = get_db_connection()
@@ -648,7 +709,9 @@ def save_user_outfit():
     作成したコーディネートをMySQL(saved_outfits)に保存
     """
     req = request.get_json() or {}
-    user_id = req.get('user_id', 1)
+    user_id = req.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
     outfit_uid = req.get('id') or f"outfit-{int(datetime.now().timestamp()*1000)}"
     title = req.get('title', 'マイスタイリングコーデ')
     date_str = req.get('date', datetime.now().strftime('%Y/%m/%d'))
@@ -683,15 +746,22 @@ def save_user_outfit():
 @app.route('/api/outfits/delete/<outfit_uid>', methods=['DELETE'])
 def delete_user_outfit(outfit_uid):
     """
-    保存したコーディネートをMySQLから削除
+    保存したコーディネートをMySQLから削除（該当アカウント分のみ削除）
     """
+    user_id = request.args.get('user_id', None)
+    if not user_id:
+        req = request.get_json(silent=True) or {}
+        user_id = req.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM `saved_outfits` WHERE `outfit_uid` = %s;", (outfit_uid,))
+            cursor.execute("DELETE FROM `saved_outfits` WHERE `outfit_uid` = %s AND `user_id` = %s;", (outfit_uid, user_id))
         conn.commit()
         return jsonify({"status": "success", "message": "コーディネートを削除しました。"}), 200
     except Exception as e:
@@ -785,7 +855,9 @@ def get_user_closet(user_id):
 def add_to_closet():
     """手持ち服または購入商品をMySQL(closet_items)に登録"""
     req = request.get_json() or {}
-    user_id = req.get('user_id', 1)
+    user_id = req.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
     name = req.get('name', '').strip()
     category = req.get('category', 'BOTTOMS')
     color = req.get('color', 'BLACK')
@@ -850,14 +922,21 @@ def add_to_closet():
 
 @app.route('/api/closet/delete/<item_uid>', methods=['DELETE'])
 def delete_closet_item(item_uid):
-    """手持ち服をMySQL(closet_items)から削除"""
+    """手持ち服をMySQL(closet_items)から削除（該当アカウント分のみ削除）"""
+    user_id = request.args.get('user_id', None)
+    if not user_id:
+        req = request.get_json(silent=True) or {}
+        user_id = req.get('user_id')
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_idが必要です。"}), 400
+
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
 
     try:
         with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM `closet_items` WHERE `item_uid` = %s;", (item_uid,))
+            cursor.execute("DELETE FROM `closet_items` WHERE `item_uid` = %s AND `user_id` = %s;", (item_uid, user_id))
         conn.commit()
         return jsonify({"status": "success", "message": "クローゼットからアイテムを削除しました。"}), 200
     except Exception as e:
