@@ -2195,7 +2195,9 @@
 }
 
 @keyframes spin-ai-cutout {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .ai-status-title {
@@ -2247,10 +2249,10 @@
     padding: 8px;
     border-radius: 8px;
     background-color: #f8fafc;
-    background-image: 
-        linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
-        linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+    background-image:
+        linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+        linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
         linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
     background-size: 14px 14px;
     background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
@@ -2355,4 +2357,3 @@
 /* 22. 洗練されたレスポンシブ画面設計（無駄な重複を排除したカスケード設計）     */
 /* デスクトップの美しさを継承し、タブレット・スマホ全サイズで滑らかにフィット   */
 /* ========================================================================== */
-
