@@ -2,36 +2,58 @@
 # 注文履歴初期化スクリプト (clear_orders.py)
 # XAMPP MySQL の orders および order_items を完全にクリアして初期状態（0件）にします
 # ==============================================================================
+# PythonからMySQLデータベースへ接続して操作するための外部ライブラリ「pymysql」を読み込みます
 import pymysql
+# SQLの結果を辞書形式（{'列名': 値}）で受け取れるようにするカーソルクラス「DictCursor」を読み込みます
 from pymysql.cursors import DictCursor
 
+# 今回操作するMySQLデータベースへの接続パラメータを辞書（DB_CONFIG）として定義します
 DB_CONFIG = {
-    'host': '127.0.0.1',
-    'port': 3306,
-    'user': 'root',
-    'password': '',
-    'database': 'manekin_db',
-    'charset': 'utf8mb4',
-    'cursorclass': DictCursor
+    'host': '127.0.0.1',      # データベースサーバーのIPアドレス（127.0.0.1は自分のパソコンを指します）
+    'port': 3306,             # MySQLの待受ポート番号（XAMPPの既定値である3306番を指定します）
+    'user': 'root',           # MySQLにログインするユーザーアカウント名（管理者root）
+    'password': '',           # ログイン用パスワード（XAMPPの初期設定のままパスワードなし＝空文字）
+    'database': 'manekin_db', # 最初から接続先として選択するデータベース名
+    'charset': 'utf8mb4',     # 日本語や絵文字も安全に扱える文字エンコーディング設定
+    'cursorclass': DictCursor # 検索結果をすべて列名付きの辞書として取得する指定です
 }
 
+# 注文履歴削除のメイン処理を行う関数「main」を定義します
 def main():
+    # 区切り線（= を60個）を表示して見出しを分かりやすくします
     print("=" * 60)
+    # ツール名称と用途をコンソールに表示します
     print("【MANEKIN FASHION】注文履歴の完全初期化（クリア）ツール")
+    # 下側の区切り線を表示します
     print("=" * 60)
+    # データベース接続・SQL実行時のエラーをキャッチして安全に通知するため try ブロックを始めます
     try:
+        # DB_CONFIG の内容を展開して MySQL に接続し、接続オブジェクト（conn）を取得します
         conn = pymysql.connect(**DB_CONFIG)
+        # with構文を使うことで、ブロックを抜けたら自動的にカーソルを閉じて後片付けしてくれます
         with conn.cursor() as cursor:
+            # 先に子テーブルである注文明細（order_items）のデータを全件削除します（外部キー制約のため子から先に消します）
             cursor.execute("DELETE FROM `order_items`;")
+            # 次に親テーブルである注文ヘッダ（orders）のデータを全件削除します
             cursor.execute("DELETE FROM `orders`;")
+        # 実行した全削除操作をデータベースに確定（コミット）保存します
         conn.commit()
+        # データベースとの接続を終了してリソースを解放します
         conn.close()
+        # 全削除に成功した旨の完了メッセージを表示します
         print("✅ 完了: MySQL (manekin_db) 内の全注文履歴を完全に削除しました（0件）。")
+        # 次のテストに向けた案内メッセージを表示します
         print("   これで初期状態から新しく注文をお試しいただけます。")
+    # データベース停止中などでエラーが発生した場合はここに入ります
     except Exception as e:
+        # 具体的なエラー内容（e）を画面に表示します
         print(f"❌ エラーが発生しました: {e}")
+        # よくある原因である「XAMPPのMySQL未起動」を確認するよう案内します
         print("   ※ XAMPPのMySQLが起動しているか確認してください。")
 
+# このスクリプトが単体で直接実行された場合のみ main() を動かします
 if __name__ == '__main__':
+    # 上で定義した注文履歴削除関数を実行します
     main()
+
 

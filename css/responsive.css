@@ -6,38 +6,56 @@
 /* A. タブレット横 & 中画面 (max-width: 1024px)                                */
 /* デスクトップ版の3カラム・余白を維持しつつスリム化 a                          */
 /* -------------------------------------------------------------------------- */
+/* ↓ 画面の横幅が1100px以下の時に適用されるレスポンシブ条件（メディアクエリ） */
 @media screen and (max-width: 1100px) {
 
     /* ヘッダーナビの間隔を少し詰めてデスクトップ表示を維持 */
+    /* ↓ メニューリンク同士の間隔を少し狭めます */
     .nav-list {
+        /* ↓ 隙間16px */
         gap: 16px;
     }
 
+    /* ↓ メニュー文字サイズをやや控えめに */
     .nav-link {
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
     }
 
+    /* ↓ ヒーロー大見出しを中画面向けに少し縮小 */
     .hero-heading {
+        /* ↓ 約35.2px */
         font-size: 2.2rem;
     }
 
     /* MANEKINスタジオ: 3カラムを自然に縮小維持 */
+    /* ↓ 3列スタジオの両サイドバー幅を240px・250pxへスリム化 */
     .studio-workspace-grid {
+        /* ↓ 左列240px・中央1fr（残り全部）・右列250px */
         grid-template-columns: 240px 1fr 250px;
+        /* ↓ 列間12px */
         gap: 12px;
     }
 
+    /* ↓ スタジオ下部パネルを2列から縦1列に積み替えます */
     .studio-bottom-panel {
+        /* ↓ 横1列構成 */
         grid-template-columns: 1fr;
     }
 
+    /* ↓ プロフィール設定領域の最大幅を制限して中央寄せ */
     .profile-settings-layout {
+        /* ↓ 最大760px */
         max-width: 760px;
+        /* ↓ 中央配置 */
         margin: 0 auto;
     }
 
+    /* ↓ フッターの4列幅バランスを保ちつつ隙間だけ少し狭めます */
     .footer-top {
+        /* ↓ 左2:1:1:1の4列比率 */
         grid-template-columns: 2fr 1fr 1fr 1fr;
+        /* ↓ 列間28px */
         gap: 28px;
     }
 }
@@ -46,76 +64,114 @@
 /* B. タブレット縦 & 中画面 (max-width: 992px)                                */
 /* デスクトップ版の配置（4カラムフッター・3カラムスタジオ・2カラム購入）を反映 */
 /* -------------------------------------------------------------------------- */
+/* ↓ 画面の横幅が992px以下の時（タブレット縦など）に適用されるルール */
 @media screen and (max-width: 992px) {
 
     /* ヘッダー: デスクトップナビを維持（メニューリンクをコンパクトに配置） */
+    /* ↓ まだ横ナビを表示したままにします */
     .desktop-nav {
+        /* ↓ ブロック表示を維持 */
         display: block;
     }
 
+    /* ↓ スマホ用ハンバーガーボタンはまだ隠しておきます */
     .hamburger-btn {
+        /* ↓ 非表示 */
         display: none;
     }
 
+    /* ↓ メニュー同士の隙間を14pxへさらに詰めます */
     .nav-list {
+        /* ↓ 隙間14px */
         gap: 14px;
     }
 
+    /* ↓ メニューリンクを少し小さく */
     .nav-link {
+        /* ↓ 約12.5px */
         font-size: 0.78rem;
+        /* ↓ 文字間隔もやや狭めます */
         letter-spacing: 0.05em;
     }
 
     /* ヒーローセクション: デスクトップ版のセンタリング・バランスを維持 */
+    /* ↓ ヒーロー大見出しサイズ */
     .hero-heading {
+        /* ↓ 約35.2px */
         font-size: 2.2rem;
     }
 
+    /* ↓ ヒーロー説明文 */
     .hero-description {
+        /* ↓ 約15.2px */
         font-size: 0.95rem;
     }
 
     /* 商品グリッド */
+    /* ↓ PCの4列からタブレットでは3列表示に変更 */
     .product-grid {
+        /* ↓ 均等3列 */
         grid-template-columns: repeat(3, 1fr);
+        /* ↓ 行間20px・列間16px */
         gap: 20px 16px;
     }
 
     /* チェックアウト: デスクトップ版と同じ2カラム（カート＋注文サマリー）を維持 */
+    /* ↓ 購入画面を1.4対1の左右2列で維持します */
     .checkout-layout {
+        /* ↓ 左1.4:右1の2列 */
         grid-template-columns: 1.4fr 1fr;
+        /* ↓ 隙間24px */
         gap: 24px;
     }
 
     /* MANEKINスタジオ: デスクトップ版と同じ3カラム表示を維持（カラムを消さない） */
+    /* ↓ スタジオ3列を維持 */
     .studio-workspace-grid {
+        /* ↓ 左240px・中央1fr・右250px */
         grid-template-columns: 240px 1fr 250px;
+        /* ↓ 列間12px */
         gap: 12px;
     }
 
+    /* ↓ スマホ専用切り替えタブはまだ非表示 */
     .studio-mobile-tabs {
+        /* ↓ 非表示 */
         display: none;
     }
 
+    /* ↓ 3カラムそれぞれの余白を少し詰めてフィットさせます */
     .studio-col {
+        /* ↓ ブロック表示 */
         display: block;
+        /* ↓ 上下14px・左右12px余白 */
         padding: 14px 12px;
     }
 
+    /* ↓ アイテムカードのサムネイル画像を縮小 */
     .studio-item-card-img {
+        /* ↓ 幅52px */
         width: 52px;
+        /* ↓ 高さ64px */
         height: 64px;
     }
 
+    /* ↓ マネキン表示領域のサイズをタブレット向けに縮小 */
     .mannequin-model-wrap {
+        /* ↓ 幅250px */
         width: 250px;
+        /* ↓ 高さ440px */
         height: 440px;
     }
 
     /* フッター: ★ デスクトップ版とまったく同じ4カラム（2fr 1fr 1fr 1fr）を完全に維持！ */
+    /* ↓ フッターの4列を維持しつつ左列比率だけ1.8frに微調整 */
     .footer-top {
+        /* ↓ Gridレイアウト */
         display: grid;
+        /* ↓ 左1.8fr・他3列各1fr */
         grid-template-columns: 1.8fr 1fr 1fr 1fr;
+        /* ↓ 上下24px・左右16px隙間 */
         gap: 24px 16px;
     }
 }
@@ -124,1087 +180,1803 @@
 /* B. モバイル標準 & タブレット縦 (max-width: 768px)                           */
 /* モバイル向け基本骨格・レイアウト変更を一元的に定義（480px以下も自動継承）    */
 /* -------------------------------------------------------------------------- */
+/* ↓ 画面の横幅が768px以下のスマホ・小タブレット向けにレイアウトを大変換するルール */
 @media screen and (max-width: 768px) {
 
     /* --- 1. 基本設定・レイアウト・セーフエリア（iPhone全機種対応） --- */
+    /* ↓ CSS変数（ヘッダーの高さ）をスマホ向けに76pxから64pxへ上書きします */
     :root {
+        /* ↓ ヘッダー高さ64px */
         --header-height: 64px;
     }
 
+    /* ↓ スマホで横にはみ出して画面がガタガタ横揺れするのを徹底防止 */
     html,
     body {
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ 横方向のはみ出しを非表示・スクロール禁止にします */
         overflow-x: hidden;
     }
 
+    /* ↓ ページ共通コンテナ（iPhoneのノッチ・ダイナミックアイランド左右のセーフエリア対応） */
     .container {
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ 最低16px、かつノッチ横などの安全余白 env(safe-area-inset-left) の大きい方を左余白に */
         padding-left: max(16px, env(safe-area-inset-left));
+        /* ↓ 同様に右側の安全余白を確保 */
         padding-right: max(16px, env(safe-area-inset-right));
+        /* ↓ 余白を含めて横幅100%に収めます */
         box-sizing: border-box;
     }
 
+    /* ↓ メイン領域（スマホ用ヘッダー高さ64px分だけ下にずらします） */
     .main-content {
+        /* ↓ 上マージン64px */
         margin-top: 64px;
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ Flex/Grid子要素として幅が膨張するのを防ぐおまじない */
         min-width: 0;
+        /* ↓ パディングを含めて幅計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ ページ本体の上下余白をスマホ向けにスリム化 */
     .page-container {
+        /* ↓ 上20px */
         padding-top: 20px;
+        /* ↓ 下50px */
         padding-bottom: 50px;
     }
 
+    /* ↓ ページ見出し下の余白縮小 */
     .page-header {
+        /* ↓ 下24px */
         margin-bottom: 24px;
     }
 
+    /* ↓ ページタイトルを画面幅に応じて滑らかに伸縮させる clamp() 指定 */
     .page-title {
+        /* ↓ 最小1.25rem・基準4.5vw・最大1.45remの範囲で自動調整 */
         font-size: clamp(1.25rem, 4.5vw, 1.45rem);
     }
 
+    /* ↓ ページ副題 */
     .page-subtitle {
+        /* ↓ 約13.1px */
         font-size: 0.82rem;
     }
 
+    /* ↓ パンくずリスト */
     .page-breadcrumb {
+        /* ↓ 12px */
         font-size: 0.75rem;
+        /* ↓ 下16px */
         margin-bottom: 16px;
     }
 
     /* --- 2. ヘッダー & ナビゲーション --- */
+    /* ↓ ヘッダー左右にもノッチ回避の安全余白を設定 */
     .header-container {
+        /* ↓ 上下0・右セーフエリア・左セーフエリア */
         padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
     }
 
+    /* ↓ PC向け横長ナビゲーションを確実に非表示にします */
     .desktop-nav {
+        /* ↓ !important で他の記述より優先して確実に隠します */
         display: none !important;
     }
 
+    /* ↓ 代わりに左側の三本線ハンバーガーボタンを表示します */
     .hamburger-btn {
+        /* ↓ !important で確実にフレックス表示させます */
         display: flex !important;
     }
 
+    /* ↓ モバイル用ブランドロゴ文字サイズ */
     .logo-text {
+        /* ↓ 20px */
         font-size: 1.25rem;
+        /* ↓ 文字間少し狭め */
         letter-spacing: 0.12em;
     }
 
+    /* ↓ ロゴ下のサブタイトル */
     .logo-subtext {
+        /* ↓ 約8.8px */
         font-size: 0.55rem;
+        /* ↓ 文字間 */
         letter-spacing: 0.2em;
     }
 
+    /* ↓ ヘッダー右アイコンボタン */
     .tool-icon-btn {
+        /* ↓ 幅38px */
         width: 38px;
+        /* ↓ 高さ38px */
         height: 38px;
     }
 
     /* --- 3. ヒーローセクション（iPhone全機種でボタン横並び・文字落ち防止） --- */
+    /* ↓ スマホ画面ではトップバナー高さを画面の60%・最低400pxにします */
     .hero-section {
+        /* ↓ ビューポート高さの60% */
         height: 60vh;
+        /* ↓ 小さいスマホでも潰れすぎない最低高さ400px */
         min-height: 400px;
     }
 
+    /* ↓ バナー中央のテキスト枠 */
     .hero-content {
+        /* ↓ 左右16px余白 */
         padding: 0 16px;
+        /* ↓ 中央揃え */
         text-align: center;
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ パディング込みで幅計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ 英字サブタイトル */
     .hero-subheading {
+        /* ↓ 12px */
         font-size: 0.75rem;
+        /* ↓ 文字間 */
         letter-spacing: 0.18em;
+        /* ↓ 下10px */
         margin-bottom: 10px;
     }
 
+    /* ↓ ヒーロー大見出し（不自然な1文字改行を防ぐ設定込み） */
     .hero-heading {
+        /* ↓ 画面幅に合わせて約23px〜31pxで自動伸縮 */
         font-size: clamp(1.45rem, 5.2vw, 1.95rem);
+        /* ↓ 行間1.35倍 */
         line-height: 1.35;
+        /* ↓ 文字間 */
         letter-spacing: 0.04em;
+        /* ↓ 下14px */
         margin-bottom: 14px;
+        /* ↓ 日本語の単語や文節の途中で不自然に改行させない指定 */
         word-break: keep-all;
+        /* ↓ 単語がどうしても長い時だけはみ出しを防ぐため折り返します */
         overflow-wrap: break-word;
     }
 
+    /* ↓ ヒーロー紹介文 */
     .hero-description {
+        /* ↓ 画面幅に合わせて約13.1px〜14.1pxで自動調整 */
         font-size: clamp(0.82rem, 2.5vw, 0.88rem);
+        /* ↓ 行間1.65倍 */
         line-height: 1.65;
+        /* ↓ 下22px */
         margin-bottom: 22px;
     }
 
+    /* ↓ 「SHOP NOW」と「MANEKIN STUDIO」ボタンの横並び容器 */
     .hero-buttons {
+        /* ↓ Flex横並び */
         display: flex;
+        /* ↓ 横1列を明示 */
         flex-direction: row;
+        /* ↓ 中央配置 */
         justify-content: center;
+        /* ↓ ボタン間10px */
         gap: 10px;
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大360px幅まで */
         max-width: 360px;
+        /* ↓ 中央配置 */
         margin: 0 auto;
     }
 
+    /* ↓ 2つのボタンそれぞれの大きさ調整 */
     .hero-buttons .btn {
+        /* ↓ 上下11px・左右16px余白 */
         padding: 11px 16px;
+        /* ↓ 約13.1px */
         font-size: 0.82rem;
+        /* ↓ 2つのボタンが均等幅になるよう1:1で伸縮 */
         flex: 1;
+        /* ↓ 1ボタン最大175px */
         max-width: 175px;
+        /* ↓ ボタン文字を折り返しません */
         white-space: nowrap;
+        /* ↓ 文字中央寄せ */
         text-align: center;
     }
 
     /* --- 4. ブランドコンセプト & 見出しタイポグラフィ --- */
+    /* ↓ 3列コンセプトカードを縦1列に積み直します */
     .concept-grid {
+        /* ↓ 強制的に1列へ */
         grid-template-columns: 1fr !important;
+        /* ↓ 縦隙間16px */
         gap: 16px !important;
     }
 
+    /* ↓ セクション見出し行（「PICK UP」と「View More」の並び） */
     .section-header {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 両端揃え */
         justify-content: space-between;
+        /* ↓ 下端揃え */
         align-items: flex-end;
+        /* ↓ 間隔10px */
         gap: 10px;
+        /* ↓ 下22px */
         margin-bottom: 22px;
     }
 
+    /* ↓ 左側のタイトル枠（縮めるため min-width: 0 が重要） */
     .section-title-wrap {
+        /* ↓ 幅縮小を許可 */
         min-width: 0;
+        /* ↓ 残りスペースを占めます */
         flex: 1;
     }
 
+    /* ↓ 英語サブタイトル */
     .section-en-title {
+        /* ↓ 約11.2px */
         font-size: 0.7rem;
+        /* ↓ 文字間 */
         letter-spacing: 0.12em;
     }
 
+    /* ↓ 日本語セクション見出し */
     .section-jp-title {
+        /* ↓ 画面幅に合わせて20px〜22.4pxで伸縮 */
         font-size: clamp(1.25rem, 4.5vw, 1.4rem);
+        /* ↓ 文字間少し狭め */
         letter-spacing: 0.02em;
     }
 
+    /* ↓ 折り返し禁止指定が付いた日本語見出し */
     .section-jp-title.text-nowrap {
+        /* ↓ 1行表示 */
         white-space: nowrap;
     }
 
+    /* ↓ 右側の「VIEW MORE」リンク */
     .view-more-link.text-nowrap {
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 改行しない */
         white-space: nowrap;
+        /* ↓ 見出しに押されて文字が潰れないよう縮み禁止 */
         flex-shrink: 0;
     }
 
     /* --- 5. 次世代MANEKIN告知バナー --- */
+    /* ↓ モバイル向け余白調整 */
     .manekin-teaser-banner {
+        /* ↓ 上下26px・左右18px */
         padding: 26px 18px;
+        /* ↓ 角丸8px */
         border-radius: 8px;
     }
 
+    /* ↓ ティーザータグ */
     .teaser-tag {
+        /* ↓ 約11.5px */
         font-size: 0.72rem;
+        /* ↓ 下8px */
         margin-bottom: 8px;
     }
 
+    /* ↓ ティーザー大見出し */
     .teaser-title {
+        /* ↓ 画面幅に合わせて伸縮 */
         font-size: clamp(1.15rem, 4.2vw, 1.4rem);
+        /* ↓ 行間1.35倍 */
         line-height: 1.35;
+        /* ↓ 下12px */
         margin-bottom: 12px;
     }
 
+    /* ↓ ティーザー本文 */
     .teaser-text {
+        /* ↓ 約13.4px */
         font-size: 0.84rem;
+        /* ↓ 行間1.7倍 */
         line-height: 1.7;
+        /* ↓ 下18px */
         margin-bottom: 18px;
     }
 
+    /* ↓ 「スタジオを見る」ボタン */
     .btn-teaser {
+        /* ↓ 横幅いっぱい */
         width: 100%;
+        /* ↓ 最大320px */
         max-width: 320px;
+        /* ↓ 中央配置 */
         margin: 0 auto;
+        /* ↓ 文字中央 */
         justify-content: center;
+        /* ↓ 約13.4px */
         font-size: 0.84rem;
+        /* ↓ 上下12px・左右16px */
         padding: 12px 16px;
+        /* ↓ 改行なし */
         white-space: nowrap;
+        /* ↓ Flexで中央配置 */
         display: flex;
     }
 
     /* --- 6. 商品グリッド（全iPhoneで美しい2列レイアウト） --- */
+    /* ↓ スマホでは商品カードを横2列で敷き詰めます */
     .product-grid {
+        /* ↓ 均等2列 */
         grid-template-columns: repeat(2, 1fr);
+        /* ↓ 行間14px・列間10px */
         gap: 14px 10px;
     }
 
+    /* ↓ カード文字欄の上余白を少し狭く */
     .product-info {
+        /* ↓ 上8px */
         padding-top: 8px;
     }
 
+    /* ↓ カテゴリラベル */
     .product-category {
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 下2px */
         margin-bottom: 2px;
     }
 
+    /* ↓ 商品名（2列時にも高さが揃うよう最大2行で「...」切り詰め） */
     .product-name {
+        /* ↓ 約13.4px */
         font-size: 0.84rem;
+        /* ↓ 行間1.35倍 */
         line-height: 1.35;
+        /* ↓ 2行分(1.35 * 2 = 2.7em)の高さ制限 */
         max-height: 2.7em;
+        /* ↓ はみ出し非表示 */
         overflow: hidden;
+        /* ↓ WebKit省略ボックス */
         display: -webkit-box;
+        /* ↓ 最大2行 */
         -webkit-line-clamp: 2;
+        /* ↓ 縦方向 */
         -webkit-box-orient: vertical;
+        /* ↓ 下4px */
         margin-bottom: 4px;
     }
 
+    /* ↓ 商品価格 */
     .product-price {
+        /* ↓ 約14.4px */
         font-size: 0.9rem;
+        /* ↓ 太字 */
         font-weight: 700;
     }
 
+    /* ↓ お気に入りハートボタンを少し小ぶりに */
     .fav-btn {
+        /* ↓ 32x32px */
         width: 32px;
+        /* ↓ 高さ32px */
         height: 32px;
+        /* ↓ 上6px */
         top: 6px;
+        /* ↓ 右6px */
         right: 6px;
     }
 
+    /* ↓ ハートSVGも16pxに縮小 */
     .fav-btn svg {
+        /* ↓ 幅16px */
         width: 16px;
+        /* ↓ 高さ16px */
         height: 16px;
     }
 
+    /* ↓ NEWバッジもスマホサイズに */
     .badge-new {
+        /* ↓ 約9.6px */
         font-size: 0.6rem;
+        /* ↓ 余白 */
         padding: 2px 6px;
+        /* ↓ 上6px */
         top: 6px;
+        /* ↓ 左6px */
         left: 6px;
     }
 
     /* --- 7. 商品詳細ページ --- */
+    /* ↓ 左写真・右説明の2列を縦1列に積み替えます */
     .item-detail-layout {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr;
+        /* ↓ 縦間20px */
         gap: 20px;
     }
 
+    /* ↓ PCの追従固定(sticky)をスマホでは解除して通常スクロールにします */
     .detail-gallery {
+        /* ↓ 通常の配置 */
         position: static;
     }
 
+    /* ↓ 商品タイトル */
     .detail-title {
+        /* ↓ 約20.8px */
         font-size: 1.3rem;
+        /* ↓ 行間1.35倍 */
         line-height: 1.35;
     }
 
+    /* ↓ 価格表示 */
     .detail-price {
+        /* ↓ 約23.2px */
         font-size: 1.45rem;
     }
 
+    /* ↓ 「カートに追加」等のボタンを縦並びに */
     .detail-actions {
+        /* ↓ 縦並び */
         flex-direction: column;
+        /* ↓ 間10px */
         gap: 10px;
     }
 
+    /* ↓ 詳細ページのボタンを全幅で押しやすくします */
     .detail-actions .btn {
+        /* ↓ 横幅いっぱい */
         width: 100%;
+        /* ↓ 上下13px・左右20px */
         padding: 13px 20px;
+        /* ↓ 約14.4px */
         font-size: 0.9rem;
     }
 
+    /* ↓ カタログの並び替えバーを縦並びに */
     .catalog-controls {
+        /* ↓ 縦並び */
         flex-direction: column;
+        /* ↓ 左揃え */
         align-items: flex-start;
+        /* ↓ 間12px */
         gap: 12px;
     }
 
+    /* ↓ スマホヘッダーの狭い場所では「カート」の文字ラベルを隠してアイコンだけ見せます */
     .cart-btn-label {
+        /* ↓ 非表示 */
         display: none;
     }
 
     /* --- 8. チェックアウト & カート --- */
+    /* ↓ カート＆入力欄(左)と注文金額サマリー(右)の2列を縦1列に積み直します */
     .checkout-layout {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr;
+        /* ↓ 隙間20px */
         gap: 20px;
     }
 
+    /* ↓ 支払い方法カードの横並びを縦1列に */
     .payment-options-grid {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr;
     }
 
+    /* ↓ 「姓・名」や「郵便番号・都道府県」の横2列フォーム欄を縦並びに */
     .form-row {
+        /* ↓ 縦積み */
         flex-direction: column;
+        /* ↓ 間12px */
         gap: 12px;
     }
 
+    /* ↓ 購入ステップ表示バーのスマホ余白調整 */
     .checkout-stepper {
+        /* ↓ 下20px */
         margin-bottom: 20px;
+        /* ↓ 左右4px余白 */
         padding: 0 4px;
     }
 
+    /* ↓ ステップ番号円を少し小ぶりに */
     .step-num {
+        /* ↓ 28x28px */
         width: 28px;
+        /* ↓ 高さ28px */
         height: 28px;
+        /* ↓ 12px */
         font-size: 0.75rem;
     }
 
+    /* ↓ ステップ名の文字サイズ縮小 */
     .step-text {
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
     }
 
+    /* ↓ ステップ間をつなぐ線の左右余白を調整 */
     .step-line {
+        /* ↓ 上0・左右6px・下14px */
         margin: 0 6px 14px;
     }
 
+    /* ↓ カート枠カードの余白を少し詰めます */
     .checkout-section-card {
+        /* ↓ 上下18px・左右14px */
         padding: 18px 14px;
     }
 
+    /* ↓ カートセクション見出し */
     .checkout-section-title {
+        /* ↓ 約16.8px */
         font-size: 1.05rem;
     }
 
+    /* ↓ スマホのカート商品行（左に写真を通し、右に上段＝名前・価格、下段＝数量・削除を配置する2段グリッド） */
     .cart-item-row {
+        /* ↓ Gridレイアウトを有効化 */
         display: grid;
+        /* ↓ 左列58px固定（写真用）、右列1fr（詳細・操作ボタン用） */
         grid-template-columns: 58px 1fr;
+        /* ↓ 名前付けたエリア配置："thumb"が2行通しで左に、"details"が右上、"controls"が右下に並びます */
         grid-template-areas:
             "thumb details"
             "thumb controls";
+        /* ↓ 行間8px・列間12px */
         gap: 8px 12px;
+        /* ↓ 内側余白 */
         padding: 12px 10px;
+        /* ↓ 縦中央寄せ */
         align-items: center;
     }
 
+    /* ↓ 商品サムネイル画像（grid-area: thumb 領域に割り当て） */
     .cart-item-thumb {
+        /* ↓ thumb エリアへ配置 */
         grid-area: thumb;
+        /* ↓ 幅58px */
         width: 58px;
+        /* ↓ 高さ74px */
         height: 74px;
+        /* ↓ 左エリアの上端にぴったり揃えます */
         align-self: start;
     }
 
+    /* ↓ 商品名・色サイズ・金額欄（右上 details 領域へ割り当て） */
     .cart-item-details {
+        /* ↓ details エリアへ配置 */
         grid-area: details;
     }
 
+    /* ↓ 商品名文字 */
     .cart-item-name {
+        /* ↓ 約14px */
         font-size: 0.88rem;
+        /* ↓ 行間1.3倍 */
         line-height: 1.3;
+        /* ↓ 下2px */
         margin-bottom: 2px;
     }
 
+    /* ↓ サイズ・カラー文字 */
     .cart-item-meta {
+        /* ↓ 約12.2px */
         font-size: 0.76rem;
+        /* ↓ 下2px */
         margin-bottom: 2px;
     }
 
+    /* ↓ 価格文字 */
     .cart-item-price {
+        /* ↓ 約14.4px */
         font-size: 0.9rem;
     }
 
+    /* ↓ 数量±ボタンと削除ボタン行（右下 controls 領域へ割り当て） */
     .cart-item-controls {
+        /* ↓ controls エリアへ配置 */
         grid-area: controls;
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 左右両端配置 */
         justify-content: space-between;
+        /* ↓ 上に6px余白 */
         padding-top: 6px;
+        /* ↓ 上の詳細文との境目に細い破線 */
         border-top: 1px dashed var(--color-gray-light);
     }
 
+    /* ↓ 数量増減ボタン */
     .cart-qty-btn {
+        /* ↓ 26x26px */
         width: 26px;
+        /* ↓ 高さ26px */
         height: 26px;
+        /* ↓ 約13.6px */
         font-size: 0.85rem;
     }
 
+    /* ↓ 数量数値テキスト */
     .cart-qty-text {
+        /* ↓ 約13.6px */
         font-size: 0.85rem;
+        /* ↓ 最小幅18px */
         min-width: 18px;
     }
 
     /* --- 9. マイページ & 注文履歴テーブル（突き破り・余白防止徹底） --- */
+    /* ↓ ログイン・登録カードの余白と外マージンをスマホ幅向けに調整 */
     .auth-card {
+        /* ↓ 上下26px・左右16px */
         padding: 26px 16px;
+        /* ↓ 上下20px・中央配置 */
         margin: 20px auto;
+        /* ↓ 角丸8px */
         border-radius: 8px;
     }
 
+    /* ↓ 認証カード見出し */
     .auth-title {
+        /* ↓ 約21.6px */
         font-size: 1.35rem;
     }
 
+    /* ↓ マイページ全体枠（横スクロールテーブルで枠ごと横に膨らむ事故を防ぎます） */
     .mypage-container {
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ 幅縮小を許可（横膨張防止） */
         min-width: 0;
+        /* ↓ パディング・ボーダーを幅100%に含めます */
         box-sizing: border-box;
     }
 
+    /* ↓ マイページヘッダーカード余白調整 */
     .mypage-header-card {
+        /* ↓ 上下20px・左右16px */
         padding: 20px 16px;
     }
 
+    /* ↓ ユーザー名サイズ縮小 */
     .mypage-user-name {
+        /* ↓ 20px */
         font-size: 1.25rem;
     }
 
+    /* ↓ マイページ統計カードを縦1列へ */
     .mypage-stats-grid {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr;
+        /* ↓ 間12px */
         gap: 12px;
     }
 
+    /* ↓ マイページの切り替えタブバー（横スクロール可能＆スクロールバー見た目非表示） */
     .mypage-tabs {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ タブ間8px */
         gap: 8px;
+        /* ↓ 下20px */
         margin-bottom: 20px;
+        /* ↓ 確実に横スクロールさせる */
         overflow-x: auto !important;
+        /* ↓ iOS向け滑らかスクロール */
         -webkit-overflow-scrolling: touch;
+        /* ↓ Firefoxでスクロールバーの太さを非表示 */
         scrollbar-width: none;
+        /* ↓ 横幅100%を死守 */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ ボックスサイズ指定 */
         box-sizing: border-box;
     }
 
+    /* ↓ Chrome/Safariでもタブの横スクロールバー自体を隠します */
     .mypage-tabs::-webkit-scrollbar {
+        /* ↓ 非表示 */
         display: none;
     }
 
+    /* ↓ 各マイページタブボタン */
     .mypage-tab-btn {
+        /* ↓ 上下10px・左右14px */
         padding: 10px 14px;
+        /* ↓ 約13.6px */
         font-size: 0.85rem;
+        /* ↓ 横スクロール内でボタンが押しつぶされないよう縮み禁止 */
         flex-shrink: 0;
+        /* ↓ ラベル1行維持 */
         white-space: nowrap;
     }
 
+    /* ↓ タブ中身コンテナも横膨張防止 */
     .mypage-tab-content {
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ 縮小許可 */
         min-width: 0;
+        /* ↓ ボックス計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ 注文履歴セクション上部バー（見出しと同期ボタンを縦積み） */
     .orders-section-header {
+        /* ↓ Flexbox有効 */
         display: flex;
+        /* ↓ 縦並びに切り替え */
         flex-direction: column;
+        /* ↓ 左端に揃えます */
         align-items: flex-start !important;
+        /* ↓ 縦隙間10px */
         gap: 10px;
+        /* ↓ 下16px */
         margin-bottom: 16px;
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ ボックスサイズ指定 */
         box-sizing: border-box;
     }
 
+    /* ↓ 注文履歴の小見出し */
     .orders-subheading {
+        /* ↓ 約16.8px */
         font-size: 1.05rem;
+        /* ↓ 太字 */
         font-weight: 700;
     }
 
+    /* ↓ 注文履歴の補足説明 */
     .orders-info-text {
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 行間1.5倍 */
         line-height: 1.5;
     }
 
+    /* ↓ スマホの注文履歴表が横に突き破らず枠内だけで横スクロールできるよう包むラッパー */
     .orders-table-wrapper {
+        /* ↓ 親幅100%を強制維持 */
         width: 100% !important;
+        /* ↓ 最大幅も100%で制限 */
         max-width: 100% !important;
+        /* ↓ 表が広い時だけ横スクロールを許可 */
         overflow-x: auto !important;
+        /* ↓ iOS滑らかスクロール */
         -webkit-overflow-scrolling: touch;
+        /* ↓ 薄い1px枠線 */
         border: 1px solid var(--color-gray-light);
+        /* ↓ 角丸4px */
         border-radius: 4px;
+        /* ↓ 枠線込みで幅100%計算 */
         box-sizing: border-box;
+        /* ↓ スクロールコンテナとしてブロック表示 */
         display: block;
+        /* ↓ 下余白24px */
         margin-bottom: 24px;
     }
 
+    /* ↓ 注文履歴テーブル本体（スマホ幅でも文字が縦1文字ずつ潰れない最低幅を確保） */
     .orders-table {
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 最小幅520pxを確保して表の列が崩れるのを防ぎ、ラッパー側でスクロールさせます */
         min-width: 520px;
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 隣接セルの二重線を1本に結合 */
         border-collapse: collapse;
     }
 
+    /* ↓ スマホ用テーブルの見出しセルとデータセルの余白調整 */
     .orders-table th,
     .orders-table td {
+        /* ↓ 上下10px・左右12px余白 */
         padding: 10px 12px;
+        /* ↓ 原則改行せず1行で整理して見せます */
         white-space: nowrap;
+        /* ↓ 約12.5px */
         font-size: 0.78rem;
     }
 
+    /* ↓ 3列目（商品名リスト列）だけは長いので改行を許可して全体を読みやすくします */
     .orders-table td:nth-child(3) {
+        /* ↓ 通常通り折り返しを許可 */
         white-space: normal;
+        /* ↓ 最低幅150pxを確保 */
         min-width: 150px;
     }
 
     /* --- 10. MANEKIN AI STUDIO（マネキン試着室・ダッシュボード） --- */
+    /* ↓ スマホ時の試着スタジオ外側余白 */
     .studio-container {
+        /* ↓ 上16px・左右12px・下60px */
         padding: 16px 12px 60px;
+        /* ↓ 最大幅100% */
         max-width: 100%;
+        /* ↓ 横はみ出し禁止 */
         overflow-x: hidden;
+        /* ↓ 余白込み計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ スタジオヘッダーカードを縦並びに変更（上にタイトル、下にユーザーチップ） */
     .studio-header-card {
+        /* ↓ 縦並び */
         flex-direction: column;
+        /* ↓ 左端揃え */
         align-items: flex-start;
+        /* ↓ 隙間14px */
         gap: 14px;
+        /* ↓ 上下18px・左右16px */
         padding: 18px 16px;
+        /* ↓ 下16px */
         margin-bottom: 16px;
     }
 
+    /* ↓ スタジオタイトル縮小 */
     .studio-title {
+        /* ↓ 20px */
         font-size: 1.25rem;
     }
 
+    /* ↓ スタジオの上部サブナビタブ（横スワイプ式・スクロールバー非表示） */
     .studio-nav-tabs {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ タブ間8px */
         gap: 8px;
+        /* ↓ 横スクロール有効 */
         overflow-x: auto !important;
+        /* ↓ iOS慣性スクロール */
         -webkit-overflow-scrolling: touch;
+        /* ↓ Firefoxのバー非表示 */
         scrollbar-width: none;
+        /* ↓ 横幅100% */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ ボックスサイズ指定 */
         box-sizing: border-box;
+        /* ↓ 下16px */
         margin-bottom: 16px;
     }
 
+    /* ↓ WebKit系ブラウザの横スクロールバーも見た目非表示に */
     .studio-nav-tabs::-webkit-scrollbar {
+        /* ↓ 非表示 */
         display: none;
     }
 
+    /* ↓ タブが横スクロール内で縮まないよう保護 */
     .studio-tab-btn {
+        /* ↓ 縮み禁止 */
         flex-shrink: 0;
+        /* ↓ 1行維持 */
         white-space: nowrap;
     }
 
     /* ダッシュボード: スタッツ & クイックカード（縦並び・文字崩れ防止） */
+    /* ↓ 統計カード3列を縦1列に積み直します */
     .studio-stats-grid {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr !important;
+        /* ↓ 縦隙間12px */
         gap: 12px !important;
+        /* ↓ 下18px */
         margin-bottom: 18px !important;
     }
 
+    /* ↓ 黒おすすめバナーの内側余白をスマホ向けに縮小 */
     .studio-recommend-banner {
+        /* ↓ 上下22px・左右18px */
         padding: 22px 18px;
     }
 
+    /* ↓ モーダル内の服カテゴリ選択ラジオボタンを2列から縦1列に */
     .category-radio-grid {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr;
     }
 
+    /* ↓ ホーム下のショートカットカード3列も縦1列へ */
     .studio-quick-cards {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr !important;
+        /* ↓ 隙間12px */
         gap: 12px !important;
     }
 
+    /* ↓ スマホのショートカットカードは左アイコン・右文字の横並びリスト形式に見やすく変更 */
     .quick-card {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 左寄せ文章 */
         text-align: left;
+        /* ↓ 上下16px・左右18px */
         padding: 16px 18px;
+        /* ↓ アイコンと文字の間を16px空けます */
         gap: 16px;
     }
 
+    /* ↓ クイックカードアイコンサイズ調整 */
     .quick-card-icon {
+        /* ↓ 約25.6px */
         font-size: 1.6rem;
+        /* ↓ 横並びにしたので下余白を0に */
         margin-bottom: 0;
+        /* ↓ 縮み防止 */
         flex-shrink: 0;
     }
 
+    /* ↓ クイックカード見出し */
     .quick-card-title {
+        /* ↓ 約15.2px */
         font-size: 0.95rem;
+        /* ↓ 下4px */
         margin-bottom: 4px;
     }
 
+    /* ↓ クイックカード本文 */
     .quick-card-desc {
+        /* ↓ 約12.5px */
         font-size: 0.78rem;
+        /* ↓ 行間1.45倍 */
         line-height: 1.45;
+        /* ↓ 余白ゼロ */
         margin: 0;
     }
 
     /* コーデ作成: 3カラムをモバイルタブに切り替え */
+    /* ↓ PC版3カラムのスタジオをスマホでは1カラム重ね方式に変更 */
     .studio-workspace-grid {
+        /* ↓ 1列 */
         grid-template-columns: 1fr !important;
+        /* ↓ 列間隙間ゼロ */
         gap: 0 !important;
     }
 
+    /* ↓ スマホ時に出現させる「マイ服 / マネキン / BRAND」3連タブバー */
     .studio-mobile-tabs {
+        /* ↓ noneからgridへ切り替えて表示します */
         display: grid;
+        /* ↓ 均等3列 */
         grid-template-columns: repeat(3, 1fr);
+        /* ↓ ボタン間6px */
         gap: 6px;
+        /* ↓ 下14px */
         margin-bottom: 14px;
     }
 
+    /* ↓ スマホ用タブボタンの文字サイズ調整 */
     .mobile-tab-btn {
+        /* ↓ 1行維持 */
         white-space: nowrap !important;
+        /* ↓ 約11.8px */
         font-size: 0.74rem;
+        /* ↓ 上下8px・左右3px */
         padding: 8px 3px;
+        /* ↓ 中央寄せ */
         text-align: center;
+        /* ↓ はみ出し防止 */
         overflow: hidden;
+        /* ↓ 長い時「...」 */
         text-overflow: ellipsis;
+        /* ↓ わずかに文字詰め */
         letter-spacing: -0.01em;
     }
 
+    /* ↓ 3列（左・中央・右）はいったんすべて非表示にしておきます */
     .studio-col {
+        /* ↓ 非表示 */
         display: none !important;
+        /* ↓ 幅100% */
         width: 100% !important;
+        /* ↓ 上下14px・左右12px */
         padding: 14px 12px;
+        /* ↓ ボックス計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ JavaScriptで選ばれた1列（.mobile-active が付いた列）だけを画面に全幅表示します */
     .studio-col.mobile-active {
+        /* ↓ ブロック表示で出現 */
         display: block !important;
+        /* ↓ 全幅 */
         width: 100% !important;
     }
 
     /* 試着室ツールバー: 上段にタイトル、下段に操作ボタンを左詰めで配置 */
+    /* ↓ スマホ画面でのツールバー再調整 */
     .mannequin-toolbar {
+        /* ↓ Flex表示 */
         display: flex !important;
+        /* ↓ 縦2段 */
         flex-direction: column !important;
+        /* ↓ 左揃え */
         align-items: flex-start !important;
+        /* ↓ 隙間6px */
         gap: 6px !important;
+        /* ↓ 折り返し許可 */
         flex-wrap: wrap !important;
+        /* ↓ はみ出し表示を通常に */
         overflow-x: visible !important;
+        /* ↓ 下内側余白8px */
         padding-bottom: 8px !important;
+        /* ↓ 下外余白10px */
         margin-bottom: 10px !important;
     }
 
+    /* ↓ ツールバーのスクロールバー抑制 */
     .mannequin-toolbar::-webkit-scrollbar {
+        /* ↓ 非表示 */
         display: none !important;
     }
 
+    /* ↓ 上段幅100% */
     .toolbar-left {
+        /* ↓ 100%幅 */
         width: 100% !important;
+        /* ↓ ブロック */
         display: block !important;
     }
 
+    /* ↓ スマホのステージ見出し */
     .stage-tag {
+        /* ↓ 約13.6px */
         font-size: 0.85rem !important;
+        /* ↓ 太字 */
         font-weight: 700 !important;
+        /* ↓ 1行維持 */
         white-space: nowrap !important;
+        /* ↓ ブロック */
         display: block !important;
     }
 
+    /* ↓ 下段の操作ボタン並べ */
     .toolbar-right {
+        /* ↓ Flex横並び */
         display: flex !important;
+        /* ↓ 縦中央 */
         align-items: center !important;
+        /* ↓ 左詰め */
         justify-content: flex-start !important;
+        /* ↓ 隙間5px */
         gap: 5px !important;
+        /* ↓ 狭い画面では2行目へ折り返します */
         flex-wrap: wrap !important;
+        /* ↓ 100%幅 */
         width: 100% !important;
     }
 
+    /* ↓ 位置調整ボタン（スマホ縮小版） */
     .btn-toolbar-adjust {
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 上下4px・左右6px */
         padding: 4px 6px;
+        /* ↓ 隙間3px */
         gap: 3px;
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ 位置調整ボタン内SVGサイズ縮小 */
     .btn-toolbar-adjust svg {
+        /* ↓ 幅12px */
         width: 12px;
+        /* ↓ 高さ12px */
         height: 12px;
     }
 
+    /* ↓ 性別ボタン（スマホ縮小版） */
     .btn-gender {
+        /* ↓ 上下3px・左右6px */
         padding: 3px 6px;
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ 全脱ぎクリアボタン（スマホ縮小版） */
     .btn-toolbar-clear {
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 上下4px・左右6px */
         padding: 4px 6px;
+        /* ↓ 隙間2px */
         gap: 2px;
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ クリアボタン内SVGサイズ縮小 */
     .btn-toolbar-clear svg {
+        /* ↓ 幅12px */
         width: 12px;
+        /* ↓ 高さ12px */
         height: 12px;
     }
 
     /* マネキン試着室: 床プレートと服のプロポーションを完全同期（デスクトップ版と同一の黄金比） */
+    /* ↓ スマホでもマネキンステージの高さを維持します */
     .mannequin-stage-box {
+        /* ↓ 最低540px */
         min-height: 540px !important;
+        /* ↓ 幅100% */
         width: 100%;
+        /* ↓ 上14px・左右10px・下12px */
         padding: 14px 10px 12px !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box;
     }
 
+    /* ↓ 各服の座標計算(280x480)が崩れないようスマホでもステージ枠自体は280x480を維持して中央置きにします */
     .mannequin-model-wrap {
+        /* ↓ 幅280px維持 */
         width: 280px !important;
+        /* ↓ 高さ480px維持 */
         height: 480px !important;
+        /* ↓ 左右中央配置 */
         margin: 0 auto;
+        /* ↓ 320px未満など極狭時は幅100%ではみ出し抑止 */
         max-width: 100%;
     }
 
+    /* ↓ 着用ブランド品価格バー余白 */
     .stage-brand-summary {
+        /* ↓ 上下10px・左右12px */
         padding: 10px 12px;
+        /* ↓ 上8px */
         margin-top: 8px;
     }
 
     /* ▼ AIコメントカード & コーディネート保存カード: コンパクト化 & 見切れ防止徹底 */
+    /* ↓ スタジオ下部エリアを縦積みのFlex列に変更 */
     .studio-bottom-panel {
+        /* ↓ Flex列 */
         display: flex !important;
+        /* ↓ 縦配置 */
         flex-direction: column !important;
+        /* ↓ 100%幅 */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ 縮小許可 */
         min-width: 0 !important;
+        /* ↓ 上下カード隙間12px */
         gap: 12px !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
     }
 
     /* 1. AIスタイリングコメントカード */
+    /* ↓ スマホ向けコンパクトカード化 */
     .ai-comment-card {
+        /* ↓ 上下14px・左右12px */
         padding: 14px 12px !important;
+        /* ↓ 幅100% */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ 縮小許可 */
         min-width: 0 !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
+        /* ↓ 角丸6px */
         border-radius: 6px;
     }
 
+    /* ↓ AIカード見出し行（1行に綺麗に収めます） */
     .ai-comment-header {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 両端配置 */
         justify-content: space-between;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 隙間4px */
         gap: 4px;
+        /* ↓ 折り返さず1行に維持 */
         flex-wrap: nowrap;
+        /* ↓ 下余白8px */
         padding-bottom: 8px;
+        /* ↓ 下線 */
         border-bottom: 1px solid var(--color-gray-light);
     }
 
+    /* ↓ 左側のドット＋AI名 */
     .ai-header-left {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 隙間4px */
         gap: 4px;
+        /* ↓ 縮小許可 */
         min-width: 0;
     }
 
+    /* ↓ 光るドットを6pxに小ぶり化 */
     .ai-sparkle-dot {
+        /* ↓ 6px */
         width: 6px;
+        /* ↓ 6px */
         height: 6px;
+        /* ↓ 縮み防止 */
         flex-shrink: 0;
     }
 
+    /* ↓ AIラベル文字サイズ */
     .ai-label {
+        /* ↓ 約11.2px */
         font-size: 0.7rem;
+        /* ↓ 太字 */
         font-weight: 700;
+        /* ↓ 1行 */
         white-space: nowrap;
+        /* ↓ 文字間 */
         letter-spacing: 0.02em;
     }
 
+    /* ↓ エンジンバージョン小タグ */
     .ai-engine-tag {
+        /* ↓ 約8.6px */
         font-size: 0.54rem;
+        /* ↓ 上下1px・左右3px */
         padding: 1px 3px;
+        /* ↓ 1行 */
         white-space: nowrap;
+        /* ↓ 角丸3px */
         border-radius: 3px;
     }
 
+    /* ↓ 右側スコアブロック */
     .ai-header-right {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 隙間3px */
         gap: 3px;
+        /* ↓ 1行 */
         white-space: nowrap;
+        /* ↓ 縮み禁止 */
         flex-shrink: 0;
     }
 
+    /* ↓ スコアラベル文字 */
     .ai-score-label {
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 1行 */
         white-space: nowrap;
+        /* ↓ グレー */
         color: var(--color-gray-medium);
     }
 
+    /* ↓ スコア数値（スマホ版） */
     .ai-score-val {
+        /* ↓ 約13.6px */
         font-size: 0.85rem;
+        /* ↓ 太字 */
         font-weight: 700;
+        /* ↓ 1行 */
         white-space: nowrap;
+        /* ↓ 黒 */
         color: var(--color-black);
     }
 
+    /* ↓ AIアドバイスの本文 */
     .ai-comment-text {
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 行間1.6倍 */
         line-height: 1.6;
+        /* ↓ 上8px・下10px余白 */
         margin: 8px 0 10px;
+        /* ↓ 濃いめグレー */
         color: var(--color-gray-dark);
+        /* ↓ 長い英字等でも枠を破らないよう折り返します */
         word-break: break-word;
     }
 
+    /* ↓ 下部のハッシュタグとカラーパレット行 */
     .ai-meta-bar {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 両端 */
         justify-content: space-between;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 折り返し許可 */
         flex-wrap: wrap;
+        /* ↓ 隙間8px */
         gap: 8px;
+        /* ↓ 上内側余白8px */
         padding-top: 8px;
+        /* ↓ 上部破線 */
         border-top: 1px dashed var(--color-gray-light);
     }
 
+    /* ↓ ハッシュタグ群 */
     .ai-tags-wrap {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 隙間4px */
         gap: 4px;
+        /* ↓ 折り返し許可 */
         flex-wrap: wrap;
     }
 
+    /* ↓ 各ハッシュタグ縮小 */
     .ai-tag {
+        /* ↓ 約10.6px */
         font-size: 0.66rem;
+        /* ↓ 余白 */
         padding: 2px 6px;
+        /* ↓ 丸角 */
         border-radius: 10px;
     }
 
+    /* ↓ カラードット群容器 */
     .ai-palette-wrap {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 縦中央 */
         align-items: center;
+        /* ↓ 隙間4px */
         gap: 4px;
     }
 
+    /* ↓ 「配色」ラベル */
     .palette-label {
+        /* ↓ 約10.6px */
         font-size: 0.66rem;
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ 色丸並び */
     .palette-dots {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 隙間3px */
         gap: 3px;
     }
 
+    /* ↓ 色丸のサイズを10pxに */
     .palette-dot {
+        /* ↓ 10px */
         width: 10px;
+        /* ↓ 10px */
         height: 10px;
     }
 
     /* 2. コーディネートを保存カード */
+    /* ↓ スマホ向けコーデ保存カード調整 */
     .outfit-save-card {
+        /* ↓ 上下14px・左右12px */
         padding: 14px 12px !important;
+        /* ↓ 幅100% */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ 縮小許可 */
         min-width: 0 !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
+        /* ↓ 角丸6px */
         border-radius: 6px;
     }
 
+    /* ↓ 保存カードタイトル */
     .save-card-title {
+        /* ↓ 約14.7px */
         font-size: 0.92rem;
+        /* ↓ 太字 */
         font-weight: 700;
+        /* ↓ 下2px */
         margin-bottom: 2px;
     }
 
+    /* ↓ 保存カード補足説明 */
     .save-card-desc {
+        /* ↓ 約11.8px */
         font-size: 0.74rem;
+        /* ↓ 行間1.45倍 */
         line-height: 1.45;
+        /* ↓ 下8px */
         margin-bottom: 8px;
+        /* ↓ グレー文字 */
         color: var(--color-gray-medium);
+        /* ↓ はみ出し防止折り返し */
         word-break: break-word;
     }
 
+    /* ↓ クイックコーデ名チップのスマホ配置 */
     .preset-name-chips {
+        /* ↓ 横並び */
         display: flex;
+        /* ↓ 隙間4px */
         gap: 4px;
+        /* ↓ 折り返し */
         flex-wrap: wrap;
+        /* ↓ 下10px */
         margin-bottom: 10px;
     }
 
+    /* ↓ プリセット名チップを小さめに */
     .preset-chip {
+        /* ↓ 約10.6px */
         font-size: 0.66rem;
+        /* ↓ 上下2px・左右7px */
         padding: 2px 7px;
+        /* ↓ 丸角10px */
         border-radius: 10px;
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ 入力欄と保存ボタンの隙間調整 */
     .save-input-group {
+        /* ↓ 縦Flex */
         display: flex;
+        /* ↓ 縦並び */
         flex-direction: column;
+        /* ↓ 隙間8px */
         gap: 8px;
     }
 
+    /* ↓ コーデ名入力欄スマホサイズ */
     .outfit-name-input {
+        /* ↓ 上下8px・左右10px */
         padding: 8px 10px;
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 角丸4px */
         border-radius: 4px;
     }
 
+    /* ↓ 保存ボタンスマホサイズ */
     .save-outfit-btn {
+        /* ↓ 上下9px・左右14px */
         padding: 9px 14px;
+        /* ↓ 約12.8px */
         font-size: 0.8rem;
+        /* ↓ 角丸4px */
         border-radius: 4px;
+        /* ↓ 隙間6px */
         gap: 6px;
     }
 
+    /* ↓ 保存ボタン内アイコン縮小 */
     .save-outfit-btn svg {
+        /* ↓ 14px */
         width: 14px;
+        /* ↓ 14px */
         height: 14px;
     }
 
     /* プロフィール & 体型設定: 見切れ防止・スッキリ配置 */
+    /* ↓ スマホのプロフィール画面を縦1列に変更 */
     .profile-settings-layout {
+        /* ↓ 1列構成 */
         grid-template-columns: 1fr !important;
+        /* ↓ 隙間14px */
         gap: 14px !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ 中央 */
         margin: 0 auto !important;
     }
 
+    /* ↓ プロフィールカード余白縮小 */
     .profile-card {
+        /* ↓ 上下16px・左右14px */
         padding: 16px 14px !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
     }
 
+    /* ↓ プロフィールセクション見出し縮小 */
     .profile-section-title {
+        /* ↓ 約15.7px */
         font-size: 0.98rem !important;
+        /* ↓ 下12px */
         margin-bottom: 12px !important;
+        /* ↓ 下内側6px */
         padding-bottom: 6px !important;
     }
 
+    /* ↓ プロフィール各行（項目名と値） */
     .profile-field-row {
+        /* ↓ 横並び */
         display: flex !important;
+        /* ↓ 両端配置 */
         justify-content: space-between !important;
+        /* ↓ 縦中央 */
         align-items: center !important;
+        /* ↓ 上下7px */
         padding: 7px 0 !important;
+        /* ↓ 約13.1px */
         font-size: 0.82rem !important;
+        /* ↓ 隙間8px */
         gap: 8px !important;
     }
 
+    /* ↓ プロフィール項目ラベル */
     .profile-label {
+        /* ↓ 約12.8px */
         font-size: 0.8rem !important;
+        /* ↓ ラベル側が縮まないよう保護 */
         flex-shrink: 0 !important;
     }
 
+    /* ↓ プロフィール登録値（長いメールアドレス等は任意の位置で改行させます） */
     .profile-val {
+        /* ↓ 約13.1px */
         font-size: 0.82rem !important;
+        /* ↓ メールアドレスなど記号で切れなくても画面幅を超えたら改行 */
         word-break: break-all !important;
+        /* ↓ 右寄せ */
         text-align: right !important;
     }
 
+    /* ↓ 会員ランクバッジ小ぶり化 */
     .membership-badge {
+        /* ↓ 約9.9px */
         font-size: 0.62rem !important;
+        /* ↓ 余白 */
         padding: 2px 7px !important;
     }
 
+    /* ↓ パネル見出し小ぶり化 */
     .pane-title {
+        /* ↓ 約19.2px */
         font-size: 1.2rem !important;
     }
 
+    /* ↓ パネル補足文小ぶり化 */
     .pane-desc {
+        /* ↓ 約12.8px */
         font-size: 0.8rem !important;
+        /* ↓ 下16px */
         margin-bottom: 16px !important;
     }
 
+    /* ↓ 旧フォーム内ラベル */
     #body-profile-form .form-label {
+        /* ↓ 約12.5px */
         font-size: 0.78rem !important;
+        /* ↓ 下4px */
         margin-bottom: 4px !important;
     }
 
+    /* ↓ 旧フォーム内入力欄 */
     #body-profile-form .form-input {
+        /* ↓ 上下8px・左右10px */
         padding: 8px 10px !important;
+        /* ↓ 約13.6px */
         font-size: 0.85rem !important;
     }
 
+    /* ↓ 旧フォーム内送信ボタンを全幅化 */
     #body-profile-form .btn {
+        /* ↓ 上下10px・左右16px */
         padding: 10px 16px !important;
+        /* ↓ 約13.1px */
         font-size: 0.82rem !important;
+        /* ↓ 全幅 */
         width: 100% !important;
+        /* ↓ 上6px */
         margin-top: 6px !important;
     }
 
     /* --- 11. フッター（★ iPhone全機種対応 2列＋全幅構成・右余白完全根絶） --- */
+    /* ↓ スマホのフッター（最下部のiPhoneホームバー安全領域対応込み） */
     .site-footer {
+        /* ↓ 幅100% */
         width: 100% !important;
+        /* ↓ ビューポート幅100vwを超えないよう強制制限 */
         max-width: 100vw !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
+        /* ↓ 横はみ出し禁止 */
         overflow-x: hidden;
+        /* ↓ 上内側余白44px */
         padding-top: 44px;
+        /* ↓ 下内側余白は最低32px、iPhoneの下部バーがある時はセーフエリア分空けます */
         padding-bottom: max(32px, env(safe-area-inset-bottom));
+        /* ↓ 画面下に吸着 */
         margin-top: auto;
     }
 
+    /* ↓ フッター内部のセーフエリア付き幅管理 */
     .footer-container {
+        /* ↓ 幅100% */
         width: 100% !important;
+        /* ↓ 最大幅100% */
         max-width: 100% !important;
+        /* ↓ 左セーフエリア */
         padding-left: max(16px, env(safe-area-inset-left)) !important;
+        /* ↓ 右セーフエリア */
         padding-right: max(16px, env(safe-area-inset-right)) !important;
+        /* ↓ ボックス計算 */
         box-sizing: border-box !important;
     }
 
+    /* ↓ スマホフッターは全体を2列グリッドとして組み直します */
     .footer-top {
+        /* ↓ Grid */
         display: grid;
+        /* ↓ 均等2列 */
         grid-template-columns: 1fr 1fr;
+        /* ↓ 行間24px・列間16px */
         gap: 24px 16px;
+        /* ↓ 下内側余白28px */
         padding-bottom: 28px;
     }
 
+    /* ↓ 1番目（ブランド紹介列）は1列目〜最終列まで全幅を使って上段に広く配置します */
     .footer-brand-column {
+        /* ↓ 全列通し */
         grid-column: 1 / -1;
+        /* ↓ 下4px */
         margin-bottom: 4px;
+        /* ↓ 薄い白仕切り線 */
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        /* ↓ 下線までの余白18px */
         padding-bottom: 18px;
     }
 
+    /* ↓ フッターロゴ文字サイズ */
     .footer-logo {
+        /* ↓ 約19.2px */
         font-size: 1.2rem;
+        /* ↓ 文字間 */
         letter-spacing: 0.14em;
+        /* ↓ 下8px */
         margin-bottom: 8px;
     }
 
+    /* ↓ フッターコンセプト説明文 */
     .footer-concept-text {
+        /* ↓ 約13.1px */
         font-size: 0.82rem;
+        /* ↓ 行間1.7倍 */
         line-height: 1.7;
+        /* ↓ 全幅使用 */
         max-width: 100%;
+        /* ↓ 70%不透明白 */
         color: rgba(255, 255, 255, 0.7);
     }
 
+    /* ↓ 2番目の列（SHOPリンク）を左列(1〜2)に配置 */
     .footer-links-column:nth-child(2) {
+        /* ↓ 1本目の線から2本目の線＝左列 */
         grid-column: 1 / 2;
     }
 
+    /* ↓ 3番目の列（SUPPORTリンク）を右列(2〜3)に配置 */
     .footer-links-column:nth-child(3) {
+        /* ↓ 2本目の線から3本目の線＝右列 */
         grid-column: 2 / 3;
     }
 
+    /* ↓ 4番目の列（ACCOUNT/STUDIOリンク）は下段に横全幅で配置します */
     .footer-links-column:nth-child(4) {
+        /* ↓ 全列通し */
         grid-column: 1 / -1;
+        /* ↓ 上部仕切り線 */
         border-top: 1px solid rgba(255, 255, 255, 0.08);
+        /* ↓ 上内側余白18px */
         padding-top: 18px;
+        /* ↓ 上外余白4px */
         margin-top: 4px;
     }
 
+    /* ↓ 4番目のリンク群は横2列で並べて高さを抑えます */
     .footer-links-column:nth-child(4) .footer-link-list {
+        /* ↓ Grid */
         display: grid;
+        /* ↓ 2列 */
         grid-template-columns: 1fr 1fr;
+        /* ↓ 隙間 */
         gap: 8px 12px;
     }
 
+    /* ↓ フッター各列タイトル */
     .footer-col-title {
+        /* ↓ 約11.8px */
         font-size: 0.74rem;
+        /* ↓ 太字 */
         font-weight: 700;
+        /* ↓ 文字間 */
         letter-spacing: 0.08em;
+        /* ↓ 下10px */
         margin-bottom: 10px;
+        /* ↓ 95%白 */
         color: rgba(255, 255, 255, 0.95);
+        /* ↓ 1行 */
         white-space: nowrap;
     }
 
+    /* ↓ フッターリンク縦並びリスト */
     .footer-link-list {
+        /* ↓ 縦Flex */
         display: flex;
+        /* ↓ 縦積み */
         flex-direction: column;
+        /* ↓ 隙間8px */
         gap: 8px;
     }
 
+    /* ↓ フッター各リンク文字 */
     .footer-link-list a {
+        /* ↓ 約12.2px */
         font-size: 0.76rem;
+        /* ↓ 行間1.45倍 */
         line-height: 1.45;
+        /* ↓ インラインブロック */
         display: inline-block;
+        /* ↓ タップしやすいよう上下2px余白 */
         padding: 2px 0;
+        /* ↓ 65%白 */
         color: rgba(255, 255, 255, 0.65);
     }
 
+    /* ↓ フッター補足小文字 */
     .footer-link-list a small {
+        /* ↓ 改行して独立表示 */
         display: block;
+        /* ↓ 約10.9px */
         font-size: 0.68rem;
+        /* ↓ 少し薄め */
         opacity: 0.75;
+        /* ↓ 上2px */
         margin-top: 2px;
     }
 
+    /* ↓ コピーライト領域の上余白 */
     .footer-bottom {
+        /* ↓ 上22px */
         padding-top: 22px;
     }
 
+    /* ↓ コピーライト表記 */
     .copyright {
+        /* ↓ 約11.2px */
         font-size: 0.7rem;
+        /* ↓ 行間1.5倍 */
         line-height: 1.5;
+        /* ↓ 半透明白 */
         color: rgba(255, 255, 255, 0.5);
     }
 }
@@ -1212,38 +1984,59 @@
 /* -------------------------------------------------------------------------- */
 /* E. 超小型スマートフォン（iPhone SE 第1世代など 画面幅360px以下）の微調整      */
 /* -------------------------------------------------------------------------- */
+/* ↓ 画面幅が360px以下という超小型端末でも表示が崩れないための最終ガード */
 @media screen and (max-width: 360px) {
+    /* ↓ ヒーロー大見出しをさらに一段小さく */
     .hero-heading {
+        /* ↓ 約21.6px */
         font-size: 1.35rem;
     }
 
+    /* ↓ ヒーローボタンの余白と文字を圧縮して横2つ並びを維持 */
     .hero-buttons .btn {
+        /* ↓ 上下10px・左右8px */
         padding: 10px 8px;
+        /* ↓ 12px */
         font-size: 0.75rem;
     }
 
+    /* ↓ 商品カードの隙間をさらに詰めます */
     .product-grid {
+        /* ↓ 行10px・列8px */
         gap: 10px 8px;
     }
 
+    /* ↓ 商品名縮小 */
     .product-name {
+        /* ↓ 約12.5px */
         font-size: 0.78rem;
     }
 
+    /* ↓ 商品価格縮小 */
     .product-price {
+        /* ↓ 約13.6px */
         font-size: 0.85rem;
     }
 
+    /* ↓ 試着室の高さをややコンパクトに */
     .mannequin-stage-box {
+        /* ↓ 最低480px */
         min-height: 480px !important;
+        /* ↓ 上下10px・左右6px */
         padding: 10px 6px !important;
     }
 
+    /* ↓ 280x480のマネキン全体をそのまま 0.88倍に縮小縮小（比例縮尺なので各服の座標ズレが一切起きません） */
     .mannequin-model-wrap {
+        /* ↓ 基準幅280pxのまま */
         width: 280px !important;
+        /* ↓ 基準高480pxのまま */
         height: 480px !important;
+        /* ↓ 見た目だけ88%サイズに縮小します */
         transform: scale(0.88);
+        /* ↓ 上端中央を基準に縮めます */
         transform-origin: center top;
+        /* ↓ 88%縮小で下に余った空隙(-55px)を上方向に詰めて余計な空白を消します */
         margin-bottom: -55px;
     }
 }

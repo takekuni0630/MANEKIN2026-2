@@ -9,608 +9,1051 @@
 /* 15. MANEKIN AI STUDIO（会員限定 AIコーデシミュレーション）スタイル       */
 /* ========================================================================== */
 
+/* ↓ 試着スタジオ画面全体の最大幅と上下左右の余白を決める大枠 */
 .studio-container {
+    /* ↓ 大きなPC画面でも横幅が1320px以上に広がりすぎないように制限します */
     max-width: 1320px;
+    /* ↓ 左右の余白をautoにして画面の中央に配置します */
     margin: 0 auto;
+    /* ↓ 上30px・左右20px・下80pxの内側余白を空けます */
     padding: 30px 20px 80px;
 }
 
 /* --- スタジオヘッダー --- */
+/* ↓ スタジオ画面上部の白いタイトルカード（左にタイトル、右に会員チップ） */
 .studio-header-card {
+    /* ↓ 子要素を横並びにするFlexbox */
     display: flex;
+    /* ↓ 左右の要素を両端に離して配置します */
     justify-content: space-between;
+    /* ↓ 縦方向の中央に揃えます */
     align-items: center;
+    /* ↓ 背景を純白に */
     background: #ffffff;
+    /* ↓ 薄いグレーの1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 四隅を8px丸めます */
     border-radius: 8px;
+    /* ↓ 上下24px・左右30pxの内側余白 */
     padding: 24px 30px;
+    /* ↓ 下に24pxの外側余白 */
     margin-bottom: 24px;
+    /* ↓ 共通変数で定義されたわずかな影を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ タイトル上の小さなバッジ2つを横並びにする枠 */
 .studio-title-badge {
+    /* ↓ Flexboxで横並びにします */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ バッジ同士の間隔を8px空けます */
     gap: 8px;
+    /* ↓ 下の見出しとの間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ 「AI STYLING」などの黒いピル型きらめきバッジ */
 .badge-sparkle {
+    /* ↓ 約11.5pxの小さめ文字 */
     font-size: 0.72rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 英字が映えるよう文字間隔を少し広げます */
     letter-spacing: 0.08em;
+    /* ↓ 黒から濃いグレーへの斜め135度グラデーション背景 */
     background: linear-gradient(135deg, #111111 0%, #444444 100%);
+    /* ↓ 白抜き文字 */
     color: #ffffff;
+    /* ↓ 上下3px・左右10pxの余白 */
     padding: 3px 10px;
+    /* ↓ 左右が半円になるカプセル型 */
     border-radius: 20px;
+    /* ↓ 中身を横並びにするインラインFlex */
     display: inline-flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
 }
 
+/* ↓ 「MEMBER ONLY」など白地に黒枠の限定バッジ */
 .badge-exclusive {
+    /* ↓ 約11.2pxの小文字 */
     font-size: 0.7rem;
+    /* ↓ セミボールド（600） */
     font-weight: 600;
+    /* ↓ 文字間隔をやや広めに */
     letter-spacing: 0.06em;
+    /* ↓ 1pxの黒い枠線 */
     border: 1px solid #111111;
+    /* ↓ 黒文字 */
     color: #111111;
+    /* ↓ 上下2px・左右8pxの余白 */
     padding: 2px 8px;
+    /* ↓ カプセル型の丸角 */
     border-radius: 20px;
 }
 
+/* ↓ スタジオの大見出し「MANEKIN AI STUDIO」 */
 .studio-title {
+    /* ↓ 約25.6pxの大きめ見出し */
     font-size: 1.6rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 少し文字間を空けてブランド感を出します */
     letter-spacing: 0.04em;
+    /* ↓ 下の説明文との間を6px空けます */
     margin-bottom: 6px;
+    /* ↓ 黒色変数 */
     color: var(--color-black);
 }
 
+/* ↓ スタジオタイトル下の案内文 */
 .studio-subtitle {
+    /* ↓ 約14.4pxの読みやすい文字サイズ */
     font-size: 0.9rem;
+    /* ↓ 落ち着いた中間グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 不要な初期マージンを消します */
     margin: 0;
 }
 
+/* ↓ ヘッダー右側のユーザー表示カプセル（アバター＋名前＋ランク） */
 .user-chip {
+    /* ↓ 横並び配置 */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ アバターと文字の間を12px空けます */
     gap: 12px;
+    /* ↓ ごく薄いグレーの背景 */
     background: var(--color-gray-bg);
+    /* ↓ 上下8px・左右16pxの内側余白 */
     padding: 8px 16px;
+    /* ↓ 大きく丸めたカプセル形状 */
     border-radius: 40px;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
 }
 
+/* ↓ ユーザー名の頭文字を入れる黒い丸アイコン */
 .user-chip-avatar {
+    /* ↓ 幅38px */
     width: 38px;
+    /* ↓ 高さ38px */
     height: 38px;
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 50%で完全な円形にします */
     border-radius: 50%;
+    /* ↓ Flexboxで頭文字を上下左右中央に配置します */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 16px */
     font-size: 1rem;
 }
 
+/* ↓ ユーザー名と会員ランクを縦に積む入れ物 */
 .user-chip-info {
+    /* ↓ Flexbox有効化 */
     display: flex;
+    /* ↓ 縦方向に並べます */
     flex-direction: column;
 }
 
+/* ↓ 会員名の文字スタイル */
 .user-chip-name {
+    /* ↓ 約14px */
     font-size: 0.88rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ 「VIP MEMBER」などのサブランク文字 */
 .user-chip-rank {
+    /* ↓ 11.2pxの小文字 */
     font-size: 0.7rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 少し文字間を空けます */
     letter-spacing: 0.04em;
 }
 
 /* --- スタジオサブナビ（タブ） --- */
+/* ↓ ホーム・マイクローゼット・コーデ作成などの切り替えタブバー */
 .studio-nav-tabs {
+    /* ↓ タブボタンを横一列に並べます */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ タブ同士の隙間6px */
     gap: 6px;
+    /* ↓ 下側に1pxの仕切り線 */
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 下のコンテンツと28px離します */
     margin-bottom: 28px;
+    /* ↓ 画面幅が狭い時はタブバーだけ横スクロールできるようにします */
     overflow-x: auto;
+    /* ↓ 下線とのわずかな余白2px */
     padding-bottom: 2px;
+    /* ↓ iOS Safariで横スクロールを慣性付きで滑らかにします */
     -webkit-overflow-scrolling: touch;
 }
 
+/* ↓ 各タブのボタン */
 .studio-tab-btn {
+    /* ↓ アイコンと文字を横並びにするインラインFlex */
     display: inline-flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ アイコン・文字・バッジの間隔8px */
     gap: 8px;
+    /* ↓ 普段は透明背景 */
     background: transparent;
+    /* ↓ 初期枠線なし */
     border: none;
+    /* ↓ 押しやすい上下12px・左右18px余白 */
     padding: 12px 18px;
+    /* ↓ 約14.7px */
     font-size: 0.92rem;
+    /* ↓ 中くらいの太さ（500） */
     font-weight: 500;
+    /* ↓ 非選択時はグレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 指カーソルに */
     cursor: pointer;
+    /* ↓ 下線切り替え時に高さが変わらないよう最初から2px透明線を用意します */
     border-bottom: 2px solid transparent;
+    /* ↓ ホバーや選択時のアニメーション */
     transition: all var(--transition-fast);
+    /* ↓ タブラベルが2行に折り返されるのを防ぎます */
     white-space: nowrap;
+    /* ↓ 上側の角だけ6px丸めます */
     border-radius: 6px 6px 0 0;
 }
 
+/* ↓ タブにマウスを乗せた時 */
 .studio-tab-btn:hover {
+    /* ↓ 文字を黒くします */
     color: var(--color-black);
+    /* ↓ ほんのり薄い黒を重ねて反応を伝えます */
     background: rgba(0, 0, 0, 0.02);
 }
 
+/* ↓ 現在開いているタブ */
 .studio-tab-btn.active {
+    /* ↓ 文字をはっきりした黒に */
     color: var(--color-black);
+    /* ↓ 太字にして強調 */
     font-weight: 700;
+    /* ↓ 下線を真っ黒にして現在位置を示します */
     border-bottom-color: var(--color-black);
+    /* ↓ ごく薄い背景色でタブ全体を目立たせます */
     background: rgba(0, 0, 0, 0.03);
 }
 
+/* ↓ タブ内のSVGアイコンサイズ */
 .tab-svg {
+    /* ↓ 幅18px */
     width: 18px;
+    /* ↓ 高さ18px */
     height: 18px;
 }
 
+/* ↓ タブ横の所持点数カウントバッジ */
 .tab-badge {
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-light);
+    /* ↓ 濃いグレー文字 */
     color: var(--color-dark);
+    /* ↓ 12pxの小文字 */
     font-size: 0.75rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 上下1px・左右7px余白 */
     padding: 1px 7px;
+    /* ↓ 丸角12px */
     border-radius: 12px;
 }
 
+/* ↓ 選択中タブの中にあるカウントバッジは黒反転させます */
 .studio-tab-btn.active .tab-badge {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
+/* ↓ 「AI」や「MAIN」など強調用小タグ */
 .tab-highlight-tag {
+    /* ↓ 10.4pxの極小文字 */
     font-size: 0.65rem;
+    /* ↓ 黒背景 */
     background: #111111;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 上下2px・左右6px余白 */
     padding: 2px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 文字間広め */
     letter-spacing: 0.05em;
 }
 
 /* --- タブコンテンツパネル --- */
+/* ↓ 各タブに対応する画面コンテンツ（普段は非表示） */
 .studio-pane {
+    /* ↓ 選択されていないタブの中身は隠します */
     display: none;
+    /* ↓ 表示される時に0.3秒でふわっと下から浮かぶアニメーションを実行 */
     animation: fadeInPane 0.3s ease;
 }
 
+/* ↓ .active クラスが付いたタブの画面だけ表示します */
 .studio-pane.active {
+    /* ↓ ブロック要素として画面に描画 */
     display: block;
 }
 
+/* ↓ タブ切り替え時のフェードイン＆6px上昇アニメーション定義 */
 @keyframes fadeInPane {
+    /* ↓ 開始時点（透明＆6px下） */
     from {
+        /* ↓ 完全に透明 */
         opacity: 0;
+        /* ↓ 少し下にずらしておきます */
         transform: translateY(6px);
     }
 
+    /* ↓ 終了時点（不透明＆定位置） */
     to {
+        /* ↓ くっきり表示 */
         opacity: 1;
+        /* ↓ 本来の高さに戻る */
         transform: translateY(0);
     }
 }
 
 /* --- パネル共通アクションバー --- */
+/* ↓ 各タブ上部にあるタイトル（左）と登録ボタンなど（右）のバー */
 .pane-action-bar {
+    /* ↓ 左右並べ */
     display: flex;
+    /* ↓ 両端揃え */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 下のコンテンツと24px空けます */
     margin-bottom: 24px;
+    /* ↓ 狭い画面では自動で折り返して2段にします */
     flex-wrap: wrap;
+    /* ↓ 要素間16px */
     gap: 16px;
 }
 
+/* ↓ パネル内の見出し文字 */
 .pane-title {
+    /* ↓ 約22.4px */
     font-size: 1.4rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下の説明文との隙間4px */
     margin-bottom: 4px;
 }
 
+/* ↓ 見出しの下に添える補足文 */
 .pane-desc {
+    /* ↓ 約14px */
     font-size: 0.88rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 余白ゼロ */
     margin: 0;
 }
 
 /* --- パネル1: ホーム（ダッシュボードサマリー） --- */
+/* ↓ 「登録アイテム数」「保存コーデ数」などの統計カード3列グリッド */
 .studio-stats-grid {
+    /* ↓ CSS Gridを有効化 */
     display: grid;
+    /* ↓ 均等な3列に分けます */
     grid-template-columns: repeat(3, 1fr);
+    /* ↓ カード間の隙間20px */
     gap: 20px;
+    /* ↓ 下のバナーとの間を28px空けます */
     margin-bottom: 28px;
 }
 
+/* ↓ 統計カードの1枚分 */
 .studio-stat-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下20px・左右24px余白 */
     padding: 20px 24px;
+    /* ↓ 左アイコンと右数値を横並びに */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 間隔18px */
     gap: 18px;
+    /* ↓ さりげない影 */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ 統計カードの左側絵文字アイコン枠 */
 .stat-icon-wrap {
+    /* ↓ 大きめの絵文字サイズ（28.8px） */
     font-size: 1.8rem;
+    /* ↓ 正方形の幅52px */
     width: 52px;
+    /* ↓ 高さ52px */
     height: 52px;
+    /* ↓ 薄いグレーの四角背景 */
     background: var(--color-gray-bg);
+    /* ↓ 角丸12px */
     border-radius: 12px;
+    /* ↓ 中央配置用Flex */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
 }
 
+/* ↓ 「クローゼット登録数」などのラベル文字 */
 .stat-card-label {
+    /* ↓ 1行ブロックとして数値の上に置きます */
     display: block;
+    /* ↓ 約13px */
     font-size: 0.82rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下の数字との間を2px空けます */
     margin-bottom: 2px;
 }
 
+/* ↓ 統計数字（大きく見せる） */
 .stat-card-val {
+    /* ↓ 約25.6px */
     font-size: 1.6rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒 */
     color: var(--color-black);
 }
 
+/* ↓ 数字の横の単位（「着」「コーデ」など） */
 .stat-card-val small {
+    /* ↓ 約14.4pxと控えめサイズに */
     font-size: 0.9rem;
+    /* ↓ 普通の太さ（500） */
     font-weight: 500;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 数字との間に2px隙間 */
     margin-left: 2px;
 }
 
+/* ↓ スタジオホームの黒いおすすめ案内バナー */
 .studio-recommend-banner {
+    /* ↓ 黒からダークグレーの高級感あるグラデーション */
     background: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
+    /* ↓ 白抜き文字 */
     color: #ffffff;
+    /* ↓ 角丸12px */
     border-radius: 12px;
+    /* ↓ 上下36px・左右40pxのゆったり余白 */
     padding: 36px 40px;
+    /* ↓ 下のクイックカードとの間を30px空けます */
     margin-bottom: 30px;
+    /* ↓ 浮き上がるカード影 */
     box-shadow: var(--shadow-card);
 }
 
+/* ↓ バナー左上の半透明タグ */
 .banner-badge {
+    /* ↓ 幅が中身に合うインラインブロック */
     display: inline-block;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 文字間広め */
     letter-spacing: 0.1em;
+    /* ↓ 18%透明の白背景 */
     background: rgba(255, 255, 255, 0.18);
+    /* ↓ 30%透明の白い枠線 */
     border: 1px solid rgba(255, 255, 255, 0.3);
+    /* ↓ 余白 */
     padding: 4px 12px;
+    /* ↓ カプセル丸角 */
     border-radius: 20px;
+    /* ↓ 下余白12px */
     margin-bottom: 12px;
 }
 
+/* ↓ 黒バナー内のタイトル見出し */
 .banner-title {
+    /* ↓ 約23.2px */
     font-size: 1.45rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下の本文との間を10px空けます */
     margin-bottom: 10px;
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
+/* ↓ 黒バナー内の説明文 */
 .banner-desc {
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
+    /* ↓ 読みやすい行間1.7倍 */
     line-height: 1.7;
+    /* ↓ 真っ白より少し柔らかい薄グレーで長時間読みやすくします */
     color: #cccccc;
+    /* ↓ 文章が横に長くなりすぎないよう最大820pxで折り返します */
     max-width: 820px;
+    /* ↓ 下のボタン群との間を22px空けます */
     margin-bottom: 22px;
 }
 
+/* ↓ バナー内のボタン横並び容器 */
 .banner-actions {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ ボタン間14px */
     gap: 14px;
+    /* ↓ スマホ幅で折り返せるように */
     flex-wrap: wrap;
 }
 
+/* ↓ 黒バナー内のメインボタン（背景色と文字色を白黒反転させて目立たせます） */
 .banner-actions .btn-primary {
+    /* ↓ 白ボタン */
     background: #ffffff;
+    /* ↓ 黒文字 */
     color: #111111;
 }
 
+/* ↓ 白ボタンホバー時 */
 .banner-actions .btn-primary:hover {
+    /* ↓ わずかに暗めの白 */
     background: #f0f0f0;
 }
 
+/* ↓ 黒バナー内のサブボタン（半透明枠線のみのアウトラインボタン） */
 .banner-actions .btn-outline {
+    /* ↓ 50%透明の白い枠線 */
     border: 1px solid rgba(255, 255, 255, 0.5);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 透過背景 */
     background: transparent;
+    /* ↓ 上下10px・左右20px余白 */
     padding: 10px 20px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ なめらか変化 */
     transition: all var(--transition-fast);
 }
 
+/* ↓ アウトラインボタンホバー時 */
 .banner-actions .btn-outline:hover {
+    /* ↓ 10%透明の白背景でうっすら光ります */
     background: rgba(255, 255, 255, 0.1);
+    /* ↓ 枠線をくっきりした白に */
     border-color: #ffffff;
 }
 
+/* ↓ ホーム下部にある機能ショートカット3カード列 */
 .studio-quick-cards {
+    /* ↓ CSS Gridで均等3列 */
     display: grid;
+    /* ↓ 1fr x 3 */
     grid-template-columns: repeat(3, 1fr);
+    /* ↓ 間隔20px */
     gap: 20px;
 }
 
+/* ↓ 各機能ショートカットカード */
 .quick-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 24px余白 */
     padding: 24px;
+    /* ↓ クリックして別タブへ飛べるため指カーソルに */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-normal);
 }
 
+/* ↓ ショートカットカードにマウスを乗せた時 */
 .quick-card:hover {
+    /* ↓ 枠線を黒くします */
     border-color: var(--color-black);
+    /* ↓ 3px上に浮かせてクリックできる感を強調 */
     transform: translateY(-3px);
+    /* ↓ 影を深めます */
     box-shadow: var(--shadow-card);
 }
 
+/* ↓ ショートカットカード上部の絵文字 */
 .quick-card-icon {
+    /* ↓ 約28.8px */
     font-size: 1.8rem;
+    /* ↓ 下余白12px */
     margin-bottom: 12px;
 }
 
+/* ↓ カード見出し */
 .quick-card h4 {
+    /* ↓ 約16.8px */
     font-size: 1.05rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下余白6px */
     margin-bottom: 6px;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ カード説明文 */
 .quick-card p {
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 余白ゼロ */
     margin: 0;
+    /* ↓ 行間1.5倍 */
     line-height: 1.5;
 }
 
 /* --- パネル2: マイクローゼット --- */
+/* ↓ カテゴリ絞り込みピル（「すべて」「トップス」「ボトムス」など）の並び */
 .closet-filter-bar {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ ボタン間8px */
     gap: 8px;
+    /* ↓ 下のグリッドとの間を24px空けます */
     margin-bottom: 24px;
+    /* ↓ 入りきらない時は折り返し */
     flex-wrap: wrap;
 }
 
+/* ↓ 各絞り込みピルボタン */
 .filter-pill {
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下8px・左右16px余白 */
     padding: 8px 16px;
+    /* ↓ カプセル丸角 */
     border-radius: 20px;
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 太さ500 */
     font-weight: 500;
+    /* ↓ 濃いグレー文字 */
     color: var(--color-dark);
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ なめらか変化 */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 絞り込みボタンホバー時 */
 .filter-pill:hover {
+    /* ↓ 枠線を黒く */
     border-color: var(--color-black);
 }
 
+/* ↓ 選択中の絞り込みボタン */
 .filter-pill.active {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
 }
 
+/* ↓ マイクローゼットのアイテムカードを敷き詰めるレスポンシブグリッド */
 .closet-grid {
+    /* ↓ Gridレイアウト */
     display: grid;
+    /* ↓ 最小220px以上を確保しつつ横幅いっぱいに列数を自動計算して並べます */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* ↓ カード間20px */
     gap: 20px;
 }
 
+/* ↓ クローゼットの服カード1枚分 */
 .closet-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ はみ出した画像角をカード角丸に合わせてカットします */
     overflow: hidden;
+    /* ↓ Flexboxで画像と本文を縦に積みます */
     display: flex;
+    /* ↓ 縦向き配置 */
     flex-direction: column;
+    /* ↓ ホバーアニメーション */
     transition: all var(--transition-normal);
+    /* ↓ 内部要素配置の基準用 */
     position: relative;
 }
 
+/* ↓ カードホバー時 */
 .closet-card:hover {
+    /* ↓ 影を強く */
     box-shadow: var(--shadow-card);
+    /* ↓ 枠線を濃いめのグレーに */
     border-color: #999999;
 }
 
+/* ↓ マネキンに現在着用中のカード */
 .closet-card.is-wearing {
+    /* ↓ 2pxの太い黒枠で着用中であることを一目で伝えます */
     border: 2px solid var(--color-black);
+    /* ↓ 外側にも3pxの薄い黒リングを足して強調 */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
+/* ↓ クローゼットカードの上半分（服写真エリア） */
 .closet-card-thumb-wrap {
+    /* ↓ 横幅いっぱい */
     width: 100%;
+    /* ↓ 高さ200px固定 */
     height: 200px;
+    /* ↓ 薄いグレー背景 */
     background: #f4f4f4;
+    /* ↓ バッジを絶対配置する基準位置 */
     position: relative;
+    /* ↓ ホバーで写真が少し拡大しても枠外に出ないようにします */
     overflow: hidden;
+    /* ↓ 中央配置用Flex */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
 }
 
+/* ↓ クローゼットカードの服画像 */
 .closet-card-img {
+    /* ↓ 幅100% */
     width: 100%;
+    /* ↓ 高さ100% */
     height: 100%;
+    /* ↓ 縦横比を崩さず枠全体を埋め尽くします */
     object-fit: cover;
+    /* ↓ 拡大アニメーション */
     transition: transform var(--transition-normal);
 }
 
+/* ↓ カードホバー時に写真だけを1.03倍に軽くズームします */
 .closet-card:hover .closet-card-img {
+    /* ↓ 3%ズーム */
     transform: scale(1.03);
 }
 
+/* ↓ 写真左上の「私物・購入品」バッジ */
 .closet-badge-owned {
+    /* ↓ 写真枠左上から10pxの位置に浮かべます */
     position: absolute;
+    /* ↓ 上10px */
     top: 10px;
+    /* ↓ 左10px */
     left: 10px;
+    /* ↓ 半透明の黒背景 */
     background: rgba(17, 17, 17, 0.85);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 極小文字（10.4px） */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 文字間広め */
     letter-spacing: 0.06em;
+    /* ↓ 余白 */
     padding: 3px 8px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 背景の服写真を軽くぼかすすりガラス効果 */
     backdrop-filter: blur(4px);
 }
 
+/* ↓ 写真右上の「着用中」バッジ */
 .closet-badge-wearing {
+    /* ↓ 写真枠右上から10pxの位置に浮かべます */
     position: absolute;
+    /* ↓ 上10px */
     top: 10px;
+    /* ↓ 右10px */
     right: 10px;
+    /* ↓ 黒背景 */
     background: #111111;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 約10.9px */
     font-size: 0.68rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 余白 */
     padding: 3px 8px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ アイコンと文字を横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間4px */
     gap: 4px;
 }
 
+/* ↓ クローゼットカードの下半分（カテゴリ・名前・ボタン類） */
 .closet-card-body {
+    /* ↓ 内側14px余白 */
     padding: 14px;
+    /* ↓ 縦Flexboxにして操作ボタンを最下部に揃えやすくします */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ 余った高さを埋めてカード同士の高さを揃えます */
     flex-grow: 1;
 }
 
+/* ↓ カテゴリ名とカラー丸を左右に置く行 */
 .closet-card-meta {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 下の服名との間を6px空けます */
     margin-bottom: 6px;
 }
 
+/* ↓ カテゴリ表記（「TOPS」「OUTER」など） */
 .closet-card-cat {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 文字間広め */
     letter-spacing: 0.05em;
 }
 
+/* ↓ 服の色を示す小さな丸印 */
 .closet-color-dot {
+    /* ↓ 幅12px */
     width: 12px;
+    /* ↓ 高さ12px */
     height: 12px;
+    /* ↓ 真円 */
     border-radius: 50%;
+    /* ↓ 白っぽい色の服でも境目が分かるよう薄い黒枠線 */
     border: 1px solid rgba(0, 0, 0, 0.15);
+    /* ↓ インラインブロック表示 */
     display: inline-block;
 }
 
+/* ↓ アイテム名（最大2行で省略記号 ... を付けます） */
 .closet-card-name {
+    /* ↓ 約14.7px */
     font-size: 0.92rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 下余白8px */
     margin-bottom: 8px;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 行間1.4倍 */
     line-height: 1.4;
+    /* ↓ 2行以上のはみ出しを隠します */
     overflow: hidden;
+    /* ↓ 末尾に「...」を付けます */
     text-overflow: ellipsis;
+    /* ↓ 複数行省略用のWebKitボックス指定 */
     display: -webkit-box;
+    /* ↓ 最大2行までに制限 */
     -webkit-line-clamp: 2;
+    /* ↓ 縦方向に並べて切り詰め判定します */
     -webkit-box-orient: vertical;
 }
 
+/* ↓ シーズンタグなどの補足行 */
 .closet-card-season {
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下のボタンとの間を12px空けます */
     margin-bottom: 12px;
 }
 
+/* ↓ 「マネキンに着せる」ボタンと「削除」ゴミ箱ボタンの横並び */
 .closet-card-actions {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ ボタン間8px */
     gap: 8px;
+    /* ↓ margin-top: auto により名前の長さが違っても常にカード最下部にピタッと揃います */
     margin-top: auto;
 }
 
+/* ↓ 「着せる / 外す」切り替えボタン */
 .btn-wear-toggle {
+    /* ↓ 削除ボタン以外の残り横幅いっぱいに広げます */
     flex: 1;
+    /* ↓ 上下8px・左右10px余白 */
     padding: 8px 10px;
+    /* ↓ 約12.8px */
     font-size: 0.8rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 黒枠線 */
     border: 1px solid var(--color-black);
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ なめらか変化 */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 着せるボタンホバー時 */
 .btn-wear-toggle:hover {
+    /* ↓ 少し明るい黒 */
     background: #333333;
 }
 
+/* ↓ すでに着用中の時は「白地に黒文字」へ反転させます */
 .btn-wear-toggle.is-active {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
 }
 
+/* ↓ クローゼットからの削除ボタン */
 .btn-closet-del {
+    /* ↓ 幅34px正方形 */
     width: 34px;
+    /* ↓ 高さ34px */
     height: 34px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ グレーアイコン色 */
     color: var(--color-gray-medium);
+    /* ↓ アイコンを中央に配置 */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ ホバー時アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 削除ボタンにマウスを乗せた時は赤系にして誤操作を防ぎます */
 .btn-closet-del:hover {
+    /* ↓ 淡い赤背景 */
     background: #ffebee;
+    /* ↓ 赤文字色変数 */
     color: var(--color-accent);
+    /* ↓ 赤枠線 */
     border-color: var(--color-accent);
 }
 
 /* クローゼットが空のとき */
+/* ↓ まだ1着も登録されていない時の案内枠 */
 .closet-empty-card {
+    /* ↓ グリッドの左端から右端まで全列をまたいで横いっぱいに表示します */
     grid-column: 1 / -1;
+    /* ↓ 文字中央寄せ */
     text-align: center;
+    /* ↓ 上下60px・左右20px余白 */
     padding: 60px 20px;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 破線枠で「ここに追加されます」という雰囲気を出します */
     border: 1px dashed var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
 }
 
+/* ↓ 空カード内の大きなハンガーアイコン */
 .closet-empty-icon {
+    /* ↓ 48px */
     font-size: 3rem;
+    /* ↓ 下余白16px */
     margin-bottom: 16px;
 }
 
+/* ↓ 空カードのタイトル */
 .closet-empty-title {
+    /* ↓ 約19.2px */
     font-size: 1.2rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下余白8px */
     margin-bottom: 8px;
 }
 
+/* ↓ 空カードの説明文 */
 .closet-empty-desc {
+    /* ↓ 約14.4px */
     font-size: 0.9rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 最大幅480pxで読みやすく制限 */
     max-width: 480px;
+    /* ↓ 中央配置＋下に24px余白 */
     margin: 0 auto 24px;
 }
 
@@ -619,265 +1062,454 @@
 /* ========================================================================== */
 
 /* モバイル用ビュー切り替え */
+/* ↓ スマホ表示時に「私物」「マネキン」「商品」の3列を切り替えるタブ群（PCでは非表示） */
 .studio-mobile-tabs {
+    /* ↓ 普段（デスクトップ幅）は隠します */
     display: none;
+    /* ↓ スマホ有効時は均等3列のグリッドボタンになります */
     grid-template-columns: repeat(3, 1fr);
+    /* ↓ ボタン同士の隙間6px */
     gap: 6px;
+    /* ↓ 下のコンテンツとの隙間16px */
     margin-bottom: 16px;
 }
 
+/* ↓ スマホ用列切り替えタブの各ボタン */
 .mobile-tab-btn {
+    /* ↓ 内側10px余白 */
     padding: 10px;
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ スマホ用タブで選択中のボタン */
 .mobile-tab-btn.active {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
 }
 
 /* 3カラムスタジオグリッド */
+/* ↓ 左(マイクローゼット)・中央(マネキン舞台)・右(ショップ商品)の3列ワークスペース */
 .studio-workspace-grid {
+    /* ↓ CSS Gridを有効化 */
     display: grid;
+    /* ↓ 左列310px固定・中央列は最小360px以上で残り幅いっぱい・右列340px固定の3列構成 */
     grid-template-columns: 310px minmax(360px, 1fr) 340px;
+    /* ↓ 列と列の間を20px空けます */
     gap: 20px;
+    /* ↓ 各列を上端基準で揃えます（中身が少なくても勝手に引き伸ばされない） */
     align-items: start;
+    /* ↓ 下部のAIコメント・コーデ保存パネルとの間を28px空けます */
     margin-bottom: 28px;
 }
 
+/* ↓ 3列それぞれの白いカード枠 */
 .studio-col {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 内側18px余白 */
     padding: 18px;
+    /* ↓ さりげない影 */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ 各列の一番上にある見出しバー */
 .col-header {
+    /* ↓ 左タイトルと右ボタンを横並びに */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 下との余白12px */
     margin-bottom: 12px;
+    /* ↓ 下線との内側余白10px */
     padding-bottom: 10px;
+    /* ↓ 1pxの仕切り線 */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 列見出しの文字とバッジをまとめる枠 */
 .col-title-wrap {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ 列のタイトル見出し（「私物・購入済」「BRAND ITEMS」など） */
 .col-title {
+    /* ↓ 約16.8px */
     font-size: 1.05rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 余白ゼロ */
     margin: 0;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ 「OWNED」などの小さいタグバッジ */
 .col-badge {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 濃いグレー文字 */
     color: var(--color-dark);
+    /* ↓ 上下2px・左右6px余白 */
     padding: 2px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 文字間 */
     letter-spacing: 0.05em;
 }
 
+/* ↓ 右列「BRAND」用の黒反転バッジ */
 .col-badge.brand-badge {
+    /* ↓ 黒背景 */
     background: #111111;
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
+/* ↓ お気に入り限定時のオレンジ系バッジ */
 .col-badge.col-badge-fav {
+    /* ↓ 8%透明のアクセントオレンジ背景 */
     background: rgba(224, 86, 36, 0.08);
+    /* ↓ オレンジ系文字色 */
     color: var(--color-accent);
+    /* ↓ 25%透明オレンジの枠線 */
     border: 1px solid rgba(224, 86, 36, 0.25);
 }
 
+/* ↓ 「+ 手持ち追加」などの極小アウトラインボタン */
 .btn-outline-xs {
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 上下4px・左右10pxのコンパクト余白 */
     padding: 4px 10px;
+    /* ↓ 黒枠線 */
     border: 1px solid var(--color-black);
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 極小ボタンホバー時 */
 .btn-outline-xs:hover {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
 /* お気に入り絞り込みトグル */
+/* ↓ 「♥ お気に入りのみ」チェックボックスとラベル全体 */
 .fav-filter-toggle {
+    /* ↓ 横並び */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 濃いグレー文字 */
     color: var(--color-dark);
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 連打しても文字が青く選択されないようにします */
     user-select: none;
+    /* ↓ 上下3px・左右8px余白 */
     padding: 3px 8px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 背景アニメーション */
     transition: background-color 0.2s ease;
 }
 
+/* ↓ お気に入りトグルホバー時 */
 .fav-filter-toggle:hover {
+    /* ↓ 薄いグレー背景に */
     background-color: var(--color-gray-bg);
 }
 
+/* ↓ お気に入り切り替えチェックボックスの大きさ・色カスタマイズ */
 .fav-filter-toggle input[type="checkbox"] {
+    /* ↓ タッチしやすい大きめ22px幅 */
     width: 22px;
+    /* ↓ 高さ22px */
     height: 22px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ チェック時の塗色をブランドアクセント色にします */
     accent-color: var(--color-accent);
+    /* ↓ 既定マージン削除 */
     margin: 0;
 }
 
+/* ↓ トグル内のハートマーク色 */
 .fav-heart-icon {
+    /* ↓ アクセント色 */
     color: var(--color-accent);
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
 }
 
 /* ミニフィルターバー */
+/* ↓ 左右の列の上部にある極小カテゴリ切り替えチップ列 */
 .mini-filter-bar {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間5px */
     gap: 5px;
+    /* ↓ 下のリストとの隙間14px */
     margin-bottom: 14px;
+    /* ↓ はみ出たら横スクロール */
     overflow-x: auto;
+    /* ↓ スクロールバーとの隙間2px */
     padding-bottom: 2px;
 }
 
+/* ↓ 各ミニカテゴリボタン */
 .mini-chip {
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ カプセル丸角 */
     border-radius: 14px;
+    /* ↓ 上下4px・左右10px */
     padding: 4px 10px;
+    /* ↓ 約11.8px */
     font-size: 0.74rem;
+    /* ↓ 中太 */
     font-weight: 500;
+    /* ↓ 濃いめグレー文字 */
     color: var(--color-gray-dark);
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 文字折り返し禁止 */
     white-space: nowrap;
+    /* ↓ なめらか変化 */
     transition: all var(--transition-fast);
 }
 
+/* ↓ ミニチップホバー時 */
 .mini-chip:hover {
+    /* ↓ 枠線を濃いグレーに */
     border-color: #999999;
 }
 
+/* ↓ 選択中のミニチップ */
 .mini-chip.active {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
 }
 
 /* アイテムスクロールリスト */
+/* ↓ 左右カラム内でアイテム一覧を高さ580pxまでに制限して縦スクロールさせる箱 */
 .studio-item-list {
+    /* ↓ Flexでカードを縦一列に積みます */
     display: flex;
+    /* ↓ 縦向き配置 */
     flex-direction: column;
+    /* ↓ カード同士の間隔10px */
     gap: 10px;
+    /* ↓ マネキンステージと高さが釣り合うよう最大580pxで内部スクロールにします */
     max-height: 580px;
+    /* ↓ 縦方向のみスクロールバーを有効化 */
     overflow-y: auto;
+    /* ↓ 右端スクロールバーに中身が重ならないよう4px余白 */
     padding-right: 4px;
 }
 
+/* ↓ スクロールバー全体の太さをすっきり細く（Chrome/Safari/Edge向け擬似要素） */
 .studio-item-list::-webkit-scrollbar {
+    /* ↓ 横幅5pxの細いスクロールバー */
     width: 5px;
 }
 
+/* ↓ スクロールバーの動くつまみ部分 */
 .studio-item-list::-webkit-scrollbar-thumb {
+    /* ↓ 薄いグレー */
     background: #d4d4d4;
+    /* ↓ 角丸4px */
     border-radius: 4px;
 }
 
 /* スタジオ用アイテムカード（コンパクト） */
+/* ↓ 左右のスクロール欄に並ぶ1着分のコンパクトな服カード */
 .studio-item-card {
+    /* ↓ 写真とテキスト情報を横並び */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 写真と文字の隙間12px */
     gap: 12px;
+    /* ↓ 内側8px余白 */
     padding: 8px;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ クリック・ドラッグできることを示す指カーソル */
     cursor: pointer;
+    /* ↓ ホバー時アニメーション */
     transition: all var(--transition-fast);
+    /* ↓ 相対位置 */
     position: relative;
+    /* ↓ 白背景 */
     background: #ffffff;
 }
 
+/* ↓ カードホバー時 */
 .studio-item-card:hover {
+    /* ↓ 枠線を少し濃く */
     border-color: #999999;
+    /* ↓ ごく薄いオフホワイト背景に */
     background: #fafafa;
 }
 
+/* ↓ 現在マネキンに着せているカード（選択中ハイライト） */
 .studio-item-card.is-active {
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
+    /* ↓ 淡いグレー背景 */
     background: #f7f7f7;
+    /* ↓ 外周にも1pxの黒線を描いて二重線風に強調します */
     box-shadow: 0 0 0 1px var(--color-black);
 }
 
+/* ↓ コンパクトカード左側の小さな服サムネイル */
 .studio-item-card-img {
+    /* ↓ 幅60px */
     width: 60px;
+    /* ↓ 高さ72px */
     height: 72px;
+    /* ↓ 縦横比を保って枠いっぱいに収めます */
     object-fit: cover;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 読み込み中の背景グレー */
     background: #eeeeee;
+    /* ↓ テキストが長くても画像が潰れないよう縮み禁止 */
     flex-shrink: 0;
 }
 
+/* ↓ カード右側の文字エリア */
 .studio-item-card-info {
+    /* ↓ 残り横幅をすべて使います */
     flex-grow: 1;
+    /* ↓ 長い商品名を省略記号(...)で切るために必要な最小幅0指定 */
     min-width: 0;
 }
 
+/* ↓ カテゴリ名と「着用中」バッジを並べる上段 */
 .studio-card-cat-row {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 下2px */
     margin-bottom: 2px;
 }
 
+/* ↓ カテゴリ名（「TOPS」など） */
 .studio-card-cat {
+    /* ↓ 約10.9px */
     font-size: 0.68rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 商品名（1行に収まらなければ「...」で切り詰めます） */
 .studio-card-name {
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 行間1.35倍 */
     line-height: 1.35;
+    /* ↓ 下4px */
     margin-bottom: 4px;
+    /* ↓ 改行せず1行に収めます */
     white-space: nowrap;
+    /* ↓ はみ出し非表示 */
     overflow: hidden;
+    /* ↓ 末尾を「...」に省略 */
     text-overflow: ellipsis;
 }
 
+/* ↓ 価格や色などのサブ情報行 */
 .studio-card-sub {
+    /* ↓ 約11.8px */
     font-size: 0.74rem;
+    /* ↓ 濃いめグレー */
     color: var(--color-gray-dark);
 }
 
+/* ↓ 「着用中」バッジ（右端に自動配置） */
 .studio-card-badge-wearing {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 上下2px・左右6px余白 */
     padding: 2px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ Flexbox内で左マージンをautoにして行の右端に寄せています */
     margin-left: auto;
+    /* ↓ 縮み防止 */
     flex-shrink: 0;
 }
 
@@ -885,746 +1517,1298 @@
 /* ◆ 中央カラム: マネキン試着室                                              */
 /* ========================================================================== */
 
+/* ↓ マネキンステージ上部の操作ツールバー */
 .mannequin-toolbar {
+    /* ↓ Flexbox有効 */
     display: flex;
+    /* ↓ 上段(見出し)・下段(操作ボタン群)の2段構成 */
     flex-direction: column;
+    /* ↓ 左端揃え */
     align-items: flex-start;
+    /* ↓ 下12px */
     margin-bottom: 12px;
+    /* ↓ 下線までの内側余白10px */
     padding-bottom: 10px;
+    /* ↓ 仕切り線 */
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 段間の隙間8px */
     gap: 8px;
 }
 
+/* ↓ 上段のタイトル容器 */
 .toolbar-left {
+    /* ↓ 横幅100% */
     width: 100%;
 }
 
+/* ↓ 「MANEKIN STAGE」見出しタグ */
 .stage-tag {
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 改行禁止 */
     white-space: nowrap;
+    /* ↓ ブロック表示 */
     display: block;
 }
 
+/* ↓ 下段の各種ボタン並び（位置微調整、MEN/WOMEN切替、全リセット） */
 .toolbar-right {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 左詰め配置 */
     justify-content: flex-start;
+    /* ↓ ボタン間6px */
     gap: 6px;
+    /* ↓ 入り切らない時は自動改行 */
     flex-wrap: wrap;
+    /* ↓ 横幅100% */
     width: 100%;
 }
 
+/* ↓ MEN / WOMEN 性別切り替えスイッチ枠 */
 .gender-toggle-wrap {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 内部ボタンの角を枠に合わせます */
     overflow: hidden;
+    /* ↓ 縮み禁止 */
     flex-shrink: 0;
 }
 
+/* ↓ MEN / WOMEN 個別ボタン */
 .btn-gender {
+    /* ↓ 非選択時は透明 */
     background: transparent;
+    /* ↓ 枠線なし */
     border: none;
+    /* ↓ 上下4px・左右8px */
     padding: 4px 8px;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 濃いめグレー */
     color: var(--color-gray-dark);
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 1行維持 */
     white-space: nowrap;
 }
 
+/* ↓ 選択中の性別ボタン（黒反転） */
 .btn-gender.active {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
+/* ↓ 「すべて外す」クリアボタン */
 .btn-toolbar-clear {
+    /* ↓ アイコンと文字を横並び */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間3px */
     gap: 3px;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 太さ500 */
     font-weight: 500;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 透明背景 */
     background: transparent;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 余白 */
     padding: 4px 7px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
+    /* ↓ 改行禁止 */
     white-space: nowrap;
+    /* ↓ 縮み防止 */
     flex-shrink: 0;
 }
 
+/* ↓ クリアボタンホバー時（ほんのり赤く警告色） */
 .btn-toolbar-clear:hover {
+    /* ↓ 赤系文字 */
     color: var(--color-accent);
+    /* ↓ 赤系枠線 */
     border-color: var(--color-accent);
+    /* ↓ ごく淡いピンク背景 */
     background: #fff5f5;
 }
 
 /* マネキンビジュアルステージ（ゴーストマネキン試着ステージ） */
+/* ↓ 中央の試着ディスプレイ空間全体 */
 .mannequin-stage-box {
+    /* ↓ 上から下に白っぽく淡いグレーへ移ろうスタジオ照明風グラデーション */
     background: linear-gradient(180deg, #fafafa 0%, #f4f6f8 100%);
+    /* ↓ 1.5pxの枠線 */
     border: 1.5px solid var(--color-gray-light);
+    /* ↓ 角丸12px */
     border-radius: 12px;
+    /* ↓ 内部ポップアップなどの絶対配置基準 */
     position: relative;
+    /* ↓ 上16px・左右16px・下14px余白 */
     padding: 16px 16px 14px;
+    /* ↓ 縦Flexboxで中央揃え */
     display: flex;
+    /* ↓ 縦配置 */
     flex-direction: column;
+    /* ↓ 横方向中央 */
     align-items: center;
+    /* ↓ 最低560pxの高さを保ち見栄えを良くします */
     min-height: 560px;
+    /* ↓ 上ヒント・中マネキン・下着用チップを上下均等に配分 */
     justify-content: space-between;
+    /* ↓ ドラッグ＆ドロップ時の強調アニメーション */
     transition: all 0.25s ease;
+    /* ↓ はみ出し防止 */
     overflow: hidden;
 }
 
+/* ↓ 服カードをステージ上へドラッグして乗せている最中の強調スタイル */
 .mannequin-stage-box.is-dragover {
+    /* ↓ 黒枠線で「ここにドロップ可能」を示します */
     border-color: var(--color-black);
+    /* ↓ 少しクールな青白背景に変化 */
     background: #f1f5f9;
+    /* ↓ 外側リング */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
+/* ↓ ステージ上部の「ドラッグまたはクリックで着せ替えできます」ヒントピル */
 .stage-guide-hint {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ スレートグレー文字 */
     color: #64748b;
+    /* ↓ 半透明白背景 */
     background: rgba(255, 255, 255, 0.9);
+    /* ↓ 枠線 */
     border: 1px solid #e2e8f0;
+    /* ↓ 余白 */
     padding: 5px 14px;
+    /* ↓ カプセル丸角 */
     border-radius: 20px;
+    /* ↓ 下8px */
     margin-bottom: 8px;
+    /* ↓ 文字間 */
     letter-spacing: 0.02em;
+    /* ↓ ドロップ操作の邪魔にならないようマウス当たり判定を無視します */
     pointer-events: none;
+    /* ↓ うっすら影 */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+/* ↓ マネキン本体と5部位の服レイヤーを重ね合わせる 280x480px の舞台キャンバス */
 .mannequin-model-wrap {
+    /* ↓ 各部位(.layer-slot)はこの要素を座標(0,0)基準にして絶対配置されます */
     position: relative;
+    /* ↓ 幅280px */
     width: 280px;
+    /* ↓ 高さ480px */
     height: 480px;
+    /* ↓ 中央揃え */
     display: flex;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 縦中央 */
     align-items: center;
 }
 
 /* マネキンベースSVG（クロームスタンドのみ表示） */
+/* ↓ 背景に立つマネキン土台シルエットのSVG領域 */
 .mannequin-base-silhouette {
+    /* ↓ 280pxいっぱい */
     width: 100%;
+    /* ↓ 480pxいっぱい */
     height: 100%;
+    /* ↓ ステージ背面にぴったり重ねます */
     position: absolute;
+    /* ↓ 上端0 */
     top: 0;
+    /* ↓ 左端0 */
     left: 0;
+    /* ↓ 重なり順 z-index: 1（すべての服レイヤーより背面） */
     z-index: 1;
+    /* ↓ スタンドはクリック操作不要なので透過 */
     pointer-events: none;
+    /* ↓ 90%の不透明度で服より主張しすぎないようにします */
     opacity: 0.9;
 }
 
+/* ↓ 「位置・サイズ調整」アコーディオンを開くボタン */
 .btn-toolbar-adjust {
+    /* ↓ 横並び */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間4px */
     gap: 4px;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 濃いグレー枠 */
     border: 1px solid var(--color-gray-dark);
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 余白 */
     padding: 4px 7px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
+    /* ↓ 改行禁止 */
     white-space: nowrap;
+    /* ↓ 縮み防止 */
     flex-shrink: 0;
 }
 
+/* ↓ 調整ボタンホバー・パネル展開中状態 */
 .btn-toolbar-adjust:hover,
 .btn-toolbar-adjust.active {
+    /* ↓ 黒反転 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
 /* 4層の試着レイヤー（ゴーストマネキン仕様・クリック操作可能） */
+/* ↓ 帽子・アウター・トップス・ボトムス・靴の各レイヤー共通スタイル */
 .layer-slot {
+    /* ↓ .mannequin-model-wrap を基準に自由な座標へ配置 */
     position: absolute;
+    /* ↓ まず左端を50%位置に置き、下の translate(-50%) で水平中央に揃えます */
     left: 50%;
+    /* ↓ CSS変数(--offset-x, --offset-y, --scale)を使ってJSからのリアルタイム位置・サイズ微調整を即反映します */
     transform: translate(calc(-50% + var(--offset-x, 0px)), var(--offset-y, 0px)) scale(var(--scale, 1));
+    /* ↓ 拡大縮小の中心点もパーツの中央にします */
     transform-origin: center center;
+    /* ↓ 中身を中央配置 */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ テキスト中央 */
     text-align: center;
+    /* ↓ 何も着ていない空スロットは背面へのクリックや下の服のクリックを妨げないよう当たり判定OFF */
     pointer-events: none;
     /* 未着用時は透過 */
+    /* ↓ ドラッグやクリックで青い選択範囲が出ないよう禁止 */
     user-select: none;
+    /* ↓ スライダーで動かした時に滑らかに追従するトランジション */
     transition: transform 0.08s ease-out, filter 0.2s;
+    /* ↓ 角丸8px */
     border-radius: 8px;
 }
 
+/* ↓ アイテム着用中のスロットはクリックしてクイック着せ替え等が開けるよう当たり判定を復活させます */
 .layer-slot.has-item {
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ クリック可能に戻す */
     pointer-events: auto;
     /* 着用時のみ操作可能 */
 }
 
+/* ↓ 着用中アイテムにマウスを乗せるとわずかに明るく光ります */
 .layer-slot.has-item:hover {
+    /* ↓ 明るさ3%アップ */
     filter: brightness(1.03);
 }
 
 /* レイヤー配置位置（服とパンツが自然に重なり合う黄金バランス） */
+/* ↓ 足元（シューズ）スロット：一番奥のz-index 3（パンツの裾が靴にかぶるように） */
 .layer-shoes {
+    /* ↓ 上から410px位置 */
     top: 410px;
+    /* ↓ 幅140px */
     width: 140px;
+    /* ↓ 高さ65px */
     height: 65px;
+    /* ↓ 重なり順 3 */
     z-index: 3;
 }
 
+/* ↓ 下半身（ボトムス）スロット：重なり順 z-index 4（トップスより奥で自然にタックイン風） */
 .layer-bottoms {
+    /* ↓ 上から230px位置 */
     top: 230px;
+    /* ↓ 幅180px */
     width: 180px;
+    /* ↓ 高さ230px */
     height: 230px;
+    /* ↓ 重なり順 4 */
     z-index: 4;
 }
 
+/* ↓ 上半身インナー（トップス）スロット：重なり順 z-index 5 */
 .layer-tops {
+    /* ↓ 上から80px位置 */
     top: 80px;
+    /* ↓ 幅200px */
     width: 200px;
+    /* ↓ 高さ200px */
     height: 200px;
+    /* ↓ 重なり順 5 */
     z-index: 5;
 }
 
+/* ↓ 羽織り物（アウター）スロット：トップスのさらに上から重ねるため z-index 6 */
 .layer-outer {
+    /* ↓ 上から70px位置 */
     top: 70px;
+    /* ↓ 幅230px */
     width: 230px;
+    /* ↓ 高さ250px */
     height: 250px;
+    /* ↓ 重なり順 6 */
     z-index: 6;
 }
 
+/* ↓ 頭部（帽子）スロット：最前面の z-index 7 */
 .layer-hat {
+    /* ↓ 上から40px位置 */
     top: 40px;
+    /* ↓ 幅125px */
     width: 125px;
+    /* ↓ 高さ75px */
     height: 75px;
+    /* ↓ 重なり順 7（一番手前） */
     z-index: 7;
 }
 
+/* ↓ スロット内で服画像を包むコンテナ */
 .layer-content {
+    /* ↓ 幅100% */
     width: 100%;
+    /* ↓ 高さ100% */
     height: 100%;
+    /* ↓ 相対位置 */
     position: relative;
+    /* ↓ 中央配置用Flex */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
 }
 
+/* ↓ マネキンに着せられた服・靴画像そのもの */
 .layer-img {
+    /* ↓ スロット枠からはみ出さない最大幅100% */
     max-width: 100%;
+    /* ↓ スロット枠からはみ出さない最大高さ100% */
     max-height: 100%;
+    /* ↓ 服が切り取られず全体が綺麗に入る object-fit: contain */
     object-fit: contain;
+    /* ↓ 背景透過画像の輪郭に沿って立体的なドロップシャドウ（影）を落とし、マネキンに着ている浮き立ち感を演出します */
     filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16));
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 着用した瞬間にぽんと弾むスプリング風アニメーション（wearPop） */
     animation: wearPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 
+/* ↓ 服を着せた瞬間のポップ登場アニメーション定義 */
 @keyframes wearPop {
+    /* ↓ 開始時は90%サイズ＆半透明 */
     0% {
+        /* ↓ 0.9倍に少し小さく */
         transform: scale(0.9);
+        /* ↓ 半透明 */
         opacity: 0.5;
     }
 
+    /* ↓ 完了時は等倍＆くっきり表示 */
     100% {
+        /* ↓ 等倍 */
         transform: scale(1);
+        /* ↓ 不透明 */
         opacity: 1;
     }
 }
 
 /* スロット空状態のガイドボタン（非表示） */
+/* ↓ 開発時の旧ガイドボタン残存スタイル（現在は見た目スッキリ化のため非表示設定） */
 .slot-empty-label {
+    /* ↓ 確実に隠す */
     display: none !important;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ グレー文字 */
     color: #475569;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 破線枠 */
     border: 1.5px dashed #94a3b8;
+    /* ↓ 余白 */
     padding: 6px 14px;
+    /* ↓ カプセル丸角 */
     border-radius: 20px;
+    /* ↓ 半透明白背景 */
     background: rgba(255, 255, 255, 0.95);
+    /* ↓ 影 */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* ↓ アニメーション */
     transition: all 0.2s ease;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間4px */
     gap: 4px;
+    /* ↓ 指カーソル */
     cursor: pointer;
 }
 
+/* ↓ 空ガイドホバー時スタイル */
 .layer-slot:hover .slot-empty-label {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠 */
     border-color: var(--color-black);
+    /* ↓ 少し拡大 */
     transform: scale(1.05);
+    /* ↓ 濃い影 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* クイックアイテム選択ポップオーバー */
+/* ↓ ステージの服をクリックした時に下からせり上がって別候補を選べる小窓 */
 .stage-quick-picker {
+    /* ↓ ステージ内下端に重ねて表示 */
     position: absolute;
+    /* ↓ 下12px */
     bottom: 12px;
+    /* ↓ 左12px */
     left: 12px;
+    /* ↓ 右12px */
     right: 12px;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 1.5px黒枠線 */
     border: 1.5px solid var(--color-black);
+    /* ↓ 角丸12px */
     border-radius: 12px;
+    /* ↓ 内側14px余白 */
     padding: 14px;
+    /* ↓ 浮かぶ大きな影 */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    /* ↓ 最前面に表示（z-index: 50） */
     z-index: 50;
+    /* ↓ 下からスライド表示 */
     animation: slideUp 0.22s ease-out;
 }
 
+/* ↓ クイックピッカー出現時の下→上スライドアニメーション */
 @keyframes slideUp {
+    /* ↓ 開始時点（20px下・透明） */
     from {
+        /* ↓ 20px下 */
         transform: translateY(20px);
+        /* ↓ 透明 */
         opacity: 0;
     }
 
+    /* ↓ 完了時点（定位置・不透明） */
     to {
+        /* ↓ 原点へ */
         transform: translateY(0);
+        /* ↓ 不透明 */
         opacity: 1;
     }
 }
 
+/* ↓ ピッカー小窓のヘッダー（タイトルと×ボタン） */
 .quick-picker-header {
+    /* ↓ 左右配置 */
     display: flex;
+    /* ↓ 両端揃え */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 下10px */
     margin-bottom: 10px;
+    /* ↓ 下余白6px */
     padding-bottom: 6px;
+    /* ↓ 薄い仕切り線 */
     border-bottom: 1px solid #f1f5f9;
 }
 
+/* ↓ ピッカー見出し（例：「TOPS を選択」） */
 .quick-picker-title {
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ ピッカー右上の閉じる×ボタン */
 .quick-picker-close {
+    /* ↓ 背景なし */
     background: none;
+    /* ↓ 枠なし */
     border: none;
+    /* ↓ 大きめ× */
     font-size: 1.2rem;
+    /* ↓ 行高1 */
     line-height: 1;
+    /* ↓ グレー */
     color: #64748b;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 左右4px余白 */
     padding: 0 4px;
 }
 
+/* ↓ 閉じるボタンホバー時 */
 .quick-picker-close:hover {
+    /* ↓ 黒く強調 */
     color: var(--color-black);
 }
 
+/* ↓ ピッカー内の候補サムネイル一覧グリッド */
 .quick-picker-body {
+    /* ↓ グリッド表示 */
     display: grid;
+    /* ↓ 最小80pxで横に自動敷き詰め */
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ 多すぎる時は最大180pxで縦スクロール */
     max-height: 180px;
+    /* ↓ 縦スクロール有効 */
     overflow-y: auto;
+    /* ↓ 右端4px余白 */
     padding-right: 4px;
 }
 
+/* ↓ ピッカー内の候補カード1枚分 */
 .quick-picker-card {
+    /* ↓ 薄い枠線 */
     border: 1px solid #e2e8f0;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 余白6px */
     padding: 6px;
+    /* ↓ 中央揃え */
     text-align: center;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ なめらか変化 */
     transition: all 0.15s;
+    /* ↓ 白背景 */
     background: #ffffff;
 }
 
+/* ↓ 候補カードホバー時 */
 .quick-picker-card:hover {
+    /* ↓ 黒枠 */
     border-color: var(--color-black);
+    /* ↓ 2px上に浮く */
     transform: translateY(-2px);
+    /* ↓ 影 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
+/* ↓ 候補カード内の商品写真 */
 .quick-picker-card img {
+    /* ↓ 幅100% */
     width: 100%;
+    /* ↓ 高さ60px */
     height: 60px;
+    /* ↓ 全体収容 */
     object-fit: contain;
+    /* ↓ 下4px余白 */
     margin-bottom: 4px;
 }
 
+/* ↓ 候補カード下の短いアイテム名 */
 .quick-picker-card-name {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 1行省略表示 */
     white-space: nowrap;
+    /* ↓ はみ出し隠し */
     overflow: hidden;
+    /* ↓ 末尾「...」 */
     text-overflow: ellipsis;
 }
 
 /* 服の位置・サイズ微調整パネル */
+/* ↓ ステージ下の「着用アイテム位置・サイズ調整」コントロールパネル */
 .fitting-adjust-panel {
+    /* ↓ 横幅100% */
     width: 100%;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ グレー枠線 */
     border: 1px solid var(--color-gray-medium);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上14px余白 */
     margin-top: 14px;
+    /* ↓ 上下12px・左右14px内側余白 */
     padding: 12px 14px;
+    /* ↓ 浮き上がり影 */
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    /* ↓ フェードイン */
     animation: fadeIn 0.2s ease-in-out;
+    /* ↓ 前面 z-index */
     z-index: 10;
 }
 
+/* ↓ 微調整パネル上部バー */
 .adjust-panel-header {
+    /* ↓ 左右並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 下10px */
     margin-bottom: 10px;
+    /* ↓ 下線余白6px */
     padding-bottom: 6px;
+    /* ↓ 薄い仕切り線 */
     border-bottom: 1px solid #f0f0f0;
 }
 
+/* ↓ パネル左上の見出し＋アイコン */
 .adjust-header-title {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ パネル右上のリセット・閉じるボタン群 */
 .adjust-header-btns {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
 }
 
+/* ↓ 「初期位置に戻す」リセットボタン */
 .btn-adjust-reset {
+    /* ↓ 透明背景 */
     background: transparent;
+    /* ↓ 薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 約11.2px */
     font-size: 0.7rem;
+    /* ↓ 濃いめグレー */
     color: var(--color-gray-dark);
+    /* ↓ 上下2px・左右8px */
     padding: 2px 8px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 背景アニメーション */
     transition: background 0.15s;
 }
 
+/* ↓ リセットボタンホバー時 */
 .btn-adjust-reset:hover {
+    /* ↓ 薄いグレー背景 */
     background: #f3f4f6;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ パネル右上の×閉じボタン */
 .btn-adjust-close {
+    /* ↓ 透明 */
     background: transparent;
+    /* ↓ 枠なし */
     border: none;
+    /* ↓ 大きめ文字 */
     font-size: 1.1rem;
+    /* ↓ 行高1 */
     line-height: 1;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 余白 */
     padding: 0 4px;
 }
 
+/* ↓ どの部位（帽子/アウター/トップス/ボトムス/靴）を調整するか選ぶ5連タブ */
 .adjust-slot-tabs {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間4px */
     gap: 4px;
+    /* ↓ 下12px */
     margin-bottom: 12px;
 }
 
+/* ↓ 各部位切り替えタブボタン */
 .adjust-tab-btn {
+    /* ↓ 5つのボタンが均等幅になるよう flex: 1 */
     flex: 1;
+    /* ↓ 上下5px・左右1px */
     padding: 5px 1px;
+    /* ↓ ごく薄いブルーグレー背景 */
     background: #f8fafc;
+    /* ↓ 薄い枠線 */
     border: 1px solid #e2e8f0;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 約11.2px */
     font-size: 0.70rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ グレー */
     color: #64748b;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 中央寄せ */
     text-align: center;
+    /* ↓ アニメーション */
     transition: all 0.15s;
+    /* ↓ 改行禁止 */
     white-space: nowrap;
 }
 
+/* ↓ 選択中の調整部位タブ */
 .adjust-tab-btn.active {
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠 */
     border-color: var(--color-black);
 }
 
+/* ↓ 上下・左右・拡大率スライダー3本を縦に積むエリア */
 .adjust-sliders-body {
+    /* ↓ 縦Flex */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ スライダー間8px */
     gap: 8px;
 }
 
+/* ↓ スライダー1本分の横行（左ラベル＋右スライダー入力） */
 .adjust-slider-row {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 両端 */
     justify-content: space-between;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ スライダー左側の項目名（「上下 Y」等）と現在数値（「+4px」等） */
 .slider-meta {
+    /* ↓ 幅96px固定で3行の縦軸が綺麗に揃うようにします */
     width: 96px;
+    /* ↓ 左右配置 */
     display: flex;
+    /* ↓ 両端 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 濃いめグレー */
     color: var(--color-gray-dark);
 }
 
+/* ↓ 「上下位置」などの項目ラベル */
 .slider-name {
+    /* ↓ セミボールド */
     font-weight: 600;
 }
 
+/* ↓ 現在の調整値（「100%」「0px」等） */
 .slider-val {
+    /* ↓ スライダーを動かしても桁ブレしない等幅数字 */
     font-variant-numeric: tabular-nums;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ －ボタン ＋ レンジスライダー ＋ ＋ボタン のまとまり */
 .slider-input-wrap {
+    /* ↓ 残り横幅いっぱい */
     flex: 1;
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
 }
 
+/* ↓ 1pxずつ細かく押せる － / ＋ ステップボタン */
 .btn-step {
+    /* ↓ 幅22px */
     width: 22px;
+    /* ↓ 高さ22px */
     height: 22px;
+    /* ↓ パディングなし */
     padding: 0;
+    /* ↓ 中央配置用インラインFlex */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 薄いグレー背景 */
     background: #f1f5f9;
+    /* ↓ 枠線 */
     border: 1px solid #cbd5e1;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 濃紺グレー文字 */
     color: #334155;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all 0.1s;
 }
 
+/* ↓ ＋/－ステップボタンホバー時 */
 .btn-step:hover {
+    /* ↓ やや濃いグレーに */
     background: #e2e8f0;
+    /* ↓ 黒文字近く */
     color: #0f172a;
 }
 
+/* ↓ 位置調整用スライダーバー本体（input type="range"） */
 .adjust-range {
+    /* ↓ 中央エリアいっぱいに伸びます */
     flex: 1;
+    /* ↓ バーの太さ4px */
     height: 4px;
+    /* ↓ バー背景色 */
     background: #cbd5e1;
+    /* ↓ 角丸2px */
     border-radius: 2px;
+    /* ↓ フォーカス枠非表示 */
     outline: none;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ つまみの色をブランド黒に設定 */
     accent-color: var(--color-black);
 }
 
+/* ↓ 微調整パネル下部のヒント注記エリア */
 .adjust-panel-footer {
+    /* ↓ 上10px */
     margin-top: 10px;
+    /* ↓ 内上余白6px */
     padding-top: 6px;
+    /* ↓ 破線区切り */
     border-top: 1px dashed #f0f0f0;
+    /* ↓ 中央寄せ */
     text-align: center;
 }
 
+/* ↓ パネル下部の小さい説明文 */
 .adjust-hint {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 薄グレー */
     color: #94a3b8;
 }
 
 /* 対象アイテム判別ステータスバー */
+/* ↓ 調整対象が「ブランド商品」か「私物クローゼット品」か「未着用」かを示す表示バー */
 .adjust-item-status {
+    /* ↓ ごく薄いブルーグレー */
     background: #f8fafc;
+    /* ↓ 1px枠線 */
     border: 1px solid #e2e8f0;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 上下6px・左右10px */
     padding: 6px 10px;
+    /* ↓ 下10px */
     margin-bottom: 10px;
+    /* ↓ 左右並べ */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 両端揃え */
     justify-content: space-between;
+    /* ↓ 12px */
     font-size: 0.75rem;
 }
 
+/* ↓ 左側のバッジ＋服名グループ */
 .adjust-item-meta-left {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ はみ出し防止 */
     overflow: hidden;
 }
 
+/* ↓ 種別タグ共通スタイル（BRAND / CLOSET / EMPTY） */
 .adjust-item-tag {
+    /* ↓ インラインブロック */
     display: inline-block;
+    /* ↓ 余白 */
     padding: 1px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 約9.9px */
     font-size: 0.62rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 0.5px文字間 */
     letter-spacing: 0.5px;
+    /* ↓ 折り返し禁止 */
     white-space: nowrap;
 }
 
+/* ↓ ブランド販売商品用タグ（水色：サイズXS〜XLのみ調整可モード） */
 .adjust-item-tag.brand {
+    /* ↓ 水色背景 */
     background: #e0f2fe;
+    /* ↓ 青文字 */
     color: #0284c7;
+    /* ↓ 水色枠 */
     border: 1px solid #bae6fd;
 }
 
+/* ↓ 私物・クローゼット商品用タグ（オレンジ：位置X/Yと倍率を自由調整可モード） */
 .adjust-item-tag.closet {
+    /* ↓ クリームオレンジ背景 */
     background: #fef3c7;
+    /* ↓ 濃いオレンジ文字 */
     color: #d97706;
+    /* ↓ オレンジ枠 */
     border: 1px solid #fde68a;
 }
 
+/* ↓ 何も着用していないスロット用タグ（グレー） */
 .adjust-item-tag.empty {
+    /* ↓ グレー背景 */
     background: #f1f5f9;
+    /* ↓ グレー文字 */
     color: #64748b;
+    /* ↓ グレー枠 */
     border: 1px solid #cbd5e1;
 }
 
+/* ↓ 現在調整中の服の名前 */
 .adjust-item-name {
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ ダークネイビー文字 */
     color: #1e293b;
+    /* ↓ はみ出し非表示 */
     overflow: hidden;
+    /* ↓ 末尾「...」 */
     text-overflow: ellipsis;
+    /* ↓ 1行表示 */
     white-space: nowrap;
+    /* ↓ 最大幅130px */
     max-width: 130px;
 }
 
+/* ↓ 右側の動作モード解説テキスト */
 .adjust-item-type-desc {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ スレートグレー */
     color: #64748b;
+    /* ↓ 折り返し禁止 */
     white-space: nowrap;
 }
 
 /* 販売商品用 5段階サイズスライダー */
+/* ↓ ブランド商品専用の5段階サイズ(XS〜XL)スライダーを包む伸縮コンテナ */
 .adjust-slider-row-brand .brand-slider-container {
+    /* ↓ 残り横幅いっぱいにスライダー容器を広げます */
     flex: 1;
+    /* ↓ スライダーバーと下のサイズ目盛りラベルを縦に並べるためFlexboxにします */
     display: flex;
+    /* ↓ 縦方向に積み上げ */
     flex-direction: column;
+    /* ↓ 垂直方向の中央に揃えます */
     justify-content: center;
+    /* ↓ 子要素配置の基準位置に指定 */
     position: relative;
+    /* ↓ ツマミの位置とバランスを取るため上に2pxだけ余白を追加 */
     padding-top: 2px;
 }
 
+/* ↓ スライダー直下に横一列で並ぶ「XS / S / M / L / XL」の目盛りラベル列 */
 .brand-size-ticks {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 5つのサイズ表記をスライダーの左右両端に合わせて均等間隔で配置 */
     justify-content: space-between;
+    /* ↓ 端の「XS」「XL」がスライダーの両端つまみ位置と一致するよう左右に4px余白 */
     padding: 0 4px;
+    /* ↓ 上のスライダー本体との隙間を4px空けます */
     margin-top: 4px;
 }
 
+/* ↓ 目盛りラベル1つ分（XS・S・M・L・XL各文字ボタン）の通常時スタイル */
 .brand-size-tick {
+    /* ↓ 約10.9pxの小さめ文字 */
     font-size: 0.68rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 未選択時は控えめなスレートグレー色 */
     color: #94a3b8;
+    /* ↓ 直接クリックしてもサイズ切替できることを示す指カーソル */
     cursor: pointer;
+    /* ↓ 目盛りを連打した時に文字が青く選択反転しないようにします */
     user-select: none;
+    /* ↓ 色・背景の変化を0.15秒で滑らかにアニメーションさせます */
     transition: all 0.15s ease;
+    /* ↓ 文字を中央寄せ */
     text-align: center;
+    /* ↓ 各サイズ文字の当たり判定横幅を24pxに統一 */
     width: 24px;
+    /* ↓ 上下1px・左右0の内側余白 */
     padding: 1px 0;
+    /* ↓ 小さな角丸3px */
     border-radius: 3px;
 }
 
+/* ↓ サイズ目盛り（XS〜XL）にマウスを乗せた時 */
 .brand-size-tick:hover {
+    /* ↓ 文字色を濃いネイビーに */
     color: #0f172a;
+    /* ↓ 背景を薄いグレーに */
     background: #f1f5f9;
 }
 
+/* ↓ 現在選択中のサイズ目盛り（黒反転で目立たせます） */
 .brand-size-tick.active {
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 濃い黒背景 */
     background: #0f172a;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 5%だけ拡大して立体感を出します */
     transform: scale(1.05);
 }
 
+/* ↓ 左上などに「M」「L」と現在サイズを表示する黒い丸みバッジ */
 .brand-size-badge {
+    /* ↓ 黒背景 */
     background: #0f172a;
+    /* ↓ 確実に白文字 */
     color: #ffffff !important;
+    /* ↓ 上下1px・左右8px */
     padding: 1px 8px;
+    /* ↓ カプセル丸角 */
     border-radius: 12px;
+    /* ↓ 約11.2px */
     font-size: 0.7rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 幅が文字サイズに合うようインラインブロック */
     display: inline-block;
+    /* ↓ SでもXLでも横幅が極端に縮まない最低幅26px */
     min-width: 26px;
+    /* ↓ 文字中央寄せ */
     text-align: center;
 }
 
 /* 無効化（未着用）状態 */
+/* ↓ 選択部位にまだ何も着ていない時はスライダー全体を薄くして操作無効にします */
 .adjust-sliders-body.disabled-mode {
+    /* ↓ 50%の半透明にして「いま無効」と視覚で伝えます */
     opacity: 0.5;
+    /* ↓ クリックやドラッグ操作を完全に受け付けなくします */
     pointer-events: none;
 }
 
 
 /* 着用中スロットチップバー */
+/* ↓ マネキン足元に並ぶ「着用中アイテム一覧」の小さな取り外しタグ群 */
 .wearing-slots-bar {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 横幅を超えたら2段目に折り返します */
     flex-wrap: wrap;
+    /* ↓ 中央揃え */
     justify-content: center;
+    /* ↓ 横幅100% */
     width: 100%;
+    /* ↓ 上に14px余白 */
     margin-top: 14px;
+    /* ↓ ベースより前面に表示 */
     z-index: 10;
 }
 
+/* ↓ 着用中タグ1個分（「TOPS: 〇〇 ×」） */
 .wearing-chip {
+    /* ↓ インラインFlex */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 文字と×ボタンの間を6px空けます */
     gap: 6px;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 1px黒枠 */
     border: 1px solid var(--color-black);
+    /* ↓ 上下4px・左右10px */
     padding: 4px 10px;
+    /* ↓ カプセル丸角 */
     border-radius: 16px;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 小さな影 */
     box-shadow: var(--shadow-subtle);
+    /* ↓ 着用時にふわっと現れるアニメ */
     animation: fadeInPane 0.25s ease;
 }
 
+/* ↓ 着用タグ右端の個別解除×ボタン */
 .wearing-chip-del {
+    /* ↓ 透明背景 */
     background: transparent;
+    /* ↓ 枠なし */
     border: none;
+    /* ↓ グレー */
     color: #999999;
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 余白ゼロ */
     padding: 0;
+    /* ↓ 行高1 */
     line-height: 1;
+    /* ↓ 左に2px隙間 */
     margin-left: 2px;
 }
 
+/* ↓ 解除×ボタンホバー時に赤強調 */
 .wearing-chip-del:hover {
+    /* ↓ アクセント赤 */
     color: var(--color-accent);
 }
 
 /* ブランド服購入サマリーバー */
+/* ↓ ステージ下の「着用中の販売アイテム合計金額＋一括カート追加ボタン」バー */
 .stage-brand-summary {
+    /* ↓ 左右両端並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 上14px */
     margin-top: 14px;
+    /* ↓ 上下12px・左右14px */
     padding: 12px 14px;
+    /* ↓ 薄いグレー背景 */
     background: #f4f4f4;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 隙間12px */
     gap: 12px;
+    /* ↓ 狭い幅ではボタンを次の行へ折り返します */
     flex-wrap: wrap;
 }
 
+/* ↓ 左側の点数＆合計金額まとまり */
 .brand-sum-info {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
 }
 
+/* ↓ 「着用中の販売商品 (○点)」ラベル */
 .sum-items-count {
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 濃いグレー */
     color: var(--color-dark);
 }
 
+/* ↓ 合計金額の強調数値 */
 .sum-total-price {
+    /* ↓ 約17.6px */
     font-size: 1.1rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
@@ -1632,225 +2816,380 @@
 /* ▼ 下部エリア: AIコメント & コーデ保存                                       */
 /* ========================================================================== */
 
+/* ↓ スタジオ下段の「AIスタイリスト講評(左)」と「コーデ保存フォーム(右)」2列エリア */
 .studio-bottom-panel {
+    /* ↓ Grid表示 */
     display: grid;
+    /* ↓ 左1.6:右1の幅比率で配置 */
     grid-template-columns: 1.6fr 1fr;
+    /* ↓ 列間20px */
     gap: 20px;
+    /* ↓ 左と右のカードの高さをぴったり揃えて揃えます */
     align-items: stretch;
 }
 
 /* AIコメントカード */
+/* ↓ AIがリアルタイムにスコアや着こなしアドバイスを出してくれる白いカード */
 .ai-comment-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下24px・左右28px */
     padding: 24px 28px;
+    /* ↓ 影 */
     box-shadow: var(--shadow-subtle);
+    /* ↓ 縦Flexboxにして本文が短くてもカラーパレット行が底に揃うようにします */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ 上中下を均等に広げます */
     justify-content: space-between;
 }
 
+/* ↓ AIカード上部バー（左タイトル、右スコア） */
 .ai-comment-header {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 下12px */
     margin-bottom: 12px;
+    /* ↓ 下線余白10px */
     padding-bottom: 10px;
+    /* ↓ 仕切り線 */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 左側のドット・タイトル・エンジンタグ */
 .ai-header-left {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ AI稼働中を示す鼓動アニメーション付きの黒い点 */
 .ai-sparkle-dot {
+    /* ↓ 8px幅 */
     width: 8px;
+    /* ↓ 8px高さ */
     height: 8px;
+    /* ↓ 真円 */
     border-radius: 50%;
+    /* ↓ 黒色 */
     background: #111111;
+    /* ↓ 外周3pxに半透明のリング影 */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+    /* ↓ 2秒周期で無限に拡大縮小する pulseDot アニメを適用 */
     animation: pulseDot 2s infinite;
 }
 
+/* ↓ 点滅・鼓動アニメーション定義 */
 @keyframes pulseDot {
 
+    /* ↓ 最初と最後(0%, 100%)は等倍でくっきり */
     0%,
     100% {
+        /* ↓ 等倍 */
         transform: scale(1);
+        /* ↓ 不透明 */
         opacity: 1;
     }
 
+    /* ↓ 中間地点(50%)で1.3倍に膨らんで少し透けます */
     50% {
+        /* ↓ 1.3倍拡大 */
         transform: scale(1.3);
+        /* ↓ やや透過 */
         opacity: 0.7;
     }
 }
 
+/* ↓ 「AI STYLIST ADVICE」ラベル */
 .ai-label {
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 文字間広め */
     letter-spacing: 0.06em;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ 「v2.6 RULE ENGINE」などの技術バッジ */
 .ai-engine-tag {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 濃いめグレー文字 */
     color: var(--color-gray-dark);
+    /* ↓ 上下2px・左右6px */
     padding: 2px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ プログラム風等幅フォントで表示 */
     font-family: monospace;
 }
 
+/* ↓ 右側のコーデ相性スコア表示部 */
 .ai-header-right {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 1行維持 */
     white-space: nowrap;
+    /* ↓ 縮み防止 */
     flex-shrink: 0;
 }
 
+/* ↓ 「相性スコア:」の文字 */
 .ai-score-label {
+    /* ↓ 約12.8px */
     font-size: 0.8rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 改行禁止 */
     white-space: nowrap;
 }
 
+/* ↓ 星アイコン表示枠（現在は数値のみスッキリ見せるため非表示化） */
 .ai-score-stars {
+    /* ↓ 強制非表示 */
     display: none !important;
 }
 
+/* ↓ スコア点数（「92 / 100」など） */
 .ai-score-val {
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 1行 */
     white-space: nowrap;
 }
 
+/* ↓ AIアドバイス本文を包む欄 */
 .ai-comment-body {
+    /* ↓ 下16px */
     margin-bottom: 16px;
 }
 
+/* ↓ AIコメント段落テキスト */
 .ai-comment-text {
+    /* ↓ 約15px */
     font-size: 0.94rem;
+    /* ↓ 読みやすい行間1.7倍 */
     line-height: 1.7;
+    /* ↓ 濃いグレー文字 */
     color: var(--color-dark);
+    /* ↓ 余白ゼロ */
     margin: 0;
 }
 
+/* ↓ AIカード最下部のスタイルタグ＋色パレット表示行 */
 .ai-meta-bar {
+    /* ↓ 左右配置 */
     display: flex;
+    /* ↓ 両端揃え */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 狭い幅では改行 */
     flex-wrap: wrap;
+    /* ↓ 隙間12px */
     gap: 12px;
+    /* ↓ 上内側余白12px */
     padding-top: 12px;
+    /* ↓ 上部に破線の仕切り */
     border-top: 1px dashed var(--color-gray-light);
 }
 
+/* ↓ スタイルタグの並び */
 .ai-tags-wrap {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 折り返し許可 */
     flex-wrap: wrap;
 }
 
+/* ↓ 「#モード」「#モノトーン」などのタグ1個分 */
 .ai-tag {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ ダークグレー */
     color: #444444;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下3px・左右9px */
     padding: 3px 9px;
+    /* ↓ カプセル丸角 */
     border-radius: 12px;
 }
 
+/* ↓ 右側の使用カラー丸一覧ブロック */
 .ai-palette-wrap {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ 「COLOR PALETTE」等の小さい文字 */
 .palette-label {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 色丸同士の横並び容器 */
 .palette-dots {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間4px */
     gap: 4px;
 }
 
+/* ↓ 着用服から抽出された色の丸ドット1個 */
 .palette-dot {
+    /* ↓ 幅14px */
     width: 14px;
+    /* ↓ 高さ14px */
     height: 14px;
+    /* ↓ 真円 */
     border-radius: 50%;
+    /* ↓ 白等の色も見分けがつくよう15%透明の黒枠線 */
     border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 /* コーデ保存カード */
+/* ↓ 右側の「このコーディネートを名前を付けて保存」ボックス */
 .outfit-save-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下22px・左右24px */
     padding: 22px 24px;
+    /* ↓ 影 */
     box-shadow: var(--shadow-subtle);
+    /* ↓ 縦Flex */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
 }
 
+/* ↓ 保存カード見出し */
 .save-card-title {
+    /* ↓ 約16.8px */
     font-size: 1.05rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下4px */
     margin-bottom: 4px;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ 保存カード補足説明 */
 .save-card-desc {
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下14px */
     margin-bottom: 14px;
 }
 
+/* ↓ ワンクリック入力できる定番コーデ名チップ列（「休日カフェ」「通勤クリーン」など） */
 .preset-name-chips {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 折り返し */
     flex-wrap: wrap;
+    /* ↓ 下14px */
     margin-bottom: 14px;
 }
 
+/* ↓ 各プリセット名チップボタン */
 .preset-chip {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下3px・左右8px */
     padding: 3px 8px;
+    /* ↓ カプセル丸角 */
     border-radius: 12px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ プリセット名チップホバー時 */
 .preset-chip:hover {
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ コーデ名入力ボックスと保存ボタンの縦積みグループ */
 .save-input-group {
+    /* ↓ Flex */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ 隙間10px */
     gap: 10px;
 }
 
+/* ↓ コーデ名テキスト入力欄 */
 .outfit-name-input {
+    /* ↓ 横幅いっぱい */
     width: 100%;
 }
 
+/* ↓ 保存実行ボタン */
 .save-outfit-btn {
+    /* ↓ 横幅いっぱい */
     width: 100%;
+    /* ↓ アイコンと文字を横並び中央 */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
@@ -1858,118 +3197,205 @@
 /* パネル5: 保存したコーデ (LOOKBOOK)                                        */
 /* ========================================================================== */
 
+/* ↓ ルックブック（保存コーデ一覧）のグリッド配置 */
 .saved-outfits-grid {
+    /* ↓ CSS Grid */
     display: grid;
+    /* ↓ 最小幅320px以上で列数を自動計算して並べます */
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    /* ↓ カード間22px */
     gap: 22px;
 }
 
+/* ↓ 保存されたコーデ1枚分のカード */
 .saved-outfit-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 内側20px余白 */
     padding: 20px;
+    /* ↓ 影 */
     box-shadow: var(--shadow-subtle);
+    /* ↓ 縦Flexでボタン位置を下に揃えます */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ ホバー時アニメーション */
     transition: all var(--transition-normal);
 }
 
+/* ↓ 保存カードホバー時 */
 .saved-outfit-card:hover {
+    /* ↓ カード影 */
     box-shadow: var(--shadow-card);
+    /* ↓ 枠色強調 */
     border-color: #999999;
 }
 
+/* ↓ 保存カード上部のコーデ名・日付・削除ボタン行 */
 .saved-outfit-header {
+    /* ↓ 左右配置 */
     display: flex;
+    /* ↓ 両端 */
     justify-content: space-between;
+    /* ↓ 上揃え */
     align-items: flex-start;
+    /* ↓ 下12px */
     margin-bottom: 12px;
 }
 
+/* ↓ 保存コーデのタイトル名 */
 .saved-outfit-title {
+    /* ↓ 約17.6px */
     font-size: 1.1rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下2px */
     margin-bottom: 2px;
+    /* ↓ 黒 */
     color: var(--color-black);
 }
 
+/* ↓ 保存日時文字 */
 .saved-outfit-date {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 保存コーデに使われている服サムネイルの横並び帯 */
 .saved-items-preview-strip {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ 余白10px */
     padding: 10px;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 下14px */
     margin-bottom: 14px;
+    /* ↓ 5点並んでも横スクロール可能に */
     overflow-x: auto;
 }
 
+/* ↓ 帯の中の小さな服サムネ1枠 */
 .saved-strip-item {
+    /* ↓ 幅54px */
     width: 54px;
+    /* ↓ 高さ64px */
     height: 64px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ はみ出し切り取り */
     overflow: hidden;
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 1px枠 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 相対位置（下部部位名タグ用） */
     position: relative;
+    /* ↓ 縮み禁止 */
     flex-shrink: 0;
 }
 
+/* ↓ 帯内の服写真 */
 .saved-strip-img {
+    /* ↓ 幅100% */
     width: 100%;
+    /* ↓ 高さ100% */
     height: 100%;
+    /* ↓ 枠いっぱい */
     object-fit: cover;
 }
 
+/* ↓ サムネ画像の下端に載せる部位名リボン（「TOPS」など） */
 .saved-strip-tag {
+    /* ↓ 下端に固定配置 */
     position: absolute;
+    /* ↓ 下0 */
     bottom: 0;
+    /* ↓ 左0 */
     left: 0;
+    /* ↓ 右0 */
     right: 0;
+    /* ↓ 75%黒の半透明帯 */
     background: rgba(0, 0, 0, 0.75);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 極小8.8px */
     font-size: 0.55rem;
+    /* ↓ 中央揃え */
     text-align: center;
+    /* ↓ 上下1px */
     padding: 1px;
 }
 
+/* ↓ 保存当時のAIコメント抜粋メモ枠 */
 .saved-comment-excerpt {
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ 行間1.5倍 */
     line-height: 1.5;
+    /* ↓ 濃いめグレー */
     color: var(--color-gray-dark);
+    /* ↓ 下16px */
     margin-bottom: 16px;
+    /* ↓ 長い文章・短い文章に関わらず下のボタン行を最下段に揃える伸縮 */
     flex-grow: 1;
+    /* ↓ 極薄グレー背景 */
     background: #fafafa;
+    /* ↓ 上下10px・左右12px */
     padding: 10px 12px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 左端だけに3pxの黒い引用線 */
     border-left: 3px solid var(--color-black);
 }
 
+/* ↓ 「マネキンに着せてみる」ボタンと削除ボタン行 */
 .saved-outfit-actions {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ カード最下部に揃え */
     margin-top: auto;
 }
 
+/* ↓ 「試着室で復元する」ボタン */
 .btn-restore-outfit {
+    /* ↓ 残り横幅いっぱい */
     flex: 1;
+    /* ↓ 上下8px・左右12px */
     padding: 8px 12px;
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒背景 */
     background: var(--color-black);
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠 */
     border: 1px solid var(--color-black);
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 復元ボタンホバー時 */
 .btn-restore-outfit:hover {
+    /* ↓ やや明るめの黒 */
     background: #333333;
 }
 
@@ -1977,56 +3403,95 @@
 /* パネル6: プロフィール & 体型設定                                          */
 /* ========================================================================== */
 
+/* ↓ プロフィール確認パネルの2列レイアウト */
 .profile-settings-layout {
+    /* ↓ Grid */
     display: grid;
+    /* ↓ 1:1.25比率 */
     grid-template-columns: 1fr 1.25fr;
+    /* ↓ 隙間20px */
     gap: 20px;
+    /* ↓ 最大820px幅 */
     max-width: 820px;
+    /* ↓ 中央配置 */
     margin: 0 auto;
 }
 
+/* ↓ プロフィール用白カード */
 .profile-card {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下20px・左右22px */
     padding: 20px 22px;
+    /* ↓ 影 */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ プロフィールカード内セクション見出し */
 .profile-section-title {
+    /* ↓ 約16.8px */
     font-size: 1.05rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 下14px */
     margin-bottom: 14px;
+    /* ↓ 下線余白8px */
     padding-bottom: 8px;
+    /* ↓ 下線 */
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ 「NEW」や「SOON」などの拡張バッジ */
 .future-tag {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 黒背景 */
     background: #111111;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 上下2px・左右6px */
     padding: 2px 6px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
 }
 
+/* ↓ プロフィール情報の1項目行（左ラベル・右値） */
 .profile-field-row {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 上下10px余白 */
     padding: 10px 0;
+    /* ↓ 下線 */
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 約14.4px */
     font-size: 0.9rem;
 }
 
+/* ↓ 項目ラベル（「お名前」など） */
 .profile-label {
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 登録されている値（「山田 太郎」など） */
 .profile-val {
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 太さ500 */
     font-weight: 500;
 }
 
@@ -2034,433 +3499,740 @@
 /* マイクローゼット登録モーダル                                              */
 /* ========================================================================== */
 
+/* ↓ 「手持ち服を登録」モーダルのダイアログ本体 */
 .modal-dialog-closet {
+    /* ↓ 最大幅580px */
     max-width: 580px;
+    /* ↓ 画面幅90% */
     width: 90%;
+    /* ↓ 画面高さの88%までに収めます */
     max-height: 88vh;
+    /* ↓ 縦が収まらない時はモーダル内部だけでスクロールできます */
     overflow-y: auto;
+    /* ↓ 角丸8px */
     border-radius: 8px;
 }
 
+/* ↓ 写真ドラッグ＆選択用の破線ドロップゾーン */
 .closet-upload-box {
+    /* ↓ 2pxの破線枠 */
     border: 2px dashed var(--color-gray-light);
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 24px余白 */
     padding: 24px;
+    /* ↓ 中央揃え */
     text-align: center;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 薄いグレー背景 */
     background: var(--color-gray-bg);
+    /* ↓ ホバーアニメーション */
     transition: all var(--transition-fast);
+    /* ↓ 下8px */
     margin-bottom: 8px;
+    /* ↓ AIローディング幕を全面に重ねる基準 */
     position: relative;
+    /* ↓ 角丸からはみ出さないように */
     overflow: hidden;
 }
 
+/* ↓ ドロップゾーンホバー時 */
 .closet-upload-box:hover {
+    /* ↓ 黒破線に強調 */
     border-color: var(--color-black);
+    /* ↓ 背景を白く明るくします */
     background: #ffffff;
 }
 
+/* ↓ アップロード雲アイコン */
 .upload-icon {
+    /* ↓ 幅36px */
     width: 36px;
+    /* ↓ 高さ36px */
     height: 36px;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下8px */
     margin-bottom: 8px;
 }
 
+/* ↓ 「写真を選択・撮影」太字案内 */
 .upload-main-text {
+    /* ↓ ブロック表示 */
     display: block;
+    /* ↓ 約14.7px */
     font-size: 0.92rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 黒文字 */
     color: var(--color-black);
+    /* ↓ 下4px */
     margin-bottom: 4px;
 }
 
+/* ↓ 対応ファイル形式などの小さめ案内 */
 .upload-sub-text {
+    /* ↓ ブロック表示 */
     display: block;
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 画像選択後のプレビュー写真＋「変更する」テキスト縦並び */
 .upload-preview {
+    /* ↓ Flex */
     display: flex;
+    /* ↓ 縦並び */
     flex-direction: column;
+    /* ↓ 中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ プレビュー画像サムネイル */
 .upload-preview img {
+    /* ↓ 最大幅140px */
     max-width: 140px;
+    /* ↓ 最大高さ140px */
     max-height: 140px;
+    /* ↓ 枠に合わせて綺麗に収めます */
     object-fit: cover;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 小さな影 */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ 「別の写真を選び直す」リンク文字 */
 .upload-change-text {
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下線 */
     text-decoration: underline;
 }
 
 /* AI背景削除用ツールバー & アクション */
+/* ↓ 自動背景透過のON/OFFスイッチと手動再実行・元画像復元ボタンバー */
 .ai-cutout-toolbar {
+    /* ↓ 下12px */
     margin-bottom: 12px;
+    /* ↓ 上下8px・左右12px */
     padding: 8px 12px;
+    /* ↓ 薄い青グレー背景 */
     background: #f8fafc;
+    /* ↓ 枠線 */
     border: 1px solid #e2e8f0;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 横並び両端配置 */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 両端 */
     justify-content: space-between;
+    /* ↓ 狭い時折り返し */
     flex-wrap: wrap;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ 「AI背景自動切り抜き ON」チェックラベル */
 .ai-toggle-label {
+    /* ↓ インラインFlex */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 約12.8px */
     font-size: 0.8rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ 濃いグレー */
     color: #1e293b;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ テキスト選択抑止 */
     user-select: none;
 }
 
+/* ↓ AI背景切り抜きチェックボックス */
 .ai-toggle-label input[type="checkbox"] {
+    /* ↓ チェック色を黒系に */
     accent-color: #0f172a;
+    /* ↓ 15px幅 */
     width: 15px;
+    /* ↓ 15px高 */
     height: 15px;
+    /* ↓ 指カーソル */
     cursor: pointer;
 }
 
+/* ↓ 「ブラウザ内無料AI」などのバッジ */
 .ai-free-badge {
+    /* ↓ 水色背景 */
     background: #e0f2fe;
+    /* ↓ 青文字 */
     color: #0284c7;
+    /* ↓ 枠線 */
     border: 1px solid #bae6fd;
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 余白 */
     padding: 1px 6px;
+    /* ↓ カプセル丸角 */
     border-radius: 10px;
+    /* ↓ 左4px */
     margin-left: 4px;
+    /* ↓ 行中央揃え */
     vertical-align: middle;
 }
 
+/* ↓ 右側の「もう一度切り抜く」「元画像に戻す」ボタン並び */
 .ai-action-btns {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間6px */
     gap: 6px;
 }
 
+/* ↓ AIツールバー内の小ボタン */
 .btn-ai-action {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ グレー枠 */
     border: 1px solid #cbd5e1;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 上下3px・左右8px */
     padding: 3px 8px;
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ セミボールド */
     font-weight: 600;
+    /* ↓ スレート文字 */
     color: #334155;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all 0.15s ease;
 }
 
+/* ↓ 小ボタンホバー時 */
 .btn-ai-action:hover {
+    /* ↓ 黒背景 */
     background: #0f172a;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 黒枠 */
     border-color: #0f172a;
 }
 
 /* AI背景処理中オーバーレイ */
+/* ↓ 背景透過や形状判定の実行中にアップロード枠全体を覆う半透明の進捗表示幕 */
 .ai-processing-overlay {
+    /* ↓ 親(.closet-upload-box)の端から端まで全画面カバー */
     position: absolute;
+    /* ↓ top/right/bottom/left すべて 0 の省略書き方 */
     inset: 0;
+    /* ↓ 95%不透明の白幕 */
     background: rgba(255, 255, 255, 0.95);
+    /* ↓ 中身を縦中央揃え */
     display: flex;
+    /* ↓ 縦積み */
     flex-direction: column;
+    /* ↓ 横中央 */
     align-items: center;
+    /* ↓ 縦中央 */
     justify-content: center;
+    /* ↓ 16px余白 */
     padding: 16px;
+    /* ↓ 最前面 z-index 20 */
     z-index: 20;
+    /* ↓ 中央寄せ */
     text-align: center;
+    /* ↓ 背後の画像を軽くぼかします */
     backdrop-filter: blur(2px);
 }
 
+/* ↓ くるくる回る青い読み込みスピナー（円の一部だけ色を塗って回転させています） */
 .ai-spinner {
+    /* ↓ 32px */
     width: 32px;
+    /* ↓ 32px */
     height: 32px;
+    /* ↓ 基本は薄いグレーの太さ3pxの輪 */
     border: 3px solid #e2e8f0;
+    /* ↓ 上辺1/4だけ明るい青色にします */
     border-top-color: #0284c7;
+    /* ↓ 50%で真円に */
     border-radius: 50%;
+    /* ↓ 0.8秒で1回転するアニメを等速(linear)で無限ループ */
     animation: spin-ai-cutout 0.8s linear infinite;
+    /* ↓ 下8px */
     margin-bottom: 8px;
 }
 
+/* ↓ 360度連続回転アニメーション */
 @keyframes spin-ai-cutout {
+    /* ↓ 終了時に1周(360deg)回転 */
     to {
+        /* ↓ Z軸回転360度 */
         transform: rotate(360deg);
     }
 }
 
+/* ↓ 進捗オーバーレイのタイトル文字（「AI解析中...」） */
 .ai-status-title {
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 黒文字 */
     color: #0f172a;
+    /* ↓ 下2px */
     margin-bottom: 2px;
 }
 
+/* ↓ サブメッセージ */
 .ai-status-subtitle {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ グレー */
     color: #64748b;
+    /* ↓ 下8px */
     margin-bottom: 8px;
 }
 
+/* ↓ 進捗バー（プログレスバー）の背景レール */
 .ai-progress-track {
+    /* ↓ 幅80% */
     width: 80%;
+    /* ↓ 最大200px */
     max-width: 200px;
+    /* ↓ 高さ6px */
     height: 6px;
+    /* ↓ レール背景 */
     background: #e2e8f0;
+    /* ↓ 角丸3px */
     border-radius: 3px;
+    /* ↓ 中身の伸びるバーの角を丸く切り抜きます */
     overflow: hidden;
+    /* ↓ 下4px */
     margin-bottom: 4px;
 }
 
+/* ↓ 0%〜100%で伸びる青グラデーション進捗バー中身 */
 .ai-progress-fill {
+    /* ↓ 初期幅0%（JSでリアルタイムに % を書き換えます） */
     width: 0%;
+    /* ↓ レールと同じ高さ100% */
     height: 100%;
+    /* ↓ 左から右へ濃い青→水色のグラデーション */
     background: linear-gradient(90deg, #0284c7, #38bdf8);
+    /* ↓ バーの幅変化を滑らかに */
     transition: width 0.2s ease;
 }
 
+/* ↓ 「65%」などのパーセント数値文字 */
 .ai-progress-percent {
+    /* ↓ 約11.5px */
     font-size: 0.72rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 青文字 */
     color: #0284c7;
+    /* ↓ 数字のガタつき防止の等幅数字 */
     font-variant-numeric: tabular-nums;
 }
 
+/* ↓ 小さな補足テキスト */
 .ai-hint-small {
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 薄グレー */
     color: #94a3b8;
+    /* ↓ 上6px */
     margin-top: 6px;
 }
 
 /* 透過写真プレビュー用の市松模様背景 */
+/* ↓ 背景が透明(PNG透過)になったことを一目で分からせるPhotoshop風の白×グレー市松模様 */
 .upload-preview.is-transparent {
+    /* ↓ 「切り抜き済み」バッジ配置用基準 */
     position: relative;
+    /* ↓ 周囲8px余白 */
     padding: 8px;
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 市松模様の基本下地カラー */
     background-color: #f8fafc;
+    /* ↓ 4枚の斜め45度線形グラデーションを組み合わせて14x14pxのチェック柄(市松模様)を描きます */
     background-image:
         linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
         linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
         linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+    /* ↓ 市松1マスのサイズ 14x14px */
     background-size: 14px 14px;
+    /* ↓ 4つの三角形グラデーションを半マス(7px)ずつずらして完璧なチェッカー柄に噛み合わせます */
     background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
 }
 
+/* ↓ 透過画像自体のドロップシャドウ調整 */
 .upload-preview.is-transparent img {
+    /* ↓ 画像枠自身の背景は完全透明に */
     background: transparent;
+    /* ↓ 切り抜かれた服の形に沿って影を落とし、浮かび上がらせます */
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
 }
 
+/* ↓ プレビュー右上の「✨ 透過済み」バッジ */
 .preview-badge-transparent {
+    /* ↓ 右上に浮かせます */
     position: absolute;
+    /* ↓ 上4px */
     top: 4px;
+    /* ↓ 右4px */
     right: 4px;
+    /* ↓ 濃い黒背景 */
     background: #0f172a;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 約10.4px */
     font-size: 0.65rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 上下2px・左右7px */
     padding: 2px 7px;
+    /* ↓ カプセル丸角 */
     border-radius: 10px;
+    /* ↓ 小さな影 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
+/* ↓ 「サンプルイラストから選ぶ」プリセットボタン並び */
 .preset-img-selector {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 隙間6px */
     gap: 6px;
+    /* ↓ 折り返し */
     flex-wrap: wrap;
+    /* ↓ 縦中央 */
     align-items: center;
 }
 
+/* ↓ 「イラスト例:」ラベル */
 .preset-label {
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ グレー */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 各サンプルイラスト選択ボタン */
 .preset-img-btn {
+    /* ↓ 白背景 */
     background: #ffffff;
+    /* ↓ 薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下4px・左右10px */
     padding: 4px 10px;
+    /* ↓ 丸角14px */
     border-radius: 14px;
+    /* ↓ 12px */
     font-size: 0.75rem;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ サンプルボタンホバー時 */
 .preset-img-btn:hover {
+    /* ↓ 黒枠線 */
     border-color: var(--color-black);
+    /* ↓ 薄グレー背景 */
     background: var(--color-gray-bg);
 }
 
+/* ↓ 服登録モーダル内のカテゴリ（アウター/トップス/ボトムス/靴/帽子）2列ラジオ選択格子 */
 .category-radio-grid {
+    /* ↓ Gridレイアウト */
     display: grid;
+    /* ↓ 均等2列 */
     grid-template-columns: 1fr 1fr;
+    /* ↓ 隙間8px */
     gap: 8px;
 }
 
+/* ↓ カテゴリ選択ラジオボタン1枠 */
 .cat-radio-label {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 隙間8px */
     gap: 8px;
+    /* ↓ 上下10px・左右12px */
     padding: 10px 12px;
+    /* ↓ 薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 指カーソル */
     cursor: pointer;
+    /* ↓ 約12.8px */
     font-size: 0.8rem;
+    /* ↓ アニメーション */
     transition: all var(--transition-fast);
+    /* ↓ 白背景 */
     background: #ffffff;
 }
 
+/* ↓ カテゴリ選択ラジオボタンにマウスを重ねた時のスタイル */
 .cat-radio-label:hover {
+    /* ↓ 枠線の色を少し濃いグレーに変更して反応を示します */
     border-color: #999999;
 }
 
+/* ↓ チェックされたラジオボタンの直後(+)にある<span>ラベルの装飾（CSSセレクタ機能） */
 .cat-radio-label input:checked+span {
+    /* ↓ 選択中の文字を太字にします */
     font-weight: 700;
+    /* ↓ 文字色をくっきりした黒色にします */
     color: var(--color-black);
 }
 
+/* ↓ CSSの:has()擬似クラスを使い「チェック済みのinputを含むラベル枠全体」を強調します */
 .cat-radio-label:has(input:checked) {
+    /* ↓ 外枠線を黒色に変更 */
     border-color: var(--color-black);
+    /* ↓ 背景色を薄いグレーにして選択状態をわかりやすくします */
     background: var(--color-gray-bg);
 }
 
+/* ↓ モーダルダイアログ下部の操作ボタン配置エリア（「キャンセル」「登録する」等） */
 .modal-actions {
+    /* ↓ Flexboxで横並びに配置 */
     display: flex;
+    /* ↓ 右端寄せ（決定ボタンを右下に置くUIの定番配置） */
     justify-content: flex-end;
+    /* ↓ 縦方向中央揃え */
     align-items: center;
+    /* ↓ ボタン同士の間隔を12px空けます */
     gap: 12px;
+    /* ↓ 上のフォームとの余白24px */
     margin-top: 24px;
+    /* ↓ 仕切り線との間の内側上余白18px */
     padding-top: 18px;
+    /* ↓ 上部に薄い区切り線を表示 */
     border-top: 1px solid var(--color-gray-light);
 }
 
+/* ↓ モーダル下部エリア内にあるボタンサイズ・文字の個別指定 */
 .modal-actions .btn {
+    /* ↓ 上下12px・左右24pxの押しやすい余白 */
     padding: 12px 24px;
+    /* ↓ 約14.7pxの読みやすい文字サイズ */
     font-size: 0.92rem;
+    /* ↓ セミボールドの太字 */
     font-weight: 600;
+    /* ↓ マウスカーソルを指アイコンに */
     cursor: pointer;
 }
 
 /* ========================================================================== */
 /* 21-b. AI形状・アイテム診断結果カード（アウター/ボトムス/トップス/靴/帽子） */
 /* ========================================================================== */
+/* ↓ 手持ち服アップロード時に「服画像かどうか」「どのカテゴリか」のAI判定結果を示すカード */
 .ai-diagnosis-card {
+    /* ↓ 上12px・左右0・下16pxの外側余白 */
     margin: 12px 0 16px;
+    /* ↓ 上下12px・左右14pxの内側余白 */
     padding: 12px 14px;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 標準時の薄いニュートラルグレー背景 */
     background: #f8f9fa;
+    /* ↓ 薄い1px枠線 */
     border: 1px solid #e5e7eb;
+    /* ↓ 左端だけ4pxの太いアクセントバーにして診断カードの視認性を高めます */
     border-left: 4px solid #111827;
+    /* ↓ 色変化を0.25秒でなめらかにアニメーションさせます */
     transition: all 0.25s ease;
 }
 
+/* ↓ AIが画像解析・推論を実行している待機中のカード色（インディゴブルー系） */
 .ai-diagnosis-card.is-analyzing {
+    /* ↓ 左アクセント線を青紫色に */
     border-left-color: #6366f1;
+    /* ↓ 淡い青系背景 */
     background: #f5f7ff;
 }
 
+/* ↓ AIが「衣服・指定アイテムとして有効」と判定した時のカード色（グリーン系） */
 .ai-diagnosis-card.is-valid {
+    /* ↓ 左アクセント線をエメラルドグリーンに */
     border-left-color: #10b981;
+    /* ↓ 淡い緑背景 */
     background: #f0fdf4;
+    /* ↓ 淡い緑色の枠線 */
     border-color: #bbf7d0;
 }
 
+/* ↓ AIが「衣服ではない画像（風景・人物のみ等）やNG」と判定した時の警告カード色（レッド系） */
 .ai-diagnosis-card.is-invalid {
+    /* ↓ 左アクセント線を警告の赤色に */
     border-left-color: #ef4444;
+    /* ↓ 淡い赤色背景 */
     background: #fef2f2;
+    /* ↓ 淡い赤枠線 */
     border-color: #fecaca;
 }
 
+/* ↓ 診断カードの上段ヘッダー（左にステータスバッジ、右にAI信頼度スコア） */
 .ai-diagnosis-header {
+    /* ↓ 横並び */
     display: flex;
+    /* ↓ 両端配置 */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 下余白6px */
     margin-bottom: 6px;
 }
 
+/* ↓ 診断ステータスを表す角丸ラベルバッジ（「AI解析中」「判定OK」「登録不可」など） */
 .ai-diagnosis-badge {
+    /* ↓ 横並びのインラインFlex（スピナーと文字を並べるため） */
     display: inline-flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ スピナーと文字の隙間6px */
     gap: 6px;
+    /* ↓ 約12.2pxの小ぶり文字 */
     font-size: 0.76rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 英字が映える文字間隔 */
     letter-spacing: 0.05em;
+    /* ↓ 上下2px・左右8px余白 */
     padding: 2px 8px;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 基本の濃紺背景 */
     background: #111827;
+    /* ↓ 白文字 */
     color: #ffffff;
 }
 
+/* ↓ 判定OK（有効）時のバッジ背景色（濃いグリーン） */
 .ai-diagnosis-card.is-valid .ai-diagnosis-badge {
+    /* ↓ 緑背景に変更 */
     background: #059669;
 }
 
+/* ↓ 判定NG（登録不可）時のバッジ背景色（濃い赤） */
 .ai-diagnosis-card.is-invalid .ai-diagnosis-badge {
+    /* ↓ 赤背景に変更 */
     background: #dc2626;
 }
 
+/* ↓ 右側に表示されるAI信頼度パーセンテージ数値 */
 .ai-diag-confidence {
+    /* ↓ 約12.5px */
     font-size: 0.78rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 緑文字 */
     color: #059669;
+    /* ↓ 数字ごとの横幅を等幅に揃えて数値変化時のガタつきを防ぎます */
     font-variant-numeric: tabular-nums;
 }
 
+/* ↓ 判定NG時の信頼度・警告スコアの色（赤字に変更） */
 .ai-diagnosis-card.is-invalid .ai-diag-confidence {
+    /* ↓ 赤文字 */
     color: #dc2626;
 }
 
+/* ↓ 診断カードの本文エリア（タイトル行と説明行を縦積み） */
 .ai-diagnosis-body {
+    /* ↓ Flexbox */
     display: flex;
+    /* ↓ 縦方向に積み上げ */
     flex-direction: column;
+    /* ↓ 行間3px */
     gap: 3px;
 }
 
+/* ↓ 診断タイトル見出し */
 .ai-diag-title {
+    /* ↓ 既定マージン削除 */
     margin: 0;
+    /* ↓ 約14px */
     font-size: 0.88rem;
+    /* ↓ 太字 */
     font-weight: 700;
+    /* ↓ 濃い黒文字 */
     color: #111827;
 }
 
+/* ↓ 判定NG時のタイトル文字色（深い赤） */
 .ai-diagnosis-card.is-invalid .ai-diag-title {
+    /* ↓ 赤茶文字 */
     color: #991b1b;
 }
 
+/* ↓ 診断の詳細理由・解説文 */
 .ai-diag-desc {
+    /* ↓ 既定マージン削除 */
     margin: 0;
+    /* ↓ 約12.5px */
     font-size: 0.78rem;
+    /* ↓ 行間1.45倍 */
     line-height: 1.45;
+    /* ↓ 落ち着いた濃いグレー文字 */
     color: #4b5563;
 }
 
+/* ↓ 判定NG時の詳細エラー・拒否理由文（赤字） */
 .ai-diagnosis-card.is-invalid .ai-diag-desc {
+    /* ↓ 赤色文字 */
     color: #b91c1c;
 }
 
+/* ↓ 解析中バッジ内でくるくる回る小さなローディングリング（CSSスピナー） */
 .ai-diag-spinner {
+    /* ↓ テキストと横並び配置 */
     display: inline-block;
+    /* ↓ 幅10px */
     width: 10px;
+    /* ↓ 高さ10px */
     height: 10px;
+    /* ↓ 3辺を半透明白にした2px円枠線 */
     border: 2px solid rgba(255, 255, 255, 0.3);
+    /* ↓ 上辺1箇所だけくっきり白くすることで回転時に円弧が回って見えます */
     border-top-color: #ffffff;
+    /* ↓ 真円にする */
     border-radius: 50%;
+    /* ↓ 0.8秒かけて等速で360度回転し続けるアニメーション */
     animation: ai-diag-spin 0.8s linear infinite;
 }
 
+/* ↓ スピナー用の回転アニメーション定義（0度→360度） */
 @keyframes ai-diag-spin {
+    /* ↓ 終了時点(100%)で360度回転させます */
     to { transform: rotate(360deg); }
 }
 

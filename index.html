@@ -1,125 +1,137 @@
-<!-- ドキュメントタイプをHTML5として宣言 -->
+<!-- ドキュメントタイプをHTML5として宣言（ブラウザに最新HTML規格で解釈させます） -->
 <!DOCTYPE html>
-<!-- 言語設定を日本語に指定 -->
+<!-- HTML文書全体のルート要素。lang="ja"で画面読み上げソフトや検索エンジンに日本語サイトと伝えます -->
 <html lang="ja">
-<!-- ヘッダーメタ情報エリアの開始 -->
+<!-- ヘッダーメタ情報エリアの開始（画面には直接表示されない裏方設定） -->
 
 <head>
-    <!-- 文字エンコーディングをUTF-8に設定 -->
+    <!-- 文字エンコーディングをUTF-8に設定し、日本語の文字化けを防ぎます -->
     <meta charset="UTF-8">
-    <!-- スマホやタブレットに対応するレスポンシブビューポート設定 -->
+    <!-- スマホやタブレットの画面幅に合わせて表示倍率1.0で伸縮させるレスポンシブ必須設定 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO用のページ説明文を設定 -->
+    <!-- 検索結果のスニペットなどに使われるサイト概要文（SEO対策） -->
     <meta name="description" content="MANEKIN FASHION - 研ぎ澄まされたシンプルを日常に。20代〜30代に向けたモダンで洗練されたアパレルブランドのECサイト。">
-    <!-- ページのタイトルを設定 -->
+    <!-- ブラウザのタブやブックマークに表示されるページタイトル -->
     <title>MANEKIN FASHION | 公式オンラインストア</title>
-    <!-- Google Fontsの事前接続設定 -->
+    <!-- Google Fontsサーバーへの事前接続（フォント取得を高速化） -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <!-- Google Fonts静的リソースの事前接続設定 -->
+    <!-- Google Fonts静的ファイルのホストへの事前接続（crossoriginはCORS許可指定） -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- モダンなタイポグラフィを提供するGoogle Fonts（InterとNoto Sans JP）の読み込み -->
+    <!-- モダンなタイポグラフィを提供するGoogle Fonts（英字Interと日本語Noto Sans JP）の読み込み -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <!-- サイト共通のスタイルシートを読み込み -->
+    <!-- サイト全体のスタイル入口（style.cssがbase/shop/studio/responsiveを順番に読み込みます） -->
     <link rel="stylesheet" href="css/style.css?v=20261109_fav">
     <!-- ヘッダーメタ情報エリアの終了 -->
 </head>
-<!-- ページ本体ボディの開始 -->
+<!-- ページ本体ボディの開始（ここから下の要素が画面に表示されます） -->
 
 <body>
-    <!-- グローバルサイトヘッダーの開始 -->
+    <!-- グローバルサイトヘッダー（画面上部に固定追従する共通ナビゲーションバー） -->
     <header class="site-header" id="site-header">
-        <!-- ヘッダー内部のコンテナラッパー -->
+        <!-- ヘッダーの中身を最大幅内に収める中央コンテナ -->
         <div class="header-container">
-            <!-- ブランドロゴエリア（クリックでトップページへ遷移） -->
+            <!-- ブランドロゴリンク（クリックするとURLハッシュを#homeに変えてトップページへ遷移） -->
             <a href="#home" class="brand-logo" id="brand-logo" aria-label="MANEKIN FASHION トップへ">
-                <!-- ロゴテキスト表示 -->
+                <!-- 主ロゴ文字 -->
                 <span class="logo-text">MANEKIN</span>
-                <!-- サブロゴテキスト表示 -->
+                <!-- サブロゴ文字 -->
                 <span class="logo-subtext">FASHION</span>
             </a>
 
-            <!-- デスクトップ用ナビゲーションメニューの開始 -->
+            <!-- PC・タブレット向けの横並びメインナビゲーションメニュー（aria-labelは支援技術用の説明） -->
             <nav class="desktop-nav" aria-label="メインナビゲーション">
-                <!-- ナビゲーションリスト -->
+                <!-- ナビゲーション項目の順序なしリスト -->
                 <ul class="nav-list">
                     <!-- HOMEリンク項目 -->
                     <li class="nav-item">
+                        <!-- data-nav="home"によりJavaScriptが現在アクティブなメニューに下線を付けます -->
                         <a href="#home" class="nav-link active" data-nav="home">HOME</a>
                     </li>
                     <!-- MEN（メンズアイテム）リンク項目 -->
                     <li class="nav-item">
+                        <!-- クリックでハッシュルーティングがメンズ一覧へ切り替えます -->
                         <a href="#men" class="nav-link" data-nav="men">MEN</a>
                     </li>
                     <!-- WOMEN（ウィメンズアイテム）リンク項目 -->
                     <li class="nav-item">
+                        <!-- クリックでウィメンズ一覧へ切り替えます -->
                         <a href="#women" class="nav-link" data-nav="women">WOMEN</a>
                     </li>
                     <!-- MANEKIN機能リンク項目（AIコーデシミュレーション・スタジオへ遷移） -->
                     <li class="nav-item">
+                        <!-- 黒背景の目立つボタン風に装飾したAI試着スタジオへのリンク -->
                         <a href="#manekin-studio" class="nav-link nav-manekin-btn" id="manekin-menu-btn"
                             data-nav="manekin-studio">
                             MANEKIN
-                            <!-- 先端的な機能であることを示すミニタグ -->
+                            <!-- 先端機能であることを示す「AI」ミニタグ -->
                             <span class="nav-tag">AI</span>
                         </a>
                     </li>
-                    <!-- ログインまたはマイページリンク項目（JSで動的切り替え） -->
+                    <!-- ログイン／ユーザー名切り替えリンク枠（JavaScriptがログイン状態で表示を書き換えます） -->
                     <li class="nav-item" id="nav-auth-container">
-                        <!-- 未ログイン時はLOGINリンク -->
+                        <!-- 未ログイン時はLOGINリンクとして表示 -->
                         <a href="#login" class="nav-link" id="nav-auth-link" data-nav="login">LOGIN</a>
                     </li>
                     <!-- マイページリンク項目（常設アクセス用） -->
                     <li class="nav-item" id="nav-mypage-container">
+                        <!-- マイページビューへ遷移 -->
                         <a href="#mypage" class="nav-link" data-nav="mypage">MYPAGE</a>
                     </li>
                 </ul>
                 <!-- デスクトップナビゲーション終了 -->
             </nav>
 
-            <!-- ヘッダー右側のユーザーツールアイコン群 -->
+            <!-- ヘッダー右側のユーザーツールアイコン群（カート・お気に入り・アカウント・スマホメニュー） -->
             <div class="header-tools">
-                <!-- 【要件追加】ユーザーのツールアイコンの左側に配置する購入ボタン（ショッピングバッグ） -->
-                <!-- ショッピングカートアイコンボタン -->
+                <!-- 【要件追加】ユーザーアイコンの左側に配置する購入手続きページ（ショッピングバッグ）ボタン -->
                 <a href="#checkout" class="tool-icon-btn cart-icon-btn" id="header-cart-btn"
                     aria-label="ショッピングカート / ご注文手続きへ">
-                    <!-- ショッピングカートSVGアイコン -->
+                    <!-- ベクター形式(SVG)のショッピングバッグアイコン（拡大縮小してもぼやけません） -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- カート左車輪 -->
                         <circle cx="9" cy="21" r="1"></circle>
+                        <!-- カート右車輪 -->
                         <circle cx="20" cy="21" r="1"></circle>
+                        <!-- カートかご本体と持ち手を描くパス -->
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
-                    <!-- カート内商品点数を表示するバッジ -->
+                    <!-- カート内の合計商品点数をリアルタイム表示する丸バッジ -->
                     <span class="icon-badge" id="header-cart-badge">0</span>
                 </a>
 
-                <!-- お気に入りクイックアイコンボタン -->
+                <!-- お気に入り一覧ページへのクイックアイコンボタン -->
                 <a href="#favorites" class="tool-icon-btn" aria-label="お気に入り一覧を表示">
-                    <!-- ハートアイコンSVG -->
+                    <!-- ハート形のSVGアイコン -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- ハートの輪郭座標 -->
                         <path
                             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
                         </path>
                     </svg>
-                    <!-- アイコン上の件数バッジ -->
+                    <!-- お気に入り件数を表示する丸バッジ -->
                     <span class="icon-badge" id="icon-fav-badge">0</span>
                 </a>
 
-                <!-- アカウントクイックアイコンボタン -->
+                <!-- マイページへのアカウントクイックアイコンボタン -->
                 <a href="#mypage" class="tool-icon-btn" aria-label="マイページを表示">
-                    <!-- ユーザーアイコンSVG -->
+                    <!-- 人物シルエットのSVGアイコン -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- 肩〜胴体の曲線 -->
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <!-- 頭部の丸 -->
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </a>
 
-                <!-- モバイル用ハンバーガーメニューボタン -->
+                <!-- スマホ・タブレット表示時に出現するハンバーガーメニュー開閉ボタン（PCではCSSで非表示） -->
                 <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開閉する">
-                    <!-- ハンバーガーの3本線アイコン -->
+                    <!-- 三本線の1本目 -->
                     <span class="hamburger-line"></span>
+                    <!-- 三本線の2本目 -->
                     <span class="hamburger-line"></span>
+                    <!-- 三本線の3本目 -->
                     <span class="hamburger-line"></span>
                 </button>
             </div>
@@ -127,70 +139,89 @@
         <!-- グローバルサイトヘッダーの終了 -->
     </header>
 
-    <!-- モバイル用スライドインナビゲーションメニューの開始 -->
+    <!-- モバイル用スライドインナビゲーションメニュー（画面右外に待機し、openクラスで滑らかに出現） -->
     <div class="mobile-menu-drawer" id="mobile-menu-drawer">
-        <!-- ドロワー内部のコンテナ -->
+        <!-- ドロワー内の縦Flexコンテナ -->
         <div class="drawer-content">
+            <!-- ドロワー上部タイトル＋×閉じるボタンバー -->
             <div class="drawer-header">
+                <!-- ドロワーロゴ -->
                 <span class="drawer-logo">MANEKIN FASHION</span>
-                <!-- 閉じるボタン -->
+                <!-- ドロワーを閉じる×ボタン -->
                 <button class="drawer-close-btn" id="drawer-close-btn" aria-label="メニューを閉じる">×</button>
             </div>
-            <!-- モバイル用ナビリスト -->
+            <!-- モバイル用縦並びナビゲーションリンク一覧 -->
             <ul class="mobile-nav-list">
+                <!-- トップページリンク -->
                 <li><a href="#home" class="mobile-nav-link" data-mobile-nav="home">HOME</a></li>
+                <!-- メンズ一覧リンク -->
                 <li><a href="#men" class="mobile-nav-link" data-mobile-nav="men">MEN (メンズ)</a></li>
+                <!-- ウィメンズ一覧リンク -->
                 <li><a href="#women" class="mobile-nav-link" data-mobile-nav="women">WOMEN (ウィメンズ)</a></li>
+                <!-- ショッピングカートリンク -->
                 <li><a href="#checkout" class="mobile-nav-link" data-mobile-nav="checkout">CART (ショッピングカート)</a></li>
+                <!-- お気に入り一覧リンク -->
                 <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
+                <!-- AI試着スタジオへの強調リンク -->
                 <li><a href="#manekin-studio" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn"
                         data-mobile-nav="manekin-studio">MANEKIN <span class="nav-tag">AI</span></a></li>
+                <!-- ナビ項目間の薄い区切り線 -->
                 <li class="mobile-divider"></li>
+                <!-- ログイン画面リンク（ログイン時はJSで非表示化） -->
                 <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN
                         (ログイン)</a></li>
+                <!-- 新規会員登録画面リンク -->
                 <li><a href="#register" class="mobile-nav-link" id="mobile-register-link"
                         data-mobile-nav="register">REGISTER (会員登録)</a></li>
+                <!-- マイページリンク -->
                 <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE
                         (マイページ)</a></li>
             </ul>
-            <!-- ドロワー下部フッター情報（下まで届いて自然なプロECレイアウト） -->
+            <!-- ドロワー最下部フッター情報（空きスペースを残さず下まで埋めるEC定番レイアウト） -->
             <div class="drawer-footer">
+                <!-- ブランドメッセージ -->
                 <p class="drawer-footer-text">研ぎ澄まされたシンプルを日常に。<br>2026 SS COLLECTION</p>
+                <!-- コピーライト表記（&copy; は HTML特殊文字で © を表します） -->
                 <p class="drawer-copyright">&copy; 2026 MANEKIN FASHION Co., Ltd.</p>
             </div>
         </div>
     </div>
-    <!-- モバイルメニューの背景オーバーレイ -->
+    <!-- モバイルメニュー展開時に背景ページを暗く覆うクリック判定用オーバーレイ -->
     <div class="menu-overlay" id="menu-overlay"></div>
 
-    <!-- メインコンテンツ領域の開始 -->
+    <!-- メインコンテンツ領域（SPA構成のため、下の複数sectionからURLハッシュに合う1枚だけがactiveで表示されます） -->
     <main class="main-content" id="app-main">
 
         <!-- ============================================== -->
         <!-- 1. トップページビュー (HOME)                   -->
         <!-- ============================================== -->
+        <!-- 初期表示ビューのため active クラスが付与されています -->
         <section class="page-view active" id="view-home">
-            <!-- メインビジュアル（HERO）セクション -->
+            <!-- メインビジュアル（HERO）セクション：画面一面に広がる第一印象エリア -->
             <section class="hero-section">
-                <!-- ヒーロー画像のコンテナ -->
+                <!-- ヒーロー画像のラッパー（拡大防止・クリッピング枠） -->
                 <div class="hero-image-wrap">
-                    <!-- 生成した高品質なブランドメイン画像 -->
+                    <!-- 生成した高品質なブランドメインビジュアル画像 -->
                     <img src="assets/images/hero.jpg" alt="MANEKIN FASHION 2026 コレクション" class="hero-image">
-                    <!-- 画像上のダークグラデーションオーバーレイ -->
+                    <!-- 白文字が背景写真に埋もれないよう下側を暗くするグラデーション膜 -->
                     <div class="hero-overlay"></div>
                 </div>
-                <!-- ヒーローコンテンツ（キャッチコピーとCTA） -->
+                <!-- ヒーロー画像の上に重ねるキャッチコピー＆CTAボタン群 -->
                 <div class="hero-content">
+                    <!-- シーズンサブタイトル -->
                     <p class="hero-subheading">2026 SPRING / SUMMER COLLECTION</p>
+                    <!-- メインキャッチコピー（keep-phraseにより単語途中で不自然に改行されるのを防ぎます） -->
                     <h1 class="hero-heading"><span class="keep-phrase">研ぎ澄まされたシンプルを</span><span
                             class="keep-phrase">日常に。</span></h1>
+                    <!-- ブランド説明のリード文 -->
                     <p class="hero-description"><span class="keep-phrase">誰にでも自然と馴染み、</span><span
                             class="keep-phrase">着る人の個性を引き立てる。</span><span class="keep-phrase">時代を超えて愛される、</span><span
                             class="keep-phrase">上質なベーシックウェアを展開します。</span></p>
+                    <!-- ヒーロー内の主要誘導ボタン並び -->
                     <div class="hero-buttons">
-                        <!-- 商品一覧への誘導ボタン -->
+                        <!-- 商品全一覧ページへの白反転ボタン -->
                         <a href="#items" class="btn btn-primary">COLLECTION ALL</a>
-                        <!-- 新着商品への誘導ボタン -->
+                        <!-- 新着商品一覧ページへの枠線ボタン -->
                         <a href="#new-items" class="btn btn-secondary">NEW ARRIVALS</a>
                     </div>
                 </div>
@@ -198,28 +229,43 @@
 
             <!-- ブランド紹介（BRAND CONCEPT）セクション -->
             <section class="concept-section container">
-                <!-- セクションヘッダー -->
+                <!-- 中央寄せのセクション見出しセット -->
                 <div class="section-header text-center">
+                    <!-- 英語小タイトル -->
                     <p class="section-en-title">BRAND CONCEPT</p>
+                    <!-- 日本語大タイトル -->
                     <h2 class="section-jp-title"><span class="keep-phrase">MANEKIN FASHION</span> <span
                             class="keep-phrase">について</span></h2>
+                    <!-- 見出し下の短い黒アクセント棒 -->
                     <div class="section-divider"></div>
                 </div>
-                <!-- コンセプト本文エリア -->
+                <!-- 3列並びのブランドコンセプトカードグリッド -->
                 <div class="concept-grid">
+                    <!-- 柱01：ミニマルデザイン -->
                     <div class="concept-card">
+                        <!-- 薄グレー透かし数字 -->
                         <span class="concept-number">01</span>
+                        <!-- カード見出し -->
                         <h3 class="concept-title">MINIMAL DESIGN</h3>
+                        <!-- 説明テキスト -->
                         <p class="concept-text">装飾を削ぎ落としたモノトーン基調の洗練されたカッティング。どんなシチュエーションにも美しく溶け込みます。</p>
                     </div>
+                    <!-- 柱02：スマートフィット -->
                     <div class="concept-card">
+                        <!-- 透かし数字 -->
                         <span class="concept-number">02</span>
+                        <!-- カード見出し -->
                         <h3 class="concept-title">SMART FIT</h3>
+                        <!-- 説明テキスト -->
                         <p class="concept-text">マネキンのように均整の取れたシルエットを、現代の日本人体型に合わせて綿密にミリ単位で設計しています。</p>
                     </div>
+                    <!-- 柱03：次世代テクノロジー -->
                     <div class="concept-card">
+                        <!-- 透かし数字 -->
                         <span class="concept-number">03</span>
+                        <!-- カード見出し -->
                         <h3 class="concept-title">NEXT TECH</h3>
+                        <!-- 説明テキスト -->
                         <p class="concept-text">AIとデジタルマネキン技術を融合し、あなただけの最適なコーディネートを提案する次世代のアパレル体験をお届けします。</p>
                     </div>
                 </div>
@@ -227,33 +273,44 @@
 
             <!-- おすすめ商品（RECOMMEND ITEMS）セクション -->
             <section class="featured-section container">
+                <!-- 左に見出し、右に「すべて見る」リンクを並べたヘッダー行 -->
                 <div class="section-header">
+                    <!-- 見出しグループ -->
                     <div class="section-title-wrap">
+                        <!-- 英語見出し -->
                         <p class="section-en-title">RECOMMENDED</p>
+                        <!-- 日本語見出し -->
                         <h2 class="section-jp-title">おすすめアイテム</h2>
                     </div>
+                    <!-- 商品一覧への遷移リンク（&rarr; は右向き矢印 →） -->
                     <a href="#items" class="view-more-link">すべて見る &rarr;</a>
                 </div>
-                <!-- おすすめ商品を表示するグリッドコンテナ（JSで動的描画） -->
+                <!-- おすすめ商品4件を表示するグリッドコンテナ（shop.jsのrenderHomeProductsで動的描画） -->
                 <div class="product-grid" id="home-featured-grid">
                     <!-- JavaScriptによって商品カードが動的に挿入されます -->
                 </div>
             </section>
 
-            <!-- 次世代MANEKIN機能告知バナーセクション -->
+            <!-- 次世代MANEKIN機能告知（黒背景ティーザーバナー）セクション -->
             <section class="banner-section container">
+                <!-- バナー外枠カード -->
                 <div class="manekin-teaser-banner" id="teaser-banner">
+                    <!-- 中央テキストブロック -->
                     <div class="teaser-content">
+                        <!-- 白枠ミニタグ -->
                         <span class="teaser-tag"><span class="keep-phrase">NEW FEATURE - 会員限定</span> <span
                                 class="keep-phrase">AIコーデシミュレーション</span></span>
+                        <!-- バナー大見出し -->
                         <h3 class="teaser-title"><span class="keep-phrase">手持ち服 × ブランド商品</span> <span
                                 class="keep-phrase">バーチャル試着スタジオ</span></h3>
+                        <!-- バナー説明コピー -->
                         <p class="teaser-text">
                             <span class="keep-phrase">あなたの「マイクローゼット」と</span><span
                                 class="keep-phrase">MANEKINの最新アイテムを組み合わせ、</span><span
                                 class="keep-phrase">AIスタイリストがリアルタイムでコーデ診断。</span><span
                                 class="keep-phrase">試着から即購入までシームレスに体験できます。</span>
                         </p>
+                        <!-- MANEKIN AI STUDIOへ直接ジャンプする白ボタン -->
                         <a href="#manekin-studio" class="btn btn-teaser text-nowrap"
                             id="banner-manekin-btn">AIコーデシミュレーションを始める &rarr;</a>
                     </div>
@@ -262,14 +319,19 @@
 
             <!-- 新作ハイライト（NEW ARRIVALS）セクション -->
             <section class="new-arrivals-section container">
+                <!-- セクションヘッダー -->
                 <div class="section-header">
+                    <!-- 見出しグループ -->
                     <div class="section-title-wrap">
+                        <!-- 英語見出し -->
                         <p class="section-en-title">NEW ARRIVALS</p>
+                        <!-- 日本語見出し -->
                         <h2 class="section-jp-title text-nowrap">新着コレクション</h2>
                     </div>
+                    <!-- 新着ページへのリンク -->
                     <a href="#new-items" class="view-more-link text-nowrap">新着一覧を見る &rarr;</a>
                 </div>
-                <!-- 新着商品を表示するグリッドコンテナ（JSで動的描画） -->
+                <!-- 新着商品4件を表示するグリッドコンテナ（JSで動的描画） -->
                 <div class="product-grid" id="home-new-grid">
                     <!-- JavaScriptによって商品カードが動的に挿入されます -->
                 </div>
@@ -277,42 +339,56 @@
         </section>
 
         <!-- ============================================== -->
-        <!-- 2. 商品一覧ページビュー (ITEM)                  -->
+        <!-- 2. 商品一覧ページビュー (ITEM / MEN / WOMEN)   -->
         <!-- ============================================== -->
         <section class="page-view" id="view-items">
+            <!-- ページ共通内側余白コンテナ -->
             <div class="container page-container">
-                <!-- ページタイトルとパンくずナビ -->
+                <!-- パンくずナビゲーション（現在階層を示すリンク列。&gt; は > 記号） -->
                 <div class="page-breadcrumb" id="catalog-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span id="catalog-breadcrumb-current">COLLECTION</span>
                 </div>
+                <!-- ページ見出し枠（ALL/MEN/WOMENに応じてJSがタイトル文言を切り替えます） -->
                 <div class="page-header">
+                    <!-- 英語ページタイトル -->
                     <h1 class="page-title" id="catalog-page-title">COLLECTION</h1>
+                    <!-- サブ説明文 -->
                     <p class="page-subtitle" id="catalog-page-subtitle">厳選されたモダンアイテム一覧</p>
                 </div>
 
-                <!-- フィルターとソートバーのコントロールエリア -->
+                <!-- カテゴリ絞り込みボタンと並び替えドロップダウンの操作バー -->
                 <div class="catalog-controls">
-                    <!-- カテゴリフィルターボタングループ -->
+                    <!-- カテゴリフィルターボタングループ（data-category属性をJSが読み取ります） -->
                     <div class="filter-group" id="category-filter-group">
+                        <!-- 全カテゴリ表示ボタン（初期選択状態 active） -->
                         <button class="filter-btn active" data-category="ALL">ALL (すべて)</button>
+                        <!-- トップスのみ絞り込み -->
                         <button class="filter-btn" data-category="TOPS">TOPS (トップス)</button>
+                        <!-- ボトムスのみ絞り込み -->
                         <button class="filter-btn" data-category="BOTTOMS">BOTTOMS (ボトムス)</button>
+                        <!-- アウターのみ絞り込み -->
                         <button class="filter-btn" data-category="OUTER">OUTER (アウター)</button>
                     </div>
 
-                    <!-- 並び替えセレクトボックス -->
+                    <!-- 商品の並び替え（ソート）セレクトボックス -->
                     <div class="sort-group">
+                        <!-- セレクトボックスに紐づくラベル（forとidを一致させると文字クリックでも選択可能になります） -->
                         <label for="sort-select" class="sort-label">並び替え:</label>
+                        <!-- プルダウン選択肢 -->
                         <select id="sort-select" class="sort-select">
+                            <!-- 標準おすすめ順（商品ID順） -->
                             <option value="default">おすすめ順</option>
+                            <!-- 価格昇順 -->
                             <option value="price-asc">価格の安い順</option>
+                            <!-- 価格降順 -->
                             <option value="price-desc">価格の高い順</option>
+                            <!-- 日本語50音・文字コード順 -->
                             <option value="name-asc">商品名順</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- 商品一覧グリッド表示エリア（JSで動的挿入） -->
+                <!-- 絞り込み・ソート後の商品一覧グリッド表示エリア（JSで動的挿入） -->
                 <div class="product-grid" id="catalog-product-grid">
                     <!-- 商品カードがJSで生成されます -->
                 </div>
@@ -323,16 +399,21 @@
         <!-- 3. 新着商品ページビュー (NEW ITEM)              -->
         <!-- ============================================== -->
         <section class="page-view" id="view-new-items">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- パンくずリスト -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>NEW ITEM</span>
                 </div>
+                <!-- ページ見出し -->
                 <div class="page-header">
+                    <!-- タイトル -->
                     <h1 class="page-title">NEW ARRIVALS</h1>
+                    <!-- 説明 -->
                     <p class="page-subtitle">今期の新作コレクション</p>
                 </div>
 
-                <!-- 新着商品一覧グリッド -->
+                <!-- 新着フラグ（isNew: true）を持つ商品一覧グリッド -->
                 <div class="product-grid" id="new-items-grid">
                     <!-- 新着商品カードがJSで生成されます -->
                 </div>
@@ -343,16 +424,17 @@
         <!-- 4. 商品詳細ページビュー (ITEM DETAIL)           -->
         <!-- ============================================== -->
         <section class="page-view" id="view-item-detail">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
-                <!-- パンくずナビゲーション -->
+                <!-- パンくずナビゲーション（商品名はJSで動的更新） -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <a href="#items">ITEM</a> &gt; <span
                         id="detail-breadcrumb-name">商品詳細</span>
                 </div>
 
-                <!-- 商品詳細の2カラムレイアウトコンテナ -->
+                <!-- 商品詳細の2カラムレイアウトコンテナ（左：写真、右：サイズ選択やカートボタン） -->
                 <div class="item-detail-layout" id="item-detail-layout">
-                    <!-- 詳細コンテンツはJavaScriptによって動的にレンダリングされます -->
+                    <!-- 詳細コンテンツはJavaScript（renderItemDetail）によって動的にレンダリングされます -->
                 </div>
             </div>
         </section>
@@ -361,18 +443,23 @@
         <!-- 5. お気に入り一覧ページビュー (FAVORITE)         -->
         <!-- ============================================== -->
         <section class="page-view" id="view-favorites">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- パンくずリスト -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>FAVORITE</span>
                 </div>
+                <!-- ページ見出し -->
                 <div class="page-header">
+                    <!-- タイトル -->
                     <h1 class="page-title">FAVORITE ITEMS</h1>
+                    <!-- 説明 -->
                     <p class="page-subtitle">お気に入りに保存したアイテム</p>
                 </div>
 
-                <!-- お気に入り商品グリッド -->
+                <!-- お気に入り登録済み商品のグリッド表示エリア -->
                 <div class="product-grid" id="favorite-product-grid">
-                    <!-- お気に入りアイテムまたは空表示がJSで生成されます -->
+                    <!-- お気に入りアイテムまたは「未登録」メッセージがJSで生成されます -->
                 </div>
             </div>
         </section>
@@ -381,174 +468,265 @@
         <!-- 6. 本格的な購入手続きページビュー (CHECKOUT)   -->
         <!-- ============================================== -->
         <section class="page-view" id="view-checkout">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- パンくずリスト -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>CHECKOUT (ご購入手続き)</span>
                 </div>
+                <!-- 中央寄せページヘッダー -->
                 <div class="page-header text-center">
+                    <!-- 大見出し（& は実体そのまま、HTMLではテキストとして使用） -->
                     <h1 class="page-title">SHOPPING BAG & CHECKOUT</h1>
+                    <!-- サブタイトル -->
                     <p class="page-subtitle">ご注文内容のご確認とお届け先・お支払い情報の入力</p>
                 </div>
 
-                <!-- チェックアウトステップナビゲーション -->
+                <!-- 現在の購入段階を示すチェックアウトステップバー（1:注文商品 → 2:お届け先・決済 → 3:注文確定） -->
                 <div class="checkout-stepper">
+                    <!-- ステップ1枠（active=現在進行または完了） -->
                     <div class="step-item active">
+                        <!-- 丸番号1 -->
                         <span class="step-num">1</span>
+                        <!-- ステップ名 -->
                         <span class="step-text">注文商品</span>
                     </div>
+                    <!-- ステップ間の接続線 -->
                     <div class="step-line active"></div>
+                    <!-- ステップ2枠 -->
                     <div class="step-item active">
+                        <!-- 丸番号2 -->
                         <span class="step-num">2</span>
+                        <!-- ステップ名 -->
                         <span class="step-text">お届け先・決済</span>
                     </div>
+                    <!-- ステップ2と3の接続線 -->
                     <div class="step-line"></div>
+                    <!-- ステップ3枠 -->
                     <div class="step-item">
+                        <!-- 丸番号3 -->
                         <span class="step-num">3</span>
+                        <!-- ステップ名 -->
                         <span class="step-text">注文確定</span>
                     </div>
                 </div>
 
-                <!-- チェックアウトメイン領域（2カラム構造） -->
+                <!-- チェックアウトメイン領域（左：カートとフォーム、右：金額合計と確定ボタンの2カラム構造） -->
                 <div class="checkout-layout" id="checkout-layout-main">
                     <!-- 左カラム: 注文商品一覧 ＆ お届け先・決済フォーム -->
                     <div class="checkout-form-column">
-                        <!-- セクション1: カート内商品の確認 -->
+                        <!-- セクション1: カート内商品の確認カード -->
                         <div class="checkout-section-card">
+                            <!-- カード見出し -->
                             <h2 class="checkout-section-title">
                                 <span class="sec-badge">1</span> 注文商品一覧
                             </h2>
+                            <!-- カート内アイテムの数量増減・削除行がJS(renderCheckoutPage)で挿入される枠 -->
                             <div class="checkout-cart-list" id="checkout-cart-list">
                                 <!-- JavaScriptでカート内アイテムを描画 -->
                             </div>
                         </div>
 
-                        <!-- セクション2: お届け先情報の入力 -->
+                        <!-- セクション2: お届け先情報・ポイント・支払い方法の入力カード -->
                         <div class="checkout-section-card">
+                            <!-- カード見出し -->
                             <h2 class="checkout-section-title">
                                 <span class="sec-badge">2</span> お届け先情報
                             </h2>
+                            <!-- 入力フォーム（novalidateを指定し、ブラウザ標準ポップアップの代わりにJSで自前の赤いエラー文を表示します） -->
                             <form id="checkout-form" class="checkout-form" novalidate>
+                                <!-- 氏名と電話番号の横並び2列行 -->
                                 <div class="form-row">
+                                    <!-- 氏名入力グループ（flex-1で均等幅） -->
                                     <div class="form-group flex-1">
+                                        <!-- 入力ラベル（必須マーク * 付き） -->
                                         <label for="order-name" class="form-label">お名前（氏名） <span
                                                 class="required">*</span></label>
+                                        <!-- テキスト入力欄 -->
                                         <input type="text" id="order-name" class="form-input" placeholder="例: 山田 太郎"
                                             required>
+                                        <!-- バリデーションエラー時にJSが赤文字メッセージを出す場所 -->
                                         <span class="form-error" id="order-name-error"></span>
                                     </div>
+                                    <!-- 電話番号入力グループ -->
                                     <div class="form-group flex-1">
+                                        <!-- 入力ラベル -->
                                         <label for="order-phone" class="form-label">電話番号 <span
                                                 class="required">*</span></label>
+                                        <!-- 電話番号入力欄（スマホでは数字テンキーが開きやすくなるtype="tel"） -->
                                         <input type="tel" id="order-phone" class="form-input"
                                             placeholder="例: 090-1234-5678" required>
+                                        <!-- エラー表示場所 -->
                                         <span class="form-error" id="order-phone-error"></span>
                                     </div>
                                 </div>
 
+                                <!-- メールアドレス入力グループ -->
                                 <div class="form-group">
+                                    <!-- ラベル -->
                                     <label for="order-email" class="form-label">メールアドレス（注文確認メール送付先） <span
                                             class="required">*</span></label>
+                                    <!-- メール入力欄 -->
                                     <input type="email" id="order-email" class="form-input"
                                         placeholder="例: example@manekin.com" required>
+                                    <!-- エラー表示場所 -->
                                     <span class="form-error" id="order-email-error"></span>
                                 </div>
 
+                                <!-- 郵便番号(幅1)とご住所(幅2)の横並び行 -->
                                 <div class="form-row">
+                                    <!-- 郵便番号グループ -->
                                     <div class="form-group flex-1">
+                                        <!-- ラベル -->
                                         <label for="order-postal" class="form-label">郵便番号 <span
                                                 class="required">*</span></label>
+                                        <!-- 入力欄 -->
                                         <input type="text" id="order-postal" class="form-input"
                                             placeholder="例: 150-0001" required>
                                     </div>
+                                    <!-- 住所グループ（flex-2で郵便番号の2倍の幅を確保） -->
                                     <div class="form-group flex-2">
+                                        <!-- ラベル -->
                                         <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
                                                 class="required">*</span></label>
+                                        <!-- 入力欄 -->
                                         <input type="text" id="order-address" class="form-input"
                                             placeholder="例: 東京都渋谷区神宮前1-1-1 MANEKINビル 4F" required>
+                                        <!-- エラー表示場所 -->
                                         <span class="form-error" id="order-address-error"></span>
                                     </div>
                                 </div>
 
+                                <!-- 配送時間帯選択グループ -->
                                 <div class="form-group">
+                                    <!-- ラベル -->
                                     <label for="order-delivery-time" class="form-label">配送希望時間帯</label>
+                                    <!-- 時間帯ドロップダウン -->
                                     <select id="order-delivery-time" class="form-input">
+                                        <!-- 最短お届け -->
                                         <option value="指定なし">指定なし（最短でお届け）</option>
+                                        <!-- 午前 -->
                                         <option value="午前中 (8:00〜12:00)">午前中 (8:00〜12:00)</option>
+                                        <!-- 14-16 -->
                                         <option value="14:00〜16:00">14:00〜16:00</option>
+                                        <!-- 16-18 -->
                                         <option value="16:00〜18:00">16:00〜18:00</option>
+                                        <!-- 18-20 -->
                                         <option value="18:00〜20:00">18:00〜20:00</option>
+                                        <!-- 19-21 -->
                                         <option value="19:00〜21:00">19:00〜21:00</option>
                                     </select>
                                 </div>
 
-                                <!-- セクション3: ポイントの利用（1pt = 1円） -->
+                                <!-- セクション3: 会員保有ポイント割引カード（1pt = 1円として決済額から差し引けます） -->
                                 <div class="checkout-point-card" id="checkout-point-card">
+                                    <!-- ポイントカード上段（タイトル＆現在の保有ポイント数） -->
                                     <div class="checkout-point-header">
+                                        <!-- 見出し＋換算レートタグ -->
                                         <div class="checkout-point-title">
+                                            <!-- キラキラ絵文字 -->
                                             <span class="point-sparkle">✨</span> ポイントの利用
+                                            <!-- レート説明タグ -->
                                             <span class="point-rate-tag">1pt ＝ 1円分</span>
                                         </div>
+                                        <!-- 会員の保有ポイント残高表示バッジ（JSで動的書き換え） -->
                                         <div class="checkout-point-balance-badge">
                                             保有ポイント: <strong id="checkout-user-points">1,000</strong> pt
                                         </div>
                                     </div>
+                                    <!-- ポイント入力＆一括適用操作ボディ -->
                                     <div class="checkout-point-body">
+                                        <!-- 入力欄とボタンの横並び行 -->
                                         <div class="point-input-row">
+                                            <!-- 数値入力ボックス＋「pt 利用」添え字 -->
                                             <div class="point-input-group">
+                                                <!-- oninputで入力のたびに割引額と合計金額を即再計算します -->
                                                 <input type="number" id="checkout-use-points" class="form-input point-num-input"
                                                     placeholder="0" min="0" value="0" oninput="handlePointsInputChange()">
+                                                <!-- 単位文字 -->
                                                 <span class="point-input-suffix">pt 利用</span>
                                             </div>
+                                            <!-- 保有ポイント上限まで一発入力するボタン -->
                                             <button type="button" class="btn btn-outline-xs btn-use-all-points"
                                                 onclick="handleUseAllPoints()">全額使う</button>
+                                            <!-- 利用ポイントを0にリセットするボタン -->
                                             <button type="button" class="btn btn-outline-xs btn-reset-points"
                                                 onclick="handleResetPoints()">取消</button>
                                         </div>
+                                        <!-- 適用中ステータスやルール注記メッセージ -->
                                         <p class="point-help-text" id="checkout-point-message">
                                             1ポイント＝1円として、今回のお買い物代金にそのままご利用いただけます。
                                         </p>
                                     </div>
                                 </div>
 
-                                <!-- セクション4: お支払い方法の選択 -->
+                                <!-- セクション4: お支払い方法の選択エリア -->
                                 <div class="payment-method-box">
+                                    <!-- タイトル -->
                                     <h3 class="payment-box-title">お支払い方法の選択 <span class="required">*</span></h3>
+                                    <!-- 2x2の支払い選択肢ラジオカード群（同一name="payment_method"で1つだけ選択可能） -->
                                     <div class="payment-options-grid">
+                                        <!-- 選択肢1：クレジットカード（初期選択状態） -->
                                         <label class="payment-option-label selected">
+                                            <!-- ラジオボタン -->
                                             <input type="radio" name="payment_method" value="クレジットカード" checked>
+                                            <!-- 決済名 -->
                                             <span class="pay-name">クレジットカード</span>
+                                            <!-- 対応ブランド -->
                                             <span class="pay-sub">VISA / JCB / MASTER / AMEX</span>
                                         </label>
+                                        <!-- 選択肢2：PayPay -->
                                         <label class="payment-option-label">
+                                            <!-- ラジオボタン -->
                                             <input type="radio" name="payment_method" value="PayPay">
+                                            <!-- 決済名 -->
                                             <span class="pay-name">PayPay (オンライン決済)</span>
+                                            <!-- 補足 -->
                                             <span class="pay-sub">残高・クレジット決済</span>
                                         </label>
+                                        <!-- 選択肢3：あと払い Paidy -->
                                         <label class="payment-option-label">
+                                            <!-- ラジオボタン -->
                                             <input type="radio" name="payment_method" value="あと払い (Paidy)">
+                                            <!-- 決済名 -->
                                             <span class="pay-name">あと払い (Paidy)</span>
+                                            <!-- 補足 -->
                                             <span class="pay-sub">翌月コンビニ・口座振替</span>
                                         </label>
+                                        <!-- 選択肢4：代金引換 -->
                                         <label class="payment-option-label">
+                                            <!-- ラジオボタン -->
                                             <input type="radio" name="payment_method" value="代金引換">
+                                            <!-- 決済名 -->
                                             <span class="pay-name">代金引換</span>
+                                            <!-- 補足 -->
                                             <span class="pay-sub">商品受け取り時にお支払い</span>
                                         </label>
                                     </div>
 
-                                    <!-- クレジットカード入力模擬フォーム -->
+                                    <!-- クレジットカード選択時だけ表示されるカード番号入力模擬フォーム（他を選ぶとJSで非表示化） -->
                                     <div class="credit-card-inputs" id="credit-card-subform">
+                                        <!-- カード番号欄 -->
                                         <div class="form-group">
+                                            <!-- ラベル -->
                                             <label class="form-label">カード番号</label>
+                                            <!-- ダミー入力枠 -->
                                             <input type="text" class="form-input" placeholder="例: 4123 4567 8901 2345">
                                         </div>
+                                        <!-- 有効期限とセキュリティコードの横並び行 -->
                                         <div class="form-row">
+                                            <!-- 有効期限 -->
                                             <div class="form-group flex-1">
+                                                <!-- ラベル -->
                                                 <label class="form-label">有効期限 (月/年)</label>
+                                                <!-- 入力欄 -->
                                                 <input type="text" class="form-input" placeholder="例: 08/29">
                                             </div>
+                                            <!-- セキュリティコード（type="password"で入力文字を伏せ字化） -->
                                             <div class="form-group flex-1">
+                                                <!-- ラベル -->
                                                 <label class="form-label">セキュリティコード</label>
+                                                <!-- 入力欄 -->
                                                 <input type="password" class="form-input" placeholder="例: 123">
                                             </div>
                                         </div>
@@ -558,54 +736,83 @@
                         </div>
                     </div>
 
-                    <!-- 右カラム: 注文金額サマリー ＆ 注文確定ボタン -->
+                    <!-- 右カラム: スクロール追従する注文金額サマリー ＆ 注文確定ボタン -->
                     <div class="checkout-summary-column">
+                        <!-- ご請求明細カード -->
                         <div class="checkout-summary-card">
+                            <!-- タイトル -->
                             <h3 class="summary-card-title">ご請求内容</h3>
+                            <!-- 明細行の縦並びブロック -->
                             <div class="summary-rows">
+                                <!-- 商品小計行 -->
                                 <div class="summary-row">
+                                    <!-- ラベル -->
                                     <span>商品合計</span>
+                                    <!-- JS更新額 -->
                                     <span id="checkout-subtotal">¥0</span>
                                 </div>
+                                <!-- ポイント割引行（1pt以上利用時のみ display: flex に切り替わります） -->
                                 <div class="summary-row checkout-point-discount-row" id="checkout-point-discount-row" style="display: none; color: #dc2626;">
+                                    <!-- ラベル -->
                                     <span>ポイント利用割引</span>
+                                    <!-- 値引き額（赤文字） -->
                                     <span id="checkout-point-discount">-¥0</span>
                                 </div>
+                                <!-- 送料行（合計5,000円未満は550円、以上で無料） -->
                                 <div class="summary-row">
+                                    <!-- ラベル -->
                                     <span>配送料 <small class="text-muted">(5,000円以上で無料)</small></span>
+                                    <!-- 送料金額 -->
                                     <span id="checkout-shipping">¥550</span>
                                 </div>
+                                <!-- 内税計算の参考消費税表示行 -->
                                 <div class="summary-row">
+                                    <!-- ラベル -->
                                     <span>消費税 (10% 内税)</span>
+                                    <!-- 消費税額 -->
                                     <span id="checkout-tax">¥0</span>
                                 </div>
+                                <!-- 太め仕切り線 -->
                                 <div class="summary-divider"></div>
+                                <!-- 最終支払合計金額行 -->
                                 <div class="summary-row total-row">
+                                    <!-- ラベル -->
                                     <span class="total-label">お支払い合計 (税込)</span>
+                                    <!-- 大きく太字の合計金額 -->
                                     <span class="total-amount" id="checkout-total">¥0</span>
                                 </div>
                             </div>
 
-                            <!-- 今回獲得予定ポイント（1%還元） -->
+                            <!-- 今回購入で還元される予定ポイント案内カード（実支払額の1%） -->
                             <div class="checkout-earned-points-card">
+                                <!-- ヘッダー行 -->
                                 <div class="earned-points-header">
+                                    <!-- ラベル -->
                                     <span class="earned-points-label">✨ 今回獲得予定ポイント (1%還元)</span>
+                                    <!-- 還元ポイント数値 -->
                                     <strong class="earned-points-value" id="checkout-earned-points">+0 pt</strong>
                                 </div>
+                                <!-- 注釈 -->
                                 <p class="earned-points-hint">※ご注文確定時に付与され、次回以降1pt＝1円として利用できます</p>
                             </div>
 
-                            <!-- 【要件追加】注文を確定するボタン -->
+                            <!-- 【要件追加】注文を確定するメイン実行ボタン（押すとPOST /api/ordersを叩きDB保存＆自動クローゼット登録を実行） -->
                             <button type="button" class="btn btn-primary btn-block btn-place-order"
                                 id="btn-place-order">
+                                <!-- ボタン主文字 -->
                                 <span class="order-btn-text">注文を確定する</span>
+                                <!-- サブ説明 -->
                                 <span class="order-btn-sub">（Python & MySQLへ保存されます）</span>
                             </button>
 
+                            <!-- セキュリティ安心メッセージ（鍵アイコン付き） -->
                             <p class="summary-security-note">
+                                <!-- 南京錠SVGアイコン -->
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
+                                    <!-- 鍵本体四角 -->
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <!-- 鍵シャックル弧 -->
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                 </svg>
                                 SSL暗号化通信により、お客様の個人情報は安全に保護されます。
@@ -614,63 +821,84 @@
                     </div>
                 </div>
 
-                <!-- 注文完了（サンクス）ビュー（注文確定後に表示） -->
+                <!-- 注文完了（サンクス）ビュー（初期は非表示、注文成功後にJSでcheckout-layout-mainと差し替え表示） -->
                 <div class="order-completed-view" id="order-completed-view" style="display: none;">
+                    <!-- 中央寄せ完了カード -->
                     <div class="completed-card text-center">
+                        <!-- 緑色のチェックマーク丸アイコン -->
                         <div class="completed-check-icon">
+                            <!-- チェックマークSVG -->
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <!-- 折れ線チェック -->
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                         </div>
+                        <!-- 完了バッジ -->
                         <span class="completed-badge">ORDER COMPLETED</span>
+                        <!-- お礼タイトル -->
                         <h2 class="completed-title">ご注文が確定いたしました！</h2>
+                        <!-- サブ説明 -->
                         <p class="completed-subtitle">MANEKIN FASHION をご利用いただき、誠にありがとうございます。</p>
 
+                        <!-- 確定注文番号・日時・住所・合計金額・ポイント変動の一覧ボックス -->
                         <div class="completed-details-box">
+                            <!-- 注文番号行 -->
                             <div class="comp-row">
                                 <span class="comp-label">注文管理番号:</span>
                                 <strong class="comp-value" id="comp-order-no">ORD-20261028-XXXX</strong>
                             </div>
+                            <!-- 注文日時行 -->
                             <div class="comp-row">
                                 <span class="comp-label">ご注文日時:</span>
                                 <span class="comp-value" id="comp-order-date">2026/10/28</span>
                             </div>
+                            <!-- お届け先住所行 -->
                             <div class="comp-row">
                                 <span class="comp-label">お届け先:</span>
                                 <span class="comp-value" id="comp-order-address">東京都渋谷区</span>
                             </div>
+                            <!-- 支払金額行 -->
                             <div class="comp-row">
                                 <span class="comp-label">お支払い合計:</span>
                                 <strong class="comp-value highlight-price" id="comp-order-total">¥0</strong>
                             </div>
+                            <!-- 今回獲得ポイント行 -->
                             <div class="comp-row" id="comp-point-row">
                                 <span class="comp-label">今回獲得ポイント:</span>
                                 <strong class="comp-value text-success" id="comp-earned-points">+0 pt</strong>
                             </div>
+                            <!-- 注文後の最新保有ポイント残高行 -->
                             <div class="comp-row">
                                 <span class="comp-label">現在の保有ポイント:</span>
                                 <span class="comp-value" id="comp-balance-points">1,000 pt</span>
                             </div>
+                            <!-- サーバー保存ステータス表示行 -->
                             <div class="comp-row">
                                 <span class="comp-label">データベース連携:</span>
                                 <span class="comp-value status-badge" id="comp-db-status">MySQL (manekin_db) 保存完了</span>
                             </div>
                         </div>
 
-                        <!-- 【要件追加】マイクローゼットへの自動保存通知バナー -->
+                        <!-- 【要件追加】購入した商品が自動で自分のクローゼットに登録されたことを知らせる通知バナー -->
                         <div class="completed-closet-banner" id="completed-closet-banner">
+                            <!-- ドレス絵文字 -->
                             <div class="closet-banner-icon">👗</div>
+                            <!-- メッセージ本文 -->
                             <div class="closet-banner-text">
                                 <strong>ご購入商品をマイクローゼットに自動保存しました！</strong>
                                 <p id="completed-closet-msg">購入いただいたアイテムは「MANEKIN AI STUDIO」に登録済みです。手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。</p>
                             </div>
                         </div>
 
+                        <!-- 完了後の次アクション誘導ボタン3種 -->
                         <div class="completed-actions">
+                            <!-- AI試着室へ即ジャンプ -->
                             <a href="#manekin" class="btn btn-primary"
                                 onclick="window.location.hash='#manekin'">✨ マイクローゼットで試着室を開く</a>
+                            <!-- マイページへ遷移 -->
                             <a href="#mypage" class="btn btn-secondary"
                                 onclick="window.location.hash='#mypage'">マイページの購入履歴を確認</a>
+                            <!-- 商品一覧へ戻る -->
                             <a href="#items" class="btn btn-outline"
                                 onclick="window.location.hash='#items'">買い物を続ける</a>
                         </div>
@@ -683,20 +911,28 @@
         <!-- 7. ログインページビュー (LOGIN)                 -->
         <!-- ============================================== -->
         <section class="page-view" id="view-login">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- 中央配置の白い認証カード -->
                 <div class="auth-card">
+                    <!-- ヘッダー部 -->
                     <div class="auth-header">
+                        <!-- タイトル -->
                         <h1 class="auth-title">LOGIN</h1>
+                        <!-- 日本語タイトル -->
                         <p class="auth-subtitle">会員ログイン</p>
                     </div>
 
-                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
+                    <!-- 未ログインのまま購入手続きやMANEKINを開こうとした時だけ出現するリダイレクト案内アラート -->
                     <div id="login-checkout-notice" class="auth-checkout-alert"
                         style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <!-- 見出し行 -->
                         <div
                             style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                            <!-- 注意メッセージ見出し -->
                             <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
                         </div>
+                        <!-- 注意本文（アクセス先に応じてJSで文言を切り替え） -->
                         <p id="login-notice-desc"
                             style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
@@ -704,30 +940,44 @@
                         </p>
                     </div>
 
+                    <!-- ログインフォーム（送信時shop.jsの認証処理を実行） -->
                     <form id="login-form" class="auth-form" novalidate>
+                        <!-- メールアドレス入力欄 -->
                         <div class="form-group">
+                            <!-- ラベル -->
                             <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <!-- 入力欄 -->
                             <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com"
                                 required>
+                            <!-- エラー表示枠 -->
                             <span class="form-error" id="login-email-error"></span>
                         </div>
 
+                        <!-- パスワード入力欄 -->
                         <div class="form-group">
+                            <!-- ラベル -->
                             <label for="login-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <!-- パスワード入力欄 -->
                             <input type="password" id="login-password" class="form-input" placeholder="8文字以上の半角英数字"
                                 required>
+                            <!-- エラー表示枠 -->
                             <span class="form-error" id="login-password-error"></span>
                         </div>
 
+                        <!-- ログイン送信ボタン（type="submit"でEnterキー送信にも対応） -->
                         <button type="submit" class="btn btn-primary btn-block">ログインする</button>
 
+                        <!-- 動作確認に便利なテストアカウントワンクリックログインボタン -->
                         <button type="button" class="btn btn-secondary btn-block demo-login-btn" id="demo-login-btn">
                             テストアカウントで簡単ログイン
                         </button>
                     </form>
 
+                    <!-- カード下部：新規登録への切り替えリンク -->
                     <div class="auth-footer">
+                        <!-- 案内文 -->
                         <p class="auth-switch-text">アカウントをお持ちでないですか？</p>
+                        <!-- 新規登録画面リンク -->
                         <a href="#register" class="auth-link">新規会員登録はこちら &rarr;</a>
                     </div>
                 </div>
@@ -738,18 +988,27 @@
         <!-- 8. 会員登録ページビュー (REGISTER)              -->
         <!-- ============================================== -->
         <section class="page-view" id="view-register">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- 中央配置の白い認証カード -->
                 <div class="auth-card">
+                    <!-- ヘッダー -->
                     <div class="auth-header">
+                        <!-- タイトル -->
                         <h1 class="auth-title">REGISTER</h1>
+                        <!-- サブタイトル -->
                         <p class="auth-subtitle">新規会員登録</p>
                     </div>
 
-                    <!-- 新規会員登録 特典バナー -->
+                    <!-- 新規会員登録特典バナー（初期1,000ポイント付与の訴求） -->
                     <div class="auth-point-banner">
+                        <!-- 黒ラベルバッジ -->
                         <div class="auth-point-badge">WELCOME GIFT</div>
+                        <!-- 特典内容横並び枠 -->
                         <div class="auth-point-content">
+                            <!-- プレゼント絵文字 -->
                             <span class="auth-point-icon">🎁</span>
+                            <!-- 特典テキスト -->
                             <div class="auth-point-text">
                                 <strong>新規会員登録で今すぐ使える 1,000 ポイント（1,000円分）プレゼント！</strong>
                                 <p>登録完了で即座に付与され、今回・次回のお買い物で1pt＝1円としてご利用いただけます。</p>
@@ -757,13 +1016,15 @@
                         </div>
                     </div>
 
-                    <!-- 未ログイン購入・MANEKIN試行時の案内バナー -->
+                    <!-- 未ログイン購入・MANEKIN試行時に会員登録へ来たときの案内バナー -->
                     <div id="reg-checkout-notice" class="auth-checkout-alert"
                         style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        <!-- 見出し -->
                         <div
                             style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
                             <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
                         </div>
+                        <!-- 説明本文 -->
                         <p id="reg-notice-desc"
                             style="font-size: 0.88rem; color: #595959; margin: 0; line-height: 1.5;">
                             商品をご購入いただくにはアカウントが必要となります。<br>
@@ -771,35 +1032,53 @@
                         </p>
                     </div>
 
+                    <!-- 新規会員登録フォーム -->
                     <form id="register-form" class="auth-form" novalidate>
+                        <!-- 氏名入力欄 -->
                         <div class="form-group">
+                            <!-- ラベル -->
                             <label for="reg-name" class="form-label">氏名 <span class="required">*</span></label>
+                            <!-- 入力欄 -->
                             <input type="text" id="reg-name" class="form-input" placeholder="山田 太郎" required>
+                            <!-- エラー枠 -->
                             <span class="form-error" id="reg-name-error"></span>
                         </div>
 
+                        <!-- メールアドレス入力欄 -->
                         <div class="form-group">
+                            <!-- ラベル -->
                             <label for="reg-email" class="form-label">メールアドレス <span class="required">*</span></label>
+                            <!-- 入力欄 -->
                             <input type="email" id="reg-email" class="form-input" placeholder="example@manekin.com"
                                 required>
+                            <!-- エラー枠 -->
                             <span class="form-error" id="reg-email-error"></span>
                         </div>
 
+                        <!-- パスワード入力欄 -->
                         <div class="form-group">
+                            <!-- ラベル -->
                             <label for="reg-password" class="form-label">パスワード <span class="required">*</span></label>
+                            <!-- 入力欄（8文字以上の制限） -->
                             <input type="password" id="reg-password" class="form-input" placeholder="8文字以上の半角英数字"
                                 required>
+                            <!-- エラー枠 -->
                             <span class="form-error" id="reg-password-error"></span>
                         </div>
 
+                        <!-- 規約同意チェックボックス行（初期checked=同意済み） -->
                         <div class="form-checkbox-group">
+                            <!-- チェックボックス本体 -->
                             <input type="checkbox" id="reg-agree" class="form-checkbox" required checked>
+                            <!-- ラベル -->
                             <label for="reg-agree" class="checkbox-label">利用規約およびプライバシーポリシーに同意します</label>
                         </div>
 
+                        <!-- 登録実行ボタン（押すと /api/register へ送信） -->
                         <button type="submit" class="btn btn-primary btn-block">会員登録を完了する</button>
                     </form>
 
+                    <!-- カード下部：すでに会員の人向けログイン誘導リンク -->
                     <div class="auth-footer">
                         <p class="auth-switch-text">すでにアカウントをお持ちですか？</p>
                         <a href="#login" class="auth-link">ログインはこちら &rarr;</a>
@@ -812,71 +1091,102 @@
         <!-- 9. マイページビュー (MYPAGE)                    -->
         <!-- ============================================== -->
         <section class="page-view" id="view-mypage">
+            <!-- コンテナ枠 -->
             <div class="container page-container">
+                <!-- パンくずリスト -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>MYPAGE</span>
                 </div>
 
-                <!-- マイページヘッダー -->
+                <!-- マイページヘッダーカード（左：アバターと会員情報、右：ログイン/ログアウトボタン） -->
                 <div class="mypage-header-card">
+                    <!-- 会員アバターと基本情報 -->
                     <div class="user-profile-info">
+                        <!-- 名前の頭文字を表示する黒丸アイコン -->
                         <div class="user-avatar-circle">
+                            <!-- 頭文字テキスト（未ログイン時はG） -->
                             <span id="mypage-avatar-initial">G</span>
                         </div>
+                        <!-- 会員名・ランク・メールアドレス列 -->
                         <div class="user-text-details">
+                            <!-- 名前とランクの横並び行 -->
                             <div class="user-title-row">
+                                <!-- 氏名見出し（JSで動的書き換え） -->
                                 <h1 class="user-display-name" id="mypage-user-name">ゲスト 様</h1>
+                                <!-- 会員ステータスバッジ（GUEST / REGULAR MEMBER 等） -->
                                 <span class="membership-badge" id="mypage-user-rank">GUEST</span>
                             </div>
+                            <!-- メールアドレス表示欄 -->
                             <p class="user-display-email" id="mypage-user-email">ログインしていません</p>
                         </div>
                     </div>
-                    <!-- アクションボタン（ログイン / ログアウト） -->
+                    <!-- 右上アクションボタン枠（ログイン時はログアウトボタンへJSで書き換え） -->
                     <div class="mypage-actions" id="mypage-actions-wrapper">
+                        <!-- ログイン誘導ボタン -->
                         <a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>
                     </div>
                 </div>
 
-                <!-- マイページの統計サマリーカード -->
+                <!-- マイページの統計サマリーカード3枚並び（保有ポイント / お気に入り / 注文回数） -->
                 <div class="mypage-stats-grid">
+                    <!-- カード1：保有ポイント数（MySQL users.points と同期） -->
                     <div class="stat-card">
+                        <!-- ラベル -->
                         <span class="stat-label">保有ポイント</span>
+                        <!-- 数値と単位 -->
                         <span class="stat-value" id="mypage-points">0 <span class="stat-unit">pt</span></span>
                     </div>
+                    <!-- カード2：お気に入りアイテム点数 -->
                     <div class="stat-card">
+                        <!-- ラベル -->
                         <span class="stat-label">お気に入りアイテム</span>
+                        <!-- 数値と単位 -->
                         <span class="stat-value" id="mypage-fav-count">0 <span class="stat-unit">点</span></span>
                     </div>
+                    <!-- カード3：確定済み注文回数 -->
                     <div class="stat-card">
+                        <!-- ラベル -->
                         <span class="stat-label">ご注文回数</span>
+                        <!-- 数値と単位 -->
                         <span class="stat-value" id="mypage-order-count">0 <span class="stat-unit">回</span></span>
                     </div>
                 </div>
 
-                <!-- マイページのメインコンテンツタブ -->
+                <!-- マイページ内部の3つの切り替えタブ（data-tab属性と連動） -->
                 <div class="mypage-tabs">
+                    <!-- タブ1：MySQL注文履歴テーブル -->
                     <button class="mypage-tab-btn active" data-tab="orders">購入履歴 (MySQL連携)</button>
+                    <!-- タブ2：お気に入り一覧プレビュー -->
                     <button class="mypage-tab-btn" data-tab="favorites-summary">お気に入りクイック閲覧</button>
+                    <!-- タブ3：システム構成紹介カード群 -->
                     <button class="mypage-tab-btn" data-tab="python-features">Python & MySQL連携機能</button>
                 </div>
 
-                <!-- タブ1: 購入履歴（【要件】購入ボタンを押して購入が完了した商品の一覧を表示） -->
+                <!-- タブ1：購入履歴一覧（ログイン会員自身の注文のみ表示） -->
                 <div class="mypage-tab-content active" id="tab-orders">
+                    <!-- 履歴見出し＋MySQL接続バッジ＋操作ボタン2種を並べた上段バー -->
                     <div class="orders-section-header"
                         style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                        <!-- 見出しとDB接続状態バッジ -->
                         <div>
+                            <!-- 見出し行 -->
                             <h3 class="orders-subheading" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span>ご注文履歴一覧</span>
+                                <!-- /api/health等の通信結果に応じて「MySQL接続中」等に切り替わるピル -->
                                 <span id="mysql-status-pill" style="font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; background: #f3f4f6; color: #4b5563;">DB接続確認中...</span>
                             </h3>
+                            <!-- 説明テキスト -->
                             <p class="orders-info-text">購入手続きが完了した注文が即座に反映されます（MySQLデータベース連携）。</p>
                         </div>
+                        <!-- オフライン時保存データの同期ボタン・履歴初期化ボタン -->
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <!-- LocalStorageにある未送信データをMySQLへ送る手動同期ボタン -->
                             <button type="button" class="btn btn-outline-xs" onclick="handleSyncAllToMySQL()"
                                 style="font-size: 0.75rem; padding: 5px 12px; color: #111; border-color: #111; font-weight: 600;"
                                 title="LocalStorageの注文データ・手持ち服データをMySQLデータベースに同期します">
                                 🔄 LocalStorage ⇄ MySQL 即時同期
                             </button>
+                            <!-- ログイン中アカウントの注文履歴だけを0件にリセットするボタン -->
                             <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
                                 style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
                                 title="テスト注文履歴をリセットして0件にします">
@@ -884,8 +1194,11 @@
                             </button>
                         </div>
                     </div>
+                    <!-- 横スクロール可能な購入履歴テーブル外枠（スマホでも表が崩れません） -->
                     <div class="orders-table-wrapper">
+                        <!-- 注文履歴テーブル本体 -->
                         <table class="orders-table">
+                            <!-- テーブル見出し行 -->
                             <thead>
                                 <tr>
                                     <th>注文番号</th>
@@ -895,7 +1208,9 @@
                                     <th>配送状況</th>
                                 </tr>
                             </thead>
+                            <!-- テーブルデータ行（shop.jsのrenderMyPageでログインユーザーの注文行を挿入） -->
                             <tbody id="orders-table-body">
+                                <!-- 注文が0件のときの初期メッセージ行（colspan="5"で5列分を結合） -->
                                 <tr>
                                     <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
                                         購入履歴はまだありません。商品をお選びいただき購入手続きをお試しください。
@@ -906,35 +1221,44 @@
                     </div>
                 </div>
 
-                <!-- タブ2: お気に入りクイック表示 -->
+                <!-- タブ2：お気に入りクイック表示 -->
                 <div class="mypage-tab-content" id="tab-favorites-summary">
+                    <!-- お気に入り商品グリッド（JSで動的描画） -->
                     <div class="product-grid" id="mypage-fav-grid">
                         <!-- お気に入りアイテムを表示 -->
                     </div>
                 </div>
 
-                <!-- タブ3: Python & MySQL連携機能ロードマップ -->
+                <!-- タブ3：Python & MySQL連携機能ロードマップ・仕様カード一覧 -->
                 <div class="mypage-tab-content" id="tab-python-features">
+                    <!-- 説明カード本体 -->
                     <div class="python-features-card">
+                        <!-- 見出し -->
                         <h3 class="python-card-title">【稼働中】Python & MySQL バックエンド連携機能</h3>
+                        <!-- 概要文 -->
                         <p class="python-card-desc">MANEKIN FASHIONでは、MySQLデータベースとPython
                             API（Flask）により以下の機能がシームレスに連動しています。</p>
+                        <!-- 4つの機能紹介カードリスト -->
                         <div class="python-roadmap-list">
+                            <!-- 機能0：DBトランザクション注文管理 -->
                             <div class="roadmap-item">
                                 <span class="roadmap-badge">Active DB</span>
                                 <h4>MySQL 注文管理トランザクション</h4>
                                 <p>チェックアウト画面で確定したご注文は、MySQLの `orders` および `order_items` テーブルへ安全に永続保存されます。</p>
                             </div>
+                            <!-- 機能1：バーチャル試着 -->
                             <div class="roadmap-item">
                                 <span class="roadmap-badge">Feature 01</span>
                                 <h4>MANEKIN機能 (バーチャルマネキン試着)</h4>
                                 <p>ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用シルエットを事前に確認できる機能です。</p>
                             </div>
+                            <!-- 機能2：マイクローゼット -->
                             <div class="roadmap-item">
                                 <span class="roadmap-badge">Feature 02</span>
                                 <h4>マイクローゼット機能 (手持ち服管理)</h4>
                                 <p>写真一枚で手持ちの服をデジタルクローゼット化。ブランドアイテムとの組み合わせシミュレーションが可能です。</p>
                             </div>
+                            <!-- 機能3：AIコーデ診断 -->
                             <div class="roadmap-item">
                                 <span class="roadmap-badge">Feature 03</span>
                                 <h4>AIコーデ提案機能 (スマートスタイリスト)</h4>
@@ -950,25 +1274,34 @@
         <!-- 10. 会員限定 AIコーデシミュレーション (MANEKIN STUDIO) -->
         <!-- ============================================== -->
         <section class="page-view" id="view-manekin-studio">
+            <!-- スタジオ用ワイドコンテナ（最大幅1320px） -->
             <div class="container studio-container">
                 <!-- ページパンくずナビ -->
                 <div class="page-breadcrumb">
                     <a href="#home">HOME</a> &gt; <span>MANEKIN STUDIO</span>
                 </div>
 
-                <!-- スタジオヘッダー -->
+                <!-- スタジオ上部の白いヘッダーカード -->
                 <div class="studio-header-card">
+                    <!-- 左側：バッジとタイトル説明 -->
                     <div class="studio-header-text">
+                        <!-- 2連バッジ行 -->
                         <div class="studio-title-badge">
                             <span class="badge-sparkle">✨ AI POWERED</span>
                             <span class="badge-exclusive">MEMBER ONLY</span>
                         </div>
+                        <!-- 大見出し -->
                         <h1 class="studio-title">MANEKIN AI STUDIO</h1>
+                        <!-- 説明文 -->
                         <p class="studio-subtitle">手持ちの服とブランドアイテムをバーチャル試着。AIスタイリストがあなただけの最適なコーデを評価します。</p>
                     </div>
+                    <!-- 右側：現在のログイン会員チップ -->
                     <div class="studio-header-user">
+                        <!-- 会員カプセル枠 -->
                         <div class="user-chip">
+                            <!-- 頭文字丸アバター -->
                             <span class="user-chip-avatar" id="studio-avatar-char">G</span>
+                            <!-- 名前・ランクテキスト列 -->
                             <div class="user-chip-info">
                                 <span class="user-chip-name" id="studio-user-name">ゲスト 様</span>
                                 <span class="user-chip-rank" id="studio-user-rank">GUEST</span>
@@ -977,16 +1310,20 @@
                     </div>
                 </div>
 
-                <!-- ダッシュボード サブナビゲーション（タブ） -->
+                <!-- スタジオ内部ダッシュボードの5タブ切り替えナビゲーションバー -->
                 <nav class="studio-nav-tabs" aria-label="スタジオナビゲーション">
+                    <!-- タブボタン1：ホーム（サマリーとショートカット） -->
                     <button class="studio-tab-btn" data-studio-tab="home" onclick="switchStudioTab('home')">
+                        <!-- 家SVGアイコン -->
                         <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                         <span>ホーム</span>
                     </button>
+                    <!-- タブボタン2：マイクローゼット管理画面（件数バッジ付き） -->
                     <button class="studio-tab-btn" data-studio-tab="closet" onclick="switchStudioTab('closet')">
+                        <!-- カレンダー/クローゼット風SVGアイコン -->
                         <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -994,30 +1331,40 @@
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
                         <span>マイクローゼット</span>
+                        <!-- 登録中の手持ち服総数バッジ -->
                         <span class="tab-badge" id="studio-closet-badge">0</span>
                     </button>
+                    <!-- タブボタン3：お気に入りブランドアイテム一覧 -->
                     <button class="studio-tab-btn" data-studio-tab="favorites" onclick="switchStudioTab('favorites')">
+                        <!-- ハートSVGアイコン -->
                         <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path
                                 d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
                             </path>
                         </svg>
                         <span>お気に入り商品</span>
+                        <!-- お気に入り総数バッジ -->
                         <span class="tab-badge" id="studio-fav-badge">0</span>
                     </button>
+                    <!-- タブボタン4：メインのバーチャル試着スタジオ（初期表示active） -->
                     <button class="studio-tab-btn active" data-studio-tab="create" onclick="switchStudioTab('create')">
+                        <!-- スパークル/コンパス風SVGアイコン -->
                         <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polygon points="12 8 8 12 12 16 16 12 12 8"></polygon>
                         </svg>
                         <span>★ コーデ作成</span>
+                        <!-- 黒い強調タグ -->
                         <span class="tab-highlight-tag">STUDIO</span>
                     </button>
+                    <!-- タブボタン5：保存したコーディネート（ルックブック）一覧 -->
                     <button class="studio-tab-btn" data-studio-tab="saved" onclick="switchStudioTab('saved')">
+                        <!-- ブックマークSVGアイコン -->
                         <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                         </svg>
                         <span>保存したコーデ</span>
+                        <!-- 保存済みコーデ数バッジ -->
                         <span class="tab-badge" id="studio-saved-badge">0</span>
                     </button>
 
@@ -1027,8 +1374,9 @@
                 <!-- パネル1: ホーム（ダッシュボード） -->
                 <!-- ============================== -->
                 <div class="studio-pane" id="studio-pane-home">
-                    <!-- サマリーステータス -->
+                    <!-- 3枚並びのステータス集計カード -->
                     <div class="studio-stats-grid">
+                        <!-- 統計1：手持ち服 -->
                         <div class="studio-stat-card">
                             <span class="stat-icon-wrap">👕</span>
                             <div>
@@ -1036,6 +1384,7 @@
                                 <span class="stat-card-val" id="home-stat-closet">0 <small>点</small></span>
                             </div>
                         </div>
+                        <!-- 統計2：保存コーデ -->
                         <div class="studio-stat-card">
                             <span class="stat-icon-wrap">✨</span>
                             <div>
@@ -1043,6 +1392,7 @@
                                 <span class="stat-card-val" id="home-stat-saved">0 <small>組</small></span>
                             </div>
                         </div>
+                        <!-- 統計3：お気に入り服 -->
                         <div class="studio-stat-card">
                             <span class="stat-icon-wrap">♥</span>
                             <div>
@@ -1052,31 +1402,40 @@
                         </div>
                     </div>
 
-                    <!-- AI本日のレコメンドバナー -->
+                    <!-- 本日のAIおすすめコーディネート提案バナー -->
                     <div class="studio-recommend-banner">
+                        <!-- バッジ -->
                         <div class="banner-badge">TODAY'S AI STYLING</div>
+                        <!-- 提案タイトル -->
                         <h3 class="banner-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
+                        <!-- 提案説明文 -->
                         <p class="banner-desc">あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
                             ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
+                        <!-- 操作ボタン群 -->
                         <div class="banner-actions">
+                            <!-- クリック1回でおすすめ構成を一括試着するボタン -->
                             <button class="btn btn-primary"
                                 onclick="applyPresetLook('trench_daily')">このおすすめをマネキンで試着する</button>
+                            <!-- 白紙から試着画面を開くボタン -->
                             <button class="btn btn-outline" onclick="switchStudioTab('create')">自由にコーデを作成する</button>
                         </div>
                     </div>
 
-                    <!-- クイックショートカットカード -->
+                    <!-- よく使う機能への3枚ショートカットカード -->
                     <div class="studio-quick-cards">
+                        <!-- ショートカット1：手持ち服登録モーダルを開く -->
                         <div class="quick-card" onclick="openAddClosetModal()">
                             <div class="quick-card-icon">➕</div>
                             <h4>手持ちの服を新しく登録</h4>
                             <p>写真やメモを追加して、クローゼットをデジタル化しましょう。</p>
                         </div>
+                        <!-- ショートカット2：試着室へ移動 -->
                         <div class="quick-card" onclick="switchStudioTab('create')">
                             <div class="quick-card-icon">🪞</div>
                             <h4>マネキン試着スタジオを開く</h4>
                             <p>3カラムのシミュレーターで、手持ち服とブランド服を着せ替え試着。</p>
                         </div>
+                        <!-- ショートカット3：保存コーデ集へ移動 -->
                         <div class="quick-card" onclick="switchStudioTab('saved')">
                             <div class="quick-card-icon">📖</div>
                             <h4>保存したコーデ（ルックブック）</h4>
@@ -1089,11 +1448,14 @@
                 <!-- パネル2: マイクローゼット         -->
                 <!-- ============================== -->
                 <div class="studio-pane" id="studio-pane-closet">
+                    <!-- 上部見出しと「+ 手持ちの服を登録する」ボタン -->
                     <div class="pane-action-bar">
+                        <!-- 左見出しブロック -->
                         <div class="pane-action-left">
                             <h2 class="pane-title">マイクローゼット <small class="text-muted">（手持ち服一覧）</small></h2>
                             <p class="pane-desc">所有している服を登録しておくと、コーデ作成スタジオでブランド商品と自由に組み合わせられます。</p>
                         </div>
+                        <!-- 右新規登録ボタン -->
                         <div class="pane-action-right">
                             <button class="btn btn-primary" onclick="openAddClosetModal()">
                                 <span>+ 手持ちの服を登録する</span>
@@ -1101,23 +1463,29 @@
                         </div>
                     </div>
 
-                    <!-- カテゴリフィルター -->
+                    <!-- 手持ち服一覧のカテゴリ絞り込みピルバー（帽子・アウター・トップス・ボトムス・靴のみ） -->
                     <div class="closet-filter-bar" id="pane-closet-filter-bar">
+                        <!-- すべて表示 -->
                         <button class="filter-pill active" data-cat="ALL" onclick="handlePaneClosetFilter('ALL')">ALL
                             (すべて)</button>
+                        <!-- 帽子 -->
                         <button class="filter-pill" data-cat="HAT" onclick="handlePaneClosetFilter('HAT')">帽子
                             (ハット/キャップ)</button>
+                        <!-- アウター -->
                         <button class="filter-pill" data-cat="OUTER"
                             onclick="handlePaneClosetFilter('OUTER')">アウター</button>
+                        <!-- トップス -->
                         <button class="filter-pill" data-cat="TOPS"
                             onclick="handlePaneClosetFilter('TOPS')">トップス</button>
+                        <!-- ボトムス -->
                         <button class="filter-pill" data-cat="BOTTOMS"
                             onclick="handlePaneClosetFilter('BOTTOMS')">ボトムス</button>
+                        <!-- 靴 -->
                         <button class="filter-pill" data-cat="SHOES" onclick="handlePaneClosetFilter('SHOES')">靴
                             (シューズ)</button>
                     </div>
 
-                    <!-- クローゼットグリッド -->
+                    <!-- 登録済み手持ち服カードのグリッド表示領域（studio.jsが描画） -->
                     <div class="closet-grid" id="closet-items-grid">
                         <!-- JSで動的描画 -->
                     </div>
@@ -1127,12 +1495,14 @@
                 <!-- パネル3: お気に入り商品         -->
                 <!-- ============================== -->
                 <div class="studio-pane" id="studio-pane-favorites">
+                    <!-- ヘッダーバー -->
                     <div class="pane-action-bar">
                         <div class="pane-action-left">
                             <h2 class="pane-title">お気に入りブランドアイテム</h2>
                             <p class="pane-desc">ECサイト上でハートを付けたアイテムです。ワンクリックでマネキンに着せ替えて手持ち服との相性を確認できます。</p>
                         </div>
                     </div>
+                    <!-- お気に入りブランド商品グリッド（JSで動的描画） -->
                     <div class="product-grid" id="studio-fav-grid">
                         <!-- JSで動的描画 -->
                     </div>
@@ -1142,22 +1512,26 @@
                 <!-- パネル4: ★ コーデ作成 (STUDIO)  -->
                 <!-- ============================== -->
                 <div class="studio-pane active" id="studio-pane-create">
-                    <!-- モバイル専用：ビュー切り替えセグメントタブ -->
+                    <!-- モバイル専用（768px以下）：手持ち服 / マネキン / ブランドの3タブ切り替えバー -->
                     <div class="studio-mobile-tabs" id="studio-mobile-tabs">
+                        <!-- マネキン画面ボタン -->
                         <button class="mobile-tab-btn active" data-mobile-view="mannequin"
                             onclick="switchMobileStudioView('mannequin')">マネキン試着室</button>
+                        <!-- 手持ち服リストボタン -->
                         <button class="mobile-tab-btn" data-mobile-view="closet"
                             onclick="switchMobileStudioView('closet')">手持ちの服 (<span
                                 id="mob-closet-cnt">0</span>)</button>
+                        <!-- ブランド商品リストボタン -->
                         <button class="mobile-tab-btn" data-mobile-view="brand"
                             onclick="switchMobileStudioView('brand')">ブランド商品 (<span
                                 id="mob-brand-fav-cnt">0</span>)</button>
                     </div>
 
-                    <!-- 3カラム・シミュレーションスタジオグリッド -->
+                    <!-- PC 3カラム・シミュレーションスタジオグリッド（左：手持ち服、中央：マネキン、右：ブランド服） -->
                     <div class="studio-workspace-grid" id="studio-workspace-grid">
                         <!-- ◀ 左カラム: マイクローゼット（手持ち服） -->
                         <div class="studio-col studio-col-left" id="col-studio-closet">
+                            <!-- 左カラム見出しと「+ 登録」ボタン -->
                             <div class="col-header">
                                 <div class="col-title-wrap">
                                     <h3 class="col-title">1. 手持ちの服</h3>
@@ -1166,56 +1540,78 @@
                                 <button class="btn btn-outline-xs" onclick="openAddClosetModal()">+ 登録</button>
                             </div>
 
-                            <!-- フィルターチップ -->
+                            <!-- 左カラム用ミニカテゴリ絞り込みチップバー -->
                             <div class="mini-filter-bar" id="col-closet-filter">
+                                <!-- すべて -->
                                 <button class="mini-chip active" data-cat="ALL"
                                     onclick="handleStudioClosetFilter('ALL')">ALL</button>
+                                <!-- 帽子 -->
                                 <button class="mini-chip" data-cat="HAT"
                                     onclick="handleStudioClosetFilter('HAT')">帽子</button>
+                                <!-- アウター -->
                                 <button class="mini-chip" data-cat="OUTER"
                                     onclick="handleStudioClosetFilter('OUTER')">アウター</button>
+                                <!-- トップス -->
                                 <button class="mini-chip" data-cat="TOPS"
                                     onclick="handleStudioClosetFilter('TOPS')">トップス</button>
+                                <!-- ボトムス -->
                                 <button class="mini-chip" data-cat="BOTTOMS"
                                     onclick="handleStudioClosetFilter('BOTTOMS')">ボトムス</button>
+                                <!-- 靴 -->
                                 <button class="mini-chip" data-cat="SHOES"
                                     onclick="handleStudioClosetFilter('SHOES')">靴</button>
                             </div>
 
-                            <!-- アイテムリスト -->
+                            <!-- スクロール可能な手持ち服ミニカードリスト（JS描画） -->
                             <div class="studio-item-list" id="studio-closet-list">
                                 <!-- JS描画 -->
                             </div>
                         </div>
 
                         <!-- ◆ 中央カラム: 試着ステージ -->
+                        <!-- 画面の中央に配置される「バーチャル試着室」全体のコンテナ枠です -->
                         <div class="studio-col studio-col-center" id="col-studio-mannequin">
+                            <!-- 試着室の上部操作バー（ツールバー）。縦積みレイアウト用のstyleを指定しています -->
                             <div class="mannequin-toolbar"
                                 style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
+                                <!-- 上段：試着室のタイトルタグを左寄せで表示する箱です -->
                                 <div class="toolbar-left" style="width: 100%;">
+                                    <!-- 「2. 試着室」を示すバッジラベルです -->
                                     <span class="stage-tag">2. 試着室</span>
                                 </div>
+                                <!-- 下段：微調整ボタン・性別切替・クリアボタンを折り返しありで横並びにする箱です -->
                                 <div class="toolbar-right"
                                     style="display: flex; align-items: center; justify-content: flex-start; gap: 6px; flex-wrap: wrap; width: 100%;">
+                                    <!-- クリックすると toggleFittingAdjustPanel() が呼ばれ、服の位置・サイズ微調整パネルを開閉します -->
                                     <button class="btn-toolbar-adjust" id="btn-toggle-adjust-mode"
                                         onclick="toggleFittingAdjustPanel()" title="服の位置やサイズを微調整する">
+                                        <!-- 鉛筆アイコンをベクター図形（SVG）で描画しています -->
                                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
                                             stroke="currentColor" stroke-width="2">
+                                            <!-- 下線のパスを描きます -->
                                             <path d="M12 20h9"></path>
+                                            <!-- 鉛筆本体のパスを描きます -->
                                             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                                         </svg>
                                         位置・サイズ微調整
                                     </button>
+                                    <!-- マネキンおよびブランド商品の性別（MEN / WOMEN）を切り替えるボタングループです -->
                                     <div class="gender-toggle-wrap">
+                                        <!-- MEN モードに切り替えるボタン（初期状態は active クラスで選択中表示）です -->
                                         <button class="btn-gender active" id="btn-gender-men"
                                             onclick="setMannequinGender('MEN')">MEN</button>
+                                        <!-- WOMEN モードに切り替えるボタンです -->
                                         <button class="btn-gender" id="btn-gender-women"
                                             onclick="setMannequinGender('WOMEN')">WOMEN</button>
                                     </div>
+                                    <!-- クリックすると clearMannequin() が呼ばれ、着せている全アイテムをリセットします -->
                                     <button class="btn-toolbar-clear" onclick="clearMannequin()" title="着用中の服をすべて脱がせる">
+                                        <!-- ゴミ箱アイコンをSVGで描画しています -->
                                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none"
                                             stroke="currentColor" stroke-width="2">
+                                            <!-- ゴミ箱のフタの横線です -->
                                             <path d="M3 6h18"></path>
+                                            <!-- ゴミ箱の本体と取っ手の形です -->
                                             <path
                                                 d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
                                             </path>
@@ -1226,223 +1622,322 @@
                             </div>
 
                             <!-- ビジュアルステージ -->
+                            <!-- ドラッグ＆ドロップ対応（ondragover / ondragleave / ondrop）の試着ステージ本体です -->
                             <div class="mannequin-stage-box" id="mannequin-stage-box"
                                 ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)"
                                 ondrop="handleStageDrop(event)">
                                 <!-- マネキン本体と重ね着レイヤー群 -->
+                                <!-- 背景のスタンドSVGと、その上に重ねる5つの衣類レイヤーをまとめる親要素です -->
                                 <div class="mannequin-model-wrap" id="mannequin-model-wrap">
                                     <!-- 直立クロームスタンド仕様（ゴーストマネキン表示・マネキン本体は非表示） -->
+                                    <!-- 座標 0,0〜300,640 の空間にマネキンスタンドを描くSVGキャンバスです -->
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
+                                        <!-- defs は後から fill="url(#ID名)" で再利用するグラデーション定義置き場です -->
                                         <defs>
                                             <!-- メタリッククローム支柱ポール -->
+                                            <!-- 左から右（x1="0%" → x2="100%"）へ光沢が変化する金属柱用の線形グラデーションです -->
                                             <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <!-- 左端 0% のハイライト（白）です -->
                                                 <stop offset="0%" stop-color="#ffffff" />
+                                                <!-- 20% 位置の明るい銀色です -->
                                                 <stop offset="20%" stop-color="#e2e8f0" />
+                                                <!-- 中央 50% の落ち着いたグレー金属色です -->
                                                 <stop offset="50%" stop-color="#64748b" />
+                                                <!-- 75% 位置の反射ハイライトです -->
                                                 <stop offset="75%" stop-color="#cbd5e1" />
+                                                <!-- 右端 100% の暗い影色です -->
                                                 <stop offset="100%" stop-color="#334155" />
                                             </linearGradient>
                                             <!-- メタリックフロア台座プレート -->
+                                            <!-- 上から下（y1="0%" → y2="100%"）へ明るさが変わる床プレート用グラデーションです -->
                                             <linearGradient id="chromePlateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <!-- 手前上部 0% の非常に明るい白銀色です -->
                                                 <stop offset="0%" stop-color="#f8fafc" />
+                                                <!-- 40% 位置のシルバー色です -->
                                                 <stop offset="40%" stop-color="#e2e8f0" />
+                                                <!-- 85% 位置の濃いグレーです -->
                                                 <stop offset="85%" stop-color="#94a3b8" />
+                                                <!-- 奥下部 100% の暗い影色です -->
                                                 <stop offset="100%" stop-color="#64748b" />
                                             </linearGradient>
                                         </defs>
 
                                         <!-- 1. 背景側：クロームスタンド支柱（脚の奥から床へ） -->
+                                        <!-- g タグは複数の図形をグループ化するコンテナです（支柱パーツ一式） -->
                                         <g id="stand-pole-group">
                                             <!-- 支柱ポール（股下から床プレートまで） -->
+                                            <!-- 縦長の角丸四角形（width=8, height=190）で中央の金属ポールを描きます -->
                                             <rect x="146" y="425" width="8" height="190" rx="3"
                                                 fill="url(#chromePoleGrad)" />
                                             <!-- 高さ調節金具ノブ -->
+                                            <!-- ポール途中の締め具ブロックを描きます -->
                                             <rect x="143" y="478" width="14" height="12" rx="2" fill="#94a3b8" />
+                                            <!-- 締め具のネジつまみを小さな円（circle）で表現しています -->
                                             <circle cx="157" cy="484" r="3" fill="#64748b" />
                                         </g>
 
                                         <!-- 6. 床面：写真と同じ四角いクロームメタリック台座＆シャドウ -->
+                                        <!-- 台座と床の影をまとめるグループです -->
                                         <g id="stand-base-group">
                                             <!-- 床のソフトドロップシャドウ -->
+                                            <!-- 半透明の黒（rgba(0,0,0,0.12)）の楕円で床に落ちる影を描きます -->
                                             <ellipse cx="150" cy="627" rx="72" ry="10" fill="rgba(0, 0, 0, 0.12)" />
                                             <!-- 四角いステンレスベースプレート（上面パース） -->
+                                            <!-- polygon は頂点座標をつないで台形を描き、遠近感のある台座天板を作ります -->
                                             <polygon points="85 614, 215 614, 235 628, 65 628"
                                                 fill="url(#chromePlateGrad)" />
                                             <!-- プレート厚み（側面） -->
+                                            <!-- 天板の下に濃い色の長方形を配置して立体的な厚みを表現しています -->
                                             <polygon points="65 628, 235 628, 235 632, 65 632" fill="#475569" />
                                             <!-- ポール接合リング（フランジ） -->
+                                            <!-- ポール根元の外周リング（暗い楕円）です -->
                                             <ellipse cx="150" cy="616" rx="10" ry="4" fill="#64748b" />
+                                            <!-- 外周リングの上に少し小さい明るい楕円を重ねて立体感を出しています -->
                                             <ellipse cx="150" cy="615" rx="8" ry="3" fill="#cbd5e1" />
                                         </g>
                                     </svg>
 
                                     <!-- 4層のバーチャル試着レイヤー（服・ボトムスの自然な重ね合わせ） -->
+                                    <!-- CSSの z-index（重なり順）により、靴 ＜ ボトムス ＜ トップス ＜ アウター ＜ 帽子 の順に重ねて試着表示します -->
                                     <!-- 1. 靴レイヤー -->
                                     <div class="layer-slot layer-shoes" id="layer-shoes">
+                                        <!-- JavaScript がここに靴の img 画像を差し込みます -->
                                         <div class="layer-content" id="layer-content-shoes"></div>
                                     </div>
                                     <!-- 2. ボトムスレイヤー -->
                                     <div class="layer-slot layer-bottoms" id="layer-bottoms">
+                                        <!-- JavaScript がここにパンツ・スカート等の画像を差し込みます -->
                                         <div class="layer-content" id="layer-content-bottoms"></div>
                                     </div>
                                     <!-- 3. トップスレイヤー -->
                                     <div class="layer-slot layer-tops" id="layer-tops">
+                                        <!-- JavaScript がここにシャツ・ニット等の画像を差し込みます -->
                                         <div class="layer-content" id="layer-content-tops"></div>
                                     </div>
                                     <!-- 4. アウターレイヤー -->
                                     <div class="layer-slot layer-outer" id="layer-outer">
+                                        <!-- JavaScript がここにコート・ジャケット等の画像を差し込みます -->
                                         <div class="layer-content" id="layer-content-outer"></div>
                                     </div>
                                     <!-- 5. 帽子レイヤー -->
                                     <div class="layer-slot layer-hat" id="layer-hat">
+                                        <!-- JavaScript がここにキャップ・ハット等の画像を差し込みます -->
                                         <div class="layer-content" id="layer-content-hat"></div>
                                     </div>
                                 </div>
                                 <!-- 服の位置・サイズ微調整コントロールパネル -->
+                                <!-- 初期状態は display: none; で非表示。ツールバーのボタンを押すと表示されるフローティング操作パネルです -->
                                 <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
+                                    <!-- 微調整パネルのヘッダー行（タイトルとリセット／閉じるボタン） -->
                                     <div class="adjust-panel-header">
+                                        <!-- 左側のアイコンとタイトル文字列の箱です -->
                                         <div class="adjust-header-title">
+                                            <!-- 三角定規の絵文字アイコンです -->
                                             <span class="adjust-icon">📐</span>
+                                            <!-- パネルタイトル文字です -->
                                             <span class="adjust-title-text">服の位置・サイズ微調整</span>
                                         </div>
+                                        <!-- 右側の「リセット」と「×」ボタンをまとめる箱です -->
                                         <div class="adjust-header-btns">
+                                            <!-- クリックすると resetFittingOffsets() で現在選択中のカテゴリ位置・サイズを初期値へ戻します -->
                                             <button type="button" class="btn-adjust-reset"
                                                 onclick="resetFittingOffsets()" title="初期値に戻す">リセット</button>
+                                            <!-- クリックするとパネルを閉じます -->
                                             <button type="button" class="btn-adjust-close"
                                                 onclick="toggleFittingAdjustPanel()" title="パネルを閉じる">×</button>
                                         </div>
                                     </div>
 
                                     <!-- 調整対象カテゴリタブ -->
+                                    <!-- どの部位（帽子・アウター・トップス・ボトムス・靴）を調整するか切り替えるタブ群です -->
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
+                                        <!-- 帽子スロットを選択します -->
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="hat"
                                             onclick="switchAdjustSlot('hat')">帽子</button>
+                                        <!-- アウタ―スロットを選択します（初期状態で active） -->
                                         <button type="button" class="adjust-tab-btn active" data-adjust-slot="outer"
                                             onclick="switchAdjustSlot('outer')">アウター</button>
+                                        <!-- トップススロットを選択します -->
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="tops"
                                             onclick="switchAdjustSlot('tops')">トップス</button>
+                                        <!-- ボトムススロットを選択します -->
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="bottoms"
                                             onclick="switchAdjustSlot('bottoms')">ボトムス</button>
+                                        <!-- 靴スロットを選択します -->
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="shoes"
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
 
                                     <!-- 対象アイテム状態インジケーター（販売商品／マイクローゼット判別） -->
+                                    <!-- 今調整しようとしているアイテムが「ブランド販売品」か「手持ち服」かを表示するステータス行です -->
                                     <div class="adjust-item-status" id="adjust-item-status">
+                                        <!-- 左側に種別バッジとアイテム名を並べます -->
                                         <div class="adjust-item-meta-left">
+                                            <!-- JSによって「販売商品」または「手持ち服」に切り替わるバッジです -->
                                             <span class="adjust-item-tag brand" id="adjust-item-badge">販売商品</span>
+                                            <!-- 着用中のアイテム名が入ります（未着用時は「未着用」） -->
                                             <span class="adjust-item-name" id="adjust-item-name">未着用</span>
                                         </div>
+                                        <!-- 右側にサイズ制御ルールの補足（XS〜XL規格サイズ／自由拡大縮小）を表示します -->
                                         <span class="adjust-item-type-desc" id="adjust-item-type-desc">XS〜XL規格サイズ</span>
                                     </div>
 
                                     <!-- スライダー操作群 -->
+                                    <!-- Y座標・X座標・サイズ調整スライダーを並べるエリアです -->
                                     <div class="adjust-sliders-body">
                                         <!-- 上下位置 (Y Offset) -->
+                                        <!-- 縦方向の表示位置をずらすスライダー行です -->
                                         <div class="adjust-slider-row">
+                                            <!-- ラベルと現在値（例: 0px）の表示行です -->
                                             <div class="slider-meta">
+                                                <!-- 項目名ラベルです -->
                                                 <span class="slider-name">上下位置 (Y)</span>
+                                                <!-- 現在の Y オフセット値（px単位）をJSが書き換えます -->
                                                 <span class="slider-val" id="val-adjust-y">0px</span>
                                             </div>
+                                            <!-- 上下ボタンとスライダーバーを横並びにするラッパーです -->
                                             <div class="slider-input-wrap">
+                                                <!-- クリックで Y 座標を -2px（上方向）へ微移動します -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('y', -2)">▲</button>
+                                                <!-- -60px〜+60px の範囲を 1px 刻みで動かせるスライダー。動かすたび oninput で即時反映します -->
                                                 <input type="range" class="adjust-range" id="slider-adjust-y" min="-60"
                                                     max="60" value="0" step="1"
                                                     oninput="handleAdjustInput('y', this.value)">
+                                                <!-- クリックで Y 座標を +2px（下方向）へ微移動します -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('y', 2)">▼</button>
                                             </div>
                                         </div>
 
                                         <!-- 左右位置 (X Offset) -->
+                                        <!-- 横方向の表示位置をずらすスライダー行です -->
                                         <div class="adjust-slider-row">
+                                            <!-- ラベルと現在値（例: 0px）の表示行です -->
                                             <div class="slider-meta">
+                                                <!-- 項目名ラベルです -->
                                                 <span class="slider-name">左右位置 (X)</span>
+                                                <!-- 現在の X オフセット値（px単位）をJSが書き換えます -->
                                                 <span class="slider-val" id="val-adjust-x">0px</span>
                                             </div>
+                                            <!-- 左右ボタンとスライダーバーの横並びラッパーです -->
                                             <div class="slider-input-wrap">
+                                                <!-- クリックで X 座標を -2px（左方向）へ微移動します -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('x', -2)">◀</button>
+                                                <!-- -40px〜+40px の範囲を 1px 刻みで調整するレンジスライダーです -->
                                                 <input type="range" class="adjust-range" id="slider-adjust-x" min="-40"
                                                     max="40" value="0" step="1"
                                                     oninput="handleAdjustInput('x', this.value)">
+                                                <!-- クリックで X 座標を +2px（右方向）へ微移動します -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('x', 2)">▶</button>
                                             </div>
                                         </div>
 
                                         <!-- 【販売されている服】XS〜XLの5段階サイズ選択スライダー -->
+                                        <!-- ブランド商品は現実のサイズ展開に合わせ、0(XS)〜4(XL)の5段階で拡大率を切り替えます -->
                                         <div class="adjust-slider-row adjust-slider-row-brand"
                                             id="adjust-row-scale-brand">
+                                            <!-- ラベルと現在選ばれている規格サイズ文字（M等）を表示します -->
                                             <div class="slider-meta">
+                                                <!-- 項目名ラベルです -->
                                                 <span class="slider-name">商品サイズ</span>
+                                                <!-- 選択サイズバッジ（XS / S / M / L / XL）です -->
                                                 <span class="slider-val brand-size-badge"
                                                     id="val-adjust-brand-size">M</span>
                                             </div>
+                                            <!-- マイナスボタン＋目盛り付きスライダー＋プラスボタンの並びです -->
                                             <div class="slider-input-wrap slider-brand-wrap">
+                                                <!-- 1段階小さいサイズへ変更します -->
                                                 <button type="button" class="btn-step" id="btn-brand-size-minus"
                                                     onclick="stepBrandSize(-1)" title="1サイズ小さく">－</button>
+                                                <!-- スライダー本体と下の目盛り文字を縦に並べるコンテナです -->
                                                 <div class="brand-slider-container">
+                                                    <!-- 0〜4 の整数ステップで動く5段階スライダー（初期値 2 = M）です -->
                                                     <input type="range" class="adjust-range adjust-range-brand"
                                                         id="slider-adjust-brand-size" min="0" max="4" value="2" step="1"
                                                         oninput="handleBrandSizeInput(this.value)">
+                                                    <!-- スライダー下部にクリック可能な XS〜XL 目盛りラベルを並べます -->
                                                     <div class="brand-size-ticks" id="brand-size-ticks">
+                                                        <!-- インデックス 0 = XS サイズ -->
                                                         <span class="brand-size-tick" data-size-idx="0"
                                                             onclick="handleBrandSizeInput(0)">XS</span>
+                                                        <!-- インデックス 1 = S サイズ -->
                                                         <span class="brand-size-tick" data-size-idx="1"
                                                             onclick="handleBrandSizeInput(1)">S</span>
+                                                        <!-- インデックス 2 = M サイズ（初期アクティブ） -->
                                                         <span class="brand-size-tick active" data-size-idx="2"
                                                             onclick="handleBrandSizeInput(2)">M</span>
+                                                        <!-- インデックス 3 = L サイズ -->
                                                         <span class="brand-size-tick" data-size-idx="3"
                                                             onclick="handleBrandSizeInput(3)">L</span>
+                                                        <!-- インデックス 4 = XL サイズ -->
                                                         <span class="brand-size-tick" data-size-idx="4"
                                                             onclick="handleBrandSizeInput(4)">XL</span>
                                                     </div>
                                                 </div>
+                                                <!-- 1段階大きいサイズへ変更します -->
                                                 <button type="button" class="btn-step" id="btn-brand-size-plus"
                                                     onclick="stepBrandSize(1)" title="1サイズ大きく">＋</button>
                                             </div>
                                         </div>
 
                                         <!-- 【手持ちの服】自由な拡大・縮小スライダー (Scale: 70%〜140%) -->
+                                        <!-- 手持ち服（写真などサイズ規格が無い服）用。70%〜140%を自由比率で拡縮します（初期は非表示） -->
                                         <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free"
                                             style="display: none;">
+                                            <!-- ラベルと現在のパーセント表示行です -->
                                             <div class="slider-meta">
+                                                <!-- 項目名ラベルです -->
                                                 <span class="slider-name">見た目サイズ</span>
+                                                <!-- 現在の拡大率（例: 100%）です -->
                                                 <span class="slider-val" id="val-adjust-scale">100%</span>
                                             </div>
+                                            <!-- －ボタン・スライダー・＋ボタンを横に並べます -->
                                             <div class="slider-input-wrap">
+                                                <!-- 拡大率を -3% 小さくします -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('scale', -3)">－</button>
+                                                <!-- 70%〜140% を 1% 刻みで動かすスライダーです -->
                                                 <input type="range" class="adjust-range" id="slider-adjust-scale"
                                                     min="70" max="140" value="100" step="1"
                                                     oninput="handleAdjustInput('scale', this.value)">
+                                                <!-- 拡大率を +3% 大きくします -->
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('scale', 3)">＋</button>
                                             </div>
                                         </div>
                                     </div>
 
+                                    <!-- 微調整パネルのフッター説明文です -->
                                     <div class="adjust-panel-footer">
+                                        <!-- リアルタイム反映と LocalStorage 自動保存の案内テキストです -->
                                         <span class="adjust-hint">💡 スライダーやボタンでリアルタイムに位置を合わせられます（自動保存）</span>
                                     </div>
                                 </div>
 
                                 <!-- 着用中スロットクイック解除バー -->
+                                <!-- マネキン足元などに、現在着ている服のチップ（タップで脱ぐボタン付き）をJSが生成します -->
                                 <div class="wearing-slots-bar" id="wearing-slots-bar">
                                     <!-- JSでスロットチップを描画 -->
                                 </div>
                             </div>
 
                             <!-- ブランド服購入サマリー & 1クリックカート追加バー -->
+                            <!-- 試着中の「ブランド商品」のみの合計点数・合計金額を表示し、ワンクリックでカートに入れるバーです -->
                             <div class="stage-brand-summary" id="stage-brand-summary">
+                                <!-- 点数と金額を横並びで表示するエリアです -->
                                 <div class="brand-sum-info">
+                                    <!-- 見出しラベルです -->
                                     <span class="sum-label">着用中ブランド品:</span>
+                                    <!-- 着用点数が入ります（例: 2点） -->
                                     <span class="sum-items-count" id="brand-sum-count">0点</span>
+                                    <!-- 着用ブランド商品の合計金額が入ります -->
                                     <span class="sum-total-price" id="brand-sum-price">¥0</span>
                                 </div>
+                                <!-- ブランド品を1着以上着ていると活性化する（disabledが外れる）カート一括追加ボタンです -->
                                 <button class="btn btn-primary btn-sm" id="btn-add-brand-to-cart"
                                     onclick="addCurrentBrandItemsToCart()" disabled>
                                     <span>着用アイテムをカートに追加</span>
@@ -1451,28 +1946,40 @@
                         </div>
 
                         <!-- ▶ 右カラム: ブランドアイテム一覧 -->
+                        <!-- 画面右側に配置する、お気に入り／ブランド商品から服を選んで試着させるカラムです -->
                         <div class="studio-col studio-col-right" id="col-studio-brand">
+                            <!-- 右カラム上部の見出しエリアです -->
                             <div class="col-header">
+                                <!-- タイトル文字と「お気に入り」バッジのセットです -->
                                 <div class="col-title-wrap">
+                                    <!-- カラム見出しです -->
                                     <h3 class="col-title">3. ブランド商品</h3>
+                                    <!-- お気に入り連動であることを示す小バッジです -->
                                     <span class="col-badge col-badge-fav">お気に入り</span>
                                 </div>
+                                <!-- 商品一覧ページ（#items）へ飛んで新しい服を探せるリンクボタンです -->
                                 <a href="#items" class="btn btn-outline-xs" title="商品一覧でお気に入り商品を探す">+ 探す</a>
                             </div>
 
                             <!-- フィルターチップ -->
+                            <!-- ブランド商品リストをカテゴリで絞り込むボタンバーです -->
                             <div class="mini-filter-bar" id="col-brand-filter">
+                                <!-- すべてのブランド商品を表示するボタン（初期 active） -->
                                 <button class="mini-chip active" data-brand-cat="ALL"
                                     onclick="handleStudioBrandFilter('ALL')">ALL</button>
+                                <!-- アウターのみ絞り込むボタンです -->
                                 <button class="mini-chip" data-brand-cat="OUTER"
                                     onclick="handleStudioBrandFilter('OUTER')">アウター</button>
+                                <!-- トップスのみ絞り込むボタンです -->
                                 <button class="mini-chip" data-brand-cat="TOPS"
                                     onclick="handleStudioBrandFilter('TOPS')">トップス</button>
+                                <!-- ボトムスのみ絞り込むボタンです -->
                                 <button class="mini-chip" data-brand-cat="BOTTOMS"
                                     onclick="handleStudioBrandFilter('BOTTOMS')">ボトムス</button>
                             </div>
 
                             <!-- ブランド商品リスト -->
+                            <!-- JS の renderStudioBrandList() がここにドラッグ可能な商品ミニカードを描画します -->
                             <div class="studio-item-list" id="studio-brand-list">
                                 <!-- JS描画 -->
                             </div>
@@ -1480,33 +1987,50 @@
                     </div>
 
                     <!-- ▼ 下部エリア: AIコメント & スタイリング診断 & コーデ保存 -->
+                    <!-- 3カラム試着エリアの下に配置する、AIの着こなし解説カードと保存フォームの2列領域です -->
                     <div class="studio-bottom-panel">
                         <!-- AIコメントセクション -->
+                        <!-- マネキンの着用組み合わせに応じて色調和度とアドバイスを自動生成するカードです -->
                         <div class="ai-comment-card">
+                            <!-- AIカードのヘッダー（エンジン名とカラー調和度スコア） -->
                             <div class="ai-comment-header">
+                                <!-- 左側：発光ドット・ラベル・AIエンジンバージョン表示です -->
                                 <div class="ai-header-left">
+                                    <!-- CSSアニメーションで光るアイコンドットです -->
                                     <span class="ai-sparkle-dot"></span>
+                                    <!-- カード見出し文字です -->
                                     <span class="ai-label">AI STYLING COMMENT</span>
+                                    <!-- 診断エンジンのバージョン表記バッジです -->
                                     <span class="ai-engine-tag">MANEKIN-AI v2.6</span>
                                 </div>
+                                <!-- 右側：カラー調和度スコア（点）の表示エリアです -->
                                 <div class="ai-header-right">
+                                    <!-- text-nowrap で改行崩れを防いでいます -->
                                     <span class="ai-score-label text-nowrap">カラー調和度:</span>
+                                    <!-- 算出された点数をJSが書き換えます -->
                                     <span class="ai-score-val text-nowrap" id="ai-score-val">95点</span>
                                 </div>
                             </div>
+                            <!-- AIの診断コメント本文エリアです -->
                             <div class="ai-comment-body">
+                                <!-- 着用内容に合わせて updateAIStylingComment() が文章を差し替えます -->
                                 <p class="ai-comment-text" id="ai-comment-text">
                                     左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
                                 </p>
                             </div>
+                            <!-- コメント下部のハッシュタグ＆カラーパレット構成バーです -->
                             <div class="ai-meta-bar">
+                                <!-- スタイルを表すハッシュタグ（#シンプル等）をJSが挿入します -->
                                 <div class="ai-tags-wrap" id="ai-tags-wrap">
                                     <span class="ai-tag">#シンプル</span>
                                     <span class="ai-tag">#ベーシック</span>
                                     <span class="ai-tag">#通年着回し</span>
                                 </div>
+                                <!-- 着用アイテムに使われている色の丸ドット一覧です -->
                                 <div class="ai-palette-wrap" id="ai-palette-wrap">
+                                    <!-- 見出し文字です -->
                                     <span class="palette-label">カラー構成:</span>
+                                    <!-- JSが色ごとの丸ドット span を生成する場所です -->
                                     <div class="palette-dots" id="palette-dots">
                                         <!-- JSで色のドットを配置 -->
                                     </div>
@@ -1515,25 +2039,40 @@
                         </div>
 
                         <!-- コーデ保存フォーム -->
+                        <!-- 作成したコーデを名前付きでMySQL/ルックブックに保存するカードです -->
                         <div class="outfit-save-card">
+                            <!-- 保存カードのタイトルです -->
                             <h4 class="save-card-title">コーディネートを保存</h4>
+                            <!-- 機能の説明文です -->
                             <p class="save-card-desc">作成した組み合わせに名前を付けて保存しておくと、「保存したコーデ」一覧からいつでも再確認・復元できます。</p>
 
+                            <!-- 入力欄にワンクリックでよく使うコーデ名をセットできるチップ群です -->
                             <div class="preset-name-chips">
+                                <!-- 「通学・デイリーコーデ」を入力欄へ自動入力します -->
                                 <span class="preset-chip" onclick="applyPresetName('通学・デイリーコーデ')">通学・デイリー</span>
+                                <!-- 「デート・きれいめコーデ」を入力欄へ自動入力します -->
                                 <span class="preset-chip" onclick="applyPresetName('デート・きれいめコーデ')">デート・きれいめ</span>
+                                <!-- 「休日カフェコーデ」を入力欄へ自動入力します -->
                                 <span class="preset-chip" onclick="applyPresetName('休日カフェコーデ')">休日カフェ</span>
+                                <!-- 「冬の防寒モードコーデ」を入力欄へ自動入力します -->
                                 <span class="preset-chip" onclick="applyPresetName('冬の防寒モードコーデ')">冬コーデ</span>
+                                <!-- 「オフィスカジュアル」を入力欄へ自動入力します -->
                                 <span class="preset-chip" onclick="applyPresetName('オフィスカジュアル')">オフィス</span>
                             </div>
 
+                            <!-- 送信すると handleSaveOutfit(event) が動き、ページ遷移せずコーデを保存します -->
                             <form class="save-outfit-form" id="save-outfit-form" onsubmit="handleSaveOutfit(event)">
+                                <!-- テキスト入力と保存ボタンの横並びグループです -->
                                 <div class="save-input-group">
+                                    <!-- コーデ名の必須入力欄（required）です -->
                                     <input type="text" id="outfit-name-input" class="form-input outfit-name-input"
                                         placeholder="例: 秋の通学カジュアルコーデ" required>
+                                    <!-- フォーム送信（type="submit"）を行う保存ボタンです -->
                                     <button type="submit" class="btn btn-primary save-outfit-btn">
+                                        <!-- しおり（ブックマーク）アイコンをSVGで描画しています -->
                                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
                                             stroke="currentColor" stroke-width="2">
+                                            <!-- リボン型ブックマークの外枠パスです -->
                                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                         </svg>
                                         <span>このコーデを保存する</span>
@@ -1547,13 +2086,19 @@
                 <!-- ============================== -->
                 <!-- パネル5: 保存したコーデ (LOOKBOOK) -->
                 <!-- ============================== -->
+                <!-- タブ「保存したコーデ」を選んだときに表示されるルックブックパネルです -->
                 <div class="studio-pane" id="studio-pane-saved">
+                    <!-- パネル上部の見出しバーです -->
                     <div class="pane-action-bar">
+                        <!-- 左側にタイトルと説明文を縦に並べる領域です -->
                         <div class="pane-action-left">
+                            <!-- セクション見出しです -->
                             <h2 class="pane-title">保存したコーディネート <small class="text-muted">（ルックブック）</small></h2>
+                            <!-- 機能説明文です -->
                             <p class="pane-desc">作成・保存したコーディネートの一覧です。クリックしてマネキンに再試着したり、含まれるブランド商品をまとめて購入できます。</p>
                         </div>
                     </div>
+                    <!-- 保存されたコーデカードをグリッド状に並べるコンテナです -->
                     <div class="saved-outfits-grid" id="saved-outfits-grid">
                         <!-- JSで動的描画 -->
                     </div>
@@ -1569,24 +2114,36 @@
     <!-- ============================================== -->
     <!-- MANEKIN機能クリック時の「開発中」モーダル      -->
     <!-- ============================================== -->
+    <!-- 画面全体を覆う半透明の背景幕（モーダルダイアログ）です。open クラスが付くと表示されます -->
     <div class="modal-backdrop" id="manekin-modal" role="dialog" aria-modal="true"
         aria-labelledby="modal-manekin-title">
+        <!-- モーダル中央の白いダイアログボックス本体です -->
         <div class="modal-dialog">
+            <!-- モーダル上部のバッジと「×」閉じるボタンの行です -->
             <div class="modal-header">
+                <!-- 将来機能であることを示す小さな英語バッジです -->
                 <span class="modal-badge">FUTURE FEATURE</span>
+                <!-- 右上の「×」閉じるボタンです -->
                 <button class="modal-close-btn" id="modal-close-btn" aria-label="閉じる">&times;</button>
             </div>
+            <!-- モーダルの本文エリア（text-center で中央揃え）です -->
             <div class="modal-body text-center">
+                <!-- キラキラ星アイコンを囲む丸い背景ボックスです -->
                 <div class="modal-icon-wrap">
+                    <!-- AI・未来感を表現したキラキラアイコンのSVG図形です -->
                     <svg class="modal-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.5">
+                        <!-- 十字と斜めの放射線を描くSVGパスです -->
                         <path
                             d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
                         </path>
                     </svg>
                 </div>
+                <!-- スクリーンリーダー用 aria-labelledby と紐づくタイトル見出しです -->
                 <h2 class="modal-title" id="modal-manekin-title">開発中</h2>
+                <!-- 英語のサブタイトルです -->
                 <p class="modal-subtext">MANEKIN AI COORDINATE & VIRTUAL CLOSET</p>
+                <!-- 今後の機能案内テキストです（<br> で改行、<strong> で重要箇所を強調しています） -->
                 <p class="modal-description">
                     ご期待ありがとうございます。<br>
                     <strong>「MANEKIN」機能</strong>は、Pythonバックエンドによる<br>
@@ -1594,6 +2151,7 @@
                     を統合した会員限定の次世代スタイリングサービスです。<br>
                     現在、順次実装を進めております。公開まで今しばらくお待ちください。
                 </p>
+                <!-- モーダルを閉じる確認ボタンです -->
                 <button class="btn btn-primary" id="modal-ok-btn">了解しました</button>
             </div>
         </div>
@@ -1602,66 +2160,105 @@
     <!-- ============================================== -->
     <!-- マイクローゼット：手持ち服登録モーダル          -->
     <!-- ============================================== -->
+    <!-- スタジオの「手持ちの服を追加」ボタン等で開くアップロード用モーダル全体です -->
     <div class="modal-backdrop" id="modal-add-closet" role="dialog" aria-modal="true"
         aria-labelledby="modal-add-closet-title">
+        <!-- クローゼット登録用に横幅などを調整したダイアログ本体です -->
         <div class="modal-dialog modal-dialog-closet">
+            <!-- ヘッダー部：MY CLOSET ラベルと × 閉じるボタン -->
             <div class="modal-header">
+                <!-- モーダル種別を示すバッジです -->
                 <span class="modal-badge">MY CLOSET</span>
+                <!-- クリックで closeAddClosetModal() を呼んでモーダルを閉じ、フォームを初期化します -->
                 <button class="modal-close-btn" onclick="closeAddClosetModal()" aria-label="閉じる">&times;</button>
             </div>
+            <!-- 入力フォームを収める本文エリアです -->
             <div class="modal-body">
+                <!-- モーダルの見出しです -->
                 <h2 class="modal-title" id="modal-add-closet-title">手持ちの服を登録する</h2>
+                <!-- 補足説明文です -->
                 <p class="modal-subtext">登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。</p>
 
+                <!-- novalidate はブラウザ既定の英語吹き出しエラーを抑え、JS側で丁寧な検証を行うための属性です -->
                 <form id="form-add-closet" novalidate>
                     <!-- 写真・画像登録エリア -->
+                    <!-- 画像アップロード枠・AI透過スイッチ・AI形状診断カード・クイック写真をまとめるグループです -->
                     <div class="form-group">
+                        <!-- 項目ラベル（赤の * は必須項目の目印です） -->
                         <label class="form-label">服の写真（画像） <span class="required">*</span></label>
+                        <!-- 枠内をクリックすると隠れた file input を自動クリックしてファイル選択画面を開きます -->
                         <div class="closet-upload-box" id="closet-upload-box"
                             onclick="document.getElementById('closet-file-input').click()">
+                            <!-- 実際の画像ファイル選択入力欄（見た目を整えるため非表示にし、選択時に handleClosetImageSelect が動きます） -->
                             <input type="file" id="closet-file-input" accept="image/*" style="display: none;"
                                 onchange="handleClosetImageSelect(event)">
+                            <!-- 画像選択後に表示されるプレビューコンテナです（初期は非表示） -->
                             <div class="upload-preview" id="closet-img-preview" style="display: none;">
+                                <!-- JSが読み込んだ画像のDataURLをここに表示します -->
                                 <img src="" alt="プレビュー" id="closet-preview-img">
+                                <!-- AI背景透過が成功したときだけ左上に光るバッジです -->
                                 <span class="preview-badge-transparent" id="preview-badge-transparent" style="display: none;">
                                     ✨ 背景透過済み
                                 </span>
+                                <!-- 画像差し替えを促す補助テキストです -->
                                 <span class="upload-change-text">タップして写真を変更</span>
                             </div>
+                            <!-- 画像未選択時に表示される点線枠内のガイド表示です -->
                             <div class="upload-placeholder" id="closet-img-placeholder">
+                                <!-- 写真アルバムをイメージしたSVGアイコンです -->
                                 <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="1.5">
+                                    <!-- 外枠の角丸四角形 -->
                                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <!-- 太陽（丸） -->
                                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <!-- 山の折れ線 -->
                                     <polyline points="21 15 16 10 5 21"></polyline>
                                 </svg>
+                                <!-- メインの案内文字 -->
                                 <span class="upload-main-text">写真を選択・撮影する</span>
+                                <!-- サブの案内文字 -->
                                 <span class="upload-sub-text">または、以下のクイック写真から選ぶこともできます</span>
                             </div>
 
                             <!-- AI背景切り抜き中オーバーレイ -->
+                            <!-- AI処理中に表示されるカバー画面。stopPropagation() で背後ボックスのクリック発火を防ぎます -->
                             <div class="ai-processing-overlay" id="ai-processing-overlay" style="display: none;" onclick="event.stopPropagation()">
+                                <!-- 回転アニメーションするローディングスピナーです -->
                                 <div class="ai-spinner"></div>
+                                <!-- 処理中のタイトル文字 -->
                                 <span class="ai-status-title">🪄 AIが服の背景を透過中...</span>
+                                <!-- モデル読込／解析中の詳細ステータス文字（JS更新） -->
                                 <span class="ai-status-subtitle" id="ai-status-subtitle">服の輪郭を解析しています</span>
+                                <!-- 進捗バー（トラック外枠と塗りつぶし中身） -->
                                 <div class="ai-progress-track">
+                                    <!-- 進捗に応じて width が 0% から 100% へ伸びます -->
                                     <div class="ai-progress-fill" id="ai-progress-fill"></div>
                                 </div>
+                                <!-- 進捗の数値表示（例: 45%） -->
                                 <span class="ai-progress-percent" id="ai-progress-percent">0%</span>
+                                <!-- ブラウザ内で完結するため外部送信されない安心注記です -->
                                 <span class="ai-hint-small">※完全無料・端末内AI（ブラウザ完結）で高速処理</span>
                             </div>
                         </div>
 
                         <!-- AI背景削除ツールバー -->
+                        <!-- 背景自動透過のON/OFFスイッチと、手動やり直しボタンを並べたツールバーです -->
                         <div class="ai-cutout-toolbar">
+                            <!-- チェックボックスと説明ラベル（初期状態は checked で自動透過ON） -->
                             <label class="ai-toggle-label" title="写真選択時に自動で背景を透明にします（完全無料・ブラウザ完結型AI）">
+                                <!-- 自動透過スイッチ本体 -->
                                 <input type="checkbox" id="check-auto-remove-bg" checked>
+                                <!-- スイッチ横のラベルテキスト -->
                                 <span class="ai-toggle-text">✨ <strong>AIで背景を自動透過する</strong> <span class="ai-free-badge">無料・端末内AI</span></span>
                             </label>
+                            <!-- 画像を選んだ後に表示される「背景を透過」「元写真に戻す」切り替えボタン群です -->
                             <div class="ai-action-btns" id="ai-action-btns" style="display: none;">
+                                <!-- 自動透過がOFFだった場合などに後から手動実行するボタンです -->
                                 <button type="button" class="btn-ai-action" id="btn-re-remove-bg" onclick="triggerManualBgRemoval()" title="現在の写真をAIで背景透過する">
                                     🪄 背景を透過
                                 </button>
+                                <!-- 切り抜き結果より元画像を使いたいときに復元するボタンです -->
                                 <button type="button" class="btn-ai-action" id="btn-restore-original" onclick="restoreOriginalUploadImage()" title="元の写真に戻す">
                                     ↺ 元写真に戻す
                                 </button>
@@ -1669,66 +2266,94 @@
                         </div>
 
                         <!-- AIアイテム形状診断結果カード（アウター/ボトムス/トップス/靴/帽子のみ保存可） -->
+                        <!-- アップロード画像が対象の5カテゴリの服かどうかを analyzeClothingItemShape() で自動判定し結果を表示するカードです -->
                         <div class="ai-diagnosis-card" id="ai-diagnosis-card" style="display: none;">
+                            <!-- 診断カードの上部バー（OK/NGバッジと適合パーセンテージ） -->
                             <div class="ai-diagnosis-header">
+                                <!-- 判定状態バッジ（解析中スピナーとテキストを含みます） -->
                                 <span class="ai-diagnosis-badge" id="ai-diag-badge">
+                                    <!-- 解析中に回る小型スピナー -->
                                     <span class="ai-diag-spinner" id="ai-diag-spinner"></span>
+                                    <!-- 状態ラベル（「AI形状判定: OK」または「登録不可（非対象）」） -->
                                     <span id="ai-diag-badge-text">AI形状診断中...</span>
                                 </span>
+                                <!-- 適合度パーセント表示（例: 88% 適合） -->
                                 <span class="ai-diag-confidence" id="ai-diag-confidence"></span>
                             </div>
+                            <!-- 診断の要約タイトルと理由説明が入る領域です -->
                             <div class="ai-diagnosis-body">
+                                <!-- 判定タイトル（例: 「トップスの形状を検出しました」） -->
                                 <p class="ai-diag-title" id="ai-diag-title"></p>
+                                <!-- 判定理由の詳細テキスト -->
                                 <p class="ai-diag-desc" id="ai-diag-desc"></p>
                             </div>
                         </div>
 
                         <!-- 撮影なしでもすぐ試せるクイック画像選択 -->
+                        <!-- 写真を用意していないユーザーがボタン1つで手持ち服を試せるプリセット画像一覧です -->
                         <div class="preset-img-selector">
+                            <!-- ラベル -->
                             <span class="preset-label">クイック写真:</span>
+                            <!-- 各ボタンをクリックすると selectPresetImage(キー, 商品名) が動きます -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('black_cap', 'クラシック ベースボールキャップ')">黒キャップ</button>
+                            <!-- 黒ボトムスプリセット -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('black_pants', '黒ワイドスラックス')">黒ボトムス</button>
+                            <!-- 白スニーカープリセット -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('white_sneakers', '白レザースニーカー')">白スニーカー</button>
+                            <!-- グレーパーカープリセット -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('grey_hoodie', 'ヘビーウェイト グレーパーカー')">グレーパーカー</button>
+                            <!-- 白Tシャツプリセット -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('white_tshirt', 'リラックス 白Tシャツ')">白Tシャツ</button>
+                            <!-- デニムジャケットプリセット -->
                             <button type="button" class="preset-img-btn"
                                 onclick="selectPresetImage('denim_jacket', 'オーバーサイズ デニムジャケット')">デニムジャケット</button>
                         </div>
                     </div>
 
                     <!-- 服名 -->
+                    <!-- アイテム名の入力グループです -->
                     <div class="form-group">
+                        <!-- for="closet-item-name" で下の input と結び付け、ラベルタップでもカーソルが入るようにしています -->
                         <label class="form-label" for="closet-item-name">服の名前・ブランド <span
                                 class="required">*</span></label>
+                        <!-- テキスト入力欄（必須） -->
                         <input type="text" id="closet-item-name" class="form-input" placeholder="例: 黒ワイドタックスラックス、白スニーカー"
                             required>
                     </div>
 
                     <!-- カテゴリ -->
+                    <!-- 5種類の衣類カテゴリ（HAT / TOPS / BOTTOMS / OUTER / SHOES）から1つを選ぶラジオボタングループです -->
                     <div class="form-group">
+                        <!-- カテゴリ見出し -->
                         <label class="form-label">カテゴリ <span class="required">*</span></label>
+                        <!-- 2列グリッド等に並ぶラジオ選択肢一覧 -->
                         <div class="category-radio-grid">
+                            <!-- 帽子選択ボタン（labelで包むと文字クリックでも反応します） -->
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="HAT" required>
                                 <span>帽子 (キャップ/ハット/ニット帽)</span>
                             </label>
+                            <!-- トップス選択ボタン -->
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="TOPS" required>
                                 <span>トップス (Tシャツ/ニット/パーカー)</span>
                             </label>
+                            <!-- ボトムス選択ボタン（初期で checked 選択状態） -->
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="BOTTOMS" required checked>
                                 <span>ボトムス (スラックス/デニム/スウェット)</span>
                             </label>
+                            <!-- アウター選択ボタン -->
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="OUTER" required>
                                 <span>アウター (コート/ジャケット)</span>
                             </label>
+                            <!-- 靴選択ボタン -->
                             <label class="cat-radio-label">
                                 <input type="radio" name="closet_category" value="SHOES" required>
                                 <span>靴 (スニーカー/革靴/ブーツ)</span>
@@ -1736,11 +2361,15 @@
                         </div>
                     </div>
 
+                    <!-- 「メインの色」と「着用季節」を横並びに配置するフォーム行です -->
                     <div class="form-row">
                         <!-- メインカラー -->
+                        <!-- AIコーデ診断で配色判定に使う色のプルダウンです -->
                         <div class="form-group flex-1">
+                            <!-- ラベル -->
                             <label class="form-label" for="closet-item-color">メインの色 <span
                                     class="required">*</span></label>
+                            <!-- カラー選択肢（セレクトボックス） -->
                             <select id="closet-item-color" class="form-input" required>
                                 <option value="BLACK" selected>BLACK (ブラック・黒)</option>
                                 <option value="WHITE">WHITE (ホワイト・白)</option>
@@ -1755,9 +2384,12 @@
                         </div>
 
                         <!-- 季節 -->
+                        <!-- クローゼットの管理や着回し参考用の着用季節セレクトボックスです -->
                         <div class="form-group flex-1">
+                            <!-- ラベル -->
                             <label class="form-label" for="closet-item-season">着用季節 <span
                                     class="required">*</span></label>
+                            <!-- 季節の選択肢 -->
                             <select id="closet-item-season" class="form-input" required>
                                 <option value="通年" selected>通年 (オールシーズン)</option>
                                 <option value="春">春 (Spring)</option>
@@ -1770,8 +2402,11 @@
                         </div>
                     </div>
 
+                    <!-- モーダル下部のアクションボタン行（キャンセル／登録） -->
                     <div class="modal-actions">
+                        <!-- 登録を中止してモーダルを閉じるボタン（type="button" でフォーム送信を防ぎます） -->
                         <button type="button" class="btn btn-secondary" onclick="closeAddClosetModal()">キャンセル</button>
+                        <!-- フォームを送信し handleAddClosetSubmit() を呼び出す登録ボタンです -->
                         <button type="submit" class="btn btn-primary" id="btn-closet-submit">クローゼットに登録する</button>
                     </div>
                 </form>
@@ -1780,24 +2415,34 @@
     </div>
 
     <!-- 操作通知用トーストメッセージコンテナ -->
+    <!-- JS の showToast() / showToastNotification() が画面隅へポップアップ通知を追加する空コンテナです（aria-liveで音声読み上げ対応） -->
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <!-- ============================================== -->
     <!-- フッターエリア                                  -->
     <!-- ============================================== -->
+    <!-- 全ページ共通で画面一番下に表示されるサイトフッターです -->
     <footer class="site-footer">
+        <!-- コンテンツ最大幅に合わせる中央コンテナ -->
         <div class="container footer-container">
+            <!-- フッター上部：ブランド紹介列 ＋ ナビゲーション3列 -->
             <div class="footer-top">
+                <!-- 左列：ブランドロゴとコンセプト文章 -->
                 <div class="footer-brand-column">
+                    <!-- クリックでホーム（#home）へ戻るロゴリンク -->
                     <a href="#home" class="footer-logo">MANEKIN FASHION</a>
+                    <!-- keep-phrase クラスで文節の途中改行を抑えつつブランド説明を表示します -->
                     <p class="footer-concept-text">
                         <span class="keep-phrase">研ぎ澄まされたシンプルを日常に。</span><br>
                         <span class="keep-phrase">20代〜30代に向けたニュースタンダードウェアを展開する、</span><span
                             class="keep-phrase">モダンアパレルECストアです。</span>
                     </p>
                 </div>
+                <!-- 列2：サイト内の主要ページリンク集 -->
                 <div class="footer-links-column">
+                    <!-- 列タイトル -->
                     <h4 class="footer-col-title">NAVIGATION</h4>
+                    <!-- ハッシュルーティングリンクのリスト -->
                     <ul class="footer-link-list">
                         <li><a href="#home"><span class="text-nowrap">HOME (トップ)</span></a></li>
                         <li><a href="#items"><span class="text-nowrap">ITEM (全商品)</span></a></li>
@@ -1807,8 +2452,11 @@
                         <li><a href="#manekin-studio"><span class="text-nowrap">MANEKIN (AI機能)</span></a></li>
                     </ul>
                 </div>
+                <!-- 列3：会員機能へのショートカットリンク集 -->
                 <div class="footer-links-column">
+                    <!-- 列タイトル -->
                     <h4 class="footer-col-title">MEMBERSHIP</h4>
+                    <!-- 会員関連ページへのリンクリスト -->
                     <ul class="footer-link-list">
                         <li><a href="#mypage"><span class="text-nowrap">マイページ</span></a></li>
                         <li><a href="#checkout"><span class="text-nowrap">ショッピングバッグ</span></a></li>
@@ -1816,8 +2464,11 @@
                         <li><a href="#register"><span class="text-nowrap">新規会員登録</span></a></li>
                     </ul>
                 </div>
+                <!-- 列4：ご利用案内や法的表記リンク（デモのため javascript:void(0) で遷移なし） -->
                 <div class="footer-links-column">
+                    <!-- 列タイトル -->
                     <h4 class="footer-col-title">HELP & INFO</h4>
+                    <!-- インフォメーションリンクリスト -->
                     <ul class="footer-link-list">
                         <li><a href="javascript:void(0)"><span class="text-nowrap">ご利用ガイド</span></a></li>
                         <li><a href="javascript:void(0)"><span class="keep-phrase">配送・送料について</span> <small
@@ -1829,30 +2480,43 @@
                 </div>
             </div>
 
+            <!-- フッター最下部のコピーライト表示帯 -->
             <div class="footer-bottom">
+                <!-- &copy; は © 記号を表すHTML文字参照です -->
                 <p class="copyright">&copy; 2026 MANEKIN FASHION Co., Ltd. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- ブラウザ完結型AI背景削除（@imgly/background-removal: 完全無料・APIキー不要） -->
+    <!-- ES Module (type="module") を使うことで CDN から背景透過ライブラリを動的に読み込めます -->
     <script type="module">
+        // ネットワーク未接続環境でもページ全体が止まらないよう try...catch で保護して読み込みます
         try {
+            // await import(...) で CDN 上の背景削除ライブラリを非同期読み込みし、removeBackground 関数を取り出します
             const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+            // 他の非モジュールJSファイル（studio.js等）から使えるよう window のプロパティに公開します
             window.imglyRemoveBackground = removeBackground;
+            // 背景透過AIの事前準備が完了したことをフラグで記録します
             window.imglyAiReady = true;
+            // コンソールへ準備完了ログを出します
             console.log('✨ [@imgly/background-removal] AI背景削除モジュールを準備しました');
         } catch (e) {
+            // 読み込み失敗時（オフライン等）は警告だけ出してアプリは通常動作させます
             console.warn('⚠️ AI背景削除モジュールの初期ロードに失敗しました（オフラインまたは制限環境）:', e);
+            // AI準備未完了フラグをセットします
             window.imglyAiReady = false;
         }
     </script>
 
     <!-- AIファッション形状・アイテム判定用軽量モデル (TensorFlow.js + MobileNet) -->
+    <!-- ブラウザ上でニューラルネットワーク推論を動かす基盤ライブラリ TensorFlow.js を読み込みます -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <!-- 画像に何が写っているか（シャツ・靴・帽子・犬・キーボード等）を分類する学習済みモデル MobileNet を読み込みます -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 分割されたJavaScriptモジュールファイルの読み込み -->
+    <!-- ※ 依存関係の順番に読み込む必要があります（データ → ショップ処理 → スタジオ機能 → 起動とルーティング） -->
     <!-- 1. 商品カタログ・マスターデータ定義 -->
     <script src="js/products-data.js?v=20261110c"></script>
     <!-- 2. ECショッピング機能（カタログ、詳細、カート、マイページ、認証） -->
@@ -1863,4 +2527,5 @@
     <script src="js/app.js?v=20261110c"></script>
 </body>
 
+<!-- HTML文書全体の終了タグ -->
 </html>

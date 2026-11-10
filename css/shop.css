@@ -1,420 +1,696 @@
 @charset "UTF-8";
+/* ↑ CSSファイルの文字コードをUTF-8に指定する必須の1行目宣言です */
 
 /* ========================================================================== */
 /* MANEKIN FASHION - EC・ショッピング機能スタイル (shop.css)
+/* トップHERO、商品一覧・詳細、カート・チェックアウト、ログイン、マイページ、ポイントUIを定義 */
 /* ========================================================================== */
 /* --- 5. メインビジュアル（HERO） --- */
+/* ↓ トップページ最上部に表示する大きな看板画像（ヒーローセクション）の枠 */
 .hero-section {
+    /* ↓ 内部の画像やオーバーレイを絶対配置（position: absolute）する基準位置にします */
     position: relative;
+    /* ↓ 画面の横幅いっぱいに広げます */
     width: 100%;
+    /* ↓ 高さをブラウザ表示領域の85%に設定してファーストビューで迫力を出します */
     height: 85vh;
+    /* ↓ 画面が極端に低いときでも最低520pxの高さを確保します */
     min-height: 520px;
+    /* ↓ 巨大なモニターでも間延びしないよう最大800pxで高さを止めます */
     max-height: 800px;
+    /* ↓ 枠からはみ出した画像部分を切り落としてすっきり見せます */
     overflow: hidden;
+    /* ↓ 中央のキャッチコピー領域をFlexで位置調整できるようにします */
     display: flex;
+    /* ↓ 上下中央揃え */
     align-items: center;
+    /* ↓ 左右中央揃え */
     justify-content: center;
 }
 
+/* ↓ ヒーローセクション背景画像を包む絶対配置ラッパー */
 .hero-image-wrap {
+    /* ↓ 親（.hero-section）いっぱいに重ねて配置します */
     position: absolute;
+    /* ↓ 上端ぴったり */
     top: 0;
+    /* ↓ 左端ぴったり */
     left: 0;
+    /* ↓ 横幅100% */
     width: 100%;
+    /* ↓ 高さ100% */
     height: 100%;
+    /* ↓ 文字コンテンツ（z-index: 2）より後ろの奥側（1番目）に配置します */
     z-index: 1;
 }
 
+/* ↓ ヒーロー画像そのもののトリミング設定 */
 .hero-image {
+    /* ↓ 枠いっぱいの幅100% */
     width: 100%;
+    /* ↓ 枠いっぱいの高さ100% */
     height: 100%;
+    /* ↓ 縦横比を保ったまま余白が出ないよう枠全体を隙間なく埋めます */
     object-fit: cover;
+    /* ↓ モデル写真の上半身や顔が切れないよう少し上寄り（縦25%位置）を基準に切り抜きます */
     object-position: center 25%;
 }
 
+/* ↓ 背景写真の上に重ねる半透明グラデーション幕（白文字を読みやすくする役割） */
 .hero-overlay {
+    /* ↓ 画像の上に重ねて絶対配置します */
     position: absolute;
+    /* ↓ 上端0 */
     top: 0;
+    /* ↓ 左端0 */
     left: 0;
+    /* ↓ 幅100% */
     width: 100%;
+    /* ↓ 高さ100% */
     height: 100%;
+    /* ↓ 左側（文字側）は45%の黒、右側に向かって15%の黒へ薄くなるグラデーション */
     background: linear-gradient(to right, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.15) 100%);
 }
 
+/* ↓ ヒーロー画像の手前に載せるキャッチコピー＆ボタンのコンテナ */
 .hero-content {
+    /* ↓ z-indexを有効にして画像より手前に出すためrelativeにします */
     position: relative;
+    /* ↓ 背景ラッパー(1)より手前の2番目に表示します */
     z-index: 2;
+    /* ↓ 文章が広がりすぎないよう最大幅800pxに制限します */
     max-width: 800px;
+    /* ↓ 左右24pxの内側余白でスマホ画面端への接触を防ぎます */
     padding: 0 24px;
+    /* ↓ 写真の上でも映える純白の文字色にします */
     color: var(--color-white);
+    /* ↓ 文字の後ろに濃い影を落として明るい背景でも文字が読めるようにします */
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* ↓ ヒーローの大見出しの上に添える小さな英語サブタイトル */
 .hero-subheading {
+    /* ↓ 小さめの0.9remサイズ */
     font-size: 0.9rem;
+    /* ↓ セミボールド600 */
     font-weight: 600;
+    /* ↓ 広い字間0.25emでファッション誌のような雰囲気を出します */
     letter-spacing: 0.25em;
+    /* ↓ すべて大文字に自動変換します */
     text-transform: uppercase;
+    /* ↓ 下の大見出しと12px間隔を空けます */
     margin-bottom: 12px;
+    /* ↓ 少し透けた白（90%）で強弱を付けます */
     color: rgba(255, 255, 255, 0.9);
 }
 
+/* ↓ ヒーローの一番大きなメインキャッチコピー見出し */
 .hero-heading {
+    /* ↓ インパクトのある2.8rem（約45px）の大サイズ */
     font-size: 2.8rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 見出し用の引き締まった行間1.25 */
     line-height: 1.25;
+    /* ↓ わずかに字間を広げます */
     letter-spacing: 0.05em;
+    /* ↓ 下の説明文と20px離します */
     margin-bottom: 20px;
 }
 
+/* ↓ ヒーロー見出し下のブランド紹介文 */
 .hero-description {
+    /* ↓ 少し大きめで読みやすい1.05rem */
     font-size: 1.05rem;
+    /* ↓ ゆったりした行間1.8で高級感を出します */
     line-height: 1.8;
+    /* ↓ 1行が長くなりすぎないよう最大幅580pxで折り返させます */
     max-width: 580px;
+    /* ↓ ボタン群の上に32pxの余白を設けます */
     margin-bottom: 32px;
+    /* ↓ 85%不透明の白で柔らかい読み心地にします */
     color: rgba(255, 255, 255, 0.85);
 }
 
+/* ↓ ヒーロー内のアクションボタン（コレクションを見る / AI試着を始める等）の横並び枠 */
 .hero-buttons {
+    /* ↓ ボタンを横並び（Flex）にします */
     display: flex;
+    /* ↓ スマホ幅で収まらない場合は自動で次の行へ折り返します */
     flex-wrap: wrap;
+    /* ↓ ボタン同士の隙間を縦横16px確保します */
     gap: 16px;
 }
 
 /* --- 6. 汎用ボタンコンポーネント --- */
+/* ↓ サイト全体で共通して使うボタンの基本骨格クラス */
 .btn {
+    /* ↓ 文字やアイコンを中央揃えしやすいinline-flex配置 */
     display: inline-flex;
+    /* ↓ 縦方向の中央揃え */
     align-items: center;
+    /* ↓ 横方向の中央揃え */
     justify-content: center;
+    /* ↓ 上下14px・左右32pxのゆとりあるクリック領域 */
     padding: 14px 32px;
+    /* ↓ 均一な文字サイズ0.9rem */
     font-size: 0.9rem;
+    /* ↓ セミボールド600 */
     font-weight: 600;
+    /* ↓ 文字間を広げてクリーンな印象に */
     letter-spacing: 0.08em;
+    /* ↓ 複数行になっても文字を中央揃え */
     text-align: center;
+    /* ↓ 角丸を0にして洗練された直線のスクエアデザインに統一 */
     border-radius: 0;
+    /* ↓ 色の反転や浮き上がり効果の遷移時間 */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 最も重要な主アクション用ボタン（黒背景・白文字） */
 .btn-primary {
+    /* ↓ 純黒の塗りつぶし背景 */
     background-color: var(--color-black);
+    /* ↓ 純白の文字色 */
     color: var(--color-white);
+    /* ↓ セカンダリボタンと高さを揃えるため同じ太さの1px枠線を付けます */
     border: 1px solid var(--color-black);
 }
 
+/* ↓ 黒ボタンのホバー時リアクション */
 .btn-primary:hover {
+    /* ↓ 少し明るいダークグレーに変化 */
     background-color: var(--color-dark);
+    /* ↓ 微かに透明感を出す */
     opacity: 0.95;
+    /* ↓ 上に2px浮き上がるアニメーション */
     transform: translateY(-2px);
+    /* ↓ 浮き上がりに合わせてカード状の影を落とします */
     box-shadow: var(--shadow-card);
 }
 
+/* ↓ 白背景に黒文字のサブ・対比アクション用ボタン（暗いヒーロー画像の上などで活躍） */
 .btn-secondary {
+    /* ↓ 純白背景 */
     background-color: var(--color-white);
+    /* ↓ 純黒文字 */
     color: var(--color-black);
+    /* ↓ 白の1px枠線 */
     border: 1px solid var(--color-white);
 }
 
+/* ↓ 白ボタンのホバー時リアクション */
 .btn-secondary:hover {
+    /* ↓ 少し透けた白背景に変化 */
     background-color: rgba(255, 255, 255, 0.9);
+    /* ↓ わずかに透過 */
     opacity: 0.95;
+    /* ↓ 上に2px浮き上がります */
     transform: translateY(-2px);
 }
 
+/* ↓ 枠線だけの小さめサブボタン（ログアウト、戻る、リセットなど） */
 .btn-outline-sm {
+    /* ↓ コンパクトな上下8px・左右18pxパディング */
     padding: 8px 18px;
+    /* ↓ やや小さめの文字サイズ0.8rem */
     font-size: 0.8rem;
+    /* ↓ 黒の1px細い枠線 */
     border: 1px solid var(--color-black);
+    /* ↓ 背景は透明 */
     background-color: transparent;
+    /* ↓ 黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ アウトラインボタンにマウスを乗せたときは黒と白を反転させます */
 .btn-outline-sm:hover {
+    /* ↓ 背景を純黒に塗りつぶし */
     background-color: var(--color-black);
+    /* ↓ 文字を白に反転 */
     color: var(--color-white);
 }
 
+/* ↓ 親要素の横幅100%いっぱいに広げる補助ボタン用クラス */
 .btn-block {
+    /* ↓ 横幅を100%にします */
     width: 100%;
+    /* ↓ ブロック要素として縦に積みやすくします */
     display: block;
 }
 
-/* 今すぐ購入するボタン（アンダーライン・太字） */
+/* 今すぐ購入するボタン（アンダーライン・太字でEC最優先行動を促す大型ボタン） */
 .btn-buy-now {
+    /* ↓ 純黒背景 */
     background-color: var(--color-black);
+    /* ↓ 純白文字 */
     color: var(--color-white);
+    /* ↓ 純黒枠線 */
     border: 1px solid var(--color-black);
+    /* ↓ 目立つ標準サイズ1rem（16px） */
     font-size: 1rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 上下左右16pxのたっぷりした押しやすさ */
     padding: 16px;
 }
 
+/* ↓ 購入ボタンのホバー時 */
 .btn-buy-now:hover {
+    /* ↓ 少し明るいチャコール黒へ変化 */
     background-color: #2b2b2b;
+    /* ↓ 上へ2px浮かべます */
     transform: translateY(-2px);
 }
 
 /* --- 7. セクション共通見出し --- */
+/* ↓ 各セクション上部のタイトルと「VIEW MORE」リンクを並べる行 */
 .section-header {
+    /* ↓ 左側の見出しと右側のリンクを横並びにします */
     display: flex;
+    /* ↓ 左右端へ振り分けます */
     justify-content: space-between;
+    /* ↓ テキストの底辺ライン（大きな文字と小さなリンク）を綺麗に揃えます */
     align-items: flex-end;
+    /* ↓ 下のコンテンツと36px空けます */
     margin-bottom: 36px;
+    /* ↓ 要素が近づきすぎないよう最低16px空けます */
     gap: 16px;
 }
 
+/* ↓ 左側タイトル部分のラッパー */
 .section-title-wrap {
+    /* ↓ Flex子要素のテキストが親幅を突き破らないようにする保険 */
     min-width: 0;
 }
 
+/* ↓ 見出しを中央寄せにするとき（例: CONCEPTセクション）の変形クラス */
 .section-header.text-center {
+    /* ↓ Flex配置 */
     display: flex;
+    /* ↓ 英語タイトル・日本語タイトル・仕切り線を縦に積みます */
     flex-direction: column;
+    /* ↓ 左右中央へ配置 */
     align-items: center;
+    /* ↓ テキストも中央揃え */
     text-align: center;
 }
 
+/* ↓ セクション見出しの小さな英語ラベル（例: BRAND CONCEPT / FEATURED） */
 .section-en-title {
+    /* ↓ 小さめ0.8rem */
     font-size: 0.8rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 広い字間0.2emでアクセントに */
     letter-spacing: 0.2em;
+    /* ↓ 補助グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 日本語タイトルとの間を6px空けます */
     margin-bottom: 6px;
+    /* ↓ すべて大文字に統一 */
     text-transform: uppercase;
 }
 
+/* ↓ セクション見出しのメイン日本語タイトル */
 .section-jp-title {
+    /* ↓ はっきり読める1.8remサイズ */
     font-size: 1.8rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ わずかな字間0.05em */
     letter-spacing: 0.05em;
+    /* ↓ 純黒文字 */
     color: var(--color-black);
 }
 
+/* ↓ 中央寄せ見出しの下に引く短いアクセント黒線 */
 .section-divider {
+    /* ↓ 横幅40pxの短い線 */
     width: 40px;
+    /* ↓ 太さ2px */
     height: 2px;
+    /* ↓ 純黒色 */
     background-color: var(--color-black);
+    /* ↓ 上に16px・左右autoで中央配置・下0 */
     margin: 16px auto 0;
 }
 
+/* ↓ 右側に置く「すべて見る →」のような下線付きテキストリンク */
 .view-more-link {
+    /* ↓ コンパクトな0.85rem文字 */
     font-size: 0.85rem;
+    /* ↓ セミボールド600 */
     font-weight: 600;
+    /* ↓ 字間0.05em */
     letter-spacing: 0.05em;
+    /* ↓ 下に1pxの黒い直線を引きます */
     border-bottom: 1px solid var(--color-black);
+    /* ↓ 文字と下線の間に2px隙間を空けて見やすくします */
     padding-bottom: 2px;
+    /* ↓ 途中で「すべ / て見る」と折り返されないように1行固定します */
     white-space: nowrap;
+    /* ↓ 右側の領域がタイトルに押されて縮まないように保護します */
     flex-shrink: 0;
 }
 
 /* --- 8. ブランドコンセプト（CONCEPT） --- */
+/* ↓ トップページ内コンセプト紹介セクションの上下余白 */
 .concept-section {
+    /* ↓ 上に80pxのゆとりあるセクション余白 */
     padding-top: 80px;
+    /* ↓ 下にも80pxの余白 */
     padding-bottom: 80px;
 }
 
+/* ↓ コンセプトカード3枚を横に並べるCSSグリッド */
 .concept-grid {
+    /* ↓ Gridレイアウトを有効化 */
     display: grid;
+    /* ↓ PCでは画面幅を均等3列（1fr × 3）に分割して並べます */
     grid-template-columns: repeat(3, 1fr);
+    /* ↓ カード間のすき間を32px空けます */
     gap: 32px;
+    /* ↓ セクション見出しから48px離します */
     margin-top: 48px;
 }
 
+/* ↓ コンセプト紹介の1枚ずつのカード箱 */
 .concept-card {
+    /* ↓ 上下32px・左右24pxの内側余白 */
     padding: 32px 24px;
+    /* ↓ 淡いオフホワイト背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 薄いグレーの1px外枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ マウスを乗せたときに上下に動くトランジション */
     transition: transform var(--transition-fast);
 }
 
+/* ↓ コンセプトカードにカーソルを乗せたとき */
 .concept-card:hover {
+    /* ↓ 上へ4pxふわっと浮き上がります */
     transform: translateY(-4px);
 }
 
+/* ↓ カード左上の番号（01 / 02 / 03） */
 .concept-number {
+    /* ↓ 大きめの1.5rem数字 */
     font-size: 1.5rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 字間0.1em */
     letter-spacing: 0.1em;
+    /* ↓ 控えめなグレーで装飾数字として馴染ませます */
     color: var(--color-gray-medium);
+    /* ↓ 1行ブロックとして下のタイトルの上に置きます */
     display: block;
+    /* ↓ タイトルとの間を12px空けます */
     margin-bottom: 12px;
 }
 
+/* ↓ 各コンセプトカードのタイトル */
 .concept-title {
+    /* ↓ 1.1rem見出し */
     font-size: 1.1rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 字間0.1em */
     letter-spacing: 0.1em;
+    /* ↓ 本文との間を12px空けます */
     margin-bottom: 12px;
 }
 
+/* ↓ コンセプトの説明本文 */
 .concept-text {
+    /* ↓ 読みやすい0.9remサイズ */
     font-size: 0.9rem;
+    /* ↓ ゆとりのある行間1.75 */
     line-height: 1.75;
+    /* ↓ 目の疲れにくいミッドグレー文字 */
     color: var(--color-gray-dark);
 }
 
 /* --- 9. おすすめ商品 & 新作セクション --- */
+/* ↓ トップページのFeaturedとNew Arrivalsに共通する上下セクション余白 */
 .featured-section,
 .new-arrivals-section {
+    /* ↓ 上余白40px */
     padding-top: 40px;
+    /* ↓ 下余白80px */
     padding-bottom: 80px;
 }
 
 /* --- 10. 商品グリッド & 商品カード --- */
+/* ↓ 商品カードを並べるグリッドコンテナ */
 .product-grid {
+    /* ↓ CSS Gridレイアウト */
     display: grid;
+    /* ↓ PCでは1行に4列等幅で商品を美しく整列させます */
     grid-template-columns: repeat(4, 1fr);
+    /* ↓ 行間（縦）28px、列間（横）20pxのすき間を空けます */
     gap: 28px 20px;
 }
 
+/* ↓ 商品1点ごとのカード外枠 */
 .product-card {
+    /* ↓ バッジ等を基準配置する可能性に備えrelativeにします */
     position: relative;
+    /* ↓ 写真エリアと文字情報エリアを縦に並べるためFlex列配置 */
     display: flex;
+    /* ↓ 上から下へ配置 */
     flex-direction: column;
+    /* ↓ 背景色は純白 */
     background-color: var(--color-white);
+    /* ↓ ホバー浮き上がりアニメーション用 */
     transition: transform var(--transition-fast);
 }
 
+/* ↓ 商品カードにマウスを乗せたとき */
 .product-card:hover {
+    /* ↓ カード全体を4pxだけ上に持ち上げて注目させます */
     transform: translateY(-4px);
 }
 
+/* ↓ 商品写真の枠（縦横比を常に3:4のポートレート比率に揃える重要ラッパー） */
 .product-img-wrapper {
+    /* ↓ 「NEW」バッジやお気に入りハートを写真の上に絶対配置する基準位置 */
     position: relative;
+    /* ↓ カード幅いっぱいの100% */
     width: 100%;
+    /* ↓ 高さの違う画像が入ってもすべてのカードの写真枠が同じ縦横比3:4で綺麗に揃います */
     aspect-ratio: 3 / 4;
+    /* ↓ 画像読み込み前のグレー背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ ホバーで写真が少し拡大したとき枠外にはみ出る部分を切り取ります */
     overflow: hidden;
+    /* ↓ クリックで詳細画面に飛べることを示す指カーソル */
     cursor: pointer;
 }
 
+/* ↓ カード内の実際の商品画像<img> */
 .product-img {
+    /* ↓ ラッパー幅いっぱいの100% */
     width: 100%;
+    /* ↓ ラッパー高さいっぱいの100% */
     height: 100%;
+    /* ↓ 画像が枠いっぱいに収まるよう自動トリミングして配置 */
     object-fit: cover;
+    /* ↓ 0.5秒かけてじんわりズームインするアニメーション */
     transition: transform 0.5s ease;
 }
 
+/* ↓ カード全体にマウスを乗せたときの商品写真ズーム効果 */
 .product-card:hover .product-img {
+    /* ↓ 画像を1.04倍（4%拡大）にして高級感のある動きを出します */
     transform: scale(1.04);
 }
 
+/* ↓ 商品写真左上に貼る「NEW」タグバッジ */
 .badge-new {
+    /* ↓ 写真枠の左上に重ねて配置 */
     position: absolute;
+    /* ↓ 上から10px */
     top: 10px;
+    /* ↓ 左から10px */
     left: 10px;
+    /* ↓ 黒背景に白文字 */
     background-color: var(--color-black);
     color: var(--color-white);
+    /* ↓ 極小文字0.65rem */
     font-size: 0.65rem;
+    /* ↓ 太字700 */
     font-weight: 700;
+    /* ↓ 字間0.1em */
     letter-spacing: 0.1em;
+    /* ↓ 上下3px・左右8pxのコンパクト余白 */
     padding: 3px 8px;
+    /* ↓ 商品画像より上に重ねます */
     z-index: 2;
 }
 
+/* ↓ 商品写真右上の丸いお気に入り（ハート）ボタン */
 .fav-btn {
+    /* ↓ 写真枠の右上に重ねて配置 */
     position: absolute;
+    /* ↓ 上から10px */
     top: 10px;
+    /* ↓ 右から10px */
     right: 10px;
+    /* ↓ 押しやすい36px × 36pxの丸ボタン */
     width: 36px;
     height: 36px;
+    /* ↓ 完全な円形にする50%角丸 */
     border-radius: 50%;
+    /* ↓ 少し透ける白（90%）背景 */
     background-color: rgba(255, 255, 255, 0.9);
+    /* ↓ 中のハートアイコンをど真ん中に配置 */
     display: flex;
     align-items: center;
     justify-content: center;
+    /* ↓ 未登録時の枠線色はダークグレー */
     color: var(--color-dark);
+    /* ↓ 写真(1)やNEWバッジ(2)より上(5)に置いて押しやすくします */
     z-index: 5;
+    /* ↓ 背景から浮き出る薄い影 */
     box-shadow: var(--shadow-subtle);
+    /* ↓ 拡大や色変更アニメーション */
     transition: all var(--transition-fast);
 }
 
+/* ↓ ハートボタンにマウスを乗せたとき */
 .fav-btn:hover {
+    /* ↓ 1.15倍にぷくっと膨らませます */
     transform: scale(1.15);
+    /* ↓ 背景をくっきり純白にします */
     background-color: var(--color-white);
 }
 
+/* ↓ 既にお気に入り登録済み（.is-favorite）のときのハートボタン色 */
 .fav-btn.is-favorite {
+    /* ↓ ハートの線の色をアクセントカラーの赤にします */
     color: var(--color-accent);
 }
 
+/* ↓ お気に入り登録済みのときのSVG内部塗りつぶし */
 .fav-btn.is-favorite svg {
+    /* ↓ 中抜きではなくハートの中まで赤く塗りつぶします */
     fill: var(--color-accent);
 }
 
+/* ↓ ボタン内のハートSVGの大きさ設定 */
 .fav-btn svg {
     width: 18px;
     height: 18px;
+    /* ↓ ハート色変化のアニメーション */
     transition: fill var(--transition-fast);
 }
 
+/* ↓ 商品写真の下にあるテキストエリア（カテゴリ・商品名・価格） */
 .product-info {
+    /* ↓ 写真の下端から12pxの余白 */
     padding-top: 12px;
+    /* ↓ 中の文字を縦に積み、価格を下端に揃えられるようFlexにします */
     display: flex;
     flex-direction: column;
+    /* ↓ 隣の商品と名前行数が違ってもカード底辺まで領域を伸ばします */
     flex-grow: 1;
 }
 
+/* ↓ 小さなカテゴリラベル（OUTER / TOPS 等） */
 .product-category {
+    /* ↓ 小さめ0.75rem */
     font-size: 0.75rem;
+    /* ↓ 補助グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 英語大文字表示 */
     text-transform: uppercase;
+    /* ↓ 字間0.05em */
     letter-spacing: 0.05em;
+    /* ↓ 下の商品名と4px離します */
     margin-bottom: 4px;
 }
 
+/* ↓ 商品タイトル */
 .product-name {
+    /* ↓ 見やすい0.95rem */
     font-size: 0.95rem;
+    /* ↓ 中太ウェイト500 */
     font-weight: 500;
+    /* ↓ 日本語商品名が2行になっても読みやすい行間1.4 */
     line-height: 1.4;
+    /* ↓ 純黒 */
     color: var(--color-black);
+    /* ↓ 下の価格と最低6px離します */
     margin-bottom: 6px;
+    /* ↓ タイトルクリックでも詳細画面に飛べるため指カーソルにします */
     cursor: pointer;
     transition: color var(--transition-fast);
 }
 
+/* ↓ 商品名にマウスを乗せたときわずかに色を変えてリンクであることを示します */
 .product-name:hover {
     color: var(--color-gray-dark);
 }
 
+/* ↓ 商品価格表示（¥8,800 等） */
 .product-price {
+    /* ↓ 1remの標準価格サイズ */
     font-size: 1rem;
+    /* ↓ 太字700で金額を明確にします */
     font-weight: 700;
     color: var(--color-black);
+    /* ↓ 上余白autoにより、商品名が1行でも2行でも価格だけは全カードの下端一直線に綺麗に揃います */
     margin-top: auto;
 }
 
+/* ↓ 価格横の「(税込)」の文字 */
 .product-price .tax {
+    /* ↓ 控えめな小サイズ0.75rem */
     font-size: 0.75rem;
+    /* ↓ 細字400 */
     font-weight: 400;
+    /* ↓ グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 金額から4px離します */
     margin-left: 4px;
 }
 
 /* --- 11. MANEKINティーザーバナー --- */
+/* ↓ トップページ中腹でAIスタジオへ誘導するバナーセクションの外側余白 */
 .banner-section {
     padding-top: 20px;
     padding-bottom: 60px;
 }
 
+/* ↓ 真っ黒背景のシックなMANEKIN AI STUDIO案内バナー箱 */
 .manekin-teaser-banner {
+    /* ↓ 純黒背景 */
     background-color: var(--color-black);
+    /* ↓ 純白文字 */
     color: var(--color-white);
+    /* ↓ 上下60px・左右40pxのゆったりした余白 */
     padding: 60px 40px;
+    /* ↓ 中身の文字・ボタンをすべて中央揃えにします */
     text-align: center;
     position: relative;
+    /* ↓ 黒背景に少し境界がわかるダークグレー1px枠線 */
     border: 1px solid #333333;
 }
 
+/* ↓ バナー最上部の「AI FITTING STUDIO」枠付き小ラベル */
 .teaser-tag {
     display: inline-block;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.2em;
+    /* ↓ 半透明40%の白枠線で囲みます */
     border: 1px solid rgba(255, 255, 255, 0.4);
     padding: 4px 12px;
     margin-bottom: 16px;
 }
 
+/* ↓ ティーザーバナーの大見出し */
 .teaser-title {
     font-size: 1.8rem;
     font-weight: 700;
@@ -422,19 +698,23 @@
     margin-bottom: 12px;
 }
 
+/* ↓ ティーザーバナーの説明文 */
 .teaser-text {
     font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.8);
     max-width: 600px;
+    /* ↓ 上0・左右auto（中央配置）・下28px余白 */
     margin: 0 auto 28px;
     line-height: 1.8;
 }
 
+/* ↓ 黒バナー上で際立つ真っ白な「AI試着を始める」ボタン */
 .btn-teaser {
     background-color: var(--color-white);
     color: var(--color-black);
     font-weight: 600;
     padding: 12px 28px;
+    /* ↓ ボタン内文字が変なところで折り返されないよう1行固定 */
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
@@ -442,32 +722,38 @@
     gap: 6px;
 }
 
+/* ↓ ティーザーボタンホバー時のリアクション */
 .btn-teaser:hover {
     background-color: var(--color-gray-light);
     transform: translateY(-2px);
 }
 
 /* --- 12. ページコンテナとパンくず --- */
+/* ↓ 各サブページ（商品一覧・詳細・カート・ログイン等）のページ本体上下余白 */
 .page-container {
     padding-top: 32px;
     padding-bottom: 80px;
 }
 
+/* ↓ 「HOME / ITEMS / ...」を示す現在地ナビ（パンくずリスト） */
 .page-breadcrumb {
     font-size: 0.8rem;
     color: var(--color-gray-medium);
     margin-bottom: 24px;
 }
 
+/* ↓ パンくず内の親リンクにマウスを乗せたとき下線を表示します */
 .page-breadcrumb a:hover {
     color: var(--color-black);
     text-decoration: underline;
 }
 
+/* ↓ サブページ見出し全体 */
 .page-header {
     margin-bottom: 36px;
 }
 
+/* ↓ サブページの大見出し（例: ALL ITEMS） */
 .page-title {
     font-size: 2rem;
     font-weight: 700;
@@ -475,12 +761,14 @@
     margin-bottom: 6px;
 }
 
+/* ↓ 大見出し下の補足サブテキスト */
 .page-subtitle {
     font-size: 0.9rem;
     color: var(--color-gray-medium);
 }
 
 /* --- 13. カタログコントロール（フィルター & ソート） --- */
+/* ↓ カテゴリボタン群（左）と並び替えプルダウン（右）を並べるコントロールバー */
 .catalog-controls {
     display: flex;
     justify-content: space-between;
@@ -488,16 +776,19 @@
     padding-bottom: 24px;
     margin-bottom: 32px;
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 狭い画面では2段に折り返せるようにします */
     flex-wrap: wrap;
     gap: 16px;
 }
 
+/* ↓ カテゴリフィルターボタン群（ALL / OUTER / TOPS / BOTTOMS） */
 .filter-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
+/* ↓ 個別のフィルターボタンの通常見た目 */
 .filter-btn {
     padding: 8px 16px;
     font-size: 0.8rem;
@@ -507,6 +798,7 @@
     color: var(--color-dark);
 }
 
+/* ↓ 選択中（.active）またはホバー中のフィルターボタン（黒背景・白文字反転） */
 .filter-btn.active,
 .filter-btn:hover {
     background-color: var(--color-black);
@@ -514,17 +806,20 @@
     border-color: var(--color-black);
 }
 
+/* ↓ 右側の並び替え（新着順・価格順等）コントロール枠 */
 .sort-group {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
+/* ↓ 「並び替え:」ラベル文字 */
 .sort-label {
     font-size: 0.85rem;
     color: var(--color-gray-dark);
 }
 
+/* ↓ <select> 並び替えドロップダウン */
 .sort-select {
     padding: 8px 14px;
     font-size: 0.85rem;
@@ -536,41 +831,64 @@
 }
 
 /* --- 14. 商品詳細ページ（ITEM DETAIL）レイアウト --- */
+/* ↓ 商品詳細画面を左（写真）と右（説明・購入ボタン）の2列に分けるCSSグリッド */
 .item-detail-layout {
+    /* ↓ 2列のグリッドレイアウトを有効化 */
     display: grid;
+    /* ↓ 左列1 : 右列1 の均等50%ずつ2列に分割します */
     grid-template-columns: 1fr 1fr;
+    /* ↓ 写真と右側の説明エリアの間隔を48px空けます */
     gap: 48px;
+    /* ↓ 上端揃え（右列が縦に長くても左写真の縦位置が上端にピタッと合います） */
     align-items: start;
+    /* ↓ パンくずリストの下から16px空けます */
     margin-top: 16px;
 }
 
+/* ↓ 左側の商品ギャラリー列（スクロールしても画面に追従させる設定） */
 .detail-gallery {
+    /* ↓ 右側の説明文を下へスクロールしても、左側の商品写真が画面内にずっと付いてくるsticky固定 */
     position: sticky;
+    /* ↓ 固定ヘッダー（72px）の下さらに24px余裕を取った位置で止まります */
     top: calc(var(--header-height) + 24px);
 }
 
+/* ↓ 商品詳細のメイン画像を収める四角いフレーム */
 .detail-main-img-box {
+    /* ↓ 左列幅いっぱいの100% */
     width: 100%;
+    /* ↓ 一覧カードと同じ縦長3:4比率に統一 */
     aspect-ratio: 3 / 4;
+    /* ↓ 画像の余白背景を淡いオフホワイトに */
     background-color: var(--color-gray-bg);
+    /* ↓ 枠外の画像部分を非表示 */
     overflow: hidden;
+    /* ↓ 下に16pxの余白 */
     margin-bottom: 16px;
+    /* ↓ 薄いグレーの1px枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 内部バッジの基準位置 */
     position: relative;
 }
 
+/* ↓ 商品詳細のメイン画像本体<img> */
 .detail-main-img {
     width: 100%;
     height: 100%;
+    /* ↓ 商品全体（袖や裾まで）が見切れないよう縦横比を保って枠内にまるごと収めます */
     object-fit: contain;
+    /* ↓ カラー切替時のフェード遷移時間0.25秒 */
     transition: opacity 0.25s ease-in-out;
 }
 
+/* ↓ 右側の商品情報・サイズ選び・購入アクション列 */
 .detail-info-column {
     display: flex;
+    /* ↓ メタ情報→商品名→価格→カラー/サイズ→ボタン→説明文の順に縦一列に積みます */
     flex-direction: column;
 }
 
+/* ↓ 商品番号（SKU）や性別・カテゴリを示す小さなメタ行 */
 .detail-meta {
     font-size: 0.8rem;
     color: var(--color-gray-medium);
@@ -578,6 +896,7 @@
     letter-spacing: 0.05em;
 }
 
+/* ↓ 商品詳細の商品名大見出し */
 .detail-title {
     font-size: 1.8rem;
     font-weight: 700;
@@ -585,31 +904,36 @@
     margin-bottom: 12px;
 }
 
+/* ↓ 価格表示と下の区切り線を包むボックス */
 .detail-price-box {
     margin-bottom: 24px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 商品詳細の販売価格 */
 .detail-price {
     font-size: 1.8rem;
     font-weight: 700;
 }
 
+/* ↓ 価格横の「(税込)」表記 */
 .detail-tax {
     font-size: 0.85rem;
     color: var(--color-gray-medium);
     margin-left: 6px;
 }
 
-/* カラー・サイズ選択 */
+/* ↓ カラー・サイズ選択ブロック全体の枠 */
 .detail-options {
     margin-bottom: 28px;
     display: flex;
     flex-direction: column;
+    /* ↓ カラー選択ブロックとサイズ選択ブロックの間隔20px */
     gap: 20px;
 }
 
+/* ↓ 「COLOR:」や「SIZE:」の見出し行 */
 .option-group-title {
     font-size: 0.85rem;
     font-weight: 600;
@@ -619,19 +943,22 @@
     gap: 8px;
 }
 
+/* ↓ 現在選択されているカラー名・サイズ名を表示する強調テキスト */
 .current-selected-label {
     font-weight: 700;
     color: var(--color-black);
 }
 
+/* ↓ カラー選択ボタン群・サイズ選択ボタン群を並べるラッパー */
 .color-chips,
 .size-chips {
     display: flex;
+    /* ↓ 選択肢が多くても自動改行して並べます */
     flex-wrap: wrap;
     gap: 10px;
 }
 
-/* カラーチップ（ボタン） */
+/* ↓ カラー選択チップ（ボタン）の通常デザイン */
 .color-chip {
     padding: 8px 18px;
     border: 2px solid var(--color-gray-light);
@@ -643,18 +970,21 @@
     transition: all var(--transition-fast);
 }
 
+/* ↓ カラーボタンにマウスを乗せたとき枠線を少し濃くします */
 .color-chip:hover {
     border-color: var(--color-gray-medium);
 }
 
+/* ↓ 現在選ばれているカラーボタン（黒背景・白文字反転） */
 .color-chip.selected {
     border-color: var(--color-black);
     background-color: var(--color-black);
     color: var(--color-white);
 }
 
-/* サイズチップ（正方形ボタン） */
+/* ↓ サイズ選択チップ（S / M / L / XL 正方形ボタン） */
 .size-chip {
+    /* ↓ 幅・高さを48pxの正方形にしてタップしやすく揃えます */
     width: 48px;
     height: 48px;
     display: flex;
@@ -669,17 +999,19 @@
     transition: all var(--transition-fast);
 }
 
+/* ↓ サイズボタンのホバー時 */
 .size-chip:hover {
     border-color: var(--color-gray-medium);
 }
 
+/* ↓ 現在選ばれているサイズボタン（黒背景・白文字反転） */
 .size-chip.selected {
     border-color: var(--color-black);
     background-color: var(--color-black);
     color: var(--color-white);
 }
 
-/* 詳細アクションボタン群 */
+/* ↓ カート追加・すぐ購入・お気に入り・マネキン試着ボタン群のラッパー */
 .detail-actions {
     display: flex;
     flex-direction: column;
@@ -687,6 +1019,7 @@
     margin-bottom: 36px;
 }
 
+/* ↓ 詳細ページ用お気に入り登録ボタン */
 .btn-detail-fav {
     display: flex;
     align-items: center;
@@ -699,27 +1032,32 @@
     background-color: var(--color-white);
 }
 
+/* ↓ 既にお気に入り済みのときのピンク系強調スタイル */
 .btn-detail-fav.is-favorite {
     background-color: #fff0f0;
     color: var(--color-accent);
     border-color: var(--color-accent);
 }
 
+/* ↓ お気に入り済み時はボタン内ハートアイコンを赤く塗ります */
 .btn-detail-fav.is-favorite svg {
     fill: var(--color-accent);
 }
 
+/* ↓ 商品説明・素材仕様エリアを上部から区切るボックス */
 .detail-description-box {
     border-top: 1px solid var(--color-gray-light);
     padding-top: 24px;
 }
 
+/* ↓ 「ITEM DESCRIPTION」などの見出し */
 .detail-desc-heading {
     font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 12px;
 }
 
+/* ↓ 商品説明文本文 */
 .detail-desc-text {
     font-size: 0.9rem;
     line-height: 1.8;
@@ -727,922 +1065,1558 @@
     margin-bottom: 20px;
 }
 
+/* ↓ 素材混率や型番などのスペックリスト */
 .detail-spec-list {
     font-size: 0.85rem;
     color: var(--color-gray-dark);
+    /* ↓ 各行間にゆったりした空間を取って一覧性を高めます */
     line-height: 2;
 }
 
-/* --- 15. 本格的な購入手続き（CHECKOUT） --- */
+/* --- 15. 本格的な購入手続き（CHECKOUT: カート・レジ・完了画面） --- */
+/* ↓ 画面上部の「1. カート確認 ─ 2. お届け先入力 ─ 3. 注文完了」ステップバー */
 .checkout-stepper {
+    /* ↓ ステップ番号と進行線を横一直線に並べます */
     display: flex;
+    /* ↓ 縦方向の中央位置を揃えます */
     align-items: center;
+    /* ↓ ステップ全体を横方向の中央に揃えます */
     justify-content: center;
+    /* ↓ バー全体の最大横幅を500pxに制限して広がりすぎないようにします */
     max-width: 500px;
+    /* ↓ 上0・左右auto（中央寄せ）・下36pxの余白を取ります */
     margin: 0 auto 36px;
 }
 
+/* ↓ ステップの丸番号とラベルを縦にまとめる1項目 */
 .step-item {
+    /* ↓ 内部要素をFlexボックスで並べます */
     display: flex;
+    /* ↓ 上に丸番号、下にステップ名を縦積みにします */
     flex-direction: column;
+    /* ↓ 丸番号とラベルを左右中央に揃えます */
     align-items: center;
+    /* ↓ 丸番号と文字の間隔を6px空けます */
     gap: 6px;
 }
 
+/* ↓ ステップ番号の丸アイコン（未到達はグレー） */
 .step-num {
+    /* ↓ 横幅32pxの丸を作ります */
     width: 32px;
+    /* ↓ 高さ32pxにして正円の下地を作ります */
     height: 32px;
+    /* ↓ 角丸を50%にして完全な正円にします */
     border-radius: 50%;
+    /* ↓ 未到達ステップなので薄いグレー背景にします */
     background-color: var(--color-gray-light);
+    /* ↓ 未到達ステップの文字色も控えめな中グレーにします */
     color: var(--color-gray-medium);
+    /* ↓ 中の数字「1」「2」「3」をFlexで上下左右ど真ん中に置きます */
     display: flex;
+    /* ↓ 上下中央揃え */
     align-items: center;
+    /* ↓ 左右中央揃え */
     justify-content: center;
+    /* ↓ 数字のサイズを約13.6pxにします */
     font-size: 0.85rem;
+    /* ↓ 数字を太字（700）にして視認性を上げます */
     font-weight: 700;
 }
 
+/* ↓ 現在または完了したステップの番号丸（黒塗り白文字で強調） */
 .step-item.active .step-num {
+    /* ↓ 到達済みステップの丸背景を純黒（#111）にします */
     background-color: var(--color-black);
+    /* ↓ 数字の文字色を白にしてくっきり目立たせます */
     color: var(--color-white);
 }
 
+/* ↓ ステップ名ラベル */
 .step-text {
+    /* ↓ ラベル文字を少し小さめの12px程度にします */
     font-size: 0.75rem;
+    /* ↓ やや太字（600）にします */
     font-weight: 600;
+    /* ↓ 未到達ステップのラベル文字色は控えめな中グレーにします */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 有効なステップ名の文字色を黒にします */
 .step-item.active .step-text {
+    /* ↓ 到達済みステップ名は純黒で強調します */
     color: var(--color-black);
 }
 
+/* ↓ ステップ同士をつなぐ横の進行線 */
 .step-line {
+    /* ↓ ステップの間の余白に合わせて横に伸び縮みします */
     flex: 1;
+    /* ↓ 線の太さ（高さ）を2pxにします */
     height: 2px;
+    /* ↓ 未到達区間は薄いグレーの線にします */
     background-color: var(--color-gray-light);
+    /* ↓ 下のラベル高さ分（20px）下余白を足すことで、丸の真ん中と線の高さがぴったり揃います */
     margin: 0 12px 20px;
 }
 
+/* ↓ 到達済みのステップ間ライン（黒線） */
 .step-line.active {
+    /* ↓ 進行済みの線も純黒にして進捗を示します */
     background-color: var(--color-black);
 }
 
+/* ↓ 購入画面を左（カート商品・住所入力フォーム）1.6 : 右（合計金額・ポイント・確定ボタン）1 で分割 */
 .checkout-layout {
+    /* ↓ CSS Gridレイアウトを有効にします */
     display: grid;
+    /* ↓ 左側の入力カラムを1.6倍、右側の合計サマリーカラムを1倍の比率で2列配置します */
     grid-template-columns: 1.6fr 1fr;
+    /* ↓ 左右カラムの隙間を36px空けます */
     gap: 36px;
+    /* ↓ 右側のサマリーカードを上端に揃えます（sticky追従を機能させるため不可欠） */
     align-items: start;
 }
 
+/* ↓ チェックアウト内の各白いステップ箱（商品確認枠、配送先枠など） */
 .checkout-section-card {
+    /* ↓ カード背景を清潔な白にします */
     background-color: var(--color-white);
+    /* ↓ 周囲に1pxの薄いグレー枠線を付けます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 内側に全方向32pxのゆとりある余白を設けます */
     padding: 32px;
+    /* ↓ 次のカードとの間隔を24px空けます */
     margin-bottom: 24px;
 }
 
+/* ↓ セクション見出し（「[1] カートに入っている商品」等） */
 .checkout-section-title {
+    /* ↓ 見出しの文字サイズを約19.2pxにします */
     font-size: 1.2rem;
+    /* ↓ 太字（700）にします */
     font-weight: 700;
+    /* ↓ 見出しの下に20pxの余白を設けます */
     margin-bottom: 20px;
+    /* ↓ 番号バッジと見出し文字を横並びにします */
     display: flex;
+    /* ↓ 縦方向の中央を揃えます */
     align-items: center;
+    /* ↓ 番号バッジと文字の間を12px空けます */
     gap: 12px;
 }
 
+/* ↓ 見出し先頭の黒い四角い番号バッジ */
 .sec-badge {
+    /* ↓ 横幅26px */
     width: 26px;
+    /* ↓ 高さ26pxの正方形 */
     height: 26px;
+    /* ↓ 背景を純黒にします */
     background-color: var(--color-black);
+    /* ↓ 数字の文字色を白にします */
     color: var(--color-white);
+    /* ↓ 数字のサイズを小さめ（約12.8px）に収めます */
     font-size: 0.8rem;
+    /* ↓ Flexで数字を四角の中央に置きます */
     display: flex;
+    /* ↓ 上下中央揃え */
     align-items: center;
+    /* ↓ 左右中央揃え */
     justify-content: center;
 }
 
-/* カートアイテム行 */
+/* ↓ カート内の商品一覧縦並びコンテナ */
 .checkout-cart-list {
+    /* ↓ Flexボックスを有効にします */
     display: flex;
+    /* ↓ 商品カードを上から下へ縦方向に積みます */
     flex-direction: column;
+    /* ↓ 商品カード同士の間隔を16px空けます */
     gap: 16px;
 }
 
+/* ↓ カート内の商品1行分のカード */
 .cart-item-row {
+    /* ↓ サムネイル画像・商品情報・数量コントロールを横並びにします */
     display: flex;
+    /* ↓ 縦方向の中央揃えにします */
     align-items: center;
+    /* ↓ 要素間を左右均等に分散配置します */
     justify-content: space-between;
+    /* ↓ カード内側に上下左右16pxの余白を作ります */
     padding: 16px;
+    /* ↓ 1pxの薄いグレー枠線で囲みます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ カード内背景をごく淡いグレー（#f7f7f7）にして白背景と区別します */
     background-color: var(--color-gray-bg);
+    /* ↓ 画像・説明・数量ボタンの間を16pxずつ空けます */
     gap: 16px;
 }
 
+/* ↓ カート商品の小さなサムネイル画像 */
 .cart-item-thumb {
+    /* ↓ サムネイル幅を64pxに固定します */
     width: 64px;
+    /* ↓ サムネイル高さを80px（縦長）に固定します */
     height: 80px;
+    /* ↓ 縦横比を崩さずに64×80枠いっぱいへトリミング表示します */
     object-fit: cover;
+    /* ↓ 画像読込中や透過時の下地背景を薄いグレーにします */
     background-color: #eee;
 }
 
+/* ↓ カート商品の名前・色サイズ・価格を並べる中間領域 */
 .cart-item-details {
+    /* ↓ 残りの横スペースすべてを占有し、右側の数量ボタンを右端に押し出します */
     flex: 1;
 }
 
+/* ↓ カート内の商品名 */
 .cart-item-name {
+    /* ↓ 商品名を約15.2pxにします */
     font-size: 0.95rem;
+    /* ↓ セミボールド（600）にします */
     font-weight: 600;
+    /* ↓ 下のカラー・サイズ情報との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ カート商品のカラー・サイズ補足文字列 */
 .cart-item-meta {
+    /* ↓ 小さめ（約12.8px）の文字にします */
     font-size: 0.8rem;
+    /* ↓ 目立ちすぎない中グレーにします */
     color: var(--color-gray-medium);
+    /* ↓ 下の価格行との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ カート商品の単価・小計金額 */
 .cart-item-price {
+    /* ↓ 金額を読みやすい約15.2pxにします */
     font-size: 0.95rem;
+    /* ↓ 金額を太字（700）で強調します */
     font-weight: 700;
 }
 
+/* ↓ 数量変更「− 1 ＋」と削除ボタンの並び */
 .cart-item-controls {
+    /* ↓ ボタン類を横一列に並べます */
     display: flex;
+    /* ↓ 上下中央揃えにします */
     align-items: center;
+    /* ↓ 各ボタン・数値の間を12px空けます */
     gap: 12px;
 }
 
+/* ↓ 数量増減の正方形（28×28px）ボタン */
 .cart-qty-btn {
+    /* ↓ 幅28px */
     width: 28px;
+    /* ↓ 高さ28px */
     height: 28px;
+    /* ↓ 薄いグレーの1px枠線を付けます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 背景を白にして押しボタンらしく見せます */
     background-color: var(--color-white);
+    /* ↓ 「−」「＋」記号を中央に置くためFlexにします */
     display: flex;
+    /* ↓ 上下中央 */
     align-items: center;
+    /* ↓ 左右中央 */
     justify-content: center;
+    /* ↓ 記号を太字（700）にします */
     font-weight: 700;
 }
 
+/* ↓ カート商品の数量数字表示 */
 .cart-qty-text {
+    /* ↓ 数字サイズ約14.4px */
     font-size: 0.9rem;
+    /* ↓ やや太字（600） */
     font-weight: 600;
+    /* ↓ 1桁と2桁でボタン位置がズレないよう最小幅20pxを確保します */
     min-width: 20px;
+    /* ↓ 数字を中央寄せにします */
     text-align: center;
 }
 
+/* ↓ カートから商品を削除するリンクボタン */
 .cart-remove-btn {
+    /* ↓ 控えめな12pxサイズにします */
     font-size: 0.75rem;
+    /* ↓ 注意・削除操作を表す赤系アクセントカラーにします */
     color: var(--color-accent);
+    /* ↓ 下線を付けて削除リンクと分かるようにします */
     text-decoration: underline;
+    /* ↓ 指カーソルでクリック可能と示します */
     cursor: pointer;
 }
 
-/* フォーム行 */
+/* ↓ 2項目（例: 姓・名 / 郵便番号・住所）を横並びにする汎用フォーム行 */
 .form-row {
+    /* ↓ 複数の入力グループを横に並べます */
     display: flex;
+    /* ↓ 入力項目同士の間隔を16px空けます */
     gap: 16px;
 }
 
+/* ↓ 横並びフォーム内で均等割合（1）を取る補助クラス */
 .flex-1 {
+    /* ↓ 利用可能スペースの比率1を割り当てます */
     flex: 1;
 }
 
+/* ↓ 横並びフォーム内で2倍の幅割合（2）を取る補助クラス */
 .flex-2 {
+    /* ↓ .flex-1 の2倍の広さ（比率2）を割り当てます */
     flex: 2;
 }
 
-/* 支払い方法選択グリッド */
+/* ↓ 支払い方法選択ブロックの区切りエリア */
 .payment-method-box {
+    /* ↓ 上の要素（ポイント利用欄）との間を24px空けます */
     margin-top: 24px;
+    /* ↓ 上側枠線から内側に24pxの余白を設けます */
     padding-top: 24px;
+    /* ↓ 上に1pxの薄いグレー区切り線を引きます */
     border-top: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 「お支払い方法」小見出し */
 .payment-box-title {
+    /* ↓ 小見出しサイズ16px（1rem） */
     font-size: 1rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下の選択肢グリッドとの間を16px空けます */
     margin-bottom: 16px;
 }
 
+/* ↓ 支払い方法（クレジットカード / 代金引換 等）を2列に並べるグリッド */
 .payment-options-grid {
+    /* ↓ CSS Gridでタイル配置します */
     display: grid;
+    /* ↓ 等幅（1fr）の2列で並べます */
     grid-template-columns: 1fr 1fr;
+    /* ↓ カード同士の縦横間隔を12px空けます */
     gap: 12px;
+    /* ↓ 下のクレジットカード入力欄との間を20px空けます */
     margin-bottom: 20px;
 }
 
+/* ↓ 個々の支払い方法ラジオ選択肢枠 */
 .payment-option-label {
+    /* ↓ 未選択時は2pxの薄いグレー枠線で囲みます */
     border: 2px solid var(--color-gray-light);
+    /* ↓ 内側に14pxの余白を設けます */
     padding: 14px;
+    /* ↓ ラベル全体をクリック可能と示す指カーソル */
     cursor: pointer;
+    /* ↓ Flexboxで中身を整列させます */
     display: flex;
+    /* ↓ ラジオボタン・名称・補足文を縦積みにします */
     flex-direction: column;
+    /* ↓ 項目間の縦間隔を4px空けます */
     gap: 4px;
+    /* ↓ 選択枠の色変化を0.2秒で滑らかにします */
     transition: all var(--transition-fast);
 }
 
+/* ↓ 選択中のお支払い方法枠（黒い太枠線＋薄グレー背景） */
 .payment-option-label.selected {
+    /* ↓ 選択中は枠線を純黒に変えてはっきり強調します */
     border-color: var(--color-black);
+    /* ↓ 背景もごく薄いグレーにして選択状態を一目で分からせます */
     background-color: var(--color-gray-bg);
 }
 
+/* ↓ 支払い方法名 */
 .pay-name {
+    /* ↓ 方法名サイズ約14.4px */
     font-size: 0.9rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
 }
 
+/* ↓ 支払い方法の説明サブ文字 */
 .pay-sub {
+    /* ↓ サブ文言は小さめ（12px） */
     font-size: 0.75rem;
+    /* ↓ 中グレーで控えめに表示します */
     color: var(--color-gray-medium);
 }
 
+/* ↓ クレジットカード選択時に開くカード番号入力エリア */
 .credit-card-inputs {
+    /* ↓ カード入力専用ボックスの背景をごく淡いグレーにします */
     background-color: var(--color-gray-bg);
+    /* ↓ 内側に20pxの余白を取ります */
     padding: 20px;
+    /* ↓ 1pxの薄いグレー枠線で囲みます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 各入力グループをFlexで整列させます */
     display: flex;
+    /* ↓ 縦方向に積みます */
     flex-direction: column;
+    /* ↓ 各行の間隔を14px空けます */
     gap: 14px;
 }
 
-/* チェックアウト金額サマリーサイドバー */
+/* ↓ 右側の注文金額・送料・確定ボタンサマリーサイドバー（画面スクロールに追従） */
 .checkout-summary-card {
+    /* ↓ サマリーカードの背景を白にします */
     background-color: var(--color-white);
+    /* ↓ 1pxの薄いグレー枠線で囲みます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 内側全方向に32pxの余白を取ります */
     padding: 32px;
+    /* ↓ 注文内容を見ながら左側の長い入力欄をスクロールできるよう固定追従させます */
     position: sticky;
+    /* ↓ 固定ヘッダー（72px）のさらに24px下の位置で吸着停止します */
     top: calc(var(--header-height) + 24px);
+    /* ↓ さりげない影を落として右サイドバーを浮かび上がらせます */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ サマリータイトル（「ご注文内容」） */
 .summary-card-title {
+    /* ↓ タイトルサイズ約19.2px */
     font-size: 1.2rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下の金額明細との間隔を20px空けます */
     margin-bottom: 20px;
+    /* ↓ 区切り線の上側に12pxの余白を取ります */
     padding-bottom: 12px;
+    /* ↓ タイトル下に1pxの仕切り線を引きます */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 金額明細の各行（小計・送料・割引・合計）を並べる枠 */
 .summary-rows {
+    /* ↓ 各明細行を縦並びにします */
     display: flex;
+    /* ↓ 縦方向積み上げ */
     flex-direction: column;
+    /* ↓ 行同士の間隔を14px空けます */
     gap: 14px;
+    /* ↓ 下の獲得予定ポイント欄等との間を24px空けます */
     margin-bottom: 24px;
 }
 
+/* ↓ 項目名（左）と金額（右）の1行 */
 .summary-row {
+    /* ↓ 項目名と金額を横並び両端に配置します */
     display: flex;
+    /* ↓ 左端と右端に振り分けてレシート風の表にします */
     justify-content: space-between;
+    /* ↓ 明細テキストは約14.4pxにします */
     font-size: 0.9rem;
+    /* ↓ 濃いグレーの文字色で落ち着かせます */
     color: var(--color-gray-dark);
 }
 
+/* ↓ 補足説明の薄いグレー小文字ユーティリティ */
 .text-muted {
+    /* ↓ 小さめ（12px）サイズ */
     font-size: 0.75rem;
+    /* ↓ 薄い中グレーの文字色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 小計・送料と最終合計額を分ける横線 */
 .summary-divider {
+    /* ↓ 高さ1pxの細い線にします */
     height: 1px;
+    /* ↓ 薄いグレーの線色にします */
     background-color: var(--color-gray-light);
+    /* ↓ 上下に8pxずつの隙間を確保します */
     margin: 8px 0;
 }
 
+/* ↓ 「ご請求合計」の強調行 */
 .summary-row.total-row {
+    /* ↓ 他より大きめ（20px）の文字サイズにします */
     font-size: 1.25rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 純黒にして最も目立たせます */
     color: var(--color-black);
+    /* ↓ 上方向に4pxだけ余分な空きを取ります */
     padding-top: 4px;
 }
 
+/* ↓ 合計金額の数字部分 */
 .total-amount {
+    /* ↓ 請求金額数字を24px（1.5rem）で大きく表示します */
     font-size: 1.5rem;
 }
 
-/* 注文確定ボタン */
+/* ↓ チェックアウト最下部の「注文を確定する」大型黒ボタン */
 .btn-place-order {
+    /* ↓ 上下左右18pxの厚みある押しやすいサイズにします */
     padding: 18px;
+    /* ↓ 背景を純黒にします */
     background-color: var(--color-black);
+    /* ↓ 文字色を白にします */
     color: var(--color-white);
+    /* ↓ メイン文言とサブ文言を縦に積むFlex配置 */
     display: flex;
+    /* ↓ 縦方向積み上げ */
     flex-direction: column;
+    /* ↓ 2行の間を4px空けます */
     gap: 4px;
 }
 
+/* ↓ 注文確定ボタンのホバー時 */
 .btn-place-order:hover {
+    /* ↓ 少し明るいダークグレー（#222）に変化します */
     background-color: #222;
+    /* ↓ わずかに2px上へ浮かび上がる動きを付けます */
     transform: translateY(-2px);
+    /* ↓ カード用の影を落として押下感を強調します */
     box-shadow: var(--shadow-card);
 }
 
+/* ↓ 注文確定ボタン内のメイン文言 */
 .order-btn-text {
+    /* ↓ 文字サイズ約16.8px */
     font-size: 1.05rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 文字間を広く（0.1em）取って高級感を出します */
     letter-spacing: 0.1em;
 }
 
+/* ↓ 注文確定ボタン内のサブ注釈文字 */
 .order-btn-sub {
+    /* ↓ ごく小さめの注釈サイズ（約11.2px） */
     font-size: 0.7rem;
+    /* ↓ 70%不透明度の白文字で控えめに添えます */
     color: rgba(255, 255, 255, 0.7);
+    /* ↓ 通常の細字（400）にします */
     font-weight: 400;
 }
 
+/* ↓ ボタン下部のSSL・データベース保全注記 */
 .summary-security-note {
+    /* ↓ 小さな安心注記文字（12px） */
     font-size: 0.75rem;
+    /* ↓ 控えめな中グレーにします */
     color: var(--color-gray-medium);
+    /* ↓ 注文確定ボタンの下から16px離します */
     margin-top: 16px;
+    /* ↓ 南京錠アイコンと注記文を横並びにします */
     display: flex;
+    /* ↓ 縦中央に揃えます */
     align-items: center;
+    /* ↓ 南京錠アイコンと文字の間を6px空けます */
     gap: 6px;
+    /* ↓ 行間を1.5倍にして折り返しても読みやすくします */
     line-height: 1.5;
 }
 
 /* 注文完了サンクスカード */
+/* ↓ 購入確定後に表示される完了メッセージ全体の外枠 */
 .order-completed-view {
+    /* ↓ 最大幅650pxに収めて中央に読みやすく置きます */
     max-width: 650px;
+    /* ↓ 上下40px・左右auto（中央寄せ） */
     margin: 40px auto;
 }
 
+/* ↓ 注文完了カードの白いボックス */
 .completed-card {
+    /* ↓ 背景を純白にします */
     background-color: var(--color-white);
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下48px・左右36pxのゆったりした余白 */
     padding: 48px 36px;
+    /* ↓ 少し浮かせて見せるカード影 */
     box-shadow: var(--shadow-card);
 }
 
+/* ↓ 上部中央の黒い丸型チェックマークアイコン枠 */
 .completed-check-icon {
+    /* ↓ 幅72px */
     width: 72px;
+    /* ↓ 高さ72pxの正円土台 */
     height: 72px;
+    /* ↓ 黒丸背景 */
     background-color: var(--color-black);
+    /* ↓ 白抜きチェックアイコン */
     color: var(--color-white);
+    /* ↓ 完全な円形にします */
     border-radius: 50%;
+    /* ↓ FlexでチェックSVGを円の中央へ置きます */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 上0・左右auto（中央寄せ）・下20px余白 */
     margin: 0 auto 20px;
 }
 
+/* ↓ 丸枠の中のチェックSVGサイズ */
 .completed-check-icon svg {
+    /* ↓ SVG幅36px */
     width: 36px;
+    /* ↓ SVG高さ36px */
     height: 36px;
 }
 
+/* ↓ 「ORDER CONFIRMED」バッジ */
 .completed-badge {
+    /* ↓ 小さな英語ラベル（12px） */
     font-size: 0.75rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 広い文字間（0.2em） */
     letter-spacing: 0.2em;
+    /* ↓ 淡いグレー背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 1pxの枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 上下4px・左右12pxの内側余白 */
     padding: 4px 12px;
+    /* ↓ 文字幅ぴったりかつ余白が効くinline-block */
     display: inline-block;
+    /* ↓ 下に12px余白 */
     margin-bottom: 12px;
 }
 
+/* ↓ 「ご注文ありがとうございました」大見出し */
 .completed-title {
+    /* ↓ 大見出しサイズ約28.8px */
     font-size: 1.8rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下に8px余白 */
     margin-bottom: 8px;
 }
 
+/* ↓ 補足サブメッセージ */
 .completed-subtitle {
+    /* ↓ サブ文サイズ約15.2px */
     font-size: 0.95rem;
+    /* ↓ 控えめな中グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下の詳細ボックスとの間を28px空けます */
     margin-bottom: 28px;
 }
 
+/* ↓ 注文番号・お支払い合計・獲得ポイント等を並べる詳細枠 */
 .completed-details-box {
+    /* ↓ ごく淡いグレー背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 1pxの薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 内側全方向に24px余白 */
     padding: 24px;
+    /* ↓ カード全体が中央揃えでも伝票明細だけは左揃えにして読みやすくします */
     text-align: left;
+    /* ↓ 下のボタン群との間を32px空けます */
     margin-bottom: 32px;
+    /* ↓ 明細各行を縦並びにします */
     display: flex;
+    /* ↓ 縦方向に積みます */
     flex-direction: column;
+    /* ↓ 行同士の間隔を12px空けます */
     gap: 12px;
+    /* ↓ 文字サイズ約14.4px */
     font-size: 0.9rem;
 }
 
+/* ↓ 完了詳細内の項目名（左）と値（右）の1行 */
 .comp-row {
+    /* ↓ 左ラベルと右値を横両端に並べます */
     display: flex;
+    /* ↓ 両端揃えで整列させます */
     justify-content: space-between;
 }
 
+/* ↓ 支払合計などの強調金額文字 */
 .highlight-price {
+    /* ↓ 約20pxの大きさ */
     font-size: 1.25rem;
+    /* ↓ 純黒で引き締めます */
     color: var(--color-black);
 }
 
+/* ↓ 完了画面下部の「お買い物を続ける」「マイページで確認」ボタン並び */
 .completed-actions {
+    /* ↓ ボタン群を横並びにします */
     display: flex;
+    /* ↓ ボタン間隔を16px空けます */
     gap: 16px;
+    /* ↓ 画面中央に揃えます */
     justify-content: center;
+    /* ↓ 狭い画面では自動で次の行に折り返します */
     flex-wrap: wrap;
 }
 
 /* --- 16. お気に入り一覧（FAVORITE） --- */
+/* ↓ 商品やお気に入りが0件のときに表示する案内ボックス */
 .empty-state {
+    /* ↓ 文言とボタンを中央寄せにします */
     text-align: center;
+    /* ↓ 上下80px・左右20pxの広い余白で空状態を上品に見せます */
     padding: 80px 20px;
+    /* ↓ 淡いオフホワイト背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 4列グリッドの1行目左端から右端（-1）まで横幅いっぱいにまたがって表示します */
     grid-column: 1 / -1;
 }
 
+/* ↓ 空状態の中央アイコン */
 .empty-state-icon {
+    /* ↓ アイコン幅48px */
     width: 48px;
+    /* ↓ アイコン高さ48px */
     height: 48px;
+    /* ↓ 上0・左右auto（中央寄せ）・下16px余白 */
     margin: 0 auto 16px;
+    /* ↓ 主張しすぎない中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 空状態タイトル */
 .empty-state-title {
+    /* ↓ タイトルサイズ20px */
     font-size: 1.25rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下に8px余白 */
     margin-bottom: 8px;
 }
 
+/* ↓ 空状態の説明テキスト */
 .empty-state-text {
+    /* ↓ 本文サイズ約14.4px */
     font-size: 0.9rem;
+    /* ↓ 落ち着いた中グレー */
     color: var(--color-gray-medium);
+    /* ↓ 下の誘導ボタンとの間を24px空けます */
     margin-bottom: 24px;
 }
 
 /* --- 17. 会員登録 & ログイン（AUTH） --- */
+/* ↓ ログイン・新規会員登録画面の中央フォームカード */
 .auth-card {
+    /* ↓ フォームの最大幅を480pxに絞って入力しやすくします */
     max-width: 480px;
+    /* ↓ 上下40px・左右auto（画面中央配置） */
     margin: 40px auto;
+    /* ↓ 上下48px・左右40pxの内側余白 */
     padding: 48px 40px;
+    /* ↓ 清潔な白背景 */
     background-color: var(--color-white);
+    /* ↓ 1pxの薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ ほのかなカード影 */
     box-shadow: var(--shadow-subtle);
 }
 
+/* ↓ カード上部の見出しブロック */
 .auth-header {
+    /* ↓ 見出しを中央寄せにします */
     text-align: center;
+    /* ↓ フォーム本体との間を32px空けます */
     margin-bottom: 32px;
 }
 
+/* ↓ 「SIGN IN」 / 「REGISTER」タイトル */
 .auth-title {
+    /* ↓ 英語大見出しを32px（2rem）で堂々と表示します */
     font-size: 2rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 文字間を広く（0.1em）取ります */
     letter-spacing: 0.1em;
+    /* ↓ 下の日本語サブタイトルとの間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ 日本語サブタイトル */
 .auth-subtitle {
+    /* ↓ 小さめ（約13.6px）の文字サイズ */
     font-size: 0.85rem;
+    /* ↓ 落ち着いた中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 認証フォーム要素の縦並びコンテナ */
 .auth-form {
+    /* ↓ 各入力グループやボタンをFlexで管理します */
     display: flex;
+    /* ↓ 上から下へ縦一列に積みます */
     flex-direction: column;
+    /* ↓ 項目間の隙間を20px空けます */
     gap: 20px;
 }
 
+/* ↓ 各入力項目（ラベル＋入力欄＋エラー表示）の1セット */
 .form-group {
+    /* ↓ ラベル・入力ボックス・エラー文をFlexで並べます */
     display: flex;
+    /* ↓ 縦方向に積みます */
     flex-direction: column;
+    /* ↓ 要素間を6px空けてラベルと入力欄を近づけます */
     gap: 6px;
 }
 
+/* ↓ フォーム項目の見出しラベル */
 .form-label {
+    /* ↓ 文字サイズ約13.6px */
     font-size: 0.85rem;
+    /* ↓ やや太字（600）で項目名を見分けやすくします */
     font-weight: 600;
+    /* ↓ 濃いダークグレーの文字色 */
     color: var(--color-dark);
 }
 
+/* ↓ 必須項目の赤い「*」マーク */
 .form-label .required {
+    /* ↓ 赤系アクセントカラーで必須マークを強調します */
     color: var(--color-accent);
 }
 
+/* ↓ テキスト入力ボックス・プルダウン・テキストエリア共通の見た目 */
 .form-input {
+    /* ↓ 入力枠の内側に上下12px・左右14pxの余白を設けて打ちやすくします */
     padding: 12px 14px;
+    /* ↓ 入力文字サイズ約15.2px */
     font-size: 0.95rem;
+    /* ↓ 親要素（Noto Sans JP / Inter）と同じフォントを引き継ぎます */
     font-family: inherit;
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ ブラウザ既定の青いフォーカス枠線を消して独自の黒枠線に統一します */
     outline: none;
+    /* ↓ 枠線の色変化を0.2秒で滑らかにします */
     transition: border-color var(--transition-fast);
 }
 
+/* ↓ 入力欄をクリック・選択して文字を打ち込める状態の枠線 */
 .form-input:focus {
+    /* ↓ 入力中の枠線を純黒に変えて選択中であることを明確にします */
     border-color: var(--color-black);
 }
 
+/* ↓ バリデーションエラーメッセージ表示欄（通常時も高さを保ちガタつきを防ぎます） */
 .form-error {
+    /* ↓ 警告文の小さめ文字サイズ（12px） */
     font-size: 0.75rem;
+    /* ↓ エラーを示す赤系アクセントカラー */
     color: var(--color-accent);
+    /* ↓ エラーが出ていないときも18px分の高さを確保し、出現時のガタつきを抑えます */
     min-height: 18px;
 }
 
+/* ↓ 利用規約同意チェックボックスとラベルの横並び枠 */
 .form-checkbox-group {
+    /* ↓ チェックボックスと同意文を横並びにします */
     display: flex;
+    /* ↓ 縦方向の中央位置を揃えます */
     align-items: center;
+    /* ↓ チェックボックスと文言の間を10px空けます */
     gap: 10px;
+    /* ↓ 文字サイズ約13.6px */
     font-size: 0.85rem;
 }
 
+/* ↓ チェックボックス本体のサイズ */
 .form-checkbox {
+    /* ↓ 横16px */
     width: 16px;
+    /* ↓ 縦16pxにしてタップしやすくします */
     height: 16px;
+    /* ↓ マウスを乗せたら指マークに変えます */
     cursor: pointer;
 }
 
+/* ↓ ワンクリックお試しログイン用ボタン */
 .demo-login-btn {
+    /* ↓ 上の標準ボタンとの間に8px余白を追加します */
     margin-top: 8px;
+    /* ↓ 少し控えめなサイズ（約12.8px）にします */
     font-size: 0.8rem;
+    /* ↓ 全方向10px余白のスリムな高さにします */
     padding: 10px;
+    /* ↓ 薄いグレーの枠線色にします */
     border-color: var(--color-gray-light);
 }
 
+/* ↓ ログイン ⇔ 新規登録 への誘導リンク枠 */
 .auth-footer {
+    /* ↓ 上のフォームから32px離します */
     margin-top: 32px;
+    /* ↓ 区切り線の下に24px余白を設けます */
     padding-top: 24px;
+    /* ↓ 上に1pxの薄い仕切り線を引きます */
     border-top: 1px solid var(--color-gray-light);
+    /* ↓ 案内文とリンクを中央揃えにします */
     text-align: center;
 }
 
+/* ↓ 切り替え案内文 */
 .auth-switch-text {
+    /* ↓ 小さめ（約13.6px）のテキスト */
     font-size: 0.85rem;
+    /* ↓ 中グレーで控えめに表示します */
     color: var(--color-gray-medium);
+    /* ↓ 下のリンクとの間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ 切り替えリンク */
 .auth-link {
+    /* ↓ 約14.4pxの文字サイズ */
     font-size: 0.9rem;
+    /* ↓ やや太字（600） */
     font-weight: 600;
+    /* ↓ 純黒で視認性を確保します */
     color: var(--color-black);
+    /* ↓ 下線を引いてページ切替リンクと分かりやすくします */
     text-decoration: underline;
 }
 
 /* --- 18. マイページ（MYPAGE） --- */
+/* ↓ マイページ上部の会員名・アバター・ログアウトボタンを載せるヘッダーカード */
 .mypage-header-card {
+    /* ↓ 左側の会員情報と右側のログアウトボタンを横並び両端に配置します */
     display: flex;
+    /* ↓ 左右両端揃え */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ カード内余白を全方向32px取ります */
     padding: 32px;
+    /* ↓ 淡いオフホワイト背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 1pxの薄い枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 下の統計カードとの間を24px空けます */
     margin-bottom: 24px;
+    /* ↓ 狭い画面ではログアウトボタンを折り返せるようにします */
     flex-wrap: wrap;
+    /* ↓ 折り返し時や要素間の隙間を16px空けます */
     gap: 16px;
 }
 
+/* ↓ 左側のイニシャル丸アイコン＋会員名・メールブロック */
 .user-profile-info {
+    /* ↓ 丸アバターと名前テキストを横並びにします */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ アバターと文字の間を20px空けます */
     gap: 20px;
 }
 
+/* ↓ 名前の頭文字を表示する黒い丸型アバターアイコン */
 .user-avatar-circle {
+    /* ↓ 幅64px */
     width: 64px;
+    /* ↓ 高さ64px */
     height: 64px;
+    /* ↓ 完全な円形 */
     border-radius: 50%;
+    /* ↓ 純黒の丸背景 */
     background-color: var(--color-black);
+    /* ↓ 白抜き頭文字 */
     color: var(--color-white);
+    /* ↓ Flexで頭文字1文字を真ん中に置きます */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 文字サイズ24px（1.5rem） */
     font-size: 1.5rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
 }
 
+/* ↓ ユーザー名と会員ランクバッジの横並び行 */
 .user-title-row {
+    /* ↓ 氏名と会員ランクタグを横に並べます */
     display: flex;
+    /* ↓ 縦中央に揃えます */
     align-items: center;
+    /* ↓ 名前とバッジの間を12px空けます */
     gap: 12px;
+    /* ↓ 下のメールアドレス行との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ 表示されるユーザー氏名 */
 .user-display-name {
+    /* ↓ 氏名を約22.4pxで大きく表示します */
     font-size: 1.4rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
 }
 
+/* ↓ 「REGULAR MEMBER」等の黒い会員ランクタグ */
 .membership-badge {
+    /* ↓ かなり小さめの英語バッジ文字（約10.4px） */
     font-size: 0.65rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 広めの文字間（0.1em） */
     letter-spacing: 0.1em;
+    /* ↓ 上下3px・左右8pxの内側余白 */
     padding: 3px 8px;
+    /* ↓ 黒背景 */
     background-color: var(--color-black);
+    /* ↓ 白文字 */
     color: var(--color-white);
 }
 
+/* ↓ 登録メールアドレス表示 */
 .user-display-email {
+    /* ↓ メール表記は少し小さめ（約13.6px） */
     font-size: 0.85rem;
+    /* ↓ 落ち着いた中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ マイページの3つのステータスカード（保有ポイント / 注文回数 / お気に入り数）を並べるグリッド */
 .mypage-stats-grid {
+    /* ↓ CSS Gridを有効にします */
     display: grid;
+    /* ↓ 均等3列（1fr × 3）に並べます */
     grid-template-columns: repeat(3, 1fr);
+    /* ↓ カード同士の間隔を20px空けます */
     gap: 20px;
+    /* ↓ 下のタブ切り替えエリアとの間を32px空けます */
     margin-bottom: 32px;
 }
 
+/* ↓ 個々の数字サマリーカード */
 .stat-card {
+    /* ↓ 全方向24pxの余白 */
     padding: 24px;
+    /* ↓ 白背景 */
     background-color: var(--color-white);
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
+    /* ↓ ラベルと数値を縦並びに配置します */
     display: flex;
+    /* ↓ 縦方向積み上げ */
     flex-direction: column;
+    /* ↓ ラベルと数値の間を8px空けます */
     gap: 8px;
 }
 
+/* ↓ 項目ラベル（「保有ポイント」等） */
 .stat-label {
+    /* ↓ 約12.8pxのラベル */
     font-size: 0.8rem;
+    /* ↓ 控えめな中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 大きな数字表示（「1,000」等） */
 .stat-value {
+    /* ↓ 数字を大きく約25.6pxで強調します */
     font-size: 1.6rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
 }
 
+/* ↓ 数字の後ろに添える単位（「pt」「件」「点」等） */
 .stat-unit {
+    /* ↓ 単位は数値より小さめ（約14.4px）にして数字を引き立てます */
     font-size: 0.9rem;
+    /* ↓ 細字（400） */
     font-weight: 400;
+    /* ↓ 中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ マイページ内のタブ切り替えボタンバー */
 .mypage-tabs {
+    /* ↓ タブボタンを横一列に並べます */
     display: flex;
+    /* ↓ ボタン同士の間隔を12px空けます */
     gap: 12px;
+    /* ↓ タブ全体の下側に1pxのベースラインを引きます */
     border-bottom: 1px solid var(--color-gray-light);
+    /* ↓ 下の中身との間を28px空けます */
     margin-bottom: 28px;
+    /* ↓ スマホ幅でタブが多くても横スクロールで閲覧可能にします */
     overflow-x: auto;
 }
 
+/* ↓ マイページタブの個別ボタン */
 .mypage-tab-btn {
+    /* ↓ 上下12px・左右20pxのクリックしやすい領域 */
     padding: 12px 20px;
+    /* ↓ 約14.4pxの文字サイズ */
     font-size: 0.9rem;
+    /* ↓ やや太字（600） */
     font-weight: 600;
+    /* ↓ 非選択時は控えめな中グレー文字 */
     color: var(--color-gray-medium);
+    /* ↓ 下線分の高さ2pxだけ透明線としてあらかじめ確保し、切替時に文字が上下に動かないようにします */
     border-bottom: 2px solid transparent;
+    /* ↓ タブ文字が途中で改行されないようにします */
     white-space: nowrap;
 }
 
+/* ↓ 現在選択中のタブボタン（黒文字＋黒い下線） */
 .mypage-tab-btn.active {
+    /* ↓ 選択中タブは文字を純黒にします */
     color: var(--color-black);
+    /* ↓ 透明だった下線の色を純黒にして選択中と示します */
     border-bottom-color: var(--color-black);
 }
 
+/* ↓ 各タブの中身領域（初期は非表示） */
 .mypage-tab-content {
+    /* ↓ 選択されていないタブパネルは非表示にします */
     display: none;
 }
 
+/* ↓ 選択中のタブの中身だけ表示します */
 .mypage-tab-content.active {
+    /* ↓ activeクラスが付いたパネルだけブロック表示します */
     display: block;
 }
 
+/* ↓ 注文履歴セクションの上部見出しラッパー */
 .orders-section-header {
+    /* ↓ 下の履歴テーブルとの間を16px空けます */
     margin-bottom: 16px;
 }
 
+/* ↓ 注文履歴サブ見出し */
 .orders-subheading {
+    /* ↓ 約17.6pxの見出し */
     font-size: 1.1rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下の説明文との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ 注文履歴の補足説明 */
 .orders-info-text {
+    /* ↓ 約13.6pxの説明文 */
     font-size: 0.85rem;
+    /* ↓ 落ち着いた中グレー色 */
     color: var(--color-gray-medium);
 }
 
+/* ↓ 注文履歴テーブルを横スクロール可能にする外枠 */
 .orders-table-wrapper {
+    /* ↓ 横幅いっぱい100% */
     width: 100%;
+    /* ↓ 親要素の横幅を絶対に超えないようにします */
     max-width: 100%;
+    /* ↓ 画面幅がテーブルより狭いときはラッパー内部だけで横スクロールさせます */
     overflow-x: auto;
+    /* ↓ iOS Safari で指スワイプの慣性スクロールを滑らかに効かせます */
     -webkit-overflow-scrolling: touch;
+    /* ↓ 表全体を1pxの薄いグレー枠線で囲みます */
     border: 1px solid var(--color-gray-light);
+    /* ↓ 枠線込みの幅計算 */
     box-sizing: border-box;
+    /* ↓ 横スクロールコンテナとして機能させるためブロック要素にします */
     display: block;
 }
 
+/* ↓ 注文履歴テーブル本体 */
 .orders-table {
+    /* ↓ 親コンテナいっぱいの幅に広げます */
     width: 100%;
+    /* ↓ スマホでも列が極端に潰れないよう最低横幅540pxを保ちます */
     min-width: 540px;
+    /* ↓ 隣接するセルの境界線を1本の線にまとめます */
     border-collapse: collapse;
+    /* ↓ 表のセル内の文字を左揃えにします */
     text-align: left;
+    /* ↓ テーブル内の文字サイズ約14.4px */
     font-size: 0.9rem;
 }
 
+/* ↓ テーブルのヘッダー行セル */
 .orders-table th {
+    /* ↓ ヘッダー行に淡いグレー背景を付けます */
     background-color: var(--color-gray-bg);
+    /* ↓ 上下14px・左右18pxの内側余白 */
     padding: 14px 18px;
+    /* ↓ セミボールド（600）の見出し文字 */
     font-weight: 600;
+    /* ↓ ヘッダー行の下に1pxの区切り線を引きます */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ テーブルのデータ行セル */
 .orders-table td {
+    /* ↓ 上下16px・左右18pxで各行を読みやすく離します */
     padding: 16px 18px;
+    /* ↓ 各データ行の下に1pxの横線を引きます */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 注文ステータス（「注文完了」等）を表す緑色の小バッジ */
 .status-badge {
+    /* ↓ 文字サイズに合わせた横幅で上下パディングが効くようにします */
     display: inline-block;
+    /* ↓ 上下4px・左右10pxの余白 */
     padding: 4px 10px;
+    /* ↓ 小さめの12px文字 */
     font-size: 0.75rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 正常完了をイメージさせるごく淡い緑背景 */
     background-color: #e8f5e9;
+    /* ↓ 読みやすい濃い緑文字 */
     color: #2e7d32;
+    /* ↓ ごく控えめに角を2pxだけ丸めます */
     border-radius: 2px;
 }
 
+/* ↓ マイページ内の「システム仕様・ロードマップ」表示カード */
 .python-features-card {
+    /* ↓ 全方向32pxの余白 */
     padding: 32px;
+    /* ↓ 淡いオフホワイト背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
 }
 
+/* ↓ カード見出し */
 .python-card-title {
+    /* ↓ 約20.8pxの見出し */
     font-size: 1.3rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下の説明文との間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ カード説明文 */
 .python-card-desc {
+    /* ↓ 約14.4pxの説明文 */
     font-size: 0.9rem;
+    /* ↓ 濃いグレーの文字色 */
     color: var(--color-gray-dark);
+    /* ↓ 下の機能一覧グリッドとの間を24px空けます */
     margin-bottom: 24px;
 }
 
+/* ↓ 機能項目を2列で並べるグリッド */
 .python-roadmap-list {
+    /* ↓ CSS Gridレイアウト */
     display: grid;
+    /* ↓ 等幅（1fr）の2列で並べます */
     grid-template-columns: repeat(2, 1fr);
+    /* ↓ カード間の隙間を20px空けます */
     gap: 20px;
 }
 
+/* ↓ ロードマップ内の各白カード */
 .roadmap-item {
+    /* ↓ 全方向20pxの余白 */
     padding: 20px;
+    /* ↓ 周囲の薄グレーと対比する清潔な白背景 */
     background-color: var(--color-white);
+    /* ↓ 1pxの薄いグレー枠線 */
     border: 1px solid var(--color-gray-light);
 }
 
+/* ↓ 「DEPLOYED / LIVE」等の黒い小バッジ */
 .roadmap-badge {
+    /* ↓ 余白が効くようにinline-blockにします */
     display: inline-block;
+    /* ↓ 小さな英語タグ文字（約10.4px） */
     font-size: 0.65rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 上下2px・左右6pxの余白 */
     padding: 2px 6px;
+    /* ↓ 黒背景 */
     background-color: var(--color-black);
+    /* ↓ 白文字 */
     color: var(--color-white);
+    /* ↓ 下の見出しとの間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ 各機能カードの見出し */
 .roadmap-item h4 {
+    /* ↓ 見出しサイズ16px（1rem） */
     font-size: 1rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 下の説明本文との間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ 各機能カードの説明文 */
 .roadmap-item p {
+    /* ↓ 約13.6pxの本文サイズ */
     font-size: 0.85rem;
+    /* ↓ 落ち着いた中グレー色 */
     color: var(--color-gray-medium);
+    /* ↓ 行間を1.6倍にして読みやすくします */
     line-height: 1.6;
 }
 
 /* --- 19. MANEKIN「開発中」モーダル --- */
+/* ↓ モーダル表示時に背景画面全体を暗く覆う半透明オーバーレイ幕 */
 .modal-backdrop {
+    /* ↓ 画面スクロールに関係なく画面全体へ固定します */
     position: fixed;
+    /* ↓ 画面上端から0px */
     top: 0;
+    /* ↓ 画面左端から0px */
     left: 0;
+    /* ↓ ビューポート横幅100%（画面いっぱい） */
     width: 100vw;
+    /* ↓ ビューポート高さ100%（画面いっぱい） */
     height: 100vh;
+    /* ↓ 65%の半透明黒で背面のショップ画面を落とします */
     background-color: rgba(0, 0, 0, 0.65);
+    /* ↓ 背景ページを4pxぼかして手前のダイアログに視線を集中させます */
     backdrop-filter: blur(4px);
+    /* ↓ 中の白いダイアログをFlexで縦横中央に置きます */
     display: flex;
+    /* ↓ 縦方向の中央揃え */
     align-items: center;
+    /* ↓ 横方向の中央揃え */
     justify-content: center;
+    /* ↓ ヘッダー（1000）やドロワーよりはるかに手前の重なり順3000にします */
     z-index: 3000;
+    /* ↓ 非表示時は透明度0にして見えなくします */
     opacity: 0;
+    /* ↓ 透明なままクリック判定を邪魔しないよう隠します */
     visibility: hidden;
+    /* ↓ 表示・非表示の切り替えを0.3秒で滑らかにします */
     transition: all var(--transition-normal);
 }
 
+/* ↓ JSで .open または .active が付いたらモーダル背景幕を画面に表示します */
 .modal-backdrop.open,
 .modal-backdrop.active {
+    /* ↓ 完全不透明にして暗幕を表示します */
     opacity: 1;
+    /* ↓ 要素を表示・操作可能にします */
     visibility: visible;
 }
 
+/* ↓ モーダル中央の白いポップアップ本体カード */
 .modal-dialog {
+    /* ↓ ダイアログ背景を純白にします */
     background-color: var(--color-white);
+    /* ↓ 大画面でも横幅が最大480pxを超えないようにします */
     max-width: 480px;
+    /* ↓ スマホでは左右に5%ずつ余裕を残した90%幅にします */
     width: 90%;
+    /* ↓ 上下36px・左右32pxのゆとりある内側余白 */
     padding: 36px 32px;
+    /* ↓ 内部配置の基準点にします */
     position: relative;
+    /* ↓ 深い影を付けて画面から浮き出たポップアップに見せます */
     box-shadow: var(--shadow-modal);
+    /* ↓ 閉じる時は下に20px下がった位置へ待機させます */
     transform: translateY(20px);
+    /* ↓ スッと上がってくる高級感あるアニメーション設定 */
     transition: transform var(--transition-smooth);
 }
 
+/* ↓ モーダルが開いた瞬間に本体カードを本来の高さ（Y=0）へスライド上げます */
 .modal-backdrop.open .modal-dialog,
 .modal-backdrop.active .modal-dialog {
+    /* ↓ 垂直位置ズレを0pxに戻し、下からふわっと登場させます */
     transform: translateY(0);
 }
 
+/* ↓ モーダル上部のタイトルタグと「×」ボタンの行 */
 .modal-header {
+    /* ↓ 左のバッジと右の閉じるボタンを横並び両端に置きます */
     display: flex;
+    /* ↓ 左右両端揃え */
     justify-content: space-between;
+    /* ↓ 上下中央揃え */
     align-items: center;
+    /* ↓ 本体の見出しとの間を20px空けます */
     margin-bottom: 20px;
 }
 
+/* ↓ モーダル左上「FUTURE FEATURE」などの小バッジ */
 .modal-badge {
+    /* ↓ 小さな英語バッジ文字（約11.2px） */
     font-size: 0.7rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 広い文字間（0.15em） */
     letter-spacing: 0.15em;
+    /* ↓ 黒背景 */
     background-color: var(--color-black);
+    /* ↓ 白文字 */
     color: var(--color-white);
+    /* ↓ 上下3px・左右8pxの内側余白 */
     padding: 3px 8px;
 }
 
+/* ↓ モーダル右上の「×」閉じるボタン */
 .modal-close-btn {
+    /* ↓ 大きめの「×」記号サイズ（約28.8px）で押しやすくします */
     font-size: 1.8rem;
+    /* ↓ 余分な行間を詰めて上下のズレをなくします */
     line-height: 1;
+    /* ↓ ダークグレー色 */
     color: var(--color-dark);
 }
 
+/* ↓ 中央のキラキラアイコンを収める丸型背景枠 */
 .modal-icon-wrap {
+    /* ↓ 幅60px */
     width: 60px;
+    /* ↓ 高さ60px */
     height: 60px;
+    /* ↓ 上0・左右auto（中央寄せ）・下16px余白 */
     margin: 0 auto 16px;
+    /* ↓ 内部SVGを上下左右真ん中に配置します */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 横中央 */
     justify-content: center;
+    /* ↓ 淡いオフホワイト背景 */
     background-color: var(--color-gray-bg);
+    /* ↓ 正円形 */
     border-radius: 50%;
 }
 
+/* ↓ モーダルアイコンSVG本体のサイズと色 */
 .modal-sparkle-icon {
+    /* ↓ SVG幅32px */
     width: 32px;
+    /* ↓ SVG高さ32px */
     height: 32px;
+    /* ↓ 純黒線色 */
     color: var(--color-black);
 }
 
+/* ↓ モーダル内の大きな見出し */
 .modal-title {
+    /* ↓ 見出し文字サイズ約28.8px */
     font-size: 1.8rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 文字間を0.1em広げて存在感を出します */
     letter-spacing: 0.1em;
+    /* ↓ 下のサブ文字との間を6px空けます */
     margin-bottom: 6px;
 }
 
+/* ↓ モーダル見出し下の小さな英語サブタイトル */
 .modal-subtext {
+    /* ↓ 約12.8pxの英語サブテキスト */
     font-size: 0.8rem;
+    /* ↓ やや太字（600） */
     font-weight: 600;
+    /* ↓ 広い文字間（0.1em） */
     letter-spacing: 0.1em;
+    /* ↓ 落ち着いた中グレー */
     color: var(--color-gray-medium);
+    /* ↓ 本文との間を20px空けます */
     margin-bottom: 20px;
 }
 
+/* ↓ モーダル内の説明本文 */
 .modal-description {
+    /* ↓ 約14.4pxの本文サイズ */
     font-size: 0.9rem;
+    /* ↓ 行間を1.8倍にしてゆったり読みやすくします */
     line-height: 1.8;
+    /* ↓ 濃いグレーの文字色 */
     color: var(--color-gray-dark);
+    /* ↓ 下のボタンとの間を28px空けます */
     margin-bottom: 28px;
 }
 
 /* --- 20. トースト通知コンポーネント --- */
+/* ↓ 画面右下に「カートに追加しました」等のお知らせを順番に積む固定コンテナ */
 .toast-container {
+    /* ↓ スクロールに関係なく画面右下へ固定表示します */
     position: fixed;
+    /* ↓ 画面下端から24px上 */
     bottom: 24px;
+    /* ↓ 画面右端から24px左 */
     right: 24px;
+    /* ↓ 複数同時に通知が出たときに縦並びにするFlex */
     display: flex;
+    /* ↓ 上下に積みます */
     flex-direction: column;
+    /* ↓ 通知同士の間隔を10px空けます */
     gap: 10px;
+    /* ↓ モーダル（3000）よりもさらに上の最前面（4000）に重ねます */
     z-index: 4000;
+    /* ↓ 空の透明エリアが下のボタンクリックを邪魔しないようマウス反応を透過させます */
     pointer-events: none;
 }
 
+/* ↓ 個々のトースト通知バー（黒塗り白文字のポップアップ） */
 .toast-message {
+    /* ↓ 通知本体だけはクリックやテキスト選択に反応できるよう有効化します */
     pointer-events: auto;
+    /* ↓ 純黒背景 */
     background-color: var(--color-black);
+    /* ↓ 白文字 */
     color: var(--color-white);
+    /* ↓ 上下14px・左右24pxの余白 */
     padding: 14px 24px;
+    /* ↓ 約13.6pxの読みやすい文字サイズ */
     font-size: 0.85rem;
+    /* ↓ 中太字（500） */
     font-weight: 500;
+    /* ↓ 少し浮いて見えるカード影 */
     box-shadow: var(--shadow-card);
+    /* ↓ アイコンと文言を横並びにします */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 要素間を12px空けます */
     gap: 12px;
+    /* ↓ 短文でも貧相にならないよう最小横幅260pxを保ちます */
     min-width: 260px;
+    /* ↓ 下からニュッと登場して完了後その場に留まる（forwards）アニメーションを実行します */
     animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    /* ↓ 消えるときのフェードアウト（透明度・移動）を0.3秒で滑らかにします */
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* ↓ トーストが一定時間後に自動で消えるときの退場クラス */
 .toast-message.toast-fadeout {
+    /* ↓ 透明にして見えなくします */
     opacity: 0;
+    /* ↓ 少し下に10px沈みながら消えていく動きにします */
     transform: translateY(10px);
 }
 
+/* ↓ トーストが画面下からスッと現れる登場アニメーション定義 */
 @keyframes toastSlideIn {
+    /* ↓ 開始時点（透明で20px下にある状態） */
     from {
         opacity: 0;
         transform: translateY(20px);
     }
 
+    /* ↓ 終了時点（不透明100%で正規位置0px） */
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1650,72 +2624,121 @@
 }
 
 /* --- 21. フッター --- */
+/* ↓ 全ページ共通の最下部黒いフッターエリア */
 .site-footer {
+    /* ↓ 純黒背景でサイト全体を引き締めます */
     background-color: var(--color-black);
+    /* ↓ 文字色を純白ベースにします */
     color: var(--color-white);
+    /* ↓ 上側に64pxの内側余白 */
     padding-top: 64px;
+    /* ↓ 下側に40pxの内側余白 */
     padding-bottom: 40px;
+    /* ↓ bodyが縦flexなので margin-top: auto によりページが短くても必ず画面最下部へ押し下げられます */
     margin-top: auto;
+    /* ↓ 縦方向のスペースが足りなくなってもフッターが押し潰れないようにします */
     flex-shrink: 0;
+    /* ↓ 横幅いっぱい100% */
     width: 100%;
 }
 
+/* ↓ フッター上段（左:ブランド説明 ＋ 右3列:リンク集） */
 .footer-top {
+    /* ↓ CSS Gridレイアウト */
     display: grid;
+    /* ↓ 左側のブランド紹介列を2倍幅、リンク3列を各1倍幅の計4列に分けます */
     grid-template-columns: 2fr 1fr 1fr 1fr;
+    /* ↓ 各列間の隙間を40px空けます */
     gap: 40px;
+    /* ↓ 下のコピーライト境界線との間に48px余白を取ります */
     padding-bottom: 48px;
+    /* ↓ 半透明15%の薄い白線（rgba）で上下段を優雅に仕切ります */
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+/* ↓ フッター内のブランドロゴ文字 */
 .footer-logo {
+    /* ↓ 約20.8pxのロゴサイズ */
     font-size: 1.3rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 広い文字間（0.15em） */
     letter-spacing: 0.15em;
+    /* ↓ ブロック要素にして下の説明文を改行配置します */
     display: block;
+    /* ↓ 下に16px余白 */
     margin-bottom: 16px;
 }
 
+/* ↓ フッター左側のブランドコンセプト紹介文 */
 .footer-concept-text {
+    /* ↓ 約13.6pxの文字サイズ */
     font-size: 0.85rem;
+    /* ↓ 行間1.8倍で読みやすくします */
     line-height: 1.8;
+    /* ↓ 65%白の落ち着いたトーンでロゴより一歩引かせます */
     color: rgba(255, 255, 255, 0.65);
+    /* ↓ 横幅が間延びしないよう最大320pxで折り返します */
     max-width: 320px;
 }
 
+/* ↓ フッター各リンク列の小見出し（「SHOP」「SUPPORT」等） */
 .footer-col-title {
+    /* ↓ 約12.8pxの見出しサイズ */
     font-size: 0.8rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 文字間0.15em */
     letter-spacing: 0.15em;
+    /* ↓ リンク一覧との間を20px空けます */
     margin-bottom: 20px;
+    /* ↓ 90%の白ではっきり読めるようにします */
     color: rgba(255, 255, 255, 0.9);
 }
 
+/* ↓ フッター内のリンク一覧縦並びリスト */
 .footer-link-list {
+    /* ↓ Flexでリンク項目を縦並びにします */
     display: flex;
+    /* ↓ 縦方向に積みます */
     flex-direction: column;
+    /* ↓ 各リンクの間を12px空けます */
     gap: 12px;
 }
 
+/* ↓ フッター内の各リンク文字 */
 .footer-link-list a {
+    /* ↓ 約13.6px */
     font-size: 0.85rem;
+    /* ↓ 通常時は65%の白で控えめに表示します */
     color: rgba(255, 255, 255, 0.65);
+    /* ↓ ホバー時の色変更を0.2秒で滑らかにします */
     transition: color var(--transition-fast);
 }
 
+/* ↓ フッターリンクにマウスを乗せたとき */
 .footer-link-list a:hover {
+    /* ↓ 100%の純白に明るく点灯させます */
     color: var(--color-white);
+    /* ↓ 共通a:hoverの半透明（0.75）を無効化して真っ白を保ちます */
     opacity: 1;
 }
 
+/* ↓ 最下段のコピーライト領域 */
 .footer-bottom {
+    /* ↓ 仕切り線の下から32pxの余白 */
     padding-top: 32px;
+    /* ↓ コピーライトを中央揃えにします */
     text-align: center;
 }
 
+/* ↓ コピーライト表記（「© 2026 MANEKIN...」） */
 .copyright {
+    /* ↓ 小さめの12px文字 */
     font-size: 0.75rem;
+    /* ↓ 45%白のごく控えめなトーン */
     color: rgba(255, 255, 255, 0.45);
+    /* ↓ わずかに文字間を空けます */
     letter-spacing: 0.05em;
 }
 
@@ -1724,212 +2747,365 @@
 /* ========================================================================== */
 
 /* 新規会員登録 特典バナー */
+/* ↓ 新規登録画面で「今すぐ使える1,000ポイント付与」を案内するゴールド系バナー */
 .auth-point-banner {
+    /* ↓ 左上から右下へ淡いクリーム色〜アンバーのグラデーション背景を敷きます */
     background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    /* ↓ 優しい黄金色の1px枠線 */
     border: 1px solid #fde68a;
+    /* ↓ 角を8px丸めます */
     border-radius: 8px;
+    /* ↓ 上下14px・左右16pxの内側余白 */
     padding: 14px 16px;
+    /* ↓ 下の入力フォームとの間を24px空けます */
     margin-bottom: 24px;
+    /* ↓ 基準位置指定 */
     position: relative;
+    /* ↓ 角丸からはみ出す要素を切り取ります */
     overflow: hidden;
 }
 
+/* ↓ 「WELCOME POINT」オレンジ系バッジ */
 .auth-point-badge {
+    /* ↓ 余白が効くようにinline-blockにします */
     display: inline-block;
+    /* ↓ 小さめの強調文字（約11.2px） */
     font-size: 0.7rem;
+    /* ↓ 極太文字（800） */
     font-weight: 800;
+    /* ↓ わずかに文字間を広げます */
     letter-spacing: 0.08em;
+    /* ↓ 上下2px・左右8pxの余白 */
     padding: 2px 8px;
+    /* ↓ 視認性の高いアンバーオレンジ背景 */
     background: #d97706;
+    /* ↓ 白抜き文字 */
     color: #ffffff;
+    /* ↓ 角丸4px */
     border-radius: 4px;
+    /* ↓ 下のテキストブロックとの間を6px空けます */
     margin-bottom: 6px;
 }
 
+/* ↓ ギフトアイコンと特典説明文を横並びにするラッパー */
 .auth-point-content {
+    /* ↓ 横並び配置 */
     display: flex;
+    /* ↓ アイコンと複数行文章の上端を揃えます */
     align-items: flex-start;
+    /* ↓ アイコンと文字の間を12px空けます */
     gap: 12px;
 }
 
+/* ↓ 左側のプレゼント絵文字アイコン */
 .auth-point-icon {
+    /* ↓ 24px（1.5rem）の大きめアイコン */
     font-size: 1.5rem;
+    /* ↓ 行高1で上端ズレを防ぎます */
     line-height: 1;
 }
 
+/* ↓ バナーの強調見出し文 */
 .auth-point-text strong {
+    /* ↓ 改行して見出し行として独立させます */
     display: block;
+    /* ↓ 約15pxの読みやすいサイズ */
     font-size: 0.94rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ クリーム背景に映える濃いアンバー茶色 */
     color: #92400e;
+    /* ↓ 下の補足説明文との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ バナーの補足文 */
 .auth-point-text p {
+    /* ↓ ブラウザ標準のpタグ余白をリセット */
     margin: 0;
+    /* ↓ 約12.8px */
     font-size: 0.8rem;
+    /* ↓ 濃い茶色系テキスト */
     color: #78350f;
+    /* ↓ 行間1.45倍 */
     line-height: 1.45;
 }
 
 /* チェックアウト: ポイント利用カード */
+/* ↓ レジ画面の「ポイントを利用する（1pt＝1円）」ボックス */
 .checkout-point-card {
+    /* ↓ ほぼ白の極淡グレー背景 */
     background: #fbfbfb;
+    /* ↓ 薄いグレーの1px枠線 */
     border: 1px solid #e5e7eb;
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下18px・左右20pxの内側余白 */
     padding: 18px 20px;
+    /* ↓ 下のお支払い方法欄との間を24px空けます */
     margin-bottom: 24px;
+    /* ↓ 左端だけ4pxの濃い黒アクセントラインを入れて重要な設定枠と示します */
     border-left: 4px solid #111827;
 }
 
+/* ↓ カード上部の「ポイント利用」タイトル（左）と「保有ポイント」（右）の行 */
 .checkout-point-header {
+    /* ↓ 左右両端に並べるFlex */
     display: flex;
+    /* ↓ 両端揃え */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 狭い画面では2段に折り返せます */
     flex-wrap: wrap;
+    /* ↓ 項目間を8px空けます */
     gap: 8px;
+    /* ↓ 下の入力ボックス行との間を12px空けます */
     margin-bottom: 12px;
 }
 
+/* ↓ カード見出し＋「1pt＝1円」タグのグループ */
 .checkout-point-title {
+    /* ↓ 16pxサイズ */
     font-size: 1rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 濃いチャコール黒 */
     color: #111827;
+    /* ↓ タグと文字を横並び中央に揃えます */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 間隔6px */
     gap: 6px;
 }
 
+/* ↓ 「1pt=1円」を示す黒の小タグ */
 .point-rate-tag {
+    /* ↓ 約11.5pxの極小文字 */
     font-size: 0.72rem;
+    /* ↓ セミボールド（600） */
     font-weight: 600;
+    /* ↓ 上下2px・左右6px余白 */
     padding: 2px 6px;
+    /* ↓ 濃黒背景 */
     background: #111827;
+    /* ↓ 白文字 */
     color: #ffffff;
+    /* ↓ 角丸4px */
     border-radius: 4px;
 }
 
+/* ↓ 右側の「保有ポイント: 〜 pt」表示ラベル */
 .checkout-point-balance-badge {
+    /* ↓ 約13.8pxの文字サイズ */
     font-size: 0.86rem;
+    /* ↓ 落ち着いた濃いグレー */
     color: #4b5563;
 }
 
+/* ↓ 保有ポイントの数値部分 */
 .checkout-point-balance-badge strong {
+    /* ↓ 少し大きめ（約16.8px）で強調 */
     font-size: 1.05rem;
+    /* ↓ お得感・残高を表すエメラルドグリーン */
     color: #059669;
+    /* ↓ 等幅数字（tabular-nums）にして桁数や数字変化時に横ガタつきを防ぎます */
     font-variant-numeric: tabular-nums;
 }
 
+/* ↓ ポイント入力欄と「全額使う」「リセット」ボタンの横並び行 */
 .point-input-row {
+    /* ↓ 入力枠とボタンを横一列に並べます */
     display: flex;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ パーツ間を8px空けます */
     gap: 8px;
+    /* ↓ スマホでは自動折り返しします */
     flex-wrap: wrap;
+    /* ↓ 下のガイド文との間を8px空けます */
     margin-bottom: 8px;
 }
 
+/* ↓ 「pt」単位をテキストボックス内右端に重ねて置くための外枠 */
 .point-input-group {
+    /* ↓ 右端の単位(.point-input-suffix)を絶対配置で重ねる基準点 */
     position: relative;
+    /* ↓ 中身を縦中央揃えにするFlex */
     display: flex;
+    /* ↓ 縦中央 */
     align-items: center;
+    /* ↓ 入力枠が広がりすぎないよう最大幅180pxにします */
     max-width: 180px;
+    /* ↓ 他のボタンと並んだとき柔軟に幅を確保します */
     flex: 1;
 }
 
+/* ↓ ポイント数の数値入力ボックス */
 .point-num-input {
+    /* ↓ 右側の「pt 利用」表示と数字が重ならないよう右パディングを58px確保します */
     padding-right: 58px;
+    /* ↓ 入力数字を太字（700）で見やすくします */
     font-weight: 700;
+    /* ↓ 約15.2pxの文字サイズ */
     font-size: 0.95rem;
+    /* ↓ 金額・ポイントらしく数値を右寄せにします */
     text-align: right;
 }
 
+/* ↓ 入力欄の右側内側に固定表示される「pt 利用」単位ラベル */
 .point-input-suffix {
+    /* ↓ .point-input-group を基準に右端に浮かせて配置します */
     position: absolute;
+    /* ↓ 右端から12px内側 */
     right: 12px;
+    /* ↓ 約12.5pxの小文字 */
     font-size: 0.78rem;
+    /* ↓ セミボールド（600） */
     font-weight: 600;
+    /* ↓ グレー文字色 */
     color: #6b7280;
+    /* ↓ この文字の上をクリックしても背後のinputにフォーカスが届くようマウス判定を透過させます */
     pointer-events: none;
 }
 
+/* ↓ 「全額使う」「リセット」の補助ボタン */
 .btn-use-all-points, .btn-reset-points {
+    /* ↓ 約12.8pxのコンパクトサイズ */
     font-size: 0.8rem;
+    /* ↓ 上下8px・左右12pxの内側余白 */
     padding: 8px 12px;
+    /* ↓ ボタンラベルが途中で改行されないようにします */
     white-space: nowrap;
 }
 
+/* ↓ ポイント利用条件などの補足ヘルプ文 */
 .point-help-text {
+    /* ↓ 初期余白をゼロに */
     margin: 0;
+    /* ↓ 約12.5pxの小文字 */
     font-size: 0.78rem;
+    /* ↓ 落ち着いたグレー */
     color: #6b7280;
+    /* ↓ 行間1.4倍 */
     line-height: 1.4;
 }
 
 /* チェックアウト: 今回獲得予定ポイントカード */
+/* ↓ 右サマリーカード内の「今回の注文で獲得予定ポイント（1%還元）」お知らせ枠 */
 .checkout-earned-points-card {
+    /* ↓ ミントグリーンのごく淡い背景 */
     background: #f0fdf4;
+    /* ↓ 明るいグリーンの破線枠でチケット・特典らしさを出します */
     border: 1px dashed #86efac;
+    /* ↓ 角丸6px */
     border-radius: 6px;
+    /* ↓ 上下10px・左右14px余白 */
     padding: 10px 14px;
+    /* ↓ 上14px・左右0・下16pxの外側余白 */
     margin: 14px 0 16px;
 }
 
+/* ↓ ラベルと獲得予定ポイント数の横並び行 */
 .earned-points-header {
+    /* ↓ 左右両端揃え */
     display: flex;
+    /* ↓ 両端に分けて視認性を高めます */
     justify-content: space-between;
+    /* ↓ 縦中央揃え */
     align-items: center;
+    /* ↓ 下の注記との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ 「今回獲得予定ポイント」ラベル */
 .earned-points-label {
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 視認性の良い深緑 */
     color: #166534;
 }
 
+/* ↓ 「+XX pt」獲得予定数値 */
 .earned-points-value {
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
+    /* ↓ 極太字（800）で大きく見せます */
     font-weight: 800;
+    /* ↓ 鮮やかな緑色 */
     color: #15803d;
+    /* ↓ 数字の横幅を揃える等幅数値書式 */
     font-variant-numeric: tabular-nums;
 }
 
+/* ↓ 付与条件（1%・注文確定後付与）の小さい補足文 */
 .earned-points-hint {
+    /* ↓ 余白ゼロ */
     margin: 0;
+    /* ↓ 小さめ（約11.5px）の文字 */
     font-size: 0.72rem;
+    /* ↓ 緑文字 */
     color: #15803d;
+    /* ↓ 行間1.35倍 */
     line-height: 1.35;
 }
 
 /* 注文完了: マイクローゼット自動保存通知バナー */
+/* ↓ 購入完了カード内で「購入した商品を自動でマイクローゼットに保存しました」と伝える水色バナー */
 .completed-closet-banner {
+    /* ↓ 爽やかなスカイブルー系の淡いグラデーション背景 */
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    /* ↓ 水色の1px枠線 */
     border: 1px solid #bae6fd;
+    /* ↓ 角丸8px */
     border-radius: 8px;
+    /* ↓ 上下16px・左右20px余白 */
     padding: 16px 20px;
+    /* ↓ 上下20pxの余白 */
     margin: 20px 0;
+    /* ↓ 左アイコンと右文章を横並びにします */
     display: flex;
+    /* ↓ 上端を揃えます */
     align-items: flex-start;
+    /* ↓ アイコンとテキストの間を14px空けます */
     gap: 14px;
+    /* ↓ 中央揃えカード内でも文章を読みやすく左寄せにします */
     text-align: left;
 }
 
+/* ↓ 左側のドレス／ハンガー絵文字アイコン */
 .closet-banner-icon {
+    /* ↓ 大きめの28.8px（1.8rem） */
     font-size: 1.8rem;
+    /* ↓ 行高1で上端ズレを防ぎます */
     line-height: 1;
 }
 
+/* ↓ バナーの強調タイトル文 */
 .closet-banner-text strong {
+    /* ↓ 独立した見出し行としてブロック表示にします */
     display: block;
+    /* ↓ 約15.2px */
     font-size: 0.95rem;
+    /* ↓ 太字（700） */
     font-weight: 700;
+    /* ↓ 知的な濃いブルー文字 */
     color: #0369a1;
+    /* ↓ 下の案内本文との間を4px空けます */
     margin-bottom: 4px;
 }
 
+/* ↓ バナー内の詳細説明文 */
 .closet-banner-text p {
+    /* ↓ 余白ゼロ */
     margin: 0;
+    /* ↓ 約13.1px */
     font-size: 0.82rem;
+    /* ↓ 青色テキスト */
     color: #0284c7;
+    /* ↓ 行間1.5倍で読みやすくします */
     line-height: 1.5;
 }
