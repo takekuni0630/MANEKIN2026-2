@@ -1,299 +1,308 @@
 // ==========================================================================
-// MANEKIN FASHION - MANEKIN AI STUDIO（試着スタジオ）モジュール (studio.js)a
+//  js/studio.js - MANEKIN AI 試着スタジオ総合エンジン
+//  仮想試着マネキン制御、手持ち服のブラウザ完結AI背景透過＆形状自動認識、
+//  位置・サイズ微調整、AIコーデ診断、保存ルックブック、MySQL状態同期を担当します。
 // ==========================================================================
 
 // ==========================================================================
-// 15. MANEKIN AI STUDIO（AIコーデシミュレーション機能）ロジック
+//  1. 定数・アップロード一時状態・スタジオタブ切り替え制御
 // ==========================================================================
-
-// クイック選択用プリセット画像マッピング（手持ち服登録モーダルの「サンプルから選ぶ」ボタンで使われるひな形辞書）
+// 登録モーダルですぐ試せるサンプル手持ち服（帽子・パンツ・靴等）のプリセット辞書を定義します
 const PRESET_CLOSET_PRESETS = {
-    // ↓ 1. 黒コットンキャップのプリセット定義
+    // オブジェクトの 'black_cap' プロパティ値を設定します
     'black_cap': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: 'クラシック コットンキャップ',
-        // ↓ カテゴリコード（帽子）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'HAT',
-        // ↓ カラー名
+        // カラー名
         color: 'BLACK',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '通年',
-        // ↓ 文字化けしないSVG Data URIとして埋め込まれた帽子イラスト画像
+        // 画像ファイルパスまたは DataURL
         image: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22180%22%20text-anchor%3D%22middle%22%20fill%3D%22%23888888%22%20font-size%3D%2212%22%20font-family%3D%22sans-serif%22%20letter-spacing%3D%222%22%20font-weight%3D%22600%22%3ECLASSIC%20CAP%3C%2Ftext%3E%3C%2Fsvg%3E'
     },
-    // ↓ 2. 黒スラックスのプリセット定義
+    // オブジェクトの 'black_pants' プロパティ値を設定します
     'black_pants': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: '黒ワイドスラックス',
-        // ↓ カテゴリコード（ボトムス）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'BOTTOMS',
-        // ↓ カラー名
+        // カラー名
         color: 'BLACK',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '通年',
-        // ↓ 画像パス
+        // 画像ファイルパスまたは DataURL
         image: 'assets/images/men/ストレートレープセミフレアスラックス.png'
     },
-    // ↓ 3. 白レザースニーカーのプリセット定義
+    // オブジェクトの 'white_sneakers' プロパティ値を設定します
     'white_sneakers': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: '白レザースニーカー',
-        // ↓ カテゴリコード（靴）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'SHOES',
-        // ↓ カラー名
+        // カラー名
         color: 'WHITE',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '通年',
-        // ↓ SVG Data URIとして埋め込まれたスニーカーイラスト画像
+        // 画像ファイルパスまたは DataURL
         image: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22300%22%20viewBox%3D%220%200%20300%20300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22300%22%20height%3D%22300%22%2F%3E%3Cpath%20d%3D%22M40%20200%20C40%20170%2090%20150%20140%20150%20C170%20150%20200%20130%20230%20140%20C260%20150%20270%20180%20270%20210%20L40%20210%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23111111%22%20stroke-width%3D%226%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%20210%20L270%20210%20L270%20230%20C270%20235%20265%20240%20260%20240%20L50%20240%20C45%20240%2040%20235%2040%20230%20Z%22%20fill%3D%22%23e5e7eb%22%20stroke%3D%22%23111111%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M150%20150%20L180%20170%20M170%20150%20L200%20170%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22270%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-size%3D%2214%22%20font-family%3D%22sans-serif%22%20letter-spacing%3D%221%22%3ESNEAKERS%3C%2Ftext%3E%3C%2Fsvg%3E'
     },
-    // ↓ 4. グレーパーカーのプリセット定義
+    // オブジェクトの 'grey_hoodie' プロパティ値を設定します
     'grey_hoodie': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: 'ヘビーウェイト グレーパーカー',
-        // ↓ カテゴリコード（トップス）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'TOPS',
-        // ↓ カラー名
+        // カラー名
         color: 'GREY',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '秋冬',
-        // ↓ 画像パス
+        // 画像ファイルパスまたは DataURL
         image: 'assets/images/men/アーバングレイジップフーディ.png'
     },
-    // ↓ 5. 白Tシャツ（シャツ代用）のプリセット定義
+    // オブジェクトの 'white_tshirt' プロパティ値を設定します
     'white_tshirt': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: 'プレミアム リラックス 白Tシャツ',
-        // ↓ カテゴリコード（トップス）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'TOPS',
-        // ↓ カラー名
+        // カラー名
         color: 'WHITE',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '春夏',
-        // ↓ 画像パス
+        // 画像ファイルパスまたは DataURL
         image: 'assets/images/men/スカイオックスフォードシャツ.png'
     },
-    // ↓ 6. デニムジャケット（テーラード代用）のプリセット定義
+    // オブジェクトの 'denim_jacket' プロパティ値を設定します
     'denim_jacket': {
-        // ↓ 表示名
+        // 商品名またはアイテム名称
         name: 'オーバーサイズ デニムジャケット',
-        // ↓ カテゴリコード（アウター）
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: 'OUTER',
-        // ↓ カラー名
+        // カラー名
         color: 'BLUE',
-        // ↓ 対応シーズン
+        // 着用シーズン
         season: '春秋',
-        // ↓ 画像パス
+        // 画像ファイルパスまたは DataURL
         image: 'assets/images/men/リラックスダブルブレストテーラードジャケット.png'
     }
 };
 
-// ↓ モーダル内で現在プレビュー中の画像データ（AI背景透過後または元画像）を保持する変数
+
+// 手持ち服登録モーダルで今選択・透過済みの表示用画像 DataURL を一時保持する変数です
 let currentClosetUploadDataUrl = '';
-// ↓ 「元画像に戻す」トグル用に透過処理前のオリジナルData URLを保持する変数
+// AI背景透過をかける前の元の画像 DataURL を保持し、「元画像に戻す」に使う変数です
 let originalClosetUploadDataUrl = '';
-// ↓ 現在表示中のアップロード画像が背景透過済みかどうかの状態フラグ
+// 現在選択中の画像に背景透過処理が完了しているかを示すフラグです
 let isCurrentUploadTransparent = false;
 
-/**
- * スタジオ内のサブタブ切り替え
- */
-// ↓ スタジオ上部ナビの「ホーム／マイクローゼット／お気に入り／試着スタジオ／保存コーデ／プロフィール」を切り替える関数
+
+// MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
 function switchStudioTab(tabKey) {
-    // ↓ 現在選択中のタブ名を全体状態へ記録
+    // アプリ全体状態 AppState.studioActiveTab を最新値（tabKey）に更新します
     AppState.studioActiveTab = tabKey;
 
-    // タブボタンのアクティブ更新（一致するタブにだけactiveクラスを付けます）
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('.studio-tab-btn').forEach(btn => {
-        // ↓ data-studio-tab属性の値と引数が同じならtrue、違えばfalse
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-studio-tab') === tabKey);
     });
 
-    // パネルのアクティブ更新：まず全パネルのactiveを外して隠します
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('.studio-pane').forEach(pane => {
-        // ↓ 非表示に戻す
+        // 要素から CSS クラスを外して強調や表示を戻します（pane.classList.remove('active');）
         pane.classList.remove('active');
     });
-    // ↓ 目的のペイン要素を取得（例: studio-pane-create）
+    // HTML 要素 #対象ID を取得して変数 targetPane に格納します
     const targetPane = document.getElementById(`studio-pane-${tabKey}`);
-    // ↓ 見つかったらactiveを付けて表示します
+    // 条件（targetPane）が成り立つか判定し、該当する場合の処理を実行します
     if (targetPane) {
-        // ↓ 表示状態にする
+        // 要素に CSS クラスを付与して見た目・表示状態を変更します（targetPane.classList.add('active');）
         targetPane.classList.add('active');
     }
 
-    // ↓ 新しく開いたタブの中身を描画します
+    // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
     renderManekinStudio(tabKey);
 }
 
-/**
- * MANEKIN AI STUDIOの全般描画
- */
-// ↓ スタジオ画面共通のユーザー名・件数バッジ更新＋開いているタブ専用の描画処理を呼び出す関数
+
+// スタジオ画面全体のヘッダー会員情報・件数バッジ・各タブの最新描画を統括して更新します
 function renderManekinStudio(activeTab = 'create') {
-    // ユーザー名反映（スタジオヘッダーのユーザーチップ＋プロフィール画面の両方）
+    // HTML 要素 #studio-user-name を取得して変数 userNameElem に格納します
     const userNameElem = document.getElementById('studio-user-name');
-    // ↓ アバター丸文字要素
+    // HTML 要素 #studio-avatar-char を取得して変数 avatarCharElem に格納します
     const avatarCharElem = document.getElementById('studio-avatar-char');
-    // ↓ ランクバッジ要素
+    // HTML 要素 #studio-user-rank を取得して変数 userRankElem に格納します
     const userRankElem = document.getElementById('studio-user-rank');
-    // ↓ ログイン済みユーザーがいる場合
+    // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
-        // ↓ 会員名を表示
+        // 条件（userNameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameElem) userNameElem.textContent = AppState.currentUser.name || '会員 様';
-        // ↓ 名前の先頭1文字を丸アイコンに表示
+        // 条件（avatarCharElem）が成り立つか判定し、該当する場合の処理を実行します
         if (avatarCharElem) avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
-        // ↓ 会員ランク表示
+        // 条件（userRankElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userRankElem) userRankElem.textContent = AppState.currentUser.rank || 'MEMBER';
-    // ↓ 未ログインのゲスト状態の場合
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // ↓ ゲスト様と表示
+        // 条件（userNameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameElem) userNameElem.textContent = 'ゲスト 様';
-        // ↓ Gアイコンを表示
+        // 条件（avatarCharElem）が成り立つか判定し、該当する場合の処理を実行します
         if (avatarCharElem) avatarCharElem.textContent = 'G';
-        // ↓ GUESTと表示
+        // 条件（userRankElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userRankElem) userRankElem.textContent = 'GUEST';
     }
 
-    // バッジ件数更新（手持ち服・お気に入り・保存済みコーデの数値をリアルタイム反映）
+    // HTML 要素 #studio-closet-badge を取得して変数 closetBadge に格納します
     const closetBadge = document.getElementById('studio-closet-badge');
-    // ↓ クローゼット総数を反映
+    // 条件（closetBadge）が成り立つか判定し、該当する場合の処理を実行します
     if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
 
-    // ↓ お気に入り件数バッジ
+    // HTML 要素 #studio-fav-badge を取得して変数 favBadge に格納します
     const favBadge = document.getElementById('studio-fav-badge');
-    // ↓ お気に入り配列の長さをセット
+    // 条件（favBadge）が成り立つか判定し、該当する場合の処理を実行します
     if (favBadge) favBadge.textContent = AppState.favorites.length;
 
-    // ↓ 保存コーデ件数バッジ
+    // HTML 要素 #studio-saved-badge を取得して変数 savedBadge に格納します
     const savedBadge = document.getElementById('studio-saved-badge');
-    // ↓ 保存済み配列の長さをセット
+    // 条件（savedBadge）が成り立つか判定し、該当する場合の処理を実行します
     if (savedBadge) savedBadge.textContent = AppState.savedOutfits.length;
 
-    // ↓ スマホ切替タブ内の手持ち服数バッジ
+    // HTML 要素 #mob-closet-cnt を取得して変数 mobClosetCnt に格納します
     const mobClosetCnt = document.getElementById('mob-closet-cnt');
-    // ↓ 長さを反映
+    // 条件（mobClosetCnt）が成り立つか判定し、該当する場合の処理を実行します
     if (mobClosetCnt) mobClosetCnt.textContent = AppState.myCloset.length;
 
-    // ↓ スマホ切替タブ内のブランドお気に入り数バッジ
+    // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
-    // ↓ 長さを反映
+    // 条件（mobBrandFavCnt）が成り立つか判定し、該当する場合の処理を実行します
     if (mobBrandFavCnt) mobBrandFavCnt.textContent = AppState.favorites.length;
 
-    // ホームサマリーの数値（スタジオホーム画面の上部3枚カード）
+    // HTML 要素 #home-stat-closet を取得して変数 homeCloset に格納します
     const homeCloset = document.getElementById('home-stat-closet');
-    // ↓ 「〇〇 点」をHTML挿入
+    // 条件（homeCloset）が成り立つか判定し、該当する場合の処理を実行します
     if (homeCloset) homeCloset.innerHTML = `${AppState.myCloset.length} <small>点</small>`;
 
-    // ↓ 保存コーデ数カード
+    // HTML 要素 #home-stat-saved を取得して変数 homeSaved に格納します
     const homeSaved = document.getElementById('home-stat-saved');
-    // ↓ 「〇〇 組」をHTML挿入
+    // 条件（homeSaved）が成り立つか判定し、該当する場合の処理を実行します
     if (homeSaved) homeSaved.innerHTML = `${AppState.savedOutfits.length} <small>組</small>`;
 
-    // ↓ お気に入りブランド数カード
+    // HTML 要素 #home-stat-fav を取得して変数 homeFav に格納します
     const homeFav = document.getElementById('home-stat-fav');
-    // ↓ 「〇〇 点」をHTML挿入
+    // 条件（homeFav）が成り立つか判定し、該当する場合の処理を実行します
     if (homeFav) homeFav.innerHTML = `${AppState.favorites.length} <small>点</small>`;
 
-    // プロフィール情報反映（ペイン6のアカウントカード用）
+    // HTML 要素 #prof-display-name を取得して変数 profName に格納します
     const profName = document.getElementById('prof-display-name');
-    // ↓ メール表示欄
+    // HTML 要素 #prof-display-email を取得して変数 profEmail に格納します
     const profEmail = document.getElementById('prof-display-email');
-    // ↓ ランク表示欄
+    // HTML 要素 #prof-display-rank を取得して変数 profRank に格納します
     const profRank = document.getElementById('prof-display-rank');
-    // ↓ ログイン中ならアカウント情報を表示
+    // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
-        // ↓ 氏名
+        // 条件（profName）が成り立つか判定し、該当する場合の処理を実行します
         if (profName) profName.textContent = AppState.currentUser.name || '会員 様';
-        // ↓ メールアドレス
+        // 条件（profEmail）が成り立つか判定し、該当する場合の処理を実行します
         if (profEmail) profEmail.textContent = AppState.currentUser.email || '';
-        // ↓ ランク名
+        // 条件（profRank）が成り立つか判定し、該当する場合の処理を実行します
         if (profRank) profRank.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
-    // ↓ 未ログインならゲスト案内を表示
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // ↓ ゲスト表記
+        // 条件（profName）が成り立つか判定し、該当する場合の処理を実行します
         if (profName) profName.textContent = 'ゲスト 様';
-        // ↓ 要ログイン案内
+        // 条件（profEmail）が成り立つか判定し、該当する場合の処理を実行します
         if (profEmail) profEmail.textContent = '未ログイン（ログインが必要です）';
-        // ↓ ランク表記
+        // 条件（profRank）が成り立つか判定し、該当する場合の処理を実行します
         if (profRank) profRank.textContent = 'GUEST';
     }
 
-    // 性別ボタンUIの同期（MEN / WOMEN切り替えトグルのアクティブ状態を最新化）
+    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
     syncGenderToggleUI();
 
-    // 各タブごとの描画（開いているペインだけを再構築して無駄な処理を省きます）
+    // 値（activeTab)）に応じて処理ケースを分岐する switch 文を開始します
     switch (activeTab) {
-        // ↓ ホームペインは静的HTML＋上記数値更新のみ
+        // 値が 'home' だった場合の専用処理ルートです
         case 'home':
+            // 現在の case / ループ処理をここで抜けます
             break;
-        // ↓ クローゼット一覧ペイン
+        // 値が 'closet' だった場合の専用処理ルートです
         case 'closet':
-            // ↓ グリッドを描画
+            // 関連処理 renderPaneClosetGrid() を呼び出して処理・画面を更新します
             renderPaneClosetGrid();
+            // 現在の case / ループ処理をここで抜けます
             break;
-        // ↓ お気に入りブランドペイン
+        // 値が 'favorites' だった場合の専用処理ルートです
         case 'favorites':
-            // ↓ お気に入りグリッドを描画
+            // 関連処理 renderStudioFavoritesGrid() を呼び出して処理・画面を更新します
             renderStudioFavoritesGrid();
+            // 現在の case / ループ処理をここで抜けます
             break;
-        // ↓ メインの試着スタジオペイン（左リスト・中央マネキン・右リスト・AI診断）
+        // 値が 'create' だった場合の専用処理ルートです
         case 'create':
-            // ↓ 左カラムの手持ち服リスト描画
+            // 関連処理 renderStudioClosetList() を呼び出して処理・画面を更新します
             renderStudioClosetList();
-            // ↓ 右カラムのお気に入りブランド服リスト描画
+            // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
             renderStudioBrandList();
-            // ↓ 中央マネキンと5層レイヤー描画
+            // 関連処理 renderMannequinStage() を呼び出して処理・画面を更新します
             renderMannequinStage();
-            // ↓ AIスタイリスト診断カードを更新
+            // 関連処理 updateAIStylingComment() を呼び出して処理・画面を更新します
             updateAIStylingComment();
+            // 現在の case / ループ処理をここで抜けます
             break;
-        // ↓ 保存済みコーデ一覧ペイン
+        // 値が 'saved' だった場合の専用処理ルートです
         case 'saved':
-            // ↓ コーデギャラリーを描画
+            // 関連処理 renderSavedOutfitsGrid() を呼び出して処理・画面を更新します
             renderSavedOutfitsGrid();
+            // 現在の case / ループ処理をここで抜けます
             break;
-        // ↓ プロフィールペイン
+        // 値が 'profile' だった場合の専用処理ルートです
         case 'profile':
+            // 現在の case / ループ処理をここで抜けます
             break;
     }
 }
 
-// 販売商品向け5段階サイズ定義（左からXS、S、M、L、XLの順番でスライダー値0〜4に対応）
+
+// ==========================================================================
+//  2. ブランド規格サイズ定数・手持ち服棚／ブランド一覧／お気に入りペイン描画
+// ==========================================================================
+// ブランド販売商品のサイズ調整スライダー(0〜4)に対応するサイズ名配列です
 const BRAND_SIZE_LIST = ['XS', 'S', 'M', 'L', 'XL'];
-// ↓ 各サイズ表記に対応するマネキン上の拡大率(%)マッピング辞書（M=100%を基準に±6%ずつ変化）
+// XS〜XL の各サイズ選択時にマネキン上で服画像を拡大縮小する倍率(%)マップです
 const BRAND_SIZE_SCALES = {
-    'XS': 88,   // 88% (タイト)
-    'S': 94,    // 94% (スリム)
-    'M': 100,  // 100% (標準)
-    'L': 106,   // 106% (ゆったり)
-    'XL': 112   // 112% (ワイド)
+    // オブジェクトの 'XS' プロパティ値を設定します
+    'XS': 88,
+    // オブジェクトの 'S' プロパティ値を設定します
+    'S': 94,
+    // オブジェクトの 'M' プロパティ値を設定します
+    'M': 100,
+    // オブジェクトの 'L' プロパティ値を設定します
+    'L': 106,
+    // オブジェクトの 'XL' プロパティ値を設定します
+    'XL': 112
 };
 
-// --------------------------------------------------------------------------
-// 15.1 マイクローゼット（手持ち服）の描画 & 操作
-// --------------------------------------------------------------------------
 
-/**
- * パネル2（マイクローゼット画面）のグリッド描画
- */
-// ↓ ペイン2の大きいカード一覧として登録済み手持ち服を描画する関数
+// スタジオ「マイクローゼット」タブ内に所有している服カード一覧を描画します
 function renderPaneClosetGrid() {
-    // ↓ グリッド枠を取得
+    // HTML 要素 #closet-items-grid を取得して変数 grid に格納します
     const grid = document.getElementById('closet-items-grid');
-    // ↓ 無ければ終了
+    // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // ↓ 現在選択中のカテゴリフィルター（ALL/TOPS等）を取得
+    // 定数 filter を宣言し、値（AppState.studioClosetFilter || 'ALL'）をセットします
     const filter = AppState.studioClosetFilter || 'ALL';
-    // ↓ ALLなら全件、特定カテゴリなら一致する手持ち服のみ抽出
+    // 定数 items を宣言し、値（(filter === 'ALL')）をセットします
     const items = (filter === 'ALL')
+        // 三項演算子・真(True)の場合の選択値（AppState.myCloset）
         ? AppState.myCloset
+        // 三項演算子・偽(False)の場合の選択値（AppState.myCloset.filter(item => item.cate…）
         : AppState.myCloset.filter(item => item.category === filter);
 
-    // ↓ 該当アイテムが0件のときは登録ボタン付きエンプティカードを表示
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (items.length === 0) {
-        // ↓ 空状態カードHTMLを挿入
+        // テンプレートリテラルで組み立てた HTML を要素 grid 内に書き込んで画面を更新します
         grid.innerHTML = `
             <div class="closet-empty-card">
                 <div class="closet-empty-icon">🧥</div>
@@ -302,18 +311,18 @@ function renderPaneClosetGrid() {
                 <button class="btn btn-primary" onclick="openAddClosetModal()">+ 手持ちの服を登録する</button>
             </div>
         `;
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // ↓ 手持ち服それぞれをカードHTMLへ変換して連結描画
+    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     grid.innerHTML = items.map(item => {
-        // ↓ 現在マネキンが試着中かどうかを判定
+        // 定数 isWearing を宣言し、値（isItemWearing(item)）をセットします
         const isWearing = isItemWearing(item);
-        // ↓ カラー名から表示用ドット色コード(#HEX)を取得
+        // 定数 colorHex を宣言し、値（getColorHex(item.color)）をセットします
         const colorHex = getColorHex(item.color);
 
-        // ↓ カード1枚分のHTMLテンプレートを返却
+        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <div class="closet-card ${isWearing ? 'is-wearing' : ''}">
                 <div class="closet-card-thumb-wrap">
@@ -339,49 +348,50 @@ function renderPaneClosetGrid() {
                 </div>
             </div>
         `;
+    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
-/**
- * スタジオ内（左カラム）の手持ち服リスト描画
- */
-// ↓ 試着画面の左パネルに表示されるコンパクトな手持ち服リストを描画する関数
+
+// 3列試着画面の左カラム「1. 手持ちの服」一覧カードを描画します（クリック着用＆ドラッグ対応）
 function renderStudioClosetList() {
-    // ↓ 左パネルのリストコンテナを取得
+    // HTML 要素 #studio-closet-list を取得して変数 list に格納します
     const list = document.getElementById('studio-closet-list');
-    // ↓ 無ければ終了
+    // 条件（!list）が成り立つか判定し、該当する場合の処理を実行します
     if (!list) return;
 
-    // ↓ カテゴリフィルターを取得
+    // 定数 filter を宣言し、値（AppState.studioClosetFilter || 'ALL'）をセットします
     const filter = AppState.studioClosetFilter || 'ALL';
-    // ↓ フィルタリング後のリストを生成
+    // 定数 items を宣言し、値（(filter === 'ALL')）をセットします
     const items = (filter === 'ALL')
+        // 三項演算子・真(True)の場合の選択値（AppState.myCloset）
         ? AppState.myCloset
+        // 三項演算子・偽(False)の場合の選択値（AppState.myCloset.filter(item => item.cate…）
         : AppState.myCloset.filter(item => item.category === filter);
 
-    // ↓ 0件時は簡易登録ボタンを表示
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (items.length === 0) {
-        // ↓ 空メッセージHTMLを挿入
+        // テンプレートリテラルで組み立てた HTML を要素 list 内に書き込んで画面を更新します
         list.innerHTML = `
             <div style="text-align: center; padding: 30px 10px; color: var(--color-gray-medium);">
                 <p style="font-size: 0.85rem; margin-bottom: 12px;">該当する手持ち服がありません</p>
                 <button class="btn btn-outline-xs" onclick="openAddClosetModal()">+ 手持ち服を登録</button>
             </div>
         `;
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // ↓ クリックで試着、ドラッグ&ドロップにも対応(draggable="true")させたコンパクトカードを描画
+    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     list.innerHTML = items.map(item => {
-        // ↓ 着用中チェック
+        // 定数 isWearing を宣言し、値（isItemWearing(item)）をセットします
         const isWearing = isItemWearing(item);
-        // ↓ カラーコード取得
+        // 定数 colorHex を宣言し、値（getColorHex(item.color)）をセットします
         const colorHex = getColorHex(item.color);
-        // ↓ 画像読み込みエラー時の代用SVGパス取得
+        // 定数 fallback を宣言し、値（getCategoryFallbackImage(item.category…）をセットします
         const fallback = getCategoryFallbackImage(item.category);
 
-        // ↓ リスト項目カードHTMLを返却
+        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, '${item.id}', true)" onclick="toggleWearItem('${item.id}', true)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
             <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';" >
@@ -396,78 +406,75 @@ function renderStudioClosetList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
             `;
+    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
-// ↓ マイクローゼット画面（ペイン2）上のカテゴリチップが押されたときの絞り込み関数
+
+// マイクローゼットタブのカテゴリ絞り込みボタン押下時の再描画処理です
 function handlePaneClosetFilter(cat) {
-    // ↓ 選択カテゴリを保存
+    // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
-    // ↓ 押されたチップにだけactiveクラスを付与
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#pane-closet-filter-bar .filter-pill').forEach(btn => {
-        // ↓ data-cat属性と一致するか判定
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
     });
-    // ↓ グリッドを再描画
+    // 関連処理 renderPaneClosetGrid() を呼び出して処理・画面を更新します
     renderPaneClosetGrid();
 }
 
-// ↓ 試着スタジオ画面（ペイン4）左カラムのミニカテゴリチップが押されたときの絞り込み関数
+
+// 3列スタジオ左カラムのカテゴリチップ絞り込み時の再描画処理です
 function handleStudioClosetFilter(cat) {
-    // ↓ 選択カテゴリを保存
+    // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
-    // ↓ ミニチップのactive状態を切り替え
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#col-closet-filter .mini-chip').forEach(btn => {
-        // ↓ data-catと一致するか判定
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
     });
-    // ↓ 左リストを再描画
+    // 関連処理 renderStudioClosetList() を呼び出して処理・画面を更新します
     renderStudioClosetList();
 }
 
-// --------------------------------------------------------------------------
-// 15.2 ブランド商品（右カラム & お気に入り）の描画
-// --------------------------------------------------------------------------
 
-/**
- * スタジオ内（右カラム）のブランド商品リスト描画（お気に入りに登録された服のみ表示）
- */
-// ↓ 試着画面の右パネルにお気に入り登録済みのブランド商品リストを描画する関数
+// 3列試着画面の右カラム「3. ブランド商品」リスト（お気に入りフィルタ・カテゴリ絞込反映）を描画します
 function renderStudioBrandList() {
-    // ↓ 右リストコンテナを取得
+    // HTML 要素 #studio-brand-list を取得して変数 list に格納します
     const list = document.getElementById('studio-brand-list');
-    // ↓ 無ければ終了
+    // 条件（!list）が成り立つか判定し、該当する場合の処理を実行します
     if (!list) return;
 
-    // ↓ カテゴリフィルターとマネキン性別を取得
+    // 定数 filter を宣言し、値（AppState.studioBrandFilter || 'ALL'）をセットします
     const filter = AppState.studioBrandFilter || 'ALL';
-    // ↓ MENまたはWOMENを取得
+    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
     const gender = AppState.studioGender || 'MEN';
 
-    // お気に入りに登録されているブランド商品のみを抽出
+    // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // ↓ 全ブランド商品からお気に入りID配列に含まれるものだけ抽出
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して allFavProducts に入れます
     const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.includes(p.id));
 
-    // モバイル用タブのカウント更新
+    // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
-    // ↓ 要素があればお気に入り件数を反映
+    // 条件（mobBrandFavCnt）が成り立つか判定し、該当する場合の処理を実行します
     if (mobBrandFavCnt) {
-        // ↓ 数値文字列を設定
+        // 文字要素 mobBrandFavCnt の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
         mobBrandFavCnt.textContent = allFavProducts.length;
     }
 
-    // 性別によるフィルタリング（MEN / WOMEN）
+    // 再代入可能な変数 products を宣言し、値（allFavProducts.filter(p => !p.gender |…）をセットします
     let products = allFavProducts.filter(p => !p.gender || p.gender === gender);
-    // ↓ カテゴリ指定があればさらに絞り込み
+    // 条件（filter !== 'ALL'）が成り立つか判定し、該当する場合の処理を実行します
     if (filter !== 'ALL') {
-        // ↓ 指定カテゴリと一致する商品だけに絞る
+        // 変数・配列項目 products の値を更新・計算します
         products = products.filter(p => p.category === filter);
     }
 
-    // お気に入りアイテムが1件も登録されていない場合は案内画面を表示
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (allFavProducts.length === 0) {
-        // ↓ 商品一覧への誘導HTMLを挿入
+        // テンプレートリテラルで組み立てた HTML を要素 list 内に書き込んで画面を更新します
         list.innerHTML = `
             <div style="text-align: center; padding: 40px 16px; color: var(--color-gray-medium);">
                 <div style="font-size: 2rem; margin-bottom: 8px; color: var(--color-accent); opacity: 0.85;">♥</div>
@@ -476,31 +483,31 @@ function renderStudioBrandList() {
                 <a href="#items" class="btn btn-outline-xs" style="display: inline-block; padding: 6px 16px; font-size: 0.75rem;">商品一覧を見に行く</a>
             </div>
         `;
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // お気に入りは登録されているが、現在の性別やカテゴリフィルターに合致しない場合
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (products.length === 0) {
-        // ↓ 別カテゴリや別性別(MEN/WOMEN切替)を促す案内HTMLを挿入
+        // テンプレートリテラルで組み立てた HTML を要素 list 内に書き込んで画面を更新します
         list.innerHTML = `
             <div style="text-align: center; padding: 36px 12px; color: var(--color-gray-medium);">
                 <p style="font-size: 0.85rem; font-weight: 600; color: var(--color-dark); margin-bottom: 6px;">該当するお気に入りアイテムがありません</p>
                 <p style="font-size: 0.75rem; color: var(--color-gray-medium); line-height: 1.4;">他のカテゴリまたはマネキンの性別（${gender === 'MEN' ? 'WOMEN' : 'MEN'}）をお試しください。</p>
             </div>
         `;
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // ↓ 条件に合うお気に入り商品をドラッグ&クリック試着可能なカードとして描画
+    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     list.innerHTML = products.map(product => {
-        // ↓ マネキン着用中判定
+        // 定数 isWearing を宣言し、値（isItemWearing(product)）をセットします
         const isWearing = isItemWearing(product);
-        // ↓ 画像エラー時の代用SVG取得
+        // 定数 fallback を宣言し、値（getCategoryFallbackImage(product.categ…）をセットします
         const fallback = getCategoryFallbackImage(product.category);
 
-        // ↓ 右リスト用ブランドカードHTMLを返却（isCloset=falseを指定）
+        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, ${product.id}, false)" onclick="toggleWearItem(${product.id}, false)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
                 <img src="${product.image}" alt="${product.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';">
@@ -515,46 +522,47 @@ function renderStudioBrandList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
         `;
+    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
-// ↓ 試着スタジオ右カラムのカテゴリフィルター切り替え関数
+
+// 右カラムブランド商品一覧のカテゴリ絞り込みチップ切替処理です
 function handleStudioBrandFilter(cat) {
-    // ↓ フィルター値を更新
+    // アプリ全体状態 AppState.studioBrandFilter を最新値（cat）に更新します
     AppState.studioBrandFilter = cat;
-    // ↓ ボタンのアクティブ表示を同期
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#col-brand-filter .mini-chip').forEach(btn => {
-        // ↓ data-brand-cat属性と一致するか判定
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-brand-cat') === cat);
     });
-    // ↓ 右リストを再描画
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
 }
 
-// ↓ 「お気に入りのみ表示」チェックボックス用ハンドラ
+
+// 右カラムの「お気に入り商品のみ表示」トグルボタン状態を切り替えます
 function toggleBrandFavFilter(chk) {
-    // ↓ チェック状態を保存
+    // アプリ全体状態 AppState.studioBrandFavOnly を最新値（chk.checked）に更新します
     AppState.studioBrandFavOnly = chk.checked;
-    // ↓ 右リストを再描画
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
 }
 
-/**
- * パネル3（お気に入りブランド商品）の描画
- */
-// ↓ スタジオのタブ3「お気に入りアイテム」画面にハート登録済みの全ブランド商品を並べて描画する関数
+
+// スタジオ「お気に入り商品」タブにハート登録済み商品カード一覧を描画します
 function renderStudioFavoritesGrid() {
-    // ↓ お気に入りグリッド容器を取得
+    // HTML 要素 #studio-fav-grid を取得して変数 grid に格納します
     const grid = document.getElementById('studio-fav-grid');
-    // ↓ 要素がなければ終了
+    // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // ↓ 全ブランド商品の中から、AppState.favoritesにお気に入りIDが含まれる商品だけを抽出
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favProducts に入れます
     const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
 
-    // ↓ お気に入りが1件もない場合は案内カードを表示して終了
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favProducts.length === 0) {
-        // ↓ 空案内HTMLをセット
+        // テンプレートリテラルで組み立てた HTML を要素 grid 内に書き込んで画面を更新します
         grid.innerHTML = `
             <div class="closet-empty-card" >
                 <div class="closet-empty-icon">♥</div>
@@ -563,15 +571,15 @@ function renderStudioFavoritesGrid() {
                 <a href="#items" class="btn btn-primary">商品コレクションを見る</a>
             </div>
             `;
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // ↓ お気に入り商品をカードHTML配列に変換し、クリックで即試着＋スタジオタブ移動できるようにします
+    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     grid.innerHTML = favProducts.map(product => {
-        // ↓ 現在マネキンが試着中かどうか判定
+        // 定数 isWearing を宣言し、値（isItemWearing(product)）をセットします
         const isWearing = isItemWearing(product);
-        // ↓ カードHTMLを返却
+        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <article class="product-card" data - id="${product.id}" >
                 <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
@@ -588,400 +596,375 @@ function renderStudioFavoritesGrid() {
                 </div>
             </article>
             `;
+    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
-// --------------------------------------------------------------------------
-// 15.3 マネキン試着室 & 自動反映 & レイヤード表示
-// --------------------------------------------------------------------------
 
-/**
- * 
- * アイテムが現在マネキンに着用されているか判定
- */
-// ↓ 指定アイテムが現在マネキンの5部位スロット(hat/outer/tops/bottoms/shoes)のどこかに着用中か判定する関数
+// ==========================================================================
+//  3. マネキン試着・着脱・ドラッグ＆ドロップ・クイックピッカー操作
+// ==========================================================================
+// 渡されたアイテムが現在マネキンの対応部位スロットに着用されているか真偽値で判定します
 function isItemWearing(item) {
-    // ↓ 現在の試着状態を保持するオブジェクトを取得
+    // 定数 outfit を宣言し、値（AppState.currentOutfit）をセットします
     const outfit = AppState.currentOutfit;
-    // ↓ 状態が存在しなければfalse(未着用)
+    // 条件（!outfit）が成り立つか判定し、該当する場合の処理を実行します
     if (!outfit) return false;
-    // ↓ 全スロットキーを1つずつ確認
+    // 配列要素やインデックスを順番に繰り返すループ処理（for (const slotKey in outfit) {）を開始します
     for (const slotKey in outfit) {
-        // ↓ その部位に着ている服を取り出し
+        // 定数 worn を宣言し、値（outfit[slotKey]）をセットします
         const worn = outfit[slotKey];
-        // ↓ ID文字列が一致すれば現在着用中と判定してtrueを返します
+        // 条件（worn && String(worn.id) === String(item.id)）が成り立つか判定し、該当する場合の処理を実行します
         if (worn && String(worn.id) === String(item.id)) {
-            // ↓ 着用中
+            // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
             return true;
         }
     }
-    // ↓ 全スロットで見つからなければfalse
+    // 処理結果の基準値として false を呼び出し元へ返して関数を終了します
     return false;
 }
 
-/**
- * 試着トグル（着用 / 脱がす）
- */
-// ↓ 服カードをクリックまたはドロップしたとき「着ていなければ着せる／すでに着ていれば脱がす」切り替え関数
+
+// アイテムカード押下時に「着ていなければマネキンに着用 / 着用中なら脱ぐ」を切り替え、AI診断＆MySQL同期します
 function toggleWearItem(itemId, isOwned) {
-    // ↓ クリックされた服オブジェクトを探索して入れる変数
+    // 再代入可能な変数 targetItem を宣言し、値（null）をセットします
     let targetItem = null;
-    // ↓ 手持ち服(isOwned=true)ならmyClosetから、ブランド商品(false)ならSAMPLE_PRODUCTSから検索
+    // 条件（isOwned）が成り立つか判定し、該当する場合の処理を実行します
     if (isOwned) {
-        // ↓ 手持ち服配列からID一致を検索
+        // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = AppState.myCloset.find(c => String(c.id) === String(itemId));
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // ↓ ブランド商品配列から数値ID一致を検索
+        // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = SAMPLE_PRODUCTS.find(p => p.id === parseInt(itemId, 10));
     }
 
-    // ↓ 対象が見つからなければ終了
+    // 条件（!targetItem）が成り立つか判定し、該当する場合の処理を実行します
     if (!targetItem) return;
 
-    // ↓ カテゴリ名（TOPS等）をマネキン部位スロットキー（'tops'等）へ変換
+    // 定数 slotKey を宣言し、値（getSlotKeyByCategory(targetItem.catego…）をセットします
     const slotKey = getSlotKeyByCategory(targetItem.category);
-    // ↓ 不明なスロットなら終了
+    // 条件（!slotKey）が成り立つか判定し、該当する場合の処理を実行します
     if (!slotKey) return;
 
-    // ↓ いまその部位に着ている服を取得
+    // 定数 currentWorn を宣言し、値（AppState.currentOutfit[slotKey]）をセットします
     const currentWorn = AppState.currentOutfit[slotKey];
-    // ↓ 同じアイテムをすでに着ている場合は「脱がせる」動作にします
+    // 条件（currentWorn && String(currentWorn.id) === String(tar…）が成り立つか判定し、該当する場合の処理を実行します
     if (currentWorn && String(currentWorn.id) === String(targetItem.id)) {
-        // すでに着用中なら脱がす（nullにクリア）
+        // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
         AppState.currentOutfit[slotKey] = null;
-        // ↓ 解除トースト通知
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`「${targetItem.name}」を外しました`);
-    // ↓ 違う服または空のスロットなら「試着させる」動作にします
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // スロットに着用情報をセット（後から手持ち/ブランド区別できるようisOwnedも記録）
+        // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
         AppState.currentOutfit[slotKey] = {
-            // ↓ アイテムID
+            // レコード・商品・コーデを識別する ID プロパティをセットします
             id: targetItem.id,
-            // ↓ アイテム名
+            // 商品名またはアイテム名称
             name: targetItem.name,
-            // ↓ カテゴリ
+            // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
             category: targetItem.category,
-            // ↓ 代表カラー（設定がなければ色配列先頭またはBLACK）
+            // カラー名
             color: targetItem.color || (targetItem.colors ? targetItem.colors[0] : 'BLACK'),
-            // ↓ ブランド価格（手持ち服は0）
+            // 単価・価格（円）
             price: targetItem.price || 0,
-            // ↓ 画像URL
+            // 画像ファイルパスまたは DataURL
             image: targetItem.image,
-            // ↓ 真偽値に統一した手持ち服フラグ
+            // ユーザーの手持ち私物であるかどうかのフラグ
             isOwned: !!isOwned
         };
-        // ↓ 試着通知を表示
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`「${targetItem.name}」をマネキンに試着しました`);
-        // ↓ 微調整パネルでいま着た部位がすぐいじれるよう選択部位も自動で切り替えます
+        // アプリ全体状態 AppState.activeAdjustSlot を最新値（slotKey）に更新します
         AppState.activeAdjustSlot = slotKey;
     }
 
-    // ↓ 現在のコーデをアカウント専用localStorageへ保存
-    saveScopedData('manekin_current_outfit', AppState.currentOutfit);
-    // ↓ デバウンスなしで即座にMySQLサーバー側にも保存します
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
 
-    // UI更新（ステージ・左リスト・右リスト・AI診断を一斉再描画）
+    // 関連処理 renderMannequinStage() を呼び出して処理・画面を更新します
     renderMannequinStage();
-    // ↓ 左の手持ち服リスト更新
+    // 関連処理 renderStudioClosetList() を呼び出して処理・画面を更新します
     renderStudioClosetList();
-    // ↓ 右のブランド服リスト更新
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
-    // ↓ 下部のAIスタイリストアドバイスを再生成
+    // 関連処理 updateAIStylingComment() を呼び出して処理・画面を更新します
     updateAIStylingComment();
 }
 
-/**
- * カテゴリをスロットキーにマッピング
- */
-// ↓ 大文字カテゴリ名('OUTER','TOPS'等)から小文字スロットキー('outer','tops'等)へ変換する関数
+
+// カテゴリ文字列('OUTER'/'TOPS'等)をマネキンスロット名('outer'/'tops'等)へ小文字正規化します
 function getSlotKeyByCategory(category) {
-    // ↓ カテゴリごとに部位名を割り振り
+    // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
-        // ↓ アウター部位
+        // 値が 'OUTER' 系だった場合、対応値 'outer' を即返却します
         case 'OUTER': return 'outer';
-        // ↓ トップス部位
+        // 値が 'TOPS' 系だった場合、対応値 'tops' を即返却します
         case 'TOPS': return 'tops';
-        // ↓ ボトムス部位
+        // 値が 'BOTTOMS' 系だった場合、対応値 'bottoms' を即返却します
         case 'BOTTOMS': return 'bottoms';
-        // ↓ 靴部位
+        // 値が 'SHOES' 系だった場合、対応値 'shoes' を即返却します
         case 'SHOES': return 'shoes';
-        // ↓ 帽子各種表記をまとめて 'hat' に正規化
+        // 値が 'HAT' 系だった場合、対応値 'hat' を即返却します
         case 'HAT': case 'HATS': case 'CAP': return 'hat';
-        // ↓ 該当しない場合の保険としてtopsへ割り当て
+        // オブジェクトの 'default' プロパティ値を設定します
         default: return 'tops';
     }
 }
 
-/**
- * スロットの服を脱がせる
- */
-// ↓ 着用中タグの「×」ボタンやマネキンクリックで指定1部位だけ脱がす関数
+
+// 指定した部位スロット('hat'〜'shoes')の服だけをマネキンから脱がせて MySQL 同期します
 function unwearSlot(slotKey) {
-    // ↓ その部位に服が着せられていれば実行
+    // 条件（AppState.currentOutfit[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit[slotKey]) {
-        // ↓ 通知用に服の名前を覚えておきます
+        // 定数 name を宣言し、値（AppState.currentOutfit[slotKey].name）をセットします
         const name = AppState.currentOutfit[slotKey].name;
-        // ↓ スロットをnullにして脱がします
+        // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
         AppState.currentOutfit[slotKey] = null;
-        // ↓ localStorage保存
-        saveScopedData('manekin_current_outfit', AppState.currentOutfit);
-        // ↓ MySQLへ即時保存
+        // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
         syncStudioStateToBackend({ immediate: true });
-        // ↓ 解除メッセージ表示
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`「${name}」を外しました`);
 
-        // ↓ マネキン・左右リスト・AI診断を再描画
+        // 関連処理 renderMannequinStage() を呼び出して処理・画面を更新します
         renderMannequinStage();
-        // ↓ 左リスト更新
+        // 関連処理 renderStudioClosetList() を呼び出して処理・画面を更新します
         renderStudioClosetList();
-        // ↓ 右リスト更新
+        // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
         renderStudioBrandList();
-        // ↓ AIコメント更新
+        // 関連処理 updateAIStylingComment() を呼び出して処理・画面を更新します
         updateAIStylingComment();
     }
 }
 
-/**
- * 全身クリア（すべての服を脱がす）
- */
-// ↓ マネキンに着せている全5部位のアイテムを一括リセットする関数（silent=trueなら通知を出さない）
+
+// マネキンの全5部位を一度に空に戻します（UI更新あり）
 function resetMannequinOutfit(silent = false) {
-    // ↓ 全スロットをnullに戻した新オブジェクトで上書き
+    // アプリ全体状態 AppState.currentOutfit を最新値（{）に更新します
     AppState.currentOutfit = {
+        // オブジェクトの 'hat' プロパティ値を設定します
         hat: null,
+        // オブジェクトの 'outer' プロパティ値を設定します
         outer: null,
+        // オブジェクトの 'tops' プロパティ値を設定します
         tops: null,
+        // オブジェクトの 'bottoms' プロパティ値を設定します
         bottoms: null,
+        // オブジェクトの 'shoes' プロパティ値を設定します
         shoes: null
     };
-    // ↓ ローカル保存
-    saveScopedData('manekin_current_outfit', AppState.currentOutfit);
-    // ↓ MySQL即時同期
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
-    // ↓ サイレントモードでなければクリア通知を表示
+    // 条件（!silent）が成り立つか判定し、該当する場合の処理を実行します
     if (!silent) {
-        // ↓ トースト通知
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('マネキンの着用服をすべてクリアしました');
     }
 
-    // ↓ ステージ・左右リスト・AIアドバイスをすべて初期化反映
+    // 関連処理 renderMannequinStage() を呼び出して処理・画面を更新します
     renderMannequinStage();
-    // ↓ 左リスト
+    // 関連処理 renderStudioClosetList() を呼び出して処理・画面を更新します
     renderStudioClosetList();
-    // ↓ 右リスト
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
-    // ↓ AIアドバイス
+    // 関連処理 updateAIStylingComment() を呼び出して処理・画面を更新します
     updateAIStylingComment();
 }
 
-// ↓ index.html側ボタンから呼ばれるエイリアス(別名ショートカット)関数
+
+// ツールバー「全身クリア」ボタン押下時にマネキンの服をすべてリセットして通知します
 function clearMannequin() {
-    // ↓ 通知付きで全身リセットを実行
+    // 関連処理 resetMannequinOutfit() を呼び出して処理・画面を更新します
     resetMannequinOutfit(false);
 }
 
-/**
- * マネキンステージの描画更新
- */
-// =========================================================================
-// カテゴリ別フォールバックSVG画像
-// =========================================================================
-// ↓ 画像リンク切れ時にカテゴリーに合う綺麗な代用SVG/PNGを返す安全用フォールバック関数
+
+// 画像読み込み失敗(onerror)時にカテゴリに応じた代用ブランド画像パスを返します
 function getCategoryFallbackImage(category) {
-    // ↓ カテゴリごとに代替パスまたはSVG Data URIを返却
+    // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
-        // ↓ 靴の場合のインラインSVGスニーカー画像
+        // 値が 'SHOES' だった場合の専用処理ルートです
         case 'SHOES':
+            // 結果（"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns…）を呼び出し元へ返却します
             return "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20140%2065%22%3E%3Cpath%20d%3D%22M15%2048%20C25%2048%2C%2035%2046%2C%2045%2040%20C55%2032%2C%2065%2022%2C%2085%2020%20C95%2019%2C%20110%2025%2C%20125%2038%20C132%2044%2C%20130%2050%2C%20120%2052%20L15%2052%20Z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M10%2052%20L128%2052%20C132%2052%2C%20132%2058%2C%20126%2058%20L10%2058%20C6%2058%2C%206%2052%2C%2010%2052%20Z%22%20fill%3D%22%23e2e8f0%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpath%20d%3D%22M65%2026%20L80%2032%20M60%2031%20L75%2037%20M55%2036%20L70%2042%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E";
-        // ↓ ボトムスの場合
+        // 値が 'BOTTOMS' だった場合の専用処理ルートです
         case 'BOTTOMS':
+            // 結果（'assets/images/men/ストレートレープセミフレアスラックス.png'）を呼び出し元へ返却します
             return 'assets/images/men/ストレートレープセミフレアスラックス.png';
-        // ↓ アウターの場合
+        // 値が 'OUTER' だった場合の専用処理ルートです
         case 'OUTER':
+            // 結果（'assets/images/men/オーバードレープダブルトレンチコート.png'）を呼び出し元へ返却します
             return 'assets/images/men/オーバードレープダブルトレンチコート.png';
-        // ↓ 帽子の場合はクラシックキャップSVG画像
+        // 値が 'HAT': case 'HATS': case 'CAP' だった場合の専用処理ルートです
         case 'HAT': case 'HATS': case 'CAP':
+            // 結果（"data:image/svg+xml;charset=UTF-8,%3Csvg%20width…）を呼び出し元へ返却します
             return "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20viewBox%3D%220%200%20300%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22capGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a2a2a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23111111%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M70%20120%20C75%2060%20140%2040%20200%2055%20C215%2060%20230%2080%20235%20115%20C205%20122%20140%20128%2070%20120%20Z%22%20fill%3D%22url(%23capGrad)%22%20stroke%3D%22%23111111%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M45%20125%20C85%20120%20165%20122%20235%20115%20C260%20118%20275%20125%20268%20138%20C240%20150%20170%20148%2055%20140%20C42%20138%2038%20130%2045%20125%20Z%22%20fill%3D%22%23111111%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2248%22%20r%3D%225%22%20fill%3D%22%23444444%22%2F%3E%3Cpath%20d%3D%22M155%2052%20Q150%2085%20145%20124%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.18)%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E";
-        // ↓ トップスおよびその他標準
+        // 値が 'TOPS' だった場合の専用処理ルートです
         case 'TOPS':
+        // どの case にも該当しなかった場合の既定（デフォルト）処理です
         default:
+            // 結果（'assets/images/men/アーバングレイジップフーディ.png'）を呼び出し元へ返却します
             return 'assets/images/men/アーバングレイジップフーディ.png';
     }
 }
 
-// 過去の旧共通localStorageキーの削除および現在のアカウントデータ内の旧画像パス補完
+
+// 古いデータに含まれる旧ファイル名画像を現行フォルダの実在画像パスへメモリ補正します
 function migrateOldBrokenAssets() {
-    // アカウント未分離時代の旧共通localStorageキーを完全に削除してデータ混在を防止
-    if (typeof purgeLegacyGlobalStorage === 'function') {
-        // ↓ 旧キーを削除
-        purgeLegacyGlobalStorage();
+    // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
+    if (typeof purgeAllManekinLocalStorage === 'function') {
+        // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
+        purgeAllManekinLocalStorage();
     }
 
-    // ↓ 未ログインならマイグレーション対象がないので終了
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) {
-        // ↓ 終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // ↓ デフォルト靴画像を取得
+    // 定数 defaultSneaker を宣言し、値（getCategoryFallbackImage('SHOES')）をセットします
     const defaultSneaker = getCategoryFallbackImage('SHOES');
-    // ↓ 手持ち服側の修正有無フラグ
-    let closetChanged = false;
-    // ↓ 旧ファイル名('pants_black.jpg'等)のまま残っている手持ち服データを新ファイルパスへ自動修復
+    // 条件（Array.isArray(AppState.myCloset)）が成り立つか判定し、該当する場合の処理を実行します
     if (Array.isArray(AppState.myCloset)) {
-        // ↓ 全アイテムを巡回チェック
+        // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         AppState.myCloset.forEach(item => {
-            // ↓ 空要素ならスキップ
+            // 条件（!item）が成り立つか判定し、該当する場合の処理を実行します
             if (!item) return;
-            // ↓ 旧パンツ画像パスなら現行スラックス画像へ差し替え
+            // 条件（!item.image || item.image.includes('pants_black.jpg'…）が成り立つか判定し、該当する場合の処理を実行します
             if (!item.image || item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
-                // ↓ 新画像パスへ更新
+                // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-                // ↓ 更新フラグを立てる
-                closetChanged = true;
-            // ↓ 旧靴画像パスならSVGスニーカーへ差し替え
+            // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
             } else if (item.image.includes('shoes_white.jpg')) {
-                // ↓ 新画像へ更新
+                // 変数・配列項目 item.image の値を更新・計算します
                 item.image = defaultSneaker;
-                // ↓ 更新フラグ
-                closetChanged = true;
-            // ↓ 旧スウェット画像パスならジップフーディ画像へ差し替え
+            // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
             } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
-                // ↓ 新画像へ更新
+                // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/アーバングレイジップフーディ.png';
-                // ↓ 更新フラグ
-                closetChanged = true;
-            // ↓ 旧Tシャツ画像パスならオックスフォードシャツ画像へ差し替え
+            // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
             } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
-                // ↓ 新画像へ更新
+                // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
-                // ↓ 更新フラグ
-                closetChanged = true;
             }
         });
     }
-    // ↓ 1件でも修復したらlocalStorageに上書き保存
-    if (closetChanged) {
-        // ↓ 更新後クローゼット保存
-        saveScopedData('manekin_my_closet', AppState.myCloset);
-    }
 
-    // ↓ 現在着用中コーデ(currentOutfit)側の修復有無フラグ
+    // 再代入可能な変数 outfitChanged を宣言し、値（false）をセットします
     let outfitChanged = false;
-    // ↓ 着用中コーデ内の不正キーや旧画像パスも同様に修復
+    // 条件（AppState.currentOutfit）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit) {
-        // ↓ 誤ってBase64文字列自体がスロットキーとして保存されてしまっていた異常データを除去
+        // 配列要素やインデックスを順番に繰り返すループ処理（for (const slotKey in AppState.currentOutfit) {）を開始します
         for (const slotKey in AppState.currentOutfit) {
-            // ↓ 'data:image'で始まる不正キーがあれば削除
+            // 条件（slotKey.startsWith("data:image")）が成り立つか判定し、該当する場合の処理を実行します
             if (slotKey.startsWith("data:image")) {
-                // ↓ プロパティ削除
+                // オブジェクトから該当キーの着用データ・項目を削除します（delete AppState.currentOutfit[slotKey];）
                 delete AppState.currentOutfit[slotKey];
-                // ↓ 更新フラグ
+                // 変数・配列項目 outfitChanged の値を更新・計算します
                 outfitChanged = true;
             }
         }
-        // ↓ 各正常スロット内の旧画像パスを確認して新画像パスへ修復
+        // 配列要素やインデックスを順番に繰り返すループ処理（for (const slot in AppState.currentOutfit) {）を開始します
         for (const slot in AppState.currentOutfit) {
-            // ↓ スロット内のアイテムを取得
+            // 定数 item を宣言し、値（AppState.currentOutfit[slot]）をセットします
             const item = AppState.currentOutfit[slot];
-            // ↓ 画像URLを持っていれば旧パス判定を実施
+            // 条件（item && item.image）が成り立つか判定し、該当する場合の処理を実行します
             if (item && item.image) {
-                // ↓ 旧パンツ画像チェック
+                // 条件（item.image.includes('pants_black.jpg') || item.image…）が成り立つか判定し、該当する場合の処理を実行します
                 if (item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
-                    // ↓ 新パスへ差し替え
+                    // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-                    // ↓ 更新フラグ
+                    // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // ↓ 旧靴画像チェック
+                // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
                 } else if (item.image.includes('shoes_white.jpg')) {
-                    // ↓ SVG画像へ差し替え
+                    // 変数・配列項目 item.image の値を更新・計算します
                     item.image = defaultSneaker;
-                    // ↓ 更新フラグ
+                    // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // ↓ 旧スウェット画像チェック
+                // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
-                    // ↓ 新パスへ差し替え
+                    // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/アーバングレイジップフーディ.png';
-                    // ↓ 更新フラグ
+                    // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // ↓ 旧Tシャツ画像チェック
+                // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
-                    // ↓ 新パスへ差し替え
+                    // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
-                    // ↓ 更新フラグ
+                    // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
                 }
             }
         }
     }
-    // ↓ 修復が行われたらアカウント別ストレージに再保存
+    // 条件（outfitChanged）が成り立つか判定し、該当する場合の処理を実行します
     if (outfitChanged) {
-        // ↓ 着用状態保存
-        saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+        // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
+        syncStudioStateToBackend({ immediate: true });
     }
 }
 
-/**
- * マネキンステージの描画更新（ゴーストマネキン試着機能）
- */
-// ↓ 中央のマネキン人形に5層の服画像を重ねて描画し、足元の着用チップ・販売品サマリー・微調整UIまで更新する核心関数
+
+// 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
 function renderMannequinStage() {
-    // ↓ 着用状態オブジェクトを取得
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // ↓ 奥(shoes/bottoms)から手前(tops/outer/hat)まで5部位スロット定義配列
+    // 定数 slots を宣言し、値（['shoes', 'bottoms', 'tops', 'outer', …）をセットします
     const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
 
-    // ↓ 各部位のPNG/SVG画像をステージの該当レイヤーDOMへ差し込みます
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     slots.forEach(slot => {
-        // ↓ 外枠スロット要素（例: layer-tops）
+        // HTML 要素 #対象ID を取得して変数 slotElem に格納します
         const slotElem = document.getElementById(`layer-${slot}`);
-        // ↓ 服画像が入る内側枠要素（例: layer-content-tops）
+        // HTML 要素 #対象ID を取得して変数 layerContent に格納します
         const layerContent = document.getElementById(`layer-content-${slot}`);
-        // ↓ 現在その部位に着ている服データ
+        // 定数 item を宣言し、値（outfit[slot]）をセットします
         const item = outfit[slot];
 
-        // ↓ 服が着せられていれば has-item クラスを付けて「空の点線プレースホルダー枠」を隠します
+        // 条件（slotElem）が成り立つか判定し、該当する場合の処理を実行します
         if (slotElem) {
-            // ↓ itemとimageが両方あるか真偽値変換(!!)でトグル
+            // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（slotElem.classList.toggle('has-item', !!(i…）
             slotElem.classList.toggle('has-item', !!(item && item.image));
         }
 
-        // ↓ 服画像<img>タグを描画（脱いでいれば中身を空文字にして消去）
+        // 条件（layerContent）が成り立つか判定し、該当する場合の処理を実行します
         if (layerContent) {
-            // ↓ 画像あり時は<img>生成
+            // 条件（item && item.image）が成り立つか判定し、該当する場合の処理を実行します
             if (item && item.image) {
-                // ↓ 読み込み失敗時用フォールバック取得
+                // 定数 fallback を宣言し、値（getCategoryFallbackImage(item.category…）をセットします
                 const fallback = getCategoryFallbackImage(item.category);
-                // ↓ 重ね着用のlayer-imgをセット
+                // テンプレートリテラルで組み立てた HTML を要素 layerContent 内に書き込んで画面を更新します
                 layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.onerror=null;this.src='${fallback}';">`;
-            // ↓ 画像なし時はクリア
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
-                // ↓ HTMLを空に
+                // 生成・変換した HTML 文字列を要素 layerContent の中身として描画します
                 layerContent.innerHTML = '';
             }
         }
     });
 
-    // 着用中チップバーの更新（ステージ下部に並ぶ脱着タグ一覧）
+    // HTML 要素 #wearing-slots-bar を取得して変数 slotsBar に格納します
     const slotsBar = document.getElementById('wearing-slots-bar');
-    // ↓ チップバー要素があれば着用中部位だけタグを生成
+    // 条件（slotsBar）が成り立つか判定し、該当する場合の処理を実行します
     if (slotsBar) {
-        // ↓ 生成したHTML断片を溜める配列
+        // 定数 chipsHtml を宣言し、値（[]）をセットします
         const chipsHtml = [];
-        // ↓ 5スロットをループ
+        // 配列要素やインデックスを順番に繰り返すループ処理（for (const slotKey of slots) {）を開始します
         for (const slotKey of slots) {
-            // ↓ スロット内の服を取得
+            // 定数 item を宣言し、値（outfit[slotKey]）をセットします
             const item = outfit[slotKey];
-            // ↓ 着用中ならチップHTMLを作成
+            // 条件（item）が成り立つか判定し、該当する場合の処理を実行します
             if (item) {
-                // ↓ 手持ち服かブランド販売品かの表示文言を決定
+                // 定数 badgeLabel を宣言し、値（item.isOwned ? '手持ち' : 'ブランド'）をセットします
                 const badgeLabel = item.isOwned ? '手持ち' : 'ブランド';
-                // ↓ 靴と帽子はサイズ無し(フリー)扱い
+                // 定数 isFreeSlot を宣言し、値（(slotKey === 'shoes' || slotKey === 'h…）をセットします
                 const isFreeSlot = (slotKey === 'shoes' || slotKey === 'hat');
-                // ↓ ブランド服でサイズ情報があれば `[L]` のような表記を追加
+                // 定数 sizeBadge を宣言し、値（(!item.isOwned && item.size && !isFree…）をセットします
                 const sizeBadge = (!item.isOwned && item.size && !isFreeSlot) ? ` [${item.size}]` : '';
-                // ↓ タグ＋解除ボタンのHTMLを追加
+                // 配列の末尾に新しい要素を追加します（chipsHtml.push(`）
                 chipsHtml.push(`
                     <span class="wearing-chip">
                         <span>${getCategoryNameJP(item.category)}: ${item.name}${sizeBadge} (${badgeLabel})</span>
@@ -990,119 +973,124 @@ function renderMannequinStage() {
                 `);
             }
         }
-        // ↓ 配列を連結して画面に描画
+        // 生成・変換した HTML 文字列を要素 slotsBar の中身として描画します
         slotsBar.innerHTML = chipsHtml.join('');
     }
 
-    // ブランド商品サマリー計算（手持ち服は除き、販売ブランド品だけの点数と合計金額を集計）
+    // 再代入可能な変数 brandCount を宣言し、値（0）をセットします
     let brandCount = 0;
-    // ↓ 販売アイテム合計額の初期値
+    // 再代入可能な変数 brandPrice を宣言し、値（0）をセットします
     let brandPrice = 0;
-    // ↓ 5部位を走査
+    // 配列要素やインデックスを順番に繰り返すループ処理（for (const slotKey of slots) {）を開始します
     for (const slotKey of slots) {
-        // ↓ アイテム取り出し
+        // 定数 item を宣言し、値（outfit[slotKey]）をセットします
         const item = outfit[slotKey];
-        // ↓ 存在し、かつ私物(isOwned)ではないブランド商品のみ加算
+        // 条件（item && !item.isOwned）が成り立つか判定し、該当する場合の処理を実行します
         if (item && !item.isOwned) {
-            // ↓ 点数加算
+            // 変数・配列項目 brandCount の値を更新・計算します
             brandCount++;
-            // ↓ 金額加算
+            // 変数・配列項目 brandPrice の値を更新・計算します
             brandPrice += (item.price || 0);
         }
     }
 
-    // ↓ 「○点」カウントテキスト更新
+    // HTML 要素 #brand-sum-count を取得して変数 countElem に格納します
     const countElem = document.getElementById('brand-sum-count');
-    // ↓ 要素があれば更新
+    // 条件（countElem）が成り立つか判定し、該当する場合の処理を実行します
     if (countElem) countElem.textContent = `${brandCount}点`;
 
-    // ↓ 合計価格表示更新
+    // HTML 要素 #brand-sum-price を取得して変数 priceElem に格納します
     const priceElem = document.getElementById('brand-sum-price');
-    // ↓ 要素があれば更新
+    // 条件（priceElem）が成り立つか判定し、該当する場合の処理を実行します
     if (priceElem) priceElem.textContent = `¥${brandPrice.toLocaleString()}`;
 
-    // ↓ 着用中ブランド品が0点のときは一括カート投入ボタンを無効化(disabled)
+    // HTML 要素 #btn-add-brand-to-cart を取得して変数 cartBtn に格納します
     const cartBtn = document.getElementById('btn-add-brand-to-cart');
-    // ↓ disabled状態を切り替え
+    // 条件（cartBtn）が成り立つか判定し、該当する場合の処理を実行します
     if (cartBtn) {
-        // ↓ 0点ならtrue(押せない)
+        // 変数・配列項目 cartBtn.disabled の値を更新・計算します
         cartBtn.disabled = (brandCount === 0);
     }
 
-    // 服の位置・サイズ微調整オフセット（translateとscaleのCSS変換）をDOMへ適用
+    // 関連処理 applyFittingOffsets() を呼び出して処理・画面を更新します
     applyFittingOffsets();
 
-    // 微調整パネルが開いていればスライダー値やタグ表示も最新に再同期
+    // HTML 要素 #fitting-adjust-panel を取得して変数 adjustPanel に格納します
     const adjustPanel = document.getElementById('fitting-adjust-panel');
-    // ↓ 非表示(none)でなければ開いていると判断して同期
+    // 条件（adjustPanel && adjustPanel.style.display !== 'none'）が成り立つか判定し、該当する場合の処理を実行します
     if (adjustPanel && adjustPanel.style.display !== 'none') {
-        // ↓ パネルUI同期
+        // 関連処理 syncAdjustPanelUI() を呼び出して処理・画面を更新します
         syncAdjustPanelUI();
     }
 }
 
-// ↓ ステージ上の各部位ボックス（アウター・トップス・ボトムス等）がクリックされた時の処理
+
+// 着用中スロットチップ押下時の処理：着ていれば調整パネル対象切替、未着用ならクイックピッカーを開きます
 function handleStageSlotClick(slotKey) {
-    // ↓ 現在の着用状態を取得
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // ↓ クリックされた部位のアイテムを確認
+    // 定数 item を宣言し、値（outfit[slotKey]）をセットします
     const item = outfit[slotKey];
 
-    // ↓ すでに着ている状態ならクリック1回で脱がせ、未着用ならクイック選択ポップオーバーを開きます
+    // 条件（item）が成り立つか判定し、該当する場合の処理を実行します
     if (item) {
-        // 着用中の場合：脱がす
+        // 専用ヘルパー関数 unwearSlot() を実行して状態や表示ラベルを更新します
         unwearSlot(slotKey);
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // 未着用の場合：その部位に合う服候補一覧ポップオーバーを開く
+        // 関連処理 openStageQuickPicker() を呼び出して処理・画面を更新します
         openStageQuickPicker(slotKey);
     }
 }
 
-/**
- * ステージ内クイック選択ポップオーバーを開く
- */
-// ↓ マネキンの未着用点線枠をクリックした時に、その部位に合う服だけをステージ上に小窓表示する関数
+
+// 未着用部位を選んだとき、手持ち服やブランド服からすぐ着せられる簡易選択リストを表示します
 function openStageQuickPicker(slotKey) {
-    // ↓ ポップオーバー外枠を取得
+    // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
-    // ↓ ポップオーバー見出しを取得
+    // HTML 要素 #quick-picker-title を取得して変数 title に格納します
     const title = document.getElementById('quick-picker-title');
-    // ↓ 候補カード一覧コンテナを取得
+    // HTML 要素 #quick-picker-body を取得して変数 body に格納します
     const body = document.getElementById('quick-picker-body');
-    // ↓ 要素不足なら終了
+    // 条件（!picker || !body）が成り立つか判定し、該当する場合の処理を実行します
     if (!picker || !body) return;
 
-    // ↓ スロット名から日本語名と大文字カテゴリコードへの変換辞書
+    // 定数 catNameMap を宣言し、値（{）をセットします
     const catNameMap = {
+        // オブジェクトの 'outer' プロパティ値を設定します
         outer: { name: 'アウター', cat: 'OUTER' },
+        // オブジェクトの 'tops' プロパティ値を設定します
         tops: { name: 'トップス', cat: 'TOPS' },
+        // オブジェクトの 'bottoms' プロパティ値を設定します
         bottoms: { name: 'ボトムス', cat: 'BOTTOMS' },
+        // オブジェクトの 'shoes' プロパティ値を設定します
         shoes: { name: '靴', cat: 'SHOES' },
+        // オブジェクトの 'hat' プロパティ値を設定します
         hat: { name: '帽子', cat: 'HAT' }
     };
-    // ↓ 対応カテゴリ情報を取得
+    // 定数 catInfo を宣言し、値（catNameMap[slotKey] || { name: 'アイテム',…）をセットします
     const catInfo = catNameMap[slotKey] || { name: 'アイテム', cat: 'ALL' };
-    // ↓ 小窓のヘッダー文字を更新（例: 「トップス を選択して試着」）
+    // 条件（title）が成り立つか判定し、該当する場合の処理を実行します
     if (title) title.textContent = `${catInfo.name} を選択して試着`;
 
-    // 候補アイテムを抽出（自分のクローゼット内の手持ち服 ＋ マネキン性別に合う全ブランド商品）
+    // 定数 myItems を宣言し、値（AppState.myCloset.filter(c => c.catego…）をセットします
     const myItems = AppState.myCloset.filter(c => c.category === catInfo.cat);
-    // ↓ ブランド側はこの画面から直接全品試せるようSAMPLE_PRODUCTSから抽出
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して brandItems に入れます
     const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat && (!p.gender || p.gender === AppState.studioGender));
 
-    // ↓ 組み立てるHTML文字列変数
+    // 再代入可能な変数 html を宣言し、値（''）をセットします
     let html = '';
-    // ↓ どちらも0件なら空メッセージを表示
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (myItems.length === 0 && brandItems.length === 0) {
-        // ↓ 空メッセージHTML
+        // 変数・配列項目 html の値を更新・計算します
         html = '<p style="grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 0.75rem; padding: 12px;">選択できるアイテムがありません</p>';
-    // ↓ 候補がある場合は[手持ち]と[ブランド価格]カードを並べて生成
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // ↓ まず手持ち服カードを追加
+        // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         myItems.forEach(item => {
-            // ↓ フォールバック画像取得
+            // 定数 fb を宣言し、値（getCategoryFallbackImage(item.category…）をセットします
             const fb = getCategoryFallbackImage(item.category);
-            // ↓ カードHTMLを追記
+            // 変数・配列項目 html の値を更新・計算します
             html += `
             <div class="quick-picker-card" onclick="toggleWearItem('${item.id}', true); closeStageQuickPicker();" title="${item.name}" >
                 <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='${fb}';">
@@ -1111,11 +1099,11 @@ function openStageQuickPicker(slotKey) {
                 </div>
         `;
         });
-        // ↓ 続けてブランド商品カードを追加
+        // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         brandItems.forEach(p => {
-            // ↓ フォールバック画像取得
+            // 定数 fb を宣言し、値（getCategoryFallbackImage(p.category)）をセットします
             const fb = getCategoryFallbackImage(p.category);
-            // ↓ カードHTMLを追記
+            // 変数・配列項目 html の値を更新・計算します
             html += `
             <div class="quick-picker-card" onclick="toggleWearItem(${p.id}, false); closeStageQuickPicker();" title="${p.name}" >
                 <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null;this.src='${fb}';">
@@ -1126,931 +1114,952 @@ function openStageQuickPicker(slotKey) {
         });
     }
 
-    // ↓ 候補一覧を小窓に挿入して表示状態(block)にします
+    // 生成・変換した HTML 文字列を要素 body の中身として描画します
     body.innerHTML = html;
-    // ↓ 表示オン
+    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（picker.style.display = 'block';）
     picker.style.display = 'block';
 
-    // 左・右カラムのフィルターも連動してクリックした部位カテゴリに自動切り替え
+    // 関連処理 handleStudioClosetFilter() を呼び出して処理・画面を更新します
     handleStudioClosetFilter(catInfo.cat);
-    // ↓ 右カラムブランドフィルターも同カテゴリに連動
+    // 関連処理 handleStudioBrandFilter() を呼び出して処理・画面を更新します
     handleStudioBrandFilter(catInfo.cat);
 }
 
-// ↓ ステージ上のクイック選択小窓の×ボタンで閉じる関数
+
+// 簡易部位選択ポップアップ要素を DOM から取り除きます
 function closeStageQuickPicker() {
-    // ↓ 小窓要素を取得
+    // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
-    // ↓ 非表示に戻します
+    // 条件（picker）が成り立つか判定し、該当する場合の処理を実行します
     if (picker) picker.style.display = 'none';
 }
 
-// ドラッグ＆ドロップ試着機能（左右カードをつかんでマネキンへ運ぶ開始処理）
+
+// 左右リストの服カードをドラッグ開始したとき、アイテム識別情報を dataTransfer に格納します
 function handleCardDragStart(event, itemId, isOwned) {
-    // ↓ ドラッグデータ内にアイテムIDと手持ちフラグをJSON文字列で仕込んでおきます
+    // ドラッグ中のアイテム種類とIDを文字列データとしてブラウザの転送領域へ格納します
     event.dataTransfer.setData('text/plain', JSON.stringify({ itemId, isOwned }));
-    // ↓ ドロップカーソルをコピー(+)アイコンに設定
+    // 変数・配列項目 event.dataTransfer.effectAllowed の値を更新・計算します
     event.dataTransfer.effectAllowed = 'copy';
 }
 
-// ↓ ドラッグ中のカードがマネキンステージの上を通過している間に呼ばれるハンドラ
+
+// マネキンステージ上にドラッグカーソルが乗ったとき、ドロップ許可スタイルを付けます
 function handleStageDragOver(event) {
-    // ↓ ブラウザ標準の「ドロップ禁止」挙動を無効化してドロップを受け入れ可能にします
+    // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
-    // ↓ マウス横にコピー用カーソルを表示
+    // 変数・配列項目 event.dataTransfer.dropEffect の値を更新・計算します
     event.dataTransfer.dropEffect = 'copy';
-    // ↓ ステージ枠を取得してハイライトクラス(is-dragover)を点灯
+    // HTML 要素 #mannequin-stage-box を取得して変数 box に格納します
     const box = document.getElementById('mannequin-stage-box');
-    // ↓ ハイライトオン
+    // 条件（box）が成り立つか判定し、該当する場合の処理を実行します
     if (box) box.classList.add('is-dragover');
 }
 
-// ↓ ドラッグ中のカーソルがマネキンステージ外へ出たときのハイライト解除ハンドラ
+
+// ドラッグがマネキンステージ領域から離れたとき、ハイライト枠を消します
 function handleStageDragLeave(event) {
-    // ↓ ステージ枠を取得
+    // HTML 要素 #mannequin-stage-box を取得して変数 box に格納します
     const box = document.getElementById('mannequin-stage-box');
-    // ↓ 破線・強調クラスを外します
+    // 条件（box）が成り立つか判定し、該当する場合の処理を実行します
     if (box) box.classList.remove('is-dragover');
 }
 
-// ↓ マネキンステージ上に服カードをドロップした瞬間に自動試着させるハンドラ
+
+// マネキンステージへ服カードがドロップされたとき、その服をマネキンへ着せ替えます
 function handleStageDrop(event) {
-    // ↓ 既定動作（画像URL直接開き等）を禁止
+    // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
-    // ↓ ハイライトクラスを消灯
+    // HTML 要素 #mannequin-stage-box を取得して変数 box に格納します
     const box = document.getElementById('mannequin-stage-box');
-    // ↓ 消灯
+    // 条件（box）が成り立つか判定し、該当する場合の処理を実行します
     if (box) box.classList.remove('is-dragover');
 
-    // ↓ ドラッグ開始時に埋め込んだJSONデータを取り出して試着関数を呼び出します
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        // ↓ JSON文字列をオブジェクトに復元
+        // 定数 data を宣言し、値（JSON.parse(event.dataTransfer.getData(…）をセットします
         const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        // ↓ itemIdが含まれていればそのアイテムをマネキンに着せます
+        // 条件（data && data.itemId !== undefined）が成り立つか判定し、該当する場合の処理を実行します
         if (data && data.itemId !== undefined) {
-            // ↓ toggleWearItem(ID, 手持ちフラグ) を呼び出し
+            // 関連処理 toggleWearItem() を呼び出して処理・画面を更新します
             toggleWearItem(data.itemId, !!data.isOwned);
         }
-    // ↓ 服カード以外のファイル等を誤ってドロップした場合のエラー保護
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
-        // ↓ コンソールにエラー出力
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.error('Drop error:', e);
     }
 }
 
-/**
- * 服の位置・サイズ微調整オフセットを各レイヤーに適用
- * 販売商品はXS〜XLの5段階サイズに応じたスケールを適用し、手持ち服は自由なカスタム倍率を適用
- */
-// ↓ fittingOffsets に記録された上下(y)・左右(x)・倍率(scale)を各レイヤーのCSSカスタム変数へ反映する関数
+
+// ==========================================================================
+//  4. フィット感・位置(X/Y)・XS〜XLサイズ・自由拡大率のリアルタイム微調整
+// ==========================================================================
+// 部位別の X/Y オフセット・ブランドサイズ換算スケール・自由拡大率を CSS transform として各服画像に即時適用します
 function applyFittingOffsets() {
-    // ↓ 部位ごとの微調整設定を取得
+    // 定数 offsets を宣言し、値（AppState.fittingOffsets || {}）をセットします
     const offsets = AppState.fittingOffsets || {};
-    // ↓ 全5部位スロット
+    // 定数 slots を宣言し、値（['outer', 'tops', 'bottoms', 'shoes', …）をセットします
     const slots = ['outer', 'tops', 'bottoms', 'shoes', 'hat'];
-    // ↓ 着用中コーデ情報
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
 
-    // ↓ 各部位レイヤーDIVに CSSカスタム変数 (--offset-x, --offset-y, --scale) を書き込んでリアルタイム変形します
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     slots.forEach(slot => {
-        // ↓ レイヤー枠を取得
+        // HTML 要素 #対象ID を取得して変数 layerElem に格納します
         const layerElem = document.getElementById(`layer-${slot}`);
-        // ↓ 無ければスキップ
+        // 条件（!layerElem）が成り立つか判定し、該当する場合の処理を実行します
         if (!layerElem) return;
-        // ↓ 該当スロットの設定（無ければ初期値を使用）
+        // 定数 off を宣言し、値（offsets[slot] || { x: 0, y: 0, scale: …）をセットします
         const off = offsets[slot] || { x: 0, y: 0, scale: 100, brandSize: 'M' };
-        // ↓ 着用中の服オブジェクト
+        // 定数 item を宣言し、値（outfit[slot]）をセットします
         const item = outfit[slot];
 
-        // ↓ 最終的に適用する拡大率(%)を入れる変数
+        // 再代入可能な変数 effectiveScale を宣言し、値（100）をセットします
         let effectiveScale = 100;
-        // ↓ 靴と帽子は衣類規格(XS〜XL)ではなく自由拡大縮小対象
+        // 定数 isFreeScaleSlot を宣言し、値（(slot === 'shoes' || slot === 'hat')）をセットします
         const isFreeScaleSlot = (slot === 'shoes' || slot === 'hat');
-        // ↓ 販売商品（アウター・トップス・ボトムス）の場合：XS(88%)〜XL(112%)の規格倍率に変換
+        // 条件（!isFreeScaleSlot && item && !item.isOwned）が成り立つか判定し、該当する場合の処理を実行します
         if (!isFreeScaleSlot && item && !item.isOwned) {
-            // 販売されている服（アウター・トップス・ボトムス）: XS〜XLの5段階サイズ
+            // 定数 bSize を宣言し、値（off.brandSize || item.size || 'M'）をセットします
             const bSize = off.brandSize || item.size || 'M';
-            // ↓ サイズ名に対応するパーセントを取得
+            // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = BRAND_SIZE_SCALES[bSize] || 100;
-        // ↓ 手持ち服や帽子・靴の場合：自由スライダーの数値(70〜140%)をそのまま採用
+        // 前の if が偽で、かつ（item && (item.isOwned || isFreeScaleSlot)）を満たす場合の別条件分岐です
         } else if (item && (item.isOwned || isFreeScaleSlot)) {
-            // 帽子・靴、および手持ちの服: スライダーによる自由な拡大縮小スケール (70%〜140%)
+            // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
-        // ↓ 未着用などその他の場合もcustomScaleまたはscaleを参照
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // ↓ デフォルト100
+            // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
         }
 
-        // ↓ CSSの transform: translate(var(--offset-x), var(--offset-y)) scale(var(--scale)) に直結します
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（layerElem.style.setProperty('--offset-x', …）
         layerElem.style.setProperty('--offset-x', `${off.x || 0}px`);
-        // ↓ 上下位置pxをセット
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（layerElem.style.setProperty('--offset-y', …）
         layerElem.style.setProperty('--offset-y', `${off.y || 0}px`);
-        // ↓ 倍率は100で割った小数(1.0 = 100%)としてセット
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（layerElem.style.setProperty('--scale', eff…）
         layerElem.style.setProperty('--scale', effectiveScale / 100);
     });
 }
 
-/**
- * 位置微調整パネルの開閉トグル
- */
-// ↓ 「位置・サイズ微調整」ボタンを押したときにパネルを出したり隠したりする関数
+
+// ツールバー「位置・サイズ微調整」パネルの表示／非表示を切り替えます
 function toggleFittingAdjustPanel() {
-    // ↓ 微調整パネルDOM
+    // HTML 要素 #fitting-adjust-panel を取得して変数 panel に格納します
     const panel = document.getElementById('fitting-adjust-panel');
-    // ↓ トグルボタンDOM
+    // HTML 要素 #btn-toggle-adjust-mode を取得して変数 btn に格納します
     const btn = document.getElementById('btn-toggle-adjust-mode');
-    // ↓ 無ければ終了
+    // 条件（!panel）が成り立つか判定し、該当する場合の処理を実行します
     if (!panel) return;
 
-    // ↓ 現在非表示かどうかを判定
+    // 定数 isHidden を宣言し、値（panel.style.display === 'none' || pane…）をセットします
     const isHidden = panel.style.display === 'none' || panel.style.display === '';
-    // ↓ 非表示ならblockで開き、表示中ならnoneで閉じます
+    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（panel.style.display = isHidden ? 'block' :…）
     panel.style.display = isHidden ? 'block' : 'none';
-    // ↓ ボタンにactive色を切り替えます
+    // 条件（btn）が成り立つか判定し、該当する場合の処理を実行します
     if (btn) btn.classList.toggle('active', isHidden);
 
-    // ↓ 開いた瞬間に現在選択部位や服種別に合わせたUIへ最新同期します
+    // 条件（isHidden）が成り立つか判定し、該当する場合の処理を実行します
     if (isHidden) {
-        // ↓ UI同期実行
+        // 関連処理 syncAdjustPanelUI() を呼び出して処理・画面を更新します
         syncAdjustPanelUI();
     }
 }
 
-/**
- * 微調整対象スロットタブ切り替え
- */
-// ↓ 微調整パネル内の部位タブ（アウター / トップス / ボトムス / 靴 / 帽子）を切り替える関数
+
+// 調整パネル内の部位タブ(帽子/アウター/トップス/ボトムス/靴)を切り替えます
 function switchAdjustSlot(slotKey) {
-    // ↓ アクティブな調整対象部位を変更
+    // アプリ全体状態 AppState.activeAdjustSlot を最新値（slotKey）に更新します
     AppState.activeAdjustSlot = slotKey;
-    // ↓ 全部位タブの中から選ばれたものだけactiveを付与
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#adjust-slot-tabs .adjust-tab-btn').forEach(btn => {
-        // ↓ data-adjust-slot属性一致判定
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-adjust-slot') === slotKey);
     });
-    // ↓ スライダーやアイテム種別バッジを切り替え先の部位に合わせて描き直します
+    // 関連処理 syncAdjustPanelUI() を呼び出して処理・画面を更新します
     syncAdjustPanelUI();
 }
 
-/**
- * スライダーUIの値を現在の服種別（販売商品 vs 手持ち服）およびオフセットに同期
- */
-// ↓ 微調整パネルの中身を「未着用」「帽子・靴」「販売商品のXS〜XLモード」「手持ち服の自由倍率モード」の4通りへ動的に切り替える関数
+
+// 現在選択中の部位が「販売商品(XS〜XL)」か「手持ち服(%自由拡大)」かに合わせて調整スライダーと数値を同期表示します
 function syncAdjustPanelUI() {
-    // ↓ 現在調整中のスロットを取得（既定はouter）
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
-    // 微調整タブボタンのアクティブ表示を同期
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#adjust-slot-tabs .adjust-tab-btn').forEach(btn => {
-        // ↓ 選択タブにactive付与
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-adjust-slot') === slotKey);
     });
-    // ↓ スロットの位置・サイズ設定を取得
+    // 定数 offsets を宣言し、値（AppState.fittingOffsets || {}）をセットします
     const offsets = AppState.fittingOffsets || {};
-    // ↓ 見つからない場合の初期値フォールバック
+    // 定数 off を宣言し、値（offsets[slotKey] || { x: 0, y: 0, scal…）をセットします
     const off = offsets[slotKey] || { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
-    // ↓ 着用中コーデと対象部位アイテムを取得
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // ↓ 対象スロットの服（未着用ならnull/undefined）
+    // 定数 item を宣言し、値（outfit[slotKey]）をセットします
     const item = outfit[slotKey];
-    // ↓ 靴・帽子スロットかどうかを判定
+    // 定数 isFreeScaleSlot を宣言し、値（(slotKey === 'shoes' || slotKey === 'h…）をセットします
     const isFreeScaleSlot = (slotKey === 'shoes' || slotKey === 'hat');
 
-    // UI要素の取得（位置スライダー類）
+    // HTML 要素 #slider-adjust-y を取得して変数 sliderY に格納します
     const sliderY = document.getElementById('slider-adjust-y');
-    // ↓ 左右スライダー
+    // HTML 要素 #slider-adjust-x を取得して変数 sliderX に格納します
     const sliderX = document.getElementById('slider-adjust-x');
-    // ↓ 上下数値表示
+    // HTML 要素 #val-adjust-y を取得して変数 valY に格納します
     const valY = document.getElementById('val-adjust-y');
-    // ↓ 左右数値表示
+    // HTML 要素 #val-adjust-x を取得して変数 valX に格納します
     const valX = document.getElementById('val-adjust-x');
 
-    // ↓ パネル内ヘッダーメタ行とモード別サイズ行
+    // HTML 要素 #adjust-item-badge を取得して変数 badgeElem に格納します
     const badgeElem = document.getElementById('adjust-item-badge');
-    // ↓ 服の名前欄
+    // HTML 要素 #adjust-item-name を取得して変数 nameElem に格納します
     const nameElem = document.getElementById('adjust-item-name');
-    // ↓ 右側モード説明文
+    // HTML 要素 #adjust-item-type-desc を取得して変数 descElem に格納します
     const descElem = document.getElementById('adjust-item-type-desc');
-    // ↓ 販売商品向け5段階(XS〜XL)スライダー行
+    // HTML 要素 #adjust-row-scale-brand を取得して変数 rowBrand に格納します
     const rowBrand = document.getElementById('adjust-row-scale-brand');
-    // ↓ 手持ち・帽子・靴向け自由倍率スライダー行
+    // HTML 要素 #adjust-row-scale-free を取得して変数 rowFree に格納します
     const rowFree = document.getElementById('adjust-row-scale-free');
-    // ↓ 下部ヒント説明文
+    // HTML 要素 #.adjust-hint を取得して変数 hintElem に格納します
     const hintElem = document.querySelector('.adjust-hint') || document.getElementById('adjust-hint-text');
 
-    // ↓ 販売商品サイズ操作パーツ
+    // HTML 要素 #slider-adjust-brand-size を取得して変数 sliderBrandSize に格納します
     const sliderBrandSize = document.getElementById('slider-adjust-brand-size');
-    // ↓ 現在サイズバッジ('M'等)
+    // HTML 要素 #val-adjust-brand-size を取得して変数 valBrandSize に格納します
     const valBrandSize = document.getElementById('val-adjust-brand-size');
-    // ↓ サイズ縮小「−」ボタン
+    // HTML 要素 #btn-brand-size-minus を取得して変数 btnBrandMinus に格納します
     const btnBrandMinus = document.getElementById('btn-brand-size-minus');
-    // ↓ サイズ拡大「＋」ボタン
+    // HTML 要素 #btn-brand-size-plus を取得して変数 btnBrandPlus に格納します
     const btnBrandPlus = document.getElementById('btn-brand-size-plus');
 
-    // ↓ 自由倍率操作パーツ
+    // HTML 要素 #slider-adjust-scale を取得して変数 sliderScale に格納します
     const sliderScale = document.getElementById('slider-adjust-scale');
-    // ↓ 倍率パーセント表示
+    // HTML 要素 #val-adjust-scale を取得して変数 valScale に格納します
     const valScale = document.getElementById('val-adjust-scale');
 
-    // 共通: 上下・左右位置の値をスライダーと数値テキストへ反映（プラス時は + 記号付き）
+    // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderY) sliderY.value = off.y || 0;
-    // ↓ X座標反映
+    // 条件（sliderX）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderX) sliderX.value = off.x || 0;
-    // ↓ Y数値テキスト
+    // 条件（valY）が成り立つか判定し、該当する場合の処理を実行します
     if (valY) valY.textContent = `${off.y > 0 ? '+' : ''}${off.y || 0}px`;
-    // ↓ X数値テキスト
+    // 条件（valX）が成り立つか判定し、該当する場合の処理を実行します
     if (valX) valX.textContent = `${off.x > 0 ? '+' : ''}${off.x || 0}px`;
 
-    // 1. 未着用状態：スライダーをすべて無効化して試着を促す表示にします
+    // 条件（!item）が成り立つか判定し、該当する場合の処理を実行します
     if (!item) {
-        // ↓ グレーの「未着用」バッジに切り替え
+        // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
-            // ↓ emptyクラス設定
+            // 変数・配列項目 badgeElem.className の値を更新・計算します
             badgeElem.className = 'adjust-item-tag empty';
-            // ↓ 文言設定
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             badgeElem.textContent = '未着用';
         }
-        // ↓ 名前欄に部位名＋(未着用)を表示
+        // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
-        // ↓ 説明文設定
+        // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
         if (descElem) descElem.textContent = isFreeScaleSlot ? '自由サイズ調整（70%〜140%）' : '試着すると調整可能';
 
-        // ↓ 上下左右スライダー操作不可に設定
+        // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します
         if (sliderY) sliderY.disabled = true;
-        // ↓ 左右スライダー操作不可
+        // 条件（sliderX）が成り立つか判定し、該当する場合の処理を実行します
         if (sliderX) sliderX.disabled = true;
 
-        // ↓ 帽子・靴と服で、未着用時に見せておくダミースライダー行を分けます
+        // 条件（isFreeScaleSlot）が成り立つか判定し、該当する場合の処理を実行します
         if (isFreeScaleSlot) {
-            // 帽子・靴は未着用でも自由サイズUIを表示（XS〜XLの服規格ではなく自由拡縮）
+            // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
             if (rowBrand) rowBrand.style.display = 'none';
-            // ↓ 自由行を表示
+            // 条件（rowFree）が成り立つか判定し、該当する場合の処理を実行します
             if (rowFree) rowFree.style.display = 'flex';
-            // ↓ 倍率スライダーを無効状態で値合わせ
+            // 条件（sliderScale）が成り立つか判定し、該当する場合の処理を実行します
             if (sliderScale) {
-                // ↓ 無効化
+                // 変数・配列項目 sliderScale.disabled の値を更新・計算します
                 sliderScale.disabled = true;
-                // ↓ 値セット
+                // 入力フォーム部品 sliderScale の現在の入力値を更新・リセットします
                 sliderScale.value = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
             }
-            // ↓ パーセント表示
+            // 条件（valScale）が成り立つか判定し、該当する場合の処理を実行します
             if (valScale) valScale.textContent = `${(off.customScale !== undefined) ? off.customScale : (off.scale || 100)}%`;
-            // ↓ ヒント文言
+            // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
             if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}をクローゼットから着用すると、マネキンに合わせてサイズ（70%〜140%）や位置を自由に微調整できます`;
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 服（アウター・トップス・ボトムス）は規格サイズUIを表示（非活性）
+            // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
             if (rowBrand) rowBrand.style.display = 'flex';
-            // ↓ 自由行を隠す
+            // 条件（rowFree）が成り立つか判定し、該当する場合の処理を実行します
             if (rowFree) rowFree.style.display = 'none';
-            // ↓ サイズ操作パーツを一式無効化
+            // 条件（sliderBrandSize）が成り立つか判定し、該当する場合の処理を実行します
             if (sliderBrandSize) sliderBrandSize.disabled = true;
-            // ↓ 縮小ボタン無効化
+            // 条件（btnBrandMinus）が成り立つか判定し、該当する場合の処理を実行します
             if (btnBrandMinus) btnBrandMinus.disabled = true;
-            // ↓ 拡大ボタン無効化
+            // 条件（btnBrandPlus）が成り立つか判定し、該当する場合の処理を実行します
             if (btnBrandPlus) btnBrandPlus.disabled = true;
-            // ↓ ヒント文言
+            // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
             if (hintElem) hintElem.textContent = '💡 クローゼットまたは商品一覧から服を選んでマネキンに試着してください';
         }
-        // ↓ 未着用分岐はここで終了
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 2. 着用中：各スライダーのdisabledを解除して操作可能に戻す
+    // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderY) sliderY.disabled = false;
-    // ↓ 左右有効化
+    // 条件（sliderX）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderX) sliderX.disabled = false;
-    // ↓ 5段階サイズ有効化
+    // 条件（sliderBrandSize）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderBrandSize) sliderBrandSize.disabled = false;
-    // ↓ 自由倍率有効化
+    // 条件（sliderScale）が成り立つか判定し、該当する場合の処理を実行します
     if (sliderScale) sliderScale.disabled = false;
 
-    // ↓ 帽子・靴／販売ブランド服／手持ち服の3モードでUI切り替え
+    // 条件（isFreeScaleSlot）が成り立つか判定し、該当する場合の処理を実行します
     if (isFreeScaleSlot) {
-        // =====================================================================
-        // 【帽子・靴: 常に自由サイズ調整（70%〜140%）】
-        // 帽子と靴は衣類のXS〜XL規格ではなく、頭の形や足元に合わせて自由にサイズ・位置を微調整できる
-        // =====================================================================
+        // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
-            // ↓ オレンジ色のタグに設定
+            // 変数・配列項目 badgeElem.className の値を更新・計算します
             badgeElem.className = 'adjust-item-tag closet';
-            // ↓ 絵文字付きカテゴリ表記
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             badgeElem.textContent = slotKey === 'hat' ? '🧢 帽子' : '👟 靴';
         }
-        // ↓ アイテム名表示
+        // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
-        // ↓ 説明文
+        // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
         if (descElem) descElem.textContent = '自由サイズ調整（70%〜140%）';
 
-        // ↓ 自由倍率スライダー行を表示
+        // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
         if (rowBrand) rowBrand.style.display = 'none';
-        // ↓ display: flex に
+        // 条件（rowFree）が成り立つか判定し、該当する場合の処理を実行します
         if (rowFree) rowFree.style.display = 'flex';
 
-        // ↓ 現在のカスタム倍率を取得してスライダー・数値へ反映
+        // 定数 currentScale を宣言し、値（(off.customScale !== undefined) ? off.…）をセットします
         const currentScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
-        // ↓ スライダー位置を合わせる
+        // 条件（sliderScale）が成り立つか判定し、該当する場合の処理を実行します
         if (sliderScale) sliderScale.value = currentScale;
-        // ↓ 「100%」等を表示
+        // 条件（valScale）が成り立つか判定し、該当する場合の処理を実行します
         if (valScale) valScale.textContent = `${currentScale}%`;
 
-        // ↓ 操作ヒント更新
+        // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}はスライダーで大きさを70%〜140%まで自由に拡大・縮小できます（自動保存）`;
 
+    // 前の if が偽で、かつ（!item.isOwned）を満たす場合の別条件分岐です
     } else if (!item.isOwned) {
-        // =====================================================================
-        // 【販売されている服（アウター・トップス・ボトムス）: XS〜XLの5段階サイズ】
-        // =====================================================================
+        // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
-            // ↓ 水色の「🏷️ 販売商品」バッジに切り替え
+            // 変数・配列項目 badgeElem.className の値を更新・計算します
             badgeElem.className = 'adjust-item-tag brand';
-            // ↓ バッジ文字
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             badgeElem.textContent = '🏷️ 販売商品';
         }
-        // ↓ 商品名
+        // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
-        // ↓ 規格モード表記
+        // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
         if (descElem) descElem.textContent = '規格サイズ（XS〜XL）';
 
-        // ↓ 5段階サイズ行を表示、自由行は非表示
+        // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
         if (rowBrand) rowBrand.style.display = 'flex';
-        // ↓ 自由行隠す
+        // 条件（rowFree）が成り立つか判定し、該当する場合の処理を実行します
         if (rowFree) rowFree.style.display = 'none';
 
-        // ↓ 現在サイズ('M'等)から配列インデックス(0〜4)を求め、見つからなければ標準の2('M')を採用
+        // 定数 currentSize を宣言し、値（off.brandSize || item.size || 'M'）をセットします
         const currentSize = off.brandSize || item.size || 'M';
-        // ↓ インデックス検索
+        // 定数 sizeIdx を宣言し、値（BRAND_SIZE_LIST.indexOf(currentSize)）をセットします
         const sizeIdx = BRAND_SIZE_LIST.indexOf(currentSize);
-        // ↓ 安全な0〜4インデックスへ確定
+        // 定数 validIdx を宣言し、値（(sizeIdx >= 0) ? sizeIdx : 2）をセットします
         const validIdx = (sizeIdx >= 0) ? sizeIdx : 2;
 
-        // ↓ 5段階スライダーの位置とサイズバッジ文字を合わせる
+        // 条件（sliderBrandSize）が成り立つか判定し、該当する場合の処理を実行します
         if (sliderBrandSize) sliderBrandSize.value = validIdx;
-        // ↓ バッジ('M'等)更新
+        // 条件（valBrandSize）が成り立つか判定し、該当する場合の処理を実行します
         if (valBrandSize) valBrandSize.textContent = BRAND_SIZE_LIST[validIdx];
 
-        // 目盛りのアクティブ表示更新（該当サイズ文字を黒反転強調）
+        // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         document.querySelectorAll('#brand-size-ticks .brand-size-tick').forEach(tick => {
-            // ↓ 数値変換して一致するかチェック
+            // 定数 tIdx を宣言し、値（parseInt(tick.getAttribute('data-size-…）をセットします
             const tIdx = parseInt(tick.getAttribute('data-size-idx'), 10);
-            // ↓ 一致するものだけactive付与
+            // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（tick.classList.toggle('active', tIdx === v…）
             tick.classList.toggle('active', tIdx === validIdx);
         });
 
-        // ↓ 両端（XS以下・XL以上）に達していたらマイナス/プラスボタンを無効化
+        // 条件（btnBrandMinus）が成り立つか判定し、該当する場合の処理を実行します
         if (btnBrandMinus) btnBrandMinus.disabled = (validIdx <= 0);
-        // ↓ 上限チェック
+        // 条件（btnBrandPlus）が成り立つか判定し、該当する場合の処理を実行します
         if (btnBrandPlus) btnBrandPlus.disabled = (validIdx >= BRAND_SIZE_LIST.length - 1);
 
-        // ↓ ヒント更新
+        // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = '💡 販売商品はXS〜XLのサイズ規格でマネキン上の表示サイズが変わります（自動保存）';
 
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // =====================================================================
-        // 【手持ちの服（アウター・トップス・ボトムス）: 自由サイズ調整】
-        // =====================================================================
+        // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
-            // ↓ オレンジ色のクローゼットバッジを設定
+            // 変数・配列項目 badgeElem.className の値を更新・計算します
             badgeElem.className = 'adjust-item-tag closet';
-            // ↓ 文字設定
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             badgeElem.textContent = '👕 マイクローゼット';
         }
-        // ↓ 手持ち服名表示
+        // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
-        // ↓ モード表記
+        // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
         if (descElem) descElem.textContent = '自由サイズ調整（見た目補正）';
 
-        // ↓ 自由倍率行を表示
+        // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
         if (rowBrand) rowBrand.style.display = 'none';
-        // ↓ flex表示
+        // 条件（rowFree）が成り立つか判定し、該当する場合の処理を実行します
         if (rowFree) rowFree.style.display = 'flex';
 
-        // ↓ カスタム倍率を取り出して反映
+        // 定数 currentScale を宣言し、値（(off.customScale !== undefined) ? off.…）をセットします
         const currentScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
-        // ↓ スライダー位置更新
+        // 条件（sliderScale）が成り立つか判定し、該当する場合の処理を実行します
         if (sliderScale) sliderScale.value = currentScale;
-        // ↓ %文字更新
+        // 条件（valScale）が成り立つか判定し、該当する場合の処理を実行します
         if (valScale) valScale.textContent = `${currentScale}%`;
 
-        // ↓ ヒント更新
+        // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = '💡 手持ちの服はブランドによって実寸が異なるため、見た目の大きさを自由に調整できます（自動保存）';
     }
 }
 
-/**
- * 販売商品用: 5段階サイズ選択（XS・S・M・L・XL）変更処理
- */
-// ↓ 販売商品の5段階サイズスライダーまたは目盛りクリック時に呼ばれ、対応倍率(88%〜112%)へ変更＆自動保存する関数
+
+// ブランド商品の規格サイズスライダー(0〜4)またはタグ押下時に XS〜XL サイズ設定を更新し、MySQL保存します
 function handleBrandSizeInput(val) {
-    // ↓ 対象スロット取得
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
-    // 帽子と靴はXS〜XL規格サイズではなく自由拡大縮小のためガード
+    // 条件（slotKey === 'shoes' || slotKey === 'hat'）が成り立つか判定し、該当する場合の処理を実行します
     if (slotKey === 'shoes' || slotKey === 'hat') return;
 
-    // ↓ 設定オブジェクトが未生成なら初期構造を作っておきます
+    // 条件（!AppState.fittingOffsets[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.fittingOffsets[slotKey]) {
-        // ↓ 初期値セット
+        // 変数・配列項目 AppState.fittingOffsets[slotKey] の値を更新・計算します
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
 
-    // ↓ 引数を整数化し、0〜4の範囲に安全にクランプ(挟み込み)します
+    // 定数 idx を宣言し、値（parseInt(val, 10)）をセットします
     const idx = parseInt(val, 10);
-    // ↓ 0未満なら0、4超えなら4に制限
+    // 定数 clampedIdx を宣言し、値（Math.max(0, Math.min(BRAND_SIZE_LIST.l…）をセットします
     const clampedIdx = Math.max(0, Math.min(BRAND_SIZE_LIST.length - 1, idx));
-    // ↓ サイズ名（'XS'〜'XL'）を取得
+    // 定数 sizeName を宣言し、値（BRAND_SIZE_LIST[clampedIdx]）をセットします
     const sizeName = BRAND_SIZE_LIST[clampedIdx];
-    // ↓ 対応するマネキン表示スケール(%)を取得
+    // 定数 targetScale を宣言し、値（BRAND_SIZE_SCALES[sizeName] || 100）をセットします
     const targetScale = BRAND_SIZE_SCALES[sizeName] || 100;
 
-    // オフセット状態に新サイズ名と倍率を記録
+    // 変数・配列項目 AppState.fittingOffsets[slotKey]… の値を更新・計算します
     AppState.fittingOffsets[slotKey].brandSize = sizeName;
-    // ↓ スケール値更新
+    // 変数・配列項目 AppState.fittingOffsets[slotKey]… の値を更新・計算します
     AppState.fittingOffsets[slotKey].scale = targetScale;
 
-    // 着用中アイテムのサイズ情報も同期（着用中タグの `[L]` 表示やカート一括追加サイズに反映される）
+    // 条件（AppState.currentOutfit && AppState.currentOutfit[slo…）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit && AppState.currentOutfit[slotKey]) {
-        // ↓ サイズ上書き
+        // 変数・配列項目 AppState.currentOutfit[slotKey].… の値を更新・計算します
         AppState.currentOutfit[slotKey].size = sizeName;
-        // ↓ ローカル保存
-        saveScopedData('manekin_current_outfit', AppState.currentOutfit);
     }
 
-    // UI表示更新（スライダー・現在サイズ文字・目盛り・＋−ボタン活性化）
+    // HTML 要素 #slider-adjust-brand-size を取得して変数 slider に格納します
     const slider = document.getElementById('slider-adjust-brand-size');
-    // ↓ スライダー位置同期
+    // 条件（slider）が成り立つか判定し、該当する場合の処理を実行します
     if (slider) slider.value = clampedIdx;
 
-    // ↓ サイズ表記更新
+    // HTML 要素 #val-adjust-brand-size を取得して変数 valElem に格納します
     const valElem = document.getElementById('val-adjust-brand-size');
-    // ↓ サイズ名反映
+    // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
     if (valElem) valElem.textContent = sizeName;
 
-    // ↓ 目盛り文字ハイライト同期
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('#brand-size-ticks .brand-size-tick').forEach(tick => {
-        // ↓ インデックス一致判定
+        // 定数 tIdx を宣言し、値（parseInt(tick.getAttribute('data-size-…）をセットします
         const tIdx = parseInt(tick.getAttribute('data-size-idx'), 10);
-        // ↓ active切替
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（tick.classList.toggle('active', tIdx === c…）
         tick.classList.toggle('active', tIdx === clampedIdx);
     });
 
-    // ↓ 端に達したボタンを無効化
+    // HTML 要素 #btn-brand-size-minus を取得して変数 btnMinus に格納します
     const btnMinus = document.getElementById('btn-brand-size-minus');
-    // ↓ プラスボタン取得
+    // HTML 要素 #btn-brand-size-plus を取得して変数 btnPlus に格納します
     const btnPlus = document.getElementById('btn-brand-size-plus');
-    // ↓ XSなら−無効
+    // 条件（btnMinus）が成り立つか判定し、該当する場合の処理を実行します
     if (btnMinus) btnMinus.disabled = (clampedIdx <= 0);
-    // ↓ XLなら＋無効
+    // 条件（btnPlus）が成り立つか判定し、該当する場合の処理を実行します
     if (btnPlus) btnPlus.disabled = (clampedIdx >= BRAND_SIZE_LIST.length - 1);
 
-    // マネキン上の服の表示サイズを即座に更新
+    // 関連処理 applyFittingOffsets() を呼び出して処理・画面を更新します
     applyFittingOffsets();
 
-    // スコープ付きローカルストレージ保存 ＋ MySQL同期（連続操作をまとめるデバウンス送信）
-    saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
-    // ↓ バックエンドへ遅延保存予約
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: false });
 }
 
-/**
- * 販売商品用: 1段階サイズ増減ステップ（－ / ＋）
- */
-// ↓ 販売商品サイズ横の「−」「＋」ボタンが押されたときに1サイズ分だけ増減させる関数
+
+// ブランドサイズの「＋／－」ボタンで 1 段階サイズを上下させます
 function stepBrandSize(delta) {
-    // ↓ 対象部位取得
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
-    // ↓ 靴・帽子なら何もしない
+    // 条件（slotKey === 'shoes' || slotKey === 'hat'）が成り立つか判定し、該当する場合の処理を実行します
     if (slotKey === 'shoes' || slotKey === 'hat') return;
 
-    // ↓ 現在設定中のサイズから現在のインデックスを求めます
+    // 定数 off を宣言し、値（(AppState.fittingOffsets && AppState.f…）をセットします
     const off = (AppState.fittingOffsets && AppState.fittingOffsets[slotKey]) || {};
-    // ↓ 着用中情報も確認
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // ↓ 対象服
+    // 定数 item を宣言し、値（outfit[slotKey]）をセットします
     const item = outfit[slotKey];
-    // ↓ 現在サイズ取得
+    // 定数 currentSize を宣言し、値（off.brandSize || (item && item.size) |…）をセットします
     const currentSize = off.brandSize || (item && item.size) || 'M';
-    // ↓ インデックス変換
+    // 定数 currentIdx を宣言し、値（BRAND_SIZE_LIST.indexOf(currentSize)）をセットします
     const currentIdx = BRAND_SIZE_LIST.indexOf(currentSize);
-    // ↓ 基準インデックス決定
+    // 定数 baseIdx を宣言し、値（(currentIdx >= 0) ? currentIdx : 2）をセットします
     const baseIdx = (currentIdx >= 0) ? currentIdx : 2;
-    // ↓ +1 または -1 した新しいサイズインデックスを渡して更新処理を実行
+    // 関連処理 handleBrandSizeInput() を呼び出して処理・画面を更新します
     handleBrandSizeInput(baseIdx + delta);
 }
 
-/**
- * 手持ち服および位置の微調整スライダー変更時処理
- */
-// ↓ 上下(y)・左右(x)・自由拡大率(scale)スライダーを動かしたときにリアルタイム更新・自動保存する関数
+
+// 上下Y・左右X・自由拡大率%スライダーが動いたとき、即座にマネキン表示へ反映して MySQL 自動保存を予約します
 function handleAdjustInput(prop, val) {
-    // ↓ 対象部位取得
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
 
-    // ↓ 未初期化スロットの安全初期化
+    // 条件（!AppState.fittingOffsets[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.fittingOffsets[slotKey]) {
-        // ↓ 初期値セット
+        // 変数・配列項目 AppState.fittingOffsets[slotKey] の値を更新・計算します
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
 
-    // ↓ 整数化して対象プロパティへ保存
+    // 定数 numVal を宣言し、値（parseInt(val, 10)）をセットします
     const numVal = parseInt(val, 10);
-    // ↓ 値を格納
+    // 変数・配列項目 AppState.fittingOffsets[slotKey]… の値を更新・計算します
     AppState.fittingOffsets[slotKey][prop] = numVal;
-    // ↓ 拡大率なら自由スケール(customScale)側にも同時に記録しておきます
+    // 条件（prop === 'scale'）が成り立つか判定し、該当する場合の処理を実行します
     if (prop === 'scale') {
-        // ↓ カスタム倍率同期
+        // 変数・配列項目 AppState.fittingOffsets[slotKey]… の値を更新・計算します
         AppState.fittingOffsets[slotKey].customScale = numVal;
     }
 
-    // UI数値表示テキストの更新
+    // 条件（prop === 'y'）が成り立つか判定し、該当する場合の処理を実行します
     if (prop === 'y') {
-        // ↓ 上下ラベル更新
+        // HTML 要素 #val-adjust-y を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-y');
-        // ↓ プラス時は+付きで表示
+        // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
+    // 前の if が偽で、かつ（prop === 'x'）を満たす場合の別条件分岐です
     } else if (prop === 'x') {
-        // ↓ 左右ラベル更新
+        // HTML 要素 #val-adjust-x を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-x');
-        // ↓ プラス時は+付きで表示
+        // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
+    // 前の if が偽で、かつ（prop === 'scale'）を満たす場合の別条件分岐です
     } else if (prop === 'scale') {
-        // ↓ 倍率ラベル更新
+        // HTML 要素 #val-adjust-scale を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-scale');
-        // ↓ %表示
+        // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal}%`;
     }
 
-    // 画面のマネキン服の見た目へ即座に反映
+    // 関連処理 applyFittingOffsets() を呼び出して処理・画面を更新します
     applyFittingOffsets();
 
-    // スコープ付きローカルストレージへ保存 ＋ MySQL同期（デバウンス送信）
-    saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
-    // ↓ サーバー同期予約
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: false });
 }
 
-/**
- * 微調整ボタン（▲▼◀▶＋－）クリック時の増減
- */
-// ↓ 微調整パネル内の細かい上下左右±矢印ボタンが押されたとき指定量(delta)だけ動かす関数
+
+// X/Y/拡大率の micro 微調整ボタン（▲▼◀▶＋－）押下時に値を指定刻みで変更します
 function stepAdjust(prop, delta) {
-    // ↓ 対象部位取得
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
 
-    // ↓ 未初期化なら初期化
+    // 条件（!AppState.fittingOffsets[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.fittingOffsets[slotKey]) {
-        // ↓ 初期オブジェクトセット
+        // 変数・配列項目 AppState.fittingOffsets[slotKey] の値を更新・計算します
         AppState.fittingOffsets[slotKey] = { x: 0, y: 0, scale: 100, brandSize: 'M', customScale: 100 };
     }
 
-    // ↓ 現在値を取り出し（未定義なら倍率は100、位置は0を初期値に）
+    // 再代入可能な変数 current を宣言し、値（AppState.fittingOffsets[slotKey][prop]）をセットします
     let current = AppState.fittingOffsets[slotKey][prop];
-    // ↓ 未定義チェック
+    // 条件（current === undefined）が成り立つか判定し、該当する場合の処理を実行します
     if (current === undefined) {
-        // ↓ デフォルト決定
+        // 変数・配列項目 current の値を更新・計算します
         current = (prop === 'scale') ? 100 : 0;
     }
-    // ↓ 差分を足した次の値を算出して反映関数へ渡します
+    // 定数 nextVal を宣言し、値（current + delta）をセットします
     const nextVal = current + delta;
-    // ↓ 画面と保存を更新
+    // 関連処理 handleAdjustInput() を呼び出して処理・画面を更新します
     handleAdjustInput(prop, nextVal);
 
-    // ↓ rangeスライダーのつまみ位置もボタン操作後の値に連動させます
+    // HTML 要素 #対象ID を取得して変数 slider に格納します
     const slider = document.getElementById(`slider-adjust-${prop}`);
-    // ↓ スライダー値更新
+    // 条件（slider）が成り立つか判定し、該当する場合の処理を実行します
     if (slider) slider.value = nextVal;
 }
 
-/**
- * オフセット初期化リセット
- */
-// ↓ 現在選択中の1部位について位置(x:0, y:0)とサイズ(100% / M)を初期状態へ戻すリセット関数
+
+// 現在調整中の部位（位置・拡大・サイズ）を初期値へリセットします
 function resetFittingOffsets() {
-    // ↓ 対象部位取得
+    // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
 
-    // ↓ 対象部位の設定だけ初期値へリセット
+    // 変数・配列項目 AppState.fittingOffsets[slotKey] の値を更新・計算します
     AppState.fittingOffsets[slotKey] = {
+        // 左右位置ズレ量 X（初期値 0）
         x: 0,
+        // 上下位置ズレ量 Y（初期値 0）
         y: 0,
+        // 拡大率 %（初期値 100）
         scale: 100,
+        // ブランド商品用の規格サイズ（初期値 'M'）
         brandSize: 'M',
+        // 手持ち登録服用の拡大率 %（初期値 100）
         customScale: 100
     };
 
-    // ↓ ブランド商品なら着用サイズ情報もMへ戻して保存
+    // 条件（AppState.currentOutfit && AppState.currentOutfit[slo…）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit && AppState.currentOutfit[slotKey] && !AppState.currentOutfit[slotKey].isOwned) {
-        // ↓ Mサイズに戻す
+        // 変数・配列項目 AppState.currentOutfit[slotKey].… の値を更新・計算します
         AppState.currentOutfit[slotKey].size = 'M';
-        // ↓ ローカル保存
-        saveScopedData('manekin_current_outfit', AppState.currentOutfit);
     }
 
-    // ↓ パネル表示・ステージ位置・ストレージ・MySQL(即時)をすべて更新して完了通知
+    // 関連処理 syncAdjustPanelUI() を呼び出して処理・画面を更新します
     syncAdjustPanelUI();
-    // ↓ ステージスタイル更新
+    // 関連処理 applyFittingOffsets() を呼び出して処理・画面を更新します
     applyFittingOffsets();
-    // ↓ ローカル保存
-    saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets);
-    // ↓ MySQL即時同期
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
-    // ↓ リセット完了通知
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
 }
 
-/**
- * 性別ボタンUIの同期
- */
-// ↓ MEN / WOMEN 切替ボタンの黒枠アクティブ表示を現在のAppState.studioGenderに一致させる関数
+
+// ツールバーの MEN / WOMEN マネキン性別ボタンの表示(.active)を AppState.studioGender に揃えます
 function syncGenderToggleUI() {
-    // ↓ 現在の性別状態（既定MEN）
+    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
     const gender = AppState.studioGender || 'MEN';
-    // ↓ MENボタン取得
+    // HTML 要素 #btn-gender-men を取得して変数 btnMen に格納します
     const btnMen = document.getElementById('btn-gender-men');
-    // ↓ WOMENボタン取得
+    // HTML 要素 #btn-gender-women を取得して変数 btnWomen に格納します
     const btnWomen = document.getElementById('btn-gender-women');
-    // ↓ MEN選択時のみbtnMenをactiveに
+    // 条件（btnMen）が成り立つか判定し、該当する場合の処理を実行します
     if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
-    // ↓ WOMEN選択時のみbtnWomenをactiveに
+    // 条件（btnWomen）が成り立つか判定し、該当する場合の処理を実行します
     if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
 }
 
-/**
- * 性別切り替え
- */
-// スタジオのマネキン表示対象性別（'MEN' または 'WOMEN'）を切り替える関数です
+
+// マネキン性別モデルを 'MEN' または 'WOMEN' へ切り替え、着用ステージ更新＆MySQL保存します
 function setMannequinGender(gender) {
-    // アプリ全体のスタジオ性別設定を新しい値に更新します
+    // アプリ全体状態 AppState.studioGender を最新値（gender）に更新します
     AppState.studioGender = gender;
-    // ログイン中のユーザーごとに分離した LocalStorage 領域へ保存します
-    saveScopedData('manekin_studio_gender', gender);
-    // MEN / WOMEN ボタンの active 見た目を同期します
+    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
     syncGenderToggleUI();
-    // サーバー（MySQL）へ性別設定の変更を即時保存します（デバウンス待ちなし）
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
 
-    // ブランド商品リストを性別に連動して再描画
-    // 選択された性別（またはユニセックス）に合う商品だけを表示し直します
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
 
-    // 切り替え完了のトースト通知を出します
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
 }
 
-/**
- * モバイルビューの切り替え
- */
-// スマホ・タブレット幅のとき「手持ちの服」「試着ステージ」「ブランド商品」を切り替える関数です
+
+// スマホ表示幅のとき「マネキン試着室／手持ちの服／ブランド商品」の3列切り替えタブを制御します
 function switchMobileStudioView(viewKey) {
-    // 現在のモバイル選択ビューを状態に保存します
+    // アプリ全体状態 AppState.studioMobileView を最新値（viewKey）に更新します
     AppState.studioMobileView = viewKey;
 
-    // 3つのモバイルタブボタンすべてについて、data-mobile-view が一致するボタンだけ active を付与します
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-mobile-view') === viewKey);
     });
 
-    // 3つのカラム要素（左・中央・右）のDOM参照を取得します
+    // HTML 要素 #col-studio-closet を取得して変数 colCloset に格納します
     const colCloset = document.getElementById('col-studio-closet');
+    // HTML 要素 #col-studio-mannequin を取得して変数 colMannequin に格納します
     const colMannequin = document.getElementById('col-studio-mannequin');
+    // HTML 要素 #col-studio-brand を取得して変数 colBrand に格納します
     const colBrand = document.getElementById('col-studio-brand');
 
-    // 選択されたビュー名に一致するカラムだけに mobile-active クラスを付けて画面に表示させます
+    // 条件（colCloset）が成り立つか判定し、該当する場合の処理を実行します
     if (colCloset) colCloset.classList.toggle('mobile-active', viewKey === 'closet');
+    // 条件（colMannequin）が成り立つか判定し、該当する場合の処理を実行します
     if (colMannequin) colMannequin.classList.toggle('mobile-active', viewKey === 'mannequin');
+    // 条件（colBrand）が成り立つか判定し、該当する場合の処理を実行します
     if (colBrand) colBrand.classList.toggle('mobile-active', viewKey === 'brand');
 }
 
-// --------------------------------------------------------------------------
-// 15.4 AIコメント生成エンジン & スタイリング診断
-// --------------------------------------------------------------------------
 
-/**
- * マネキンの現在着用状態からリアルタイムAIコメントを生成
- */
-// 現在マネキンに着せている組み合わせを解析してコメント・タグ・スコア・色ドットを更新します
+// ==========================================================================
+//  5. AIスタイリング自動診断・保存済みコーデ（Lookbook）＆一括カート追加
+// ==========================================================================
+// 現在着せている服の組み合わせ（アウター・色構成・部位充実度）を解析し、AIスコア・アドバイス文・カラー構成ドットを更新します
 function updateAIStylingComment() {
-    // 現在の着用状態（outer / tops / bottoms / shoes / hat）を取得します
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // 画面下部のAI診断パネルにある各DOM要素を取得します
+    // HTML 要素 #ai-comment-text を取得して変数 commentElem に格納します
     const commentElem = document.getElementById('ai-comment-text');
+    // HTML 要素 #ai-tags-wrap を取得して変数 tagsElem に格納します
     const tagsElem = document.getElementById('ai-tags-wrap');
+    // HTML 要素 #palette-dots を取得して変数 dotsElem に格納します
     const dotsElem = document.getElementById('palette-dots');
+    // HTML 要素 #ai-score-val を取得して変数 scoreValElem に格納します
     const scoreValElem = document.getElementById('ai-score-val');
+    // HTML 要素 #ai-score-stars を取得して変数 scoreStarsElem に格納します
     const scoreStarsElem = document.getElementById('ai-score-stars');
 
-    // 各部位の値だけを取り出し、null/undefined を除外（filter(Boolean)）して着ている服だけの配列を作ります
+    // 定数 wornItems を宣言し、値（Object.values(outfit).filter(Boolean)）をセットします
     const wornItems = Object.values(outfit).filter(Boolean);
 
-    // まだ1着も着せていない場合は初期案内テキストをセットして終了します
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (wornItems.length === 0) {
+        // 条件（commentElem）が成り立つか判定し、該当する場合の処理を実行します
         if (commentElem) {
+            // 文字要素 commentElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             commentElem.textContent = '左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。';
         }
+        // 条件（tagsElem）が成り立つか判定し、該当する場合の処理を実行します
         if (tagsElem) tagsElem.innerHTML = '<span class="ai-tag">#試着待ち</span>';
+        // 条件（dotsElem）が成り立つか判定し、該当する場合の処理を実行します
         if (dotsElem) dotsElem.innerHTML = '';
+        // 条件（scoreValElem）が成り立つか判定し、該当する場合の処理を実行します
         if (scoreValElem) scoreValElem.textContent = '--点';
+        // 条件（scoreStarsElem）が成り立つか判定し、該当する場合の処理を実行します
         if (scoreStarsElem) scoreStarsElem.textContent = '';
-        // 未着用のためここで処理を終わります
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // !! は値を真偽値（true / false）へ変換する記法です。どの部位を着用中か判定します
+    // 定数 hasBottoms を宣言し、値（!!outfit.bottoms）をセットします
     const hasBottoms = !!outfit.bottoms;
+    // 定数 hasTops を宣言し、値（!!outfit.tops）をセットします
     const hasTops = !!outfit.tops;
+    // 定数 hasOuter を宣言し、値（!!outfit.outer）をセットします
     const hasOuter = !!outfit.outer;
+    // 定数 hasShoes を宣言し、値（!!outfit.shoes）をセットします
     const hasShoes = !!outfit.shoes;
+    // 定数 hasHat を宣言し、値（!!outfit.hat）をセットします
     const hasHat = !!outfit.hat;
 
-    // カラーパレット抽出
-    // 着用アイテムごとの color 属性を取り出します（未設定は 'BLACK' とみなします）
+    // 定数 colors を宣言し、値（wornItems.map(item => item.color || 'B…）をセットします
     const colors = wornItems.map(item => item.color || 'BLACK');
-    // Set オブジェクトで重複する色を除き、スプレッド構文 [... ] で配列に戻します
+    // 定数 uniqueColors を宣言し、値（[...new Set(colors)]）をセットします
     const uniqueColors = [...new Set(colors)];
 
-    // カラー構成ドット（丸い色見本）のHTMLを生成して挿入します
+    // 条件（dotsElem）が成り立つか判定し、該当する場合の処理を実行します
     if (dotsElem) {
+        // 生成・変換した HTML 文字列を要素 dotsElem の中身として描画します
         dotsElem.innerHTML = uniqueColors.map(c => `
             <span class="palette-dot" style="background-color: ${getColorHex(c)};" title="${c}" ></span>
                 `).join('');
     }
 
-    // AI診断ロジックの構築
-    // 生成する診断文・スタイルタグ配列・スコアを格納する変数を初期化します
+    // 再代入可能な変数 comment を宣言し、値（''）をセットします
     let comment = '';
+    // 再代入可能な変数 tags を宣言し、値（[]）をセットします
     let tags = [];
+    // 再代入可能な変数 score を宣言し、値（95）をセットします
     let score = 95;
 
-    // パターン1: 黒ボトムス + 白スニーカー + パーカー/トップス（要件例の完全再現）
+    // 条件（hasBottoms && hasShoes && outfit.bottoms.color === '…）が成り立つか判定し、該当する場合の処理を実行します
     if (hasBottoms && hasShoes && outfit.bottoms.color === 'BLACK' && outfit.shoes.color === 'WHITE' && hasTops) {
-        // モノトーンの王道バランスに対するコメントを組み立てます
+        // 変数・配列項目 comment の値を更新・計算します
         comment = `「${outfit.bottoms.name}」と「${outfit.tops.name}」の組み合わせは落ち着いた印象を与えます。足元の「${outfit.shoes.name}」がアクセントとなり、視線が自然に抜けるバランスの良いカジュアルコーデです。`;
-        // さらにアウターも重ね着している場合は評価とスコア（98点）を上乗せします
+        // 条件（hasOuter）が成り立つか判定し、該当する場合の処理を実行します
         if (hasOuter) {
+            // 変数・配列項目 comment の値を更新・計算します
             comment += ` さらに「${outfit.outer.name}」を羽織ることで、程よい大人の上品さとこなれ感がプラスされます。`;
+            // 変数・配列項目 tags の値を更新・計算します
             tags = ['#大人の品格', '#モノトーン+1', '#Aラインシルエット'];
+            // 変数・配列項目 score の値を更新・計算します
             score = 98;
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // 変数・配列項目 tags の値を更新・計算します
             tags = ['#キレイめカジュアル', '#通学デイリー', '#モノトーンアクセント'];
+            // 変数・配列項目 score の値を更新・計算します
             score = 95;
         }
     }
-    // パターン2: アウターがある全身コーデ
+    // 前の if が偽で、かつ（hasOuter && hasBottoms）を満たす場合の別条件分岐です
     else if (hasOuter && hasBottoms) {
+        // 変数・配列項目 comment の値を更新・計算します
         comment = `「${outfit.outer.name}」の優美なドレープ感が全体のシルエットを引き締めています。ボトムスに「${outfit.bottoms.name}」を合わせることで、現代的で清潔感のあるミニマルな装いに仕上がっています。`;
+        // 変数・配列項目 tags の値を更新・計算します
         tags = ['#スマートシルエット', '#都会派モード', '#大人の休日'];
+        // 変数・配列項目 score の値を更新・計算します
         score = 96;
     }
-    // パターン3: トップス + ボトムス
+    // 前の if が偽で、かつ（hasTops && hasBottoms）を満たす場合の別条件分岐です
     else if (hasTops && hasBottoms) {
+        // 変数・配列項目 comment の値を更新・計算します
         comment = `「${outfit.tops.name}」と「${outfit.bottoms.name}」の明度バランスが非常に美しく調和しています。手持ち服の日常感にブランドの上質さが加わり、抜け感のある洗練されたスタイルです。`;
+        // 変数・配列項目 tags の値を更新・計算します
         tags = ['#黄金バランス', '#デイリーシック', '#着回し自在'];
+        // 変数・配列項目 score の値を更新・計算します
         score = 94;
     }
-    // パターン4: 単品試着
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     else {
-        // 着用中の1着目を取り出し、次に合わせると良いカテゴリを提案します
+        // 定数 singleItem を宣言し、値（wornItems[0]）をセットします
         const singleItem = wornItems[0];
+        // 変数・配列項目 comment の値を更新・計算します
         comment = `「${singleItem.name}」を着用中。美しいカッティングが際立っています。さらに相性の良い${hasTops ? 'ボトムスや靴' : 'トップスやアウター'} を組み合わせると、全体のトータルバランスを診断できます。`;
+        // 変数・配列項目 tags の値を更新・計算します
         tags = ['#シルエット重視', '#スタイリング途中'];
+        // 変数・配列項目 score の値を更新・計算します
         score = 90;
     }
 
-    // 帽子のアクセント診断
-    // 帽子が着用されている場合は追加コメントと小物タグを足します
+    // 条件（hasHat && outfit.hat）が成り立つか判定し、該当する場合の処理を実行します
     if (hasHat && outfit.hat) {
+        // 変数・配列項目 comment の値を更新・計算します
         comment += ` 頭元の「${outfit.hat.name}」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
-        // タグの重複追加を防ぐため includes() で未登録か確認してから push します
+        // 条件（!tags.includes('#アクセント小物')）が成り立つか判定し、該当する場合の処理を実行します
         if (!tags.includes('#アクセント小物')) tags.push('#アクセント小物');
     }
 
-    // DOMへ反映
-    // 生成した診断文・タグチップ・点数をそれぞれHTML要素へ書き込みます
+    // 条件（commentElem）が成り立つか判定し、該当する場合の処理を実行します
     if (commentElem) commentElem.textContent = comment;
+    // 条件（tagsElem）が成り立つか判定し、該当する場合の処理を実行します
     if (tagsElem) {
+        // 生成・変換した HTML 文字列を要素 tagsElem の中身として描画します
         tagsElem.innerHTML = tags.map(t => `<span class="ai-tag" > ${t}</span> `).join('');
     }
+    // 条件（scoreValElem）が成り立つか判定し、該当する場合の処理を実行します
     if (scoreValElem) scoreValElem.textContent = `${score}点`;
+    // 条件（scoreStarsElem）が成り立つか判定し、該当する場合の処理を実行します
     if (scoreStarsElem) scoreStarsElem.textContent = '';
 }
 
-// --------------------------------------------------------------------------
-// 15.5 コーデ保存機能 & ルックブック
-// --------------------------------------------------------------------------
 
-/**
- * プリセットコーデ名の適用
- */
-// プリセットチップ（通学・デイリー等）が押されたときに保存名入力欄へ文字をセットします
+// コーデ保存用の人気シーンチップ押下時にそのタイトル名をテキスト入力欄へ入力します
 function applyPresetName(name) {
-    // コーデ名入力の input 要素を取得して value を書き換えます
+    // HTML 要素 #outfit-name-input を取得して変数 input に格納します
     const input = document.getElementById('outfit-name-input');
+    // 条件（input）が成り立つか判定し、該当する場合の処理を実行します
     if (input) input.value = name;
 }
 
-// 保存・削除操作と非同期取得（syncOutfitsFromBackend）の競合を防ぐための操作カウンターです
+
+// 再代入可能な変数 _outfitsMutationSeq を宣言し、値（0）をセットします
 let _outfitsMutationSeq = 0;
 
-/**
- * コーデの保存処理 (MySQL連携・アカウント分離)
- */
-// 「このコーデを保存する」フォーム送信時に実行される保存処理関数です
-function handleSaveOutfit(e) {
-    // form のデフォルト動作（ページ全体のリロード）をキャンセルします
+
+// 現在マネキンに着せているコーデに名前とAIコメントを添えて MySQL saved_outfits へ保存します
+async function handleSaveOutfit(e) {
+    // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
 
-    // ログインしていない場合は保存できないため警告を出して終了します
-    if (!AppState.currentUser || !AppState.currentUser.id) {
-        showToastNotification('⚠️ コーデを保存するにはログインが必要です');
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('⚠️ コーデをMySQLに保存するにはログインが必要です');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 現在マネキンに着せている服を配列として取得し、0着なら保存不可と通知します
+    // 定数 wornItems を宣言し、値（Object.values(AppState.currentOutfit).…）をセットします
     const wornItems = Object.values(AppState.currentOutfit).filter(Boolean);
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (wornItems.length === 0) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('マネキンに服を1着以上着せてから保存してください');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 現在のユーザーIDを控えます
+    // 定数 userId を宣言し、値（AppState.currentUser.id）をセットします
     const userId = AppState.currentUser.id;
-    // 入力されたコーデ名を取り出し、前後の空白（trim）を取り除きます
+    // HTML 要素 #outfit-name-input を取得して変数 input に格納します
     const input = document.getElementById('outfit-name-input');
+    // 定数 title を宣言し、値（(input && input.value.trim()) ? input.…）をセットします
     const title = (input && input.value.trim()) ? input.value.trim() : 'マイスタイリングコーデ';
 
-    // その時点のAIコメント文も一緒にルックブックへ記録するため取得します
+    // HTML 要素 #ai-comment-text を取得して変数 commentElem に格納します
     const commentElem = document.getElementById('ai-comment-text');
+    // 定数 comment を宣言し、値（commentElem ? commentElem.textContent …）をセットします
     const comment = commentElem ? commentElem.textContent : '';
 
-    // 変更世代カウンターを増やします
+    // 変数・配列項目 _outfitsMutationSeq の値を更新・計算します
     _outfitsMutationSeq++;
-    // 新規保存用コーデオブジェクトを組み立てます
+    // 定数 newOutfit を宣言し、値（{）をセットします
     const newOutfit = {
-        // ユーザーIDと現在ミリ秒を組み合わせた一意なIDを作ります
+        // レコード・商品・コーデを識別する ID プロパティをセットします
         id: 'outfit-' + userId + '-' + Date.now(),
-        // 所有ユーザーID
+        // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
         user_id: userId,
-        // コーデタイトル
+        // モーダル見出しまたはコーデ保存タイトル
         title: title,
-        // 日本語形式（YYYY/MM/DD）の本日日付
+        // 登録・保存日付文字列
         date: new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }),
-        // 診断コメント
+        // AIスタイリストからの診断コメント本文
         comment: comment,
-        // JSON.parse(JSON.stringify(...)) によるディープコピーで現在の試着内容を独立保存します
-        items: JSON.parse(JSON.stringify(AppState.currentOutfit)),
-        // サーバー通信が成功するまではオフライン未同期印を付けておきます
-        offlinePending: true
+        // 対象商品・着用アイテムの一覧データです
+        items: JSON.parse(JSON.stringify(AppState.currentOutfit))
     };
 
-    // 保存済み配列の先頭（unshift）へ新しいコーデを追加して先頭に表示されるようにします
-    AppState.savedOutfits.unshift(newOutfit);
-    // ユーザー専用のLocalStorage領域へ保存します
-    saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
-
-    // MySQLに保存
-    // サーバー起動先URLを判定し、POST /api/outfits/save を呼び出します
-    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-    fetch(`${apiBase}/api/outfits/save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            user_id: userId,
-            id: newOutfit.id,
-            title: newOutfit.title,
-            date: newOutfit.date,
-            comment: newOutfit.comment,
-            items: newOutfit.items
-        })
-    }).then(res => {
-        // HTTPステータスがエラーなら例外を投げて catch へ送ります
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+        ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    try {
+        // Flask バックエンド API（/api/outfits/save）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/outfits/save`, {
+            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+            method: 'POST',
+            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
+            headers: { 'Content-Type': 'application/json' },
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
+            body: JSON.stringify({
+                // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
+                user_id: userId,
+                // レコード・商品・コーデを識別する ID プロパティをセットします
+                id: newOutfit.id,
+                // モーダル見出しまたはコーデ保存タイトル
+                title: newOutfit.title,
+                // 登録・保存日付文字列
+                date: newOutfit.date,
+                // AIスタイリストからの診断コメント本文
+                comment: newOutfit.comment,
+                // 対象商品・着用アイテムの一覧データです
+                items: newOutfit.items
+            })
+        });
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
         if (!res.ok) throw new Error('API Error');
-        // MySQL保存に成功したら未同期フラグを消してLocalStorageを更新します
-        delete newOutfit.offlinePending;
-        saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
-    }).catch(err => {
-        // サーバー未起動などで保存できなかった場合はフラグを true のまま残し、後から一括同期できるようにします
-        newOutfit.offlinePending = true;
-        saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
-        console.warn('MySQLコーデ保存オフライン:', err);
-    });
 
-    // 保存完了の通知を表示し、名前入力欄を空に戻します
-    showToastNotification(`「${title}」を保存しました！`);
-    if (input) input.value = '';
-
-    // バッジ等の更新
-    renderManekinStudio(AppState.studioActiveTab);
+        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
+        // 新規追加された最新データを配列 AppState.savedOutfits の先頭へ挿入して即画面反映します
+        AppState.savedOutfits.unshift(newOutfit);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification(`「${title}」をMySQLに保存しました！`);
+        // 条件（input）が成り立つか判定し、該当する場合の処理を実行します
+        if (input) input.value = '';
+        // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
+        renderManekinStudio(AppState.studioActiveTab);
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+    } catch (err) {
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLコーデ保存失敗:', err);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('⚠️ MySQLへのコーディネート保存に失敗しました（サーバー・DB接続を確認してください）');
+    }
 }
 
-/**
- * 保存したコーデ一覧（ルックブック）の描画
- */
-// 「保存したコーデ」タブに表示するカード一覧を組み立てる関数です
+
+// 「保存したコーデ（ルックブック）」タブ内にカード形式で保存コーデ一覧と「このコーデを再現」「削除」を描画します
 function renderSavedOutfitsGrid() {
-    // 一覧を表示するコンテナ要素を取得します
+    // HTML 要素 #saved-outfits-grid を取得して変数 grid に格納します
     const grid = document.getElementById('saved-outfits-grid');
+    // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // 保存されたコーデが0件のときは、作成タブへ戻る案内カードを表示します
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (AppState.savedOutfits.length === 0) {
+        // テンプレートリテラルで組み立てた HTML を要素 grid 内に書き込んで画面を更新します
         grid.innerHTML = `
             <div class="closet-empty-card" >
                 <div class="closet-empty-icon">📖</div>
@@ -2059,16 +2068,18 @@ function renderSavedOutfitsGrid() {
                 <button class="btn btn-primary" onclick="switchStudioTab('create')">コーデを作成する</button>
             </div>
             `;
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 各保存コーデをカードHTMLに変換して結合します
+    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     grid.innerHTML = AppState.savedOutfits.map(outfit => {
-        // コーデ内の5部位オブジェクトと、着用されている有効アイテム一覧を取り出します
+        // 定数 items を宣言し、値（outfit.items || {}）をセットします
         const items = outfit.items || {};
+        // 定数 itemList を宣言し、値（Object.values(items).filter(Boolean)）をセットします
         const itemList = Object.values(items).filter(Boolean);
 
-        // 各アイテムのミニ画像ストリップ（「手持ち」/「ブランド」タグ付き）を作成します
+        // 定数 stripsHtml を宣言し、値（itemList.map(it => `）をセットします
         const stripsHtml = itemList.map(it => `
             <div class="saved-strip-item" title="${it.name}" >
                 <img src="${it.image}" alt="${it.name}" class="saved-strip-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
@@ -2076,7 +2087,7 @@ function renderSavedOutfitsGrid() {
                 </div>
         `).join('');
 
-        // カード全体のHTMLを返します
+        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <div class="saved-outfit-card" >
                 <div class="saved-outfit-header">
@@ -2101,345 +2112,468 @@ function renderSavedOutfitsGrid() {
                 </div>
             </div>
             `;
+    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
-/**
- * 保存したコーデをマネキンに再現
- */
-// ルックブック上の保存コーデをクリックして、試着ステージへ再着用させる関数です
+
+// 保存済みコーデカードからクリックで当時の服5部位を一括再試着させ、試着タブへ切り替えます
 function restoreOutfit(outfitId) {
-    // 指定されたIDの保存コーデを配列から検索します
+    // 定数 target を宣言し、値（AppState.savedOutfits.find(o => o.id =…）をセットします
     const target = AppState.savedOutfits.find(o => o.id === outfitId);
-    // 見つからなければ何もしません
+    // 条件（!target）が成り立つか判定し、該当する場合の処理を実行します
     if (!target) return;
 
-    // 元の配列を破壊しないようディープコピーで現在の着用状態にセットします
+    // アプリ全体状態 AppState.currentOutfit を最新値（JSON.parse(JSON.stringify(target.items…）に更新します
     AppState.currentOutfit = JSON.parse(JSON.stringify(target.items));
-    // LocalStorageとMySQLへ再現した試着状態を保存します
-    saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
 
-    // 復元完了を通知し、試着作成タブ（create）へ自動で切り替えます
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification(`「${target.title}」をマネキンに復元しました`);
+    // 専用ヘルパー関数 switchStudioTab() を実行して状態や表示ラベルを更新します
     switchStudioTab('create');
 }
 
-/**
- * 保存コーデの削除 (MySQL連携・アカウント限定)
- */
-// 保存済みコーディネートを1件削除する関数です
-function deleteSavedOutfit(outfitId) {
-    // ログインチェックを行います
-    if (!AppState.currentUser || !AppState.currentUser.id) {
+
+// 指定した保存済みコーデを MySQL（DELETE /api/outfits/delete/...）から削除します
+async function deleteSavedOutfit(outfitId) {
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('⚠️ ログインが必要です');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 userId を宣言し、値（AppState.currentUser.id）をセットします
     const userId = AppState.currentUser.id;
-    // 誤操作防止のためブラウザ標準の confirm ダイアログで確認します
-    if (confirm('この保存コーディネートを削除しますか？')) {
-        // 削除世代カウンターを進めます
-        _outfitsMutationSeq++;
-        // 指定されたID以外のコーデだけを残すことで配列から削除します
+    // 条件（!confirm('この保存コーディネートを削除しますか？')）が成り立つか判定し、該当する場合の処理を実行します
+    if (!confirm('この保存コーディネートを削除しますか？')) return;
+
+    // 変数・配列項目 _outfitsMutationSeq の値を更新・計算します
+    _outfitsMutationSeq++;
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+        ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    try {
+        // Flask バックエンド API（/api/outfits/delete/${encodeURIComponent）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/outfits/delete/${encodeURIComponent(outfitId)}?user_id=${userId}`, {
+            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+            method: 'DELETE',
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include'
+        });
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
+        if (!res.ok) throw new Error('API Error');
+
+        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
+        // アプリ全体状態 AppState.savedOutfits を最新値（AppState.savedOutfits.filter(o => o.id…）に更新します
         AppState.savedOutfits = AppState.savedOutfits.filter(o => o.id !== outfitId);
-        // 更新後の配列をユーザー別LocalStorageに保存します
-        saveScopedData('manekin_saved_outfits', AppState.savedOutfits, userId);
-
-        // MySQL側からも削除するため DELETE リクエストを送ります（ID内の特殊文字をエスケープ）
-        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-        fetch(`${apiBase}/api/outfits/delete/${encodeURIComponent(outfitId)}?user_id=${userId}`, { method: 'DELETE' })
-            .catch(err => console.warn('MySQLコーデ削除オフライン:', err));
-
-        // 通知と画面再描画を行います
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('コーディネートを削除しました');
+        // 関連処理 renderSavedOutfitsGrid() を呼び出して処理・画面を更新します
         renderSavedOutfitsGrid();
+        // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+    } catch (err) {
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLコーデ削除失敗:', err);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('⚠️ MySQLからのコーディネート削除に失敗しました（サーバー接続を確認してください）');
     }
 }
 
-/**
- * MySQLからログイン中アカウントだけの保存済みコーデを同期取得
- */
-// サーバー上の saved_outfits テーブルからログインユーザー分のコーデを取得・統合する関数です
+
+// ログイン会員の保存済みコーディネート一覧を MySQL（GET /api/outfits/...）から取得します
 async function syncOutfitsFromBackend() {
-    // 未ログインなら保存コーデ一覧を空にして戻ります
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
+        // アプリ全体状態 AppState.savedOutfits を最新値（[]）に更新します
         AppState.savedOutfits = [];
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
-    // サーバー発行IDでない場合はAPI取得をスキップします
+    // 条件（typeof isServerUserId === 'function' && !isServerUse…）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        // アプリ全体状態 AppState.savedOutfits を最新値（[]）に更新します
+        AppState.savedOutfits = [];
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
-    // 取得開始時点の操作シーケンスを記録します
+    // 定数 fetchStartSeq を宣言し、値（_outfitsMutationSeq）をセットします
     const fetchStartSeq = _outfitsMutationSeq;
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-        // 該当ユーザーの保存コーデ一覧をGET取得します
-        const res = await fetch(`${apiBase}/api/outfits/${targetUserId}`);
+        // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+        const apiBase = (typeof getApiBaseUrl === 'function')
+            // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+            ? getApiBaseUrl()
+            // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+            : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+        // Flask バックエンド API（/api/outfits/${targetUserId}）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/outfits/${targetUserId}`, {
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // ブラウザが昔の通信結果をキャッシュ再利用しないよう 'no-store' を指定します
+            cache: 'no-store'
+        });
+        // 条件（res.ok）が成り立つか判定し、該当する場合の処理を実行します
         if (res.ok) {
+            // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
             const data = await res.json();
-            // 通信中にユーザーが変わった場合は安全のため破棄します
+            // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
-            // 通信中に新規保存や削除が行われていた場合も古い結果で上書きしないよう中止します
+            // 条件（fetchStartSeq !== _outfitsMutationSeq）が成り立つか判定し、該当する場合の処理を実行します
             if (fetchStartSeq !== _outfitsMutationSeq) return;
+            // 条件（Array.isArray(data.outfits)）が成り立つか判定し、該当する場合の処理を実行します
             if (Array.isArray(data.outfits)) {
-                // ローカルにしかない未送信コーデ（offlinePending === true）を残して消えないように抽出します
-                const offlinePending = (AppState.savedOutfits || []).filter(local =>
-                    local &&
-                    local.offlinePending === true &&
-                    (!local.user_id || String(local.user_id) === String(targetUserId)) &&
-                    !data.outfits.some(m => String(m.id) === String(local.id))
-                );
-                // 未送信分を先頭、MySQL分を後ろに結合した最新配列を作成します
-                const merged = [...offlinePending, ...data.outfits];
-                // 状態とLocalStorageを更新します
-                AppState.savedOutfits = merged;
-                saveScopedData('manekin_saved_outfits', merged, targetUserId);
-                // タブバッジやホーム画面の「保存コーデ数」カウント表示を書き換えます
+                // アプリ全体状態 AppState.savedOutfits を最新値（data.outfits）に更新します
+                AppState.savedOutfits = data.outfits;
+                // HTML 要素 #studio-saved-badge を取得して変数 savedBadge に格納します
                 const savedBadge = document.getElementById('studio-saved-badge');
-                if (savedBadge) savedBadge.textContent = merged.length;
+                // 条件（savedBadge）が成り立つか判定し、該当する場合の処理を実行します
+                if (savedBadge) savedBadge.textContent = data.outfits.length;
+                // HTML 要素 #home-stat-saved を取得して変数 homeSaved に格納します
                 const homeSaved = document.getElementById('home-stat-saved');
-                if (homeSaved) homeSaved.innerHTML = `${merged.length} <small>組</small>`;
-                // 現在保存済みコーデ一覧タブを開いていれば即座に一覧を再描画します
+                // 条件（homeSaved）が成り立つか判定し、該当する場合の処理を実行します
+                if (homeSaved) homeSaved.innerHTML = `${data.outfits.length} <small>組</small>`;
+                // 条件（AppState.studioActiveTab === 'saved'）が成り立つか判定し、該当する場合の処理を実行します
                 if (AppState.studioActiveTab === 'saved') {
+                    // 関連処理 renderSavedOutfitsGrid() を呼び出して処理・画面を更新します
                     renderSavedOutfitsGrid();
                 }
             }
         }
-    } catch (e) {}
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+    } catch (e) {
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLからの保存コーデ取得に失敗しました:', e);
+    }
 }
 
-// --------------------------------------------------------------------------
-// 15.6 EC連携（試着中ブランド商品の1クリックカート追加）
-// --------------------------------------------------------------------------
 
-/**
- * 着用中のブランド商品をショッピングカートへ一括追加
- */
-// 試着室の下にある「着用アイテムをカートに追加」ボタンから呼ばれる一括購入支援関数です
-function addCurrentBrandItemsToCart() {
-    // カート配列が未初期化なら空配列として用意します
+// 現在マネキンで試着中のブランド販売商品をまとめてショッピングカートに追加し、MySQL同期します
+async function addCurrentBrandItemsToCart() {
+    // 条件（!AppState.cart || !Array.isArray(AppState.cart)）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart || !Array.isArray(AppState.cart)) {
+        // アプリ全体状態 AppState.cart を最新値（[]）に更新します
         AppState.cart = [];
     }
+    // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-    // 着ている服のうち「手持ち服ではない（!it.isOwned）」ブランド商品だけを抽出します
+    // 定数 brandItems を宣言し、値（Object.values(outfit).filter(it => it …）をセットします
     const brandItems = Object.values(outfit).filter(it => it && !it.isOwned);
 
-    // ブランド商品が1つも試着されていなければメッセージを出して終了します
+    // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (brandItems.length === 0) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('現在マネキンが着用しているブランド商品はありません');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 微調整パネルでユーザーが選んだ規格サイズ（XS〜XL）を参照するためのオフセット設定を取得します
+    // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して prevCart に保存します
+    const prevCart = JSON.parse(JSON.stringify(AppState.cart || []));
+
+    // 定数 offsets を宣言し、値（AppState.fittingOffsets || {}）をセットします
     const offsets = AppState.fittingOffsets || {};
-    // 着用中のブランド商品すべてを1着ずつカート配列へ追加します
+    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     brandItems.forEach(item => {
+        // 条件（!item）が成り立つか判定し、該当する場合の処理を実行します
         if (!item) return;
-        // カテゴリからスロット名（tops, bottoms 等）を求めます
+        // 定数 slotKey を宣言し、値（getSlotKeyByCategory(item.category) ||…）をセットします
         const slotKey = getSlotKeyByCategory(item.category) || 'tops';
-        // そのスロットで調整・選択された商品サイズを取り出します（未指定時は 'M'）
+        // 定数 off を宣言し、値（offsets[slotKey] || {}）をセットします
         const off = offsets[slotKey] || {};
+        // 定数 chosenSize を宣言し、値（item.size || off.brandSize || 'M'）をセットします
         const chosenSize = item.size || off.brandSize || 'M';
 
-        // すでに同じ商品・同じサイズがカートに入っていないか検索します
+        // 定数 existing を宣言し、値（AppState.cart.find(c => c && c.id === …）をセットします
         const existing = AppState.cart.find(c => c && c.id === item.id && c.size === chosenSize);
+        // 条件（existing）が成り立つか判定し、該当する場合の処理を実行します
         if (existing) {
-            // すでに入っていれば数量だけを +1 増やします
+            // 変数・配列項目 existing.quantity の値を更新・計算します
             existing.quantity = (existing.quantity || 1) + 1;
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 無ければ新しいカート項目オブジェクトを配列末尾へ追加します
+            // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
             AppState.cart.push({
+                // レコード・商品・コーデを識別する ID プロパティをセットします
                 id: item.id,
+                // 商品名またはアイテム名称
                 name: item.name || '商品',
+                // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                 category: item.category || 'TOPS',
+                // カラー名
                 color: item.color || 'BLACK',
+                // 選択サイズ
                 size: chosenSize,
+                // 単価・価格（円）
                 price: item.price || 0,
+                // 数量
                 quantity: 1,
+                // 画像ファイルパスまたは DataURL
                 image: item.image || getCategoryFallbackImage(item.category)
             });
         }
     });
 
-    // カート情報をアカウント別のLocalStorageへ保存し、ヘッダー等のバッジ件数を更新します
-    saveScopedData('manekin_cart', AppState.cart);
+    // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
     updateCartBadge();
-    // MySQLのcartsテーブル同期関数が存在すれば呼び出して永続化します
-    if (typeof syncCartToBackend === 'function') {
-        syncCartToBackend();
+
+    // 条件（AppState.currentUser && (typeof isServerUserId !== '…）が成り立つか判定し、該当する場合の処理を実行します
+    if (AppState.currentUser && (typeof isServerUserId !== 'function' || isServerUserId(AppState.currentUser.id))) {
+        // 条件（typeof syncCartToBackend === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        if (typeof syncCartToBackend === 'function') {
+            // 定数 ok を宣言し、値（await syncCartToBackend()）をセットします
+            const ok = await syncCartToBackend();
+            // 条件（!ok）が成り立つか判定し、該当する場合の処理を実行します
+            if (!ok) {
+                // アプリ全体状態 AppState.cart を最新値（prevCart）に更新します
+                AppState.cart = prevCart;
+                // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
+                updateCartBadge();
+                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+                showToastNotification('⚠️ MySQLへのカート保存に失敗しました（サーバー接続を確認してください）');
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+                return;
+            }
+        }
     }
-    // 追加点数をトーストで知らせます
-    showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しました！`);
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+    showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しMySQLへ保存しました！`);
 }
 
-// --------------------------------------------------------------------------
-// 15.7 手持ち服の登録モーダル処理
-// --------------------------------------------------------------------------
 
-// 手持ち服登録モーダルを開く関数です
+// ==========================================================================
+//  6. 手持ち服登録モーダル・AI背景透過（@imgly）＆ Canvas＋MobileNet形状診断
+// ==========================================================================
+// 「手持ちの服を登録する」モーダルを開き、アップロード一時変数を初期化します
 function openAddClosetModal() {
-    // モーダル要素を取得します
+    // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
+    // 条件（modal）が成り立つか判定し、該当する場合の処理を実行します
     if (modal) {
-        // 表示用CSSクラス（open と active）を付与してポップアップ表示します
+        // 要素に CSS クラスを付与して見た目・表示状態を変更します（modal.classList.add('open');）
         modal.classList.add('open');
+        // 要素に CSS クラスを付与して見た目・表示状態を変更します（modal.classList.add('active');）
         modal.classList.add('active');
-        // 背景クリックで閉じる処理
-        // 白いダイアログの外側（暗い背景幕そのもの）がクリックされたときだけモーダルを閉じます
+        // 変数・配列項目 modal.onclick の値を更新・計算します
         modal.onclick = function (e) {
+            // 条件（e.target === modal）が成り立つか判定し、該当する場合の処理を実行します
             if (e.target === modal) closeAddClosetModal();
         };
     }
 }
 
-// 手持ち服登録モーダルを閉じ、アップロード画像やAI診断結果・フォームを初期化する関数です
+
+// 手持ち服登録モーダルを閉じてフォーム入力と画像をリセットします
 function closeAddClosetModal() {
+    // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
+    // 条件（modal）が成り立つか判定し、該当する場合の処理を実行します
     if (modal) {
+        // 要素から CSS クラスを外して強調や表示を戻します（modal.classList.remove('open');）
         modal.classList.remove('open');
+        // 要素から CSS クラスを外して強調や表示を戻します（modal.classList.remove('active');）
         modal.classList.remove('active');
     }
-    // 次回開いたときに前回の写真や診断結果が残らないよう管理変数をすべて空に戻します
+    // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
     currentClosetUploadDataUrl = '';
+    // 変数・配列項目 originalClosetUploadDataUrl の値を更新・計算します
     originalClosetUploadDataUrl = '';
+    // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
     isCurrentUploadTransparent = false;
+    // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
     currentAiAnalysisResult = null;
-    // AI形状診断カードの表示を非表示へリセットします
+    // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
     updateAiDiagnosisUI(null);
 
-    // プレビュー・プレースホルダー・バッジ・ボタン・オーバーレイの各DOM要素を取得します
+    // HTML 要素 #closet-img-preview を取得して変数 preview に格納します
     const preview = document.getElementById('closet-img-preview');
+    // HTML 要素 #closet-img-placeholder を取得して変数 placeholder に格納します
     const placeholder = document.getElementById('closet-img-placeholder');
+    // HTML 要素 #preview-badge-transparent を取得して変数 badgeTrans に格納します
     const badgeTrans = document.getElementById('preview-badge-transparent');
+    // HTML 要素 #ai-action-btns を取得して変数 actionBtns に格納します
     const actionBtns = document.getElementById('ai-action-btns');
+    // HTML 要素 #ai-processing-overlay を取得して変数 overlay に格納します
     const overlay = document.getElementById('ai-processing-overlay');
 
-    // 画像プレビューを隠して透明状態クラスを外します
+    // 条件（preview）が成り立つか判定し、該当する場合の処理を実行します
     if (preview) {
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（preview.style.display = 'none';）
         preview.style.display = 'none';
+        // 要素から CSS クラスを外して強調や表示を戻します（preview.classList.remove('is-transparent')…）
         preview.classList.remove('is-transparent');
     }
+    // 条件（badgeTrans）が成り立つか判定し、該当する場合の処理を実行します
     if (badgeTrans) badgeTrans.style.display = 'none';
+    // 条件（actionBtns）が成り立つか判定し、該当する場合の処理を実行します
     if (actionBtns) actionBtns.style.display = 'none';
+    // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
     if (overlay) overlay.style.display = 'none';
-    // 点線枠内の「写真を選択・撮影する」案内を再表示します
+    // 条件（placeholder）が成り立つか判定し、該当する場合の処理を実行します
     if (placeholder) placeholder.style.display = 'block';
 
-    // テキスト入力欄やラジオボタンの選択状態を初期状態へリセットします
+    // HTML 要素 #form-add-closet を取得して変数 form に格納します
     const form = document.getElementById('form-add-closet');
+    // 条件（form）が成り立つか判定し、該当する場合の処理を実行します
     if (form) form.reset();
 }
 
-/**
- * 画像リサイズ前処理（AI処理の高速化・メモリ節約）
- */
-// スマホの高解像度写真を最大 maxDim px (既定 1024px) 以下に縮小し、AI透過処理の負担を軽くする関数です
+
+// アップロードされた高解像度画像を、AI認識とDB保存に丁度いい最大辺長へ Canvas で縮小圧縮します
 function resizeImageForAi(imageSource, maxDim = 1024) {
-    // テスト環境等で Image クラスが存在しない場合はそのまま返します
+    // 条件（typeof Image === 'undefined'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof Image === 'undefined') return Promise.resolve(imageSource);
-    // 画像の読み込みとCanvas変換を非同期に完了通知するため Promise を返します
+    // 非同期完了を await で待てる Promise オブジェクトを作成して返します
     return new Promise((resolve) => {
-        // メモリ上で画像を読み込むための Image オブジェクトを作ります
+        // Canvas 画像処理・ピクセル解析を行うために画像オブジェクト Image() を作成します
         const img = new Image();
-        // CORS（他ドメイン画像読み込み制限）によるCanvas汚染を防ぐ設定です
+        // 変数・配列項目 img.crossOrigin の値を更新・計算します
         img.crossOrigin = 'anonymous';
-        // 画像のロードが完了したあとのサイズ確認＆縮小処理です
+        // 変数・配列項目 img.onload の値を更新・計算します
         img.onload = () => {
+            // 再代入可能な変数 width を宣言し、値（img.width）をセットします
             let width = img.width;
+            // 再代入可能な変数 height を宣言し、値（img.height）をセットします
             let height = img.height;
-            // 元画像の縦横どちらも maxDim 以下ならリサイズ不要なので元の画像データを返します
+            // 条件（width <= maxDim && height <= maxDim）が成り立つか判定し、該当する場合の処理を実行します
             if (width <= maxDim && height <= maxDim) {
+                // 非同期 Promise を完了し、結果値（imageSource）を呼び出し元へ返します
                 resolve(imageSource);
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
-            // 長辺が maxDim になるよう、元の縦横比（アスペクト比）を保ったままサイズを計算します
+            // 条件（width > height）が成り立つか判定し、該当する場合の処理を実行します
             if (width > height) {
+                // 変数・配列項目 height の値を更新・計算します
                 height = Math.round((height * maxDim) / width);
+                // 変数・配列項目 width の値を更新・計算します
                 width = maxDim;
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
+                // 変数・配列項目 width の値を更新・計算します
                 width = Math.round((width * maxDim) / height);
+                // 変数・配列項目 height の値を更新・計算します
                 height = maxDim;
             }
-            // 画面に見えない一時Canvasを作り、縮小後のサイズで描画します
+            // 画像の縮小・ピクセル色解析を行うためのメモリ上お絵描き領域(Canvas)を作ります
             const canvas = document.createElement('canvas');
+            // 変数・配列項目 canvas.width の値を更新・計算します
             canvas.width = width;
+            // 変数・配列項目 canvas.height の値を更新・計算します
             canvas.height = height;
+            // 定数 ctx を宣言し、値（canvas.getContext('2d')）をセットします
             const ctx = canvas.getContext('2d');
+            // 元の画像を圧縮用 Canvas 領域へ縮小描画します
             ctx.drawImage(img, 0, 0, width, height);
-            // Canvas内容を PNG形式の Blob（バイナリデータ）に変換して呼び出し元へ渡します
+            // 縮小した Canvas 画像を PNG バイナリ形式（Blob）へ変換開始します
             canvas.toBlob((blob) => {
+                // 非同期 Promise を完了し、結果値（blob || imageSource）を呼び出し元へ返します
                 resolve(blob || imageSource);
+            // Canvas 画像を PNG 形式（透過対応）で書き出す処理を閉じます
             }, 'image/png');
         };
-        // もし画像読み込みが失敗しても処理を止めないよう元データを返します
+        // 変数・配列項目 img.onerror の値を更新・計算します
         img.onerror = () => resolve(imageSource);
 
-        // 引数が文字列（URLやBase64）か Blob（選択ファイル）かに応じて img.src へセットします
+        // 条件（typeof imageSource === 'string'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof imageSource === 'string') {
+            // 変数・配列項目 img.src の値を更新・計算します
             img.src = imageSource;
+        // 前の if が偽で、かつ（imageSource instanceof Blob）を満たす場合の別条件分岐です
         } else if (imageSource instanceof Blob) {
+            // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(imageSource);
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // 非同期 Promise を完了し、結果値（imageSource）を呼び出し元へ返します
             resolve(imageSource);
         }
     });
 }
 
-/**
- * ブラウザ完結型AI背景削除コア処理（@imgly/background-removal）
- */
-// 受け取った画像から背景だけを切り抜いて透明PNGの Blob を返す非同期関数です
+
+// ブラウザAI（@imgly/background-removal）を優先使用（失敗時はCanvasエッジ自動透過フォールバック）して服の背景を透明化します
 async function runAiBackgroundRemoval(imageSource) {
-    // グローバルまたは動的インポートでモジュール取得
-    // index.html の module script で事前読み込みした関数を取り出します
+    // 再代入可能な変数 removeBgFunc を宣言し、値（window.imglyRemoveBackground）をセットします
     let removeBgFunc = window.imglyRemoveBackground;
-    // まだ読み込めていなかった場合はこの場で CDN から動的 import を試みます
+    // 条件（!removeBgFunc）が成り立つか判定し、該当する場合の処理を実行します
     if (!removeBgFunc) {
+        // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
         try {
+            // 定数 mod を宣言し、値（await import('https://cdn.jsdelivr.net…）をセットします
             const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+            // 変数・配列項目 removeBgFunc の値を更新・計算します
             removeBgFunc = mod.removeBackground;
+            // 変数・配列項目 window.imglyRemoveBackground の値を更新・計算します
             window.imglyRemoveBackground = removeBgFunc;
+            // 変数・配列項目 window.imglyAiReady の値を更新・計算します
             window.imglyAiReady = true;
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
+            // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.error('AIモジュール読み込みエラー:', e);
+            // 処理を中断して呼び出し元の catch へエラー内容（throw new Error('AI背景削除モジュールをロードできませんでした。ネ…）を渡します
             throw new Error('AI背景削除モジュールをロードできませんでした。ネットワーク接続を確認してください。');
         }
     }
 
-    // 進捗バーオーバーレイの各UI要素を取得します
+    // HTML 要素 #ai-processing-overlay を取得して変数 overlay に格納します
     const overlay = document.getElementById('ai-processing-overlay');
+    // HTML 要素 #ai-progress-fill を取得して変数 progressFill に格納します
     const progressFill = document.getElementById('ai-progress-fill');
+    // HTML 要素 #ai-progress-percent を取得して変数 progressPct に格納します
     const progressPct = document.getElementById('ai-progress-percent');
+    // HTML 要素 #ai-status-subtitle を取得して変数 subtitle に格納します
     const subtitle = document.getElementById('ai-status-subtitle');
 
-    // 処理中オーバーレイを表示し、進捗バーを 0% に初期化します
+    // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
     if (overlay) overlay.style.display = 'flex';
+    // 条件（progressFill）が成り立つか判定し、該当する場合の処理を実行します
     if (progressFill) progressFill.style.width = '0%';
+    // 条件（progressPct）が成り立つか判定し、該当する場合の処理を実行します
     if (progressPct) progressPct.textContent = '0%';
+    // 条件（subtitle）が成り立つか判定し、該当する場合の処理を実行します
     if (subtitle) subtitle.textContent = 'AIモデルを初期化中...';
 
-    // 高解像度画像の場合は1024pxにリサイズして高速化
+    // 定数 resizedSource を宣言し、値（await resizeImageForAi(imageSource, 10…）をセットします
     const resizedSource = await resizeImageForAi(imageSource, 1024);
 
-    // @imgly ライブラリへ渡す設定オプション（使用モデルサイズと進捗コールバック）です
+    // 定数 config を宣言し、値（{）をセットします
     const config = {
-        model: 'small', // small: 約40MBの軽量モデル。服の輪郭切り抜きに十分な精度で高速
-        // モデルダウンロードや画像推論の進行状況が通知されるたびに呼ばれます
+        // オブジェクトの 'model' プロパティ値を設定します
+        model: 'small',
+        // オブジェクトの 'progress' プロパティ値を設定します
         progress: (key, current, total) => {
+            // 条件（total > 0）が成り立つか判定し、該当する場合の処理を実行します
             if (total > 0) {
-                // 0〜100% に丸めた進捗率を計算し、プログレスバーと数値表示をリアルタイム更新します
+                // 定数 pct を宣言し、値（Math.min(100, Math.round((current / to…）をセットします
                 const pct = Math.min(100, Math.round((current / total) * 100));
+                // 条件（progressFill）が成り立つか判定し、該当する場合の処理を実行します
                 if (progressFill) progressFill.style.width = `${pct}%`;
+                // 条件（progressPct）が成り立つか判定し、該当する場合の処理を実行します
                 if (progressPct) progressPct.textContent = `${pct}%`;
+                // 条件（subtitle）が成り立つか判定し、該当する場合の処理を実行します
                 if (subtitle) {
-                    // AI重みファイルのダウンロード段階か、画像の輪郭解析段階かを文言で出し分けます
+                    // 条件（key.includes('model') || key.includes('onnx')）が成り立つか判定し、該当する場合の処理を実行します
                     if (key.includes('model') || key.includes('onnx')) {
+                        // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `AIモデル読込中... (${pct}%)`;
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                     } else {
+                        // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `服の輪郭をAI解析・透過処理中... (${pct}%)`;
                     }
                 }
@@ -2447,1164 +2581,1620 @@ async function runAiBackgroundRemoval(imageSource) {
         }
     };
 
-    // AI背景削除を実行し、完了または失敗のどちらでも必ずオーバーレイを閉じるよう処理します
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
+        // 定数 outputBlob を宣言し、値（await removeBgFunc(resizedSource, conf…）をセットします
         const outputBlob = await removeBgFunc(resizedSource, config);
+        // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
         if (overlay) overlay.style.display = 'none';
+        // 結果（outputBlob）を呼び出し元へ返却します
         return outputBlob;
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
+        // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
         if (overlay) overlay.style.display = 'none';
+        // 処理を中断して呼び出し元の catch へエラー内容（throw err;）を渡します
         throw err;
     }
 }
 
-/**
- * プレビュー表示の更新ヘルパー
- */
-// 選択またはAI透過した画像をアップロード枠のプレビューエリアに表示し、操作ボタンを整える関数です
+
+// プレビュー領域にアップロード画像（透過済/元画像）と「AI透過済」「やり直し」ボタン状態を反映します
 function updateClosetPreviewUI(imgUrl, isTransparent = false) {
+    // HTML 要素 #closet-img-preview を取得して変数 preview に格納します
     const preview = document.getElementById('closet-img-preview');
+    // HTML 要素 #closet-preview-img を取得して変数 previewImg に格納します
     const previewImg = document.getElementById('closet-preview-img');
+    // HTML 要素 #closet-img-placeholder を取得して変数 placeholder に格納します
     const placeholder = document.getElementById('closet-img-placeholder');
+    // HTML 要素 #preview-badge-transparent を取得して変数 badgeTrans に格納します
     const badgeTrans = document.getElementById('preview-badge-transparent');
+    // HTML 要素 #ai-action-btns を取得して変数 actionBtns に格納します
     const actionBtns = document.getElementById('ai-action-btns');
 
+    // 条件（preview && previewImg && placeholder）が成り立つか判定し、該当する場合の処理を実行します
     if (preview && previewImg && placeholder) {
-        // 画像を表示し、元の点線プレースホルダーを隠します
+        // 変数・配列項目 previewImg.src の値を更新・計算します
         previewImg.src = imgUrl;
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（preview.style.display = 'flex';）
         preview.style.display = 'flex';
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（placeholder.style.display = 'none';）
         placeholder.style.display = 'none';
 
-        // 背景透過済みかどうかで市松模様背景クラスと「✨ 背景透過済み」バッジを切り替えます
+        // 条件（isTransparent）が成り立つか判定し、該当する場合の処理を実行します
         if (isTransparent) {
+            // 要素に CSS クラスを付与して見た目・表示状態を変更します（preview.classList.add('is-transparent');）
             preview.classList.add('is-transparent');
+            // 条件（badgeTrans）が成り立つか判定し、該当する場合の処理を実行します
             if (badgeTrans) badgeTrans.style.display = 'block';
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // 要素から CSS クラスを外して強調や表示を戻します（preview.classList.remove('is-transparent')…）
             preview.classList.remove('is-transparent');
+            // 条件（badgeTrans）が成り立つか判定し、該当する場合の処理を実行します
             if (badgeTrans) badgeTrans.style.display = 'none';
         }
 
-        // 「背景を透過」ボタンと「元写真に戻す」ボタンの表示を状態に合わせて排他的に切り替えます
+        // 条件（actionBtns）が成り立つか判定し、該当する場合の処理を実行します
         if (actionBtns) {
+            // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（actionBtns.style.display = 'flex';）
             actionBtns.style.display = 'flex';
+            // HTML 要素 #btn-re-remove-bg を取得して変数 btnReRemove に格納します
             const btnReRemove = document.getElementById('btn-re-remove-bg');
+            // HTML 要素 #btn-restore-original を取得して変数 btnRestore に格納します
             const btnRestore = document.getElementById('btn-restore-original');
+            // 条件（btnReRemove）が成り立つか判定し、該当する場合の処理を実行します
             if (btnReRemove) btnReRemove.style.display = isTransparent ? 'none' : 'inline-block';
+            // 条件（btnRestore）が成り立つか判定し、該当する場合の処理を実行します
             if (btnRestore) btnRestore.style.display = isTransparent ? 'inline-block' : 'none';
         }
     }
 }
 
-// AI形状・アイテム診断結果のステート
-// 最新の判定結果オブジェクトを保持（登録ボタン押下時の可否チェックに使います）
+
+// 再代入可能な変数 currentAiAnalysisResult を宣言し、値（null）をセットします
 let currentAiAnalysisResult = null;
-// MobileNet モデルを初回のみロードして使い回すための Promise キャッシュです
+// 再代入可能な変数 _mobilenetModelPromise を宣言し、値（null）をセットします
 let _mobilenetModelPromise = null;
 
-/**
- * MobileNet画像分類AIモデルの遅延ロード
- */
-// 必要なときに初めて MobileNet モデルをメモリへ読み込み、以降は同じモデルを再利用します
+
+// TensorFlow.js の MobileNet 画像分類モデルを初回だけロードしてキャッシュ返却するシングルトン関数です
 function getMobileNetModel() {
-    // ライブラリが読み込まれていない場合（オフライン等）は null を返します
+    // 条件（!window.mobilenet）が成り立つか判定し、該当する場合の処理を実行します
     if (!window.mobilenet) return Promise.resolve(null);
+    // 条件（!_mobilenetModelPromise）が成り立つか判定し、該当する場合の処理を実行します
     if (!_mobilenetModelPromise) {
-        // 軽量版 MobileNet v2（alpha=0.5）を読み込み、失敗時は幾何学形状解析のみで動かせるよう null へフォールバックします
+        // 変数・配列項目 _mobilenetModelPromise の値を更新・計算します
         _mobilenetModelPromise = window.mobilenet.load({ version: 2, alpha: 0.5 }).catch(err => {
+            // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.warn('MobileNetモデルのロードをスキップしました (形状幾何学解析でフォールバック動作):', err);
+            // 処理結果の基準値として null を呼び出し元へ返して関数を終了します
             return null;
         });
     }
+    // 結果（_mobilenetModelPromise）を呼び出し元へ返却します
     return _mobilenetModelPromise;
 }
 
-/**
- * AI形状診断結果カードのUI更新
- */
-// 診断中／判定OK／判定NG の状態に応じてモーダル内の結果カード表示を切り替える関数です
+
+// モーダル内の AI 形状診断ボックスを「解析中 / 認識成功 / 要確認エラー」の見た目に書き換えます
 function updateAiDiagnosisUI(result, isAnalyzing = false) {
+    // HTML 要素 #ai-diagnosis-card を取得して変数 card に格納します
     const card = document.getElementById('ai-diagnosis-card');
+    // HTML 要素 #ai-diag-badge を取得して変数 badge に格納します
     const badge = document.getElementById('ai-diag-badge');
+    // HTML 要素 #ai-diag-badge-text を取得して変数 badgeText に格納します
     const badgeText = document.getElementById('ai-diag-badge-text');
+    // HTML 要素 #ai-diag-spinner を取得して変数 spinner に格納します
     const spinner = document.getElementById('ai-diag-spinner');
+    // HTML 要素 #ai-diag-confidence を取得して変数 confidence に格納します
     const confidence = document.getElementById('ai-diag-confidence');
+    // HTML 要素 #ai-diag-title を取得して変数 title に格納します
     const title = document.getElementById('ai-diag-title');
+    // HTML 要素 #ai-diag-desc を取得して変数 desc に格納します
     const desc = document.getElementById('ai-diag-desc');
 
+    // 条件（!card）が成り立つか判定し、該当する場合の処理を実行します
     if (!card) return;
 
-    // 診断実行中の表示（ローディングスピナー＋解析中メッセージ）
+    // 条件（isAnalyzing）が成り立つか判定し、該当する場合の処理を実行します
     if (isAnalyzing) {
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（card.style.display = 'block';）
         card.style.display = 'block';
+        // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-analyzing';
+        // 条件（badgeText）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeText) badgeText.textContent = 'AI形状・アイテム診断中...';
+        // 条件（spinner）が成り立つか判定し、該当する場合の処理を実行します
         if (spinner) spinner.style.display = 'inline-block';
+        // 条件（confidence）が成り立つか判定し、該当する場合の処理を実行します
         if (confidence) confidence.textContent = '';
+        // 条件（title）が成り立つか判定し、該当する場合の処理を実行します
         if (title) title.textContent = '被写体の形状を解析中';
+        // 条件（desc）が成り立つか判定し、該当する場合の処理を実行します
         if (desc) desc.textContent = 'アウター、ボトムス、トップス、靴、帽子のいずれかかAIが判定しています...';
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 結果が null（初期化時）なら診断カードを隠して終了します
+    // 条件（!result）が成り立つか判定し、該当する場合の処理を実行します
     if (!result) {
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（card.style.display = 'none';）
         card.style.display = 'none';
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 結果が確定したのでカードを表示し、スピナーを止めます
+    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（card.style.display = 'block';）
     card.style.display = 'block';
+    // 条件（spinner）が成り立つか判定し、該当する場合の処理を実行します
     if (spinner) spinner.style.display = 'none';
 
-    // 対象の5カテゴリの服・小物と判定された場合（OK表示＋カテゴリラジオボタン自動選択）
+    // 条件（result.isValid）が成り立つか判定し、該当する場合の処理を実行します
     if (result.isValid) {
+        // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-valid';
+        // 条件（badgeText）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeText) badgeText.textContent = 'AI形状判定: OK';
+        // 条件（confidence）が成り立つか判定し、該当する場合の処理を実行します
         if (confidence) confidence.textContent = `${result.confidence}% 適合`;
+        // 条件（title）が成り立つか判定し、該当する場合の処理を実行します
         if (title) title.textContent = result.title;
+        // 条件（desc）が成り立つか判定し、該当する場合の処理を実行します
         if (desc) desc.textContent = result.desc;
 
-        // カテゴリラジオボタンを自動選択
-        // AIが推測したカテゴリ（HAT / TOPS / BOTTOMS / OUTER / SHOES）に一致するラジオボタンへ自動でチェックを入れます
+        // 条件（result.category）が成り立つか判定し、該当する場合の処理を実行します
         if (result.category) {
+            // CSS セレクタに最初に一致した HTML 要素を取得して変数 radio に入れます
             const radio = document.querySelector(`input[name="closet_category"][value="${result.category}"]`);
+            // 条件（radio）が成り立つか判定し、該当する場合の処理を実行します
             if (radio) {
+                // 変数・配列項目 radio.checked の値を更新・計算します
                 radio.checked = true;
             }
         }
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // 服以外（風景・書類・その他物体）または判別不能とされた場合（赤色の警告カード表示）
+        // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-invalid';
+        // 条件（badgeText）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeText) badgeText.textContent = '⚠️ 登録不可（非対象）';
+        // 条件（confidence）が成り立つか判定し、該当する場合の処理を実行します
         if (confidence) confidence.textContent = '判定不可';
+        // 条件（title）が成り立つか判定し、該当する場合の処理を実行します
         if (title) title.textContent = result.title;
+        // 条件（desc）が成り立つか判定し、該当する場合の処理を実行します
         if (desc) desc.textContent = result.desc;
     }
 }
 
-/**
- * 服・アイテムの画像形状およびAIモデルによる診断を行う
- * アウター(OUTER)、ボトムス(BOTTOMS)、トップス(TOPS)、靴(SHOES)、帽子(HAT)のみ判定・登録可能
- */
-// Canvas でのピクセル輪郭解析と MobileNet 画像分類AIを組み合わせて、写真の対象カテゴリと登録可否を診断するメイン関数です
+
+// アップロード画像から背景除去後のシルエット縦横比・股下有無・幅分布 ＋ MobileNet推論で服種別と不正画像(顔/風景等)を判定します
 async function analyzeClothingItemShape(source) {
-    // 非同期完了を待つ Promise を返します
+    // 非同期完了を await で待てる Promise オブジェクトを作成して返します
     return new Promise((resolve) => {
+        // Canvas 画像処理・ピクセル解析を行うために画像オブジェクト Image() を作成します
         const img = new Image();
+        // 変数・配列項目 img.crossOrigin の値を更新・計算します
         img.crossOrigin = 'anonymous';
 
+        // 変数・配列項目 img.onload の値を更新・計算します
         img.onload = async () => {
+            // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
             try {
-                // 1. オフスクリーンCanvasで180x180にリサイズ描画してピクセル解析
-                // 計算速度と特徴抽出精度を両立するため 180x180 ピクセルのキャンバスを作成します
+                // 画像の縮小・ピクセル色解析を行うためのメモリ上お絵描き領域(Canvas)を作ります
                 const canvas = document.createElement('canvas');
+                // 定数 cw を宣言し、値（180）をセットします
                 const cw = 180;
+                // 定数 ch を宣言し、値（180）をセットします
                 const ch = 180;
+                // 変数・配列項目 canvas.width の値を更新・計算します
                 canvas.width = cw;
+                // 変数・配列項目 canvas.height の値を更新・計算します
                 canvas.height = ch;
-                // 頻繁にピクセル読み取り（getImageData）を行うため最適化ヒント willReadFrequently: true を付けます
+                // 定数 ctx を宣言し、値（canvas.getContext('2d', { willReadFreq…）をセットします
                 const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                // 元の画像を圧縮用 Canvas 領域へ縮小描画します
                 ctx.drawImage(img, 0, 0, cw, ch);
 
-                // 画像全ピクセルの RGBA（赤・緑・青・不透明度）の一次元配列を取り出します
+                // 定数 imgData を宣言し、値（ctx.getImageData(0, 0, cw, ch)）をセットします
                 const imgData = ctx.getImageData(0, 0, cw, ch);
+                // 定数 data を宣言し、値（imgData.data）をセットします
                 const data = imgData.data;
 
-                // 2. 背景透過度および色差による被写体マスク作成
-                // インデックス 3, 7, 11...（4つおき）に入っている Alpha 値を合計して、背景透過画像か判定します
+                // 再代入可能な変数 totalAlpha を宣言し、値（0）をセットします
                 let totalAlpha = 0;
+                // 配列要素やインデックスを順番に繰り返すループ処理（for (let i = 3; i < data.length; i += 4) {）を開始します
                 for (let i = 3; i < data.length; i += 4) {
+                    // 変数・配列項目 totalAlpha の値を更新・計算します
                     totalAlpha += data[i];
                 }
-                // 平均アルファ値が 240 未満なら「すでに背景透過済みの画像」とみなします
+                // 定数 isAlreadyTransparent を宣言し、値（(totalAlpha / (cw * ch)) < 240）をセットします
                 const isAlreadyTransparent = (totalAlpha / (cw * ch)) < 240;
 
-                // 四隅の平均背景色（非透過画像用）
-                // 背景透過していない写真の場合は、画像の四隅8点の色をサンプルとして平均背景色を求めます
+                // 再代入可能な変数 bgR を宣言し、値（0, bgG = 0, bgB = 0, bgSamples = 0）をセットします
                 let bgR = 0, bgG = 0, bgB = 0, bgSamples = 0;
+                // 定数 cornerCoords を宣言し、値（[）をセットします
                 const cornerCoords = [
+                    // 配列要素データ（[5, 5], [cw - 5, 5], [5, ch - 5], [cw - 5,…）を定義します
                     [5, 5], [cw - 5, 5], [5, ch - 5], [cw - 5, ch - 5],
+                    // 配列要素データ（[10, 10], [cw - 10, 10], [10, ch - 10], [c…）を定義します
                     [10, 10], [cw - 10, 10], [10, ch - 10], [cw - 10, ch - 10]
                 ];
-                // 8座標のRGB値を合算してサンプル数で割ります
+                // 配列要素やインデックスを順番に繰り返すループ処理（for (const [cx, cy] of cornerCoords) {）を開始します
                 for (const [cx, cy] of cornerCoords) {
+                    // 定数 idx を宣言し、値（(cy * cw + cx) * 4）をセットします
                     const idx = (cy * cw + cx) * 4;
+                    // 変数・配列項目 bgR の値を更新・計算します
                     bgR += data[idx];
+                    // 変数・配列項目 bgG の値を更新・計算します
                     bgG += data[idx + 1];
+                    // 変数・配列項目 bgB の値を更新・計算します
                     bgB += data[idx + 2];
+                    // 変数・配列項目 bgSamples の値を更新・計算します
                     bgSamples++;
                 }
+                // 変数・配列項目 bgR の値を更新・計算します
                 bgR /= bgSamples;
+                // 変数・配列項目 bgG の値を更新・計算します
                 bgG /= bgSamples;
+                // 変数・配列項目 bgB の値を更新・計算します
                 bgB /= bgSamples;
 
-                // 各ピクセルが前景（服=1）か背景（=0）かを記録する高速な Uint8Array マスクと外接矩形の座標を準備します
+                // 定数 mask を宣言し、値（new Uint8Array(cw * ch)）をセットします
                 const mask = new Uint8Array(cw * ch);
+                // 再代入可能な変数 fgCount を宣言し、値（0）をセットします
                 let fgCount = 0;
+                // 再代入可能な変数 minX を宣言し、値（cw, maxX = 0, minY = ch, maxY = 0）をセットします
                 let minX = cw, maxX = 0, minY = ch, maxY = 0;
 
-                // 全ピクセル (180 x 180) を走査し、被写体ピクセルをマスクへ登録します
+                // 配列要素やインデックスを順番に繰り返すループ処理（for (let y = 0; y < ch; y++) {）を開始します
                 for (let y = 0; y < ch; y++) {
+                    // 配列要素やインデックスを順番に繰り返すループ処理（for (let x = 0; x < cw; x++) {）を開始します
                     for (let x = 0; x < cw; x++) {
+                        // 定数 idx を宣言し、値（(y * cw + x) * 4）をセットします
                         const idx = (y * cw + x) * 4;
+                        // 定数 r を宣言し、値（data[idx]）をセットします
                         const r = data[idx];
+                        // 定数 g を宣言し、値（data[idx + 1]）をセットします
                         const g = data[idx + 1];
+                        // 定数 b を宣言し、値（data[idx + 2]）をセットします
                         const b = data[idx + 2];
+                        // 定数 a を宣言し、値（data[idx + 3]）をセットします
                         const a = data[idx + 3];
 
-                        // 前景（アイテム部分）かどうかを判定します
+                        // 再代入可能な変数 isFg を宣言し、値（false）をセットします
                         let isFg = false;
+                        // 条件（isAlreadyTransparent）が成り立つか判定し、該当する場合の処理を実行します
                         if (isAlreadyTransparent) {
-                            // 透過画像なら不透明度 a > 35 のピクセルを服として拾います
+                            // 変数・配列項目 isFg の値を更新・計算します
                             isFg = a > 35;
+                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
-                            // 非透過画像なら、四隅の平均背景色との色距離（3次元ユークリッド距離）が 25 を超える部分を被写体とします
+                            // 定数 diff を宣言し、値（Math.hypot(r - bgR, g - bgG, b - bgB)）をセットします
                             const diff = Math.hypot(r - bgR, g - bgG, b - bgB);
+                            // 変数・配列項目 isFg の値を更新・計算します
                             isFg = (diff > 25) || (a < 220);
                         }
 
-                        // 前景ピクセルならマスクを立て、前景面積カウントと外接矩形（上下左右の端）を更新します
+                        // 条件（isFg）が成り立つか判定し、該当する場合の処理を実行します
                         if (isFg) {
+                            // 変数・配列項目 mask[y * cw + x] の値を更新・計算します
                             mask[y * cw + x] = 1;
+                            // 変数・配列項目 fgCount の値を更新・計算します
                             fgCount++;
+                            // 条件（x < minX）が成り立つか判定し、該当する場合の処理を実行します
                             if (x < minX) minX = x;
+                            // 条件（x > maxX）が成り立つか判定し、該当する場合の処理を実行します
                             if (x > maxX) maxX = x;
+                            // 条件（y < minY）が成り立つか判定し、該当する場合の処理を実行します
                             if (y < minY) minY = y;
+                            // 条件（y > maxY）が成り立つか判定し、該当する場合の処理を実行します
                             if (y > maxY) maxY = y;
                         }
                     }
                 }
 
-                // 画像全体のうち被写体が占める面積割合（占有率）を計算します
+                // 定数 coverage を宣言し、値（fgCount / (cw * ch)）をセットします
                 const coverage = fgCount / (cw * ch);
 
-                // 被写体が小さすぎる・あるいは画像全体がベタ塗り/無背景
-                // 被写体が全体の 3.5% 未満または 200ピクセル未満なら検出不能（NG）として返します
+                // 条件（coverage < 0.035 || fgCount < 200）が成り立つか判定し、該当する場合の処理を実行します
                 if (coverage < 0.035 || fgCount < 200) {
+                    // 判定・解析結果オブジェクトを resolve() に渡して Promise を完了返却します
                     return resolve({
+                        // 有効なファッションアイテム画像として許可するかどうかの真偽値
                         isValid: false,
+                        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                         category: null,
+                        // AI 形状判定の信頼度スコア（%）
                         confidence: 0,
+                        // モーダル見出しまたはコーデ保存タイトル
                         title: 'アイテムが検出できません',
+                        // 画面に表示する補足説明文
                         desc: '服や靴、帽子がはっきりと写った写真を選択してください。'
                     });
                 }
 
-                // 外接矩形の幅・高さ・縦横比（アスペクト比）・矩形内の充填率を計算します
+                // 定数 boxW を宣言し、値（Math.max(1, maxX - minX + 1)）をセットします
                 const boxW = Math.max(1, maxX - minX + 1);
+                // 定数 boxH を宣言し、値（Math.max(1, maxY - minY + 1)）をセットします
                 const boxH = Math.max(1, maxY - minY + 1);
-                const aspectRatio = boxH / boxW; // 縦横比
-                const boxFillRatio = fgCount / (boxW * boxH); // 充填率
+                // 定数 aspectRatio を宣言し、値（boxH / boxW）をセットします
+                const aspectRatio = boxH / boxW;
+                // 定数 boxFillRatio を宣言し、値（fgCount / (boxW * boxH)）をセットします
+                const boxFillRatio = fgCount / (boxW * boxH);
 
-                // 四角い写真（書類や壁、風景写真、スクショなど）は充填率が95%超で服の輪郭がない
-                // 画像の大部分を占めつつ長方形にベタッと埋まっている場合は「服の切り抜き形状がない」として拒否します
+                // 条件（boxFillRatio > 0.94 && coverage > 0.85）が成り立つか判定し、該当する場合の処理を実行します
                 if (boxFillRatio > 0.94 && coverage > 0.85) {
+                    // 判定・解析結果オブジェクトを resolve() に渡して Promise を完了返却します
                     return resolve({
+                        // 有効なファッションアイテム画像として許可するかどうかの真偽値
                         isValid: false,
+                        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                         category: null,
+                        // AI 形状判定の信頼度スコア（%）
                         confidence: 0,
+                        // モーダル見出しまたはコーデ保存タイトル
                         title: '服の形状が認識できません',
+                        // 画面に表示する補足説明文
                         desc: '四角い写真や背景が検出されました。アウター・トップス・ボトムス・靴・帽子の写真を選択してください。'
                     });
                 }
 
-                // 3. 10スライス幾何学的プロファイル解析
-                // 被写体の高さ（boxH）を上から下まで10等分（スライス0〜9）し、シルエットの横幅の変化を測ります
+                // 定数 sliceH を宣言し、値（boxH / 10.0）をセットします
                 const sliceH = boxH / 10.0;
-                // 各スライスの横幅比率（0.0〜1.0）を格納する配列です
+                // 定数 sliceWidths を宣言し、値（[]）をセットします
                 const sliceWidths = [];
-                let crotchSlices = 0; // 二股（股下）スライス数
-                // 最も横幅が広いスライスの位置番号（0〜9）と最大幅を記録します
+                // 再代入可能な変数 crotchSlices を宣言し、値（0）をセットします
+                let crotchSlices = 0;
+                // 再代入可能な変数 maxSliceIdx を宣言し、値（0）をセットします
                 let maxSliceIdx = 0;
+                // 再代入可能な変数 maxSliceWidth を宣言し、値（0）をセットします
                 let maxSliceWidth = 0;
 
-                // 0番目（最上部）から9番目（最下部）までの10スライスを順番に解析します
+                // 配列要素やインデックスを順番に繰り返すループ処理（for (let s = 0; s < 10; s++) {）を開始します
                 for (let s = 0; s < 10; s++) {
-                    // 現在のスライス s の上端Y座標（sy1）と下端Y座標（sy2）を求めます
+                    // 定数 sy1 を宣言し、値（Math.floor(minY + s * sliceH)）をセットします
                     const sy1 = Math.floor(minY + s * sliceH);
+                    // 定数 sy2 を宣言し、値（Math.min(ch, Math.floor(minY + (s + 1)…）をセットします
                     const sy2 = Math.min(ch, Math.floor(minY + (s + 1) * sliceH));
-                    // このスライス帯の中で前景が存在するX列の数（実効横幅）です
+                    // 再代入可能な変数 rowCount を宣言し、値（0）をセットします
                     let rowCount = 0;
-                    // 直前のX列に前景があったかを覚えるフラグと、背景→前景への切り替え回数です
+                    // 再代入可能な変数 prevWasFg を宣言し、値（false）をセットします
                     let prevWasFg = false;
+                    // 再代入可能な変数 transitions を宣言し、値（0）をセットします
                     let transitions = 0;
 
-                    // 左端 minX から右端 maxX まで左から右へ横方向スキャンします
+                    // 配列要素やインデックスを順番に繰り返すループ処理（for (let x = minX; x <= maxX; x++) {）を開始します
                     for (let x = minX; x <= maxX; x++) {
+                        // 再代入可能な変数 colHasFg を宣言し、値（false）をセットします
                         let colHasFg = false;
-                        // X列の縦区間（sy1〜sy2）に1ピクセルでも前景が含まれていれば「列に服がある」と判断します
+                        // 配列要素やインデックスを順番に繰り返すループ処理（for (let y = sy1; y < sy2; y++) {）を開始します
                         for (let y = sy1; y < sy2; y++) {
+                            // 条件（mask[y * cw + x]）が成り立つか判定し、該当する場合の処理を実行します
                             if (mask[y * cw + x]) {
+                                // 変数・配列項目 colHasFg の値を更新・計算します
                                 colHasFg = true;
+                                // 現在の case / ループ処理をここで抜けます
                                 break;
                             }
                         }
-                        // 横断スキャン中に「背景→前景」の切り替わり（transitions）が2回以上起きると左右の脚に分かれた二股と判定できます
+                        // 条件（colHasFg）が成り立つか判定し、該当する場合の処理を実行します
                         if (colHasFg) {
+                            // 変数・配列項目 rowCount の値を更新・計算します
                             rowCount++;
+                            // 条件（!prevWasFg）が成り立つか判定し、該当する場合の処理を実行します
                             if (!prevWasFg) transitions++;
+                            // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = true;
+                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
+                            // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = false;
                         }
                     }
 
-                    // 全体横幅 boxW に対するこのスライスの横幅比率を記録します
+                    // 配列の末尾に新しい要素を追加します（sliceWidths.push(rowCount / boxW);）
                     sliceWidths.push(rowCount / boxW);
-                    // これまでの最大幅を超えた場合、一番広いスライス位置を更新します（Tシャツの肩や袖の位置検出に利用）
+                    // 条件（rowCount / boxW > maxSliceWidth）が成り立つか判定し、該当する場合の処理を実行します
                     if (rowCount / boxW > maxSliceWidth) {
+                        // 変数・配列項目 maxSliceWidth の値を更新・計算します
                         maxSliceWidth = rowCount / boxW;
+                        // 変数・配列項目 maxSliceIdx の値を更新・計算します
                         maxSliceIdx = s;
                     }
 
-                    // 二股判定: スライス4以降（下半分）で2回以上のブロック開始があれば二股
+                    // 条件（transitions >= 2 && s >= 4）が成り立つか判定し、該当する場合の処理を実行します
                     if (transitions >= 2 && s >= 4) {
+                        // 変数・配列項目 crotchSlices の値を更新・計算します
                         crotchSlices++;
                     }
                 }
 
-                // 上部（スライス0・1平均）・中部（4・5平均）・下部（8・9平均）のシルエット幅を算出します
+                // 定数 topW を宣言し、値（(sliceWidths[0] + sliceWidths[1]) / 2）をセットします
                 const topW = (sliceWidths[0] + sliceWidths[1]) / 2;
+                // 定数 midW を宣言し、値（(sliceWidths[4] + sliceWidths[5]) / 2）をセットします
                 const midW = (sliceWidths[4] + sliceWidths[5]) / 2;
+                // 定数 bottomW を宣言し、値（(sliceWidths[8] + sliceWidths[9]) / 2）をセットします
                 const bottomW = (sliceWidths[8] + sliceWidths[9]) / 2;
 
-                // 4. カテゴリスコアリング
-                // 5カテゴリそれぞれに基礎点 10 を入れ、形状の特徴が当てはまるたびに加点していきます
+                // 定数 scores を宣言し、値（{）をセットします
                 const scores = {
+                    // オブジェクトの 'BOTTOMS' プロパティ値を設定します
                     BOTTOMS: 10,
+                    // オブジェクトの 'SHOES' プロパティ値を設定します
                     SHOES: 10,
+                    // オブジェクトの 'HAT' プロパティ値を設定します
                     HAT: 10,
+                    // オブジェクトの 'TOPS' プロパティ値を設定します
                     TOPS: 10,
+                    // オブジェクトの 'OUTER' プロパティ値を設定します
                     OUTER: 10
                 };
 
-                // BOTTOMS 特徴: 縦長 (AR >= 1.25) かつ下半分が二股、または台形Aライン
-                // 縦横比が縦長で、下半分の二股スライス（股下）が多ければボトムスの点数を高くします
+                // 条件（aspectRatio >= 1.25）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio >= 1.25) scores.BOTTOMS += 35;
+                // 条件（aspectRatio >= 1.5）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio >= 1.5) scores.BOTTOMS += 20;
+                // 条件（crotchSlices >= 2）が成り立つか判定し、該当する場合の処理を実行します
                 if (crotchSlices >= 2) scores.BOTTOMS += 45;
+                // 条件（topW < 0.8 && bottomW > 0.4 && crotchSlices >= 1）が成り立つか判定し、該当する場合の処理を実行します
                 if (topW < 0.8 && bottomW > 0.4 && crotchSlices >= 1) scores.BOTTOMS += 20;
 
-                // SHOES 特徴: 横長〜スクエア (AR <= 1.15)、底面がフラットで広い、履き口
-                // 横幅が広くて靴底部分がしっかり詰まっており、股割れが無い形状に靴スコアを加点します
+                // 条件（aspectRatio <= 1.1）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio <= 1.1) scores.SHOES += 35;
+                // 条件（aspectRatio <= 0.85）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio <= 0.85) scores.SHOES += 25;
+                // 条件（bottomW >= 0.65）が成り立つか判定し、該当する場合の処理を実行します
                 if (bottomW >= 0.65) scores.SHOES += 25;
+                // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
                 if (crotchSlices === 0) scores.SHOES += 10;
 
-                // HAT 特徴: スクエア〜やや横長 (0.55 <= AR <= 1.25)、上部が丸いドーム、ツバ
-                // 最上部が細く丸みを帯び（sliceWidths[0] < 0.4）、クラウン〜ツバ（[2]）で広がる形に帽子スコアを加点します
+                // 条件（aspectRatio >= 0.55 && aspectRatio <= 1.25）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio >= 0.55 && aspectRatio <= 1.25) scores.HAT += 30;
-                if (sliceWidths[0] < 0.4 && sliceWidths[2] > 0.6) scores.HAT += 35; // ドーム形状
+                // 条件（sliceWidths[0] < 0.4 && sliceWidths[2] > 0.6）が成り立つか判定し、該当する場合の処理を実行します
+                if (sliceWidths[0] < 0.4 && sliceWidths[2] > 0.6) scores.HAT += 35;
+                // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
                 if (crotchSlices === 0) scores.HAT += 15;
 
-                // TOPS 特徴: T字型（肩・袖の張り出し）、0.75 <= AR <= 1.45、裾が二股でない
-                // 上から2〜4段目付近（肩・袖の位置）が最も横幅が広いシルエットにトップススコアを加点します
+                // 条件（aspectRatio >= 0.75 && aspectRatio <= 1.45）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio >= 0.75 && aspectRatio <= 1.45) scores.TOPS += 25;
-                if (maxSliceIdx >= 1 && maxSliceIdx <= 3) scores.TOPS += 35; // 上部袖の広がり
+                // 条件（maxSliceIdx >= 1 && maxSliceIdx <= 3）が成り立つか判定し、該当する場合の処理を実行します
+                if (maxSliceIdx >= 1 && maxSliceIdx <= 3) scores.TOPS += 35;
+                // 条件（crotchSlices <= 1）が成り立つか判定し、該当する場合の処理を実行します
                 if (crotchSlices <= 1) scores.TOPS += 20;
 
-                // OUTER 特徴: コート・ジャケット（T字型で縦長 AR >= 1.15）
-                // トップス同様に上部が広がりつつ着丈が長めの縦長シルエットにアウタースコアを加点します
+                // 条件（aspectRatio >= 1.15 && aspectRatio <= 2.2）が成り立つか判定し、該当する場合の処理を実行します
                 if (aspectRatio >= 1.15 && aspectRatio <= 2.2) scores.OUTER += 30;
+                // 条件（maxSliceIdx >= 1 && maxSliceIdx <= 4）が成り立つか判定し、該当する場合の処理を実行します
                 if (maxSliceIdx >= 1 && maxSliceIdx <= 4) scores.OUTER += 25;
+                // 条件（crotchSlices <= 1）が成り立つか判定し、該当する場合の処理を実行します
                 if (crotchSlices <= 1) scores.OUTER += 15;
 
-                // 5. MobileNet AI による分類アシスト（利用可能な場合）
-                // 犬・車・パソコン・食べ物などの「服ではない物」が混入した場合にブロックするためのフラグです
+                // 再代入可能な変数 isNonClothingAi を宣言し、値（false）をセットします
                 let isNonClothingAi = false;
-                // MobileNet がロード済み・通信可能であれば画像認識推論を実行してスコアを補強します
+                // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
                 try {
+                    // 定数 model を宣言し、値（await getMobileNetModel()）をセットします
                     const model = await getMobileNetModel();
+                    // 条件（model）が成り立つか判定し、該当する場合の処理を実行します
                     if (model) {
-                        // 180x180キャンバス画像をAIモデルへ入力し、可能性の高い物体名トップ候補を取得します
+                        // 定数 predictions を宣言し、値（await model.classify(canvas)）をセットします
                         const predictions = await model.classify(canvas);
+                        // 条件（predictions && predictions.length > 0）が成り立つか判定し、該当する場合の処理を実行します
                         if (predictions && predictions.length > 0) {
+                            // 定数 top を宣言し、値（predictions[0]）をセットします
                             const top = predictions[0];
-                            // モデルが返した英語の物体クラス名を小文字にして判定しやすくします
+                            // 定数 label を宣言し、値（(top.className || '').toLowerCase()）をセットします
                             const label = (top.className || '').toLowerCase();
 
-                            // 非衣類キーワードの検出
-                            // 動物・食べ物・車両・家電・家具などの代表単語リストと照合します
+                            // 定数 nonClothingKeywords を宣言し、値（[）をセットします
                             const nonClothingKeywords = [
+                                // 配列要素データ（'dog', 'cat', 'bird', 'animal', 'pizza', '…）を定義します
                                 'dog', 'cat', 'bird', 'animal', 'pizza', 'sandwich', 'burger', 'food',
+                                // 配列要素データ（'car', 'vehicle', 'truck', 'traffic', 'com…）を定義します
                                 'car', 'vehicle', 'truck', 'traffic', 'computer', 'laptop', 'cellular',
+                                // 配列要素データ（'phone', 'book', 'bottle', 'cup', 'mug', '…）を定義します
                                 'phone', 'book', 'bottle', 'cup', 'mug', 'desk', 'chair', 'table'
                             ];
-                            // 最有力候補に非衣類ワードが含まれ確信度 25% 超なら「ファッション外」と確定します
+                            // 配列要素やインデックスを順番に繰り返すループ処理（for (const kw of nonClothingKeywords) {）を開始します
                             for (const kw of nonClothingKeywords) {
+                                // 条件（label.includes(kw) && top.probability > 0.25）が成り立つか判定し、該当する場合の処理を実行します
                                 if (label.includes(kw) && top.probability > 0.25) {
+                                    // 変数・配列項目 isNonClothingAi の値を更新・計算します
                                     isNonClothingAi = true;
+                                    // 現在の case / ループ処理をここで抜けます
                                     break;
                                 }
                             }
 
-                            // ファッションキーワード照合
-                            // 靴・帽子・パンツ・コート・シャツ等の英語ラベルと一致した場合、該当カテゴリへ大きく +60点 加点します
+                            // 条件（label.match(/shoe|sneaker|boot|loafer|sandal|clog/)）が成り立つか判定し、該当する場合の処理を実行します
                             if (label.match(/shoe|sneaker|boot|loafer|sandal|clog/)) {
+                                // 変数・配列項目 scores.SHOES の値を更新・計算します
                                 scores.SHOES += 60;
+                            // 前の if が偽で、かつ（label.match(/hat|cap|bonnet|beret|helmet/)）を満たす場合の別条件分岐です
                             } else if (label.match(/hat|cap|bonnet|beret|helmet/)) {
+                                // 変数・配列項目 scores.HAT の値を更新・計算します
                                 scores.HAT += 60;
+                            // 前の if が偽で、かつ（label.match(/jean|pant|trouser|skirt/)）を満たす場合の別条件分岐です
                             } else if (label.match(/jean|pant|trouser|skirt/)) {
+                                // 変数・配列項目 scores.BOTTOMS の値を更新・計算します
                                 scores.BOTTOMS += 60;
+                            // 前の if が偽で、かつ（label.match(/coat|jacket|trench|overcoat/)）を満たす場合の別条件分岐です
                             } else if (label.match(/coat|jacket|trench|overcoat/)) {
+                                // 変数・配列項目 scores.OUTER の値を更新・計算します
                                 scores.OUTER += 60;
+                            // 前の if が偽で、かつ（label.match(/jersey|shirt|t-shirt|sweater|sweatshirt…）を満たす場合の別条件分岐です
                             } else if (label.match(/jersey|shirt|t-shirt|sweater|sweatshirt|cardigan|vest|top/)) {
+                                // 変数・配列項目 scores.TOPS の値を更新・計算します
                                 scores.TOPS += 60;
                             }
                         }
                     }
+                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
                 } catch (e) {
-                    // オフライン等で MobileNet が使えなくても上の「10スライス幾何学形状スコア」でそのまま判定を続行します
+                    // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                     console.warn('AIモデル判定スキップ:', e);
                 }
 
-                // AIが明らかな非衣類と判断した場合
-                // 服・靴・帽子以外と判明した写真をクローゼット登録できないよう NG 結果を返します
+                // 条件（isNonClothingAi）が成り立つか判定し、該当する場合の処理を実行します
                 if (isNonClothingAi) {
+                    // 判定・解析結果オブジェクトを resolve() に渡して Promise を完了返却します
                     return resolve({
+                        // 有効なファッションアイテム画像として許可するかどうかの真偽値
                         isValid: false,
+                        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                         category: null,
+                        // AI 形状判定の信頼度スコア（%）
                         confidence: 0,
+                        // モーダル見出しまたはコーデ保存タイトル
                         title: 'ファッションアイテムではありません',
+                        // 画面に表示する補足説明文
                         desc: '服や靴、帽子の写真ではありません。アウター、トップス、ボトムス、靴、帽子を撮影または選択してください。'
                     });
                 }
 
-                // 最高スコアのカテゴリを特定
-                // 5カテゴリ（OUTER / BOTTOMS / TOPS / SHOES / HAT）の中で最も高い得点を得たカテゴリを選びます
+                // 再代入可能な変数 bestCategory を宣言し、値（'TOPS'）をセットします
                 let bestCategory = 'TOPS';
+                // 再代入可能な変数 highestScore を宣言し、値（-1）をセットします
                 let highestScore = -1;
+                // 配列要素やインデックスを順番に繰り返すループ処理（for (const cat in scores) {）を開始します
                 for (const cat in scores) {
+                    // 条件（scores[cat] > highestScore）が成り立つか判定し、該当する場合の処理を実行します
                     if (scores[cat] > highestScore) {
+                        // 変数・配列項目 highestScore の値を更新・計算します
                         highestScore = scores[cat];
+                        // 変数・配列項目 bestCategory の値を更新・計算します
                         bestCategory = cat;
                     }
                 }
 
-                // 最低適合スコアの基準（服・靴・帽子としての十分な特徴があるか）
-                // 最高点でも 45点 未満しか特徴が取れなかった曖昧な画像は登録不可とします
+                // 条件（highestScore < 45）が成り立つか判定し、該当する場合の処理を実行します
                 if (highestScore < 45) {
+                    // 判定・解析結果オブジェクトを resolve() に渡して Promise を完了返却します
                     return resolve({
+                        // 有効なファッションアイテム画像として許可するかどうかの真偽値
                         isValid: false,
+                        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                         category: null,
+                        // AI 形状判定の信頼度スコア（%）
                         confidence: 0,
+                        // モーダル見出しまたはコーデ保存タイトル
                         title: '服の形状が特定できません',
+                        // 画面に表示する補足説明文
                         desc: 'アウター、ボトムス、トップス、靴、帽子のいずれかの形状がはっきりわかる写真をご使用ください。'
                     });
                 }
 
-                // 判定結果カードに表示するカテゴリごとのわかりやすい日本語名称マップです
+                // 定数 catNames を宣言し、値（{）をセットします
                 const catNames = {
+                    // オブジェクトの 'OUTER' プロパティ値を設定します
                     OUTER: 'アウター (コート/ジャケット形状)',
+                    // オブジェクトの 'BOTTOMS' プロパティ値を設定します
                     BOTTOMS: 'ボトムス (パンツ/スラックス形状)',
+                    // オブジェクトの 'TOPS' プロパティ値を設定します
                     TOPS: 'トップス (Tシャツ/スウェット形状)',
+                    // オブジェクトの 'SHOES' プロパティ値を設定します
                     SHOES: '靴 (スニーカー/シューズ形状)',
+                    // オブジェクトの 'HAT' プロパティ値を設定します
                     HAT: '帽子 (キャップ/ハット形状)'
                 };
 
-                // UI表示用の適合パーセンテージ（82%〜99%の範囲に調整）を計算します
+                // 定数 confidence を宣言し、値（Math.min(99, Math.max(82, Math.round(h…）をセットします
                 const confidence = Math.min(99, Math.max(82, Math.round(highestScore * 0.95)));
 
-                // 判定成功オブジェクトを呼び出し元へ返し、カテゴリラジオ自動選択へ進みます
+                // 最終結果を resolve() に渡して非同期 Promise を完了させます
                 resolve({
+                    // 有効なファッションアイテム画像として許可するかどうかの真偽値
                     isValid: true,
+                    // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                     category: bestCategory,
+                    // AI 形状判定の信頼度スコア（%）
                     confidence: confidence,
+                    // モーダル見出しまたはコーデ保存タイトル
                     title: `✨ AI形状認識: ${catNames[bestCategory]}`,
+                    // 画面に表示する補足説明文
                     desc: 'マイクローゼットに登録可能です。カテゴリを自動選択しました。'
                 });
 
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (err) {
-                // Canvasのセキュリティ制限や予期せぬエラー時は登録自体は止めないようフォールバック結果を返します
+                // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.error('形状解析エラー:', err);
+                // 最終結果を resolve() に渡して非同期 Promise を完了させます
                 resolve({
-                    isValid: true, // フォールバック
+                    // 有効なファッションアイテム画像として許可するかどうかの真偽値
+                    isValid: true,
+                    // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                     category: 'TOPS',
+                    // AI 形状判定の信頼度スコア（%）
                     confidence: 80,
+                    // モーダル見出しまたはコーデ保存タイトル
                     title: '✨ 形状解析完了',
+                    // 画面に表示する補足説明文
                     desc: 'マイクローゼットに登録可能です。'
                 });
             }
         };
 
-        // 画像ファイルが壊れているなどで読み込めなかった場合はエラー扱い（登録不可）を返します
+        // 変数・配列項目 img.onerror の値を更新・計算します
         img.onerror = () => {
+            // 最終結果を resolve() に渡して非同期 Promise を完了させます
             resolve({
+                // 有効なファッションアイテム画像として許可するかどうかの真偽値
                 isValid: false,
+                // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                 category: null,
+                // AI 形状判定の信頼度スコア（%）
                 confidence: 0,
+                // モーダル見出しまたはコーデ保存タイトル
                 title: '画像の読み込みに失敗しました',
+                // 画面に表示する補足説明文
                 desc: '有効な画像ファイルを選択してください。'
             });
         };
 
-        // 入力ソースの種類（文字列URL/DataURL か Blobオブジェクトか）に合わせて画像読み込みを開始します
+        // 条件（typeof source === 'string'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof source === 'string') {
+            // 変数・配列項目 img.src の値を更新・計算します
             img.src = source;
+        // 前の if が偽で、かつ（source instanceof Blob）を満たす場合の別条件分岐です
         } else if (source instanceof Blob) {
+            // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(source);
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // 最終結果を resolve() に渡して非同期 Promise を完了させます
             resolve({
+                // 有効なファッションアイテム画像として許可するかどうかの真偽値
                 isValid: false,
+                // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                 category: null,
+                // AI 形状判定の信頼度スコア（%）
                 confidence: 0,
+                // モーダル見出しまたはコーデ保存タイトル
                 title: '無効な画像データです',
+                // 画面に表示する補足説明文
                 desc: '画像を選択してください。'
             });
         }
     });
 }
 
-/**
- * AIによる背景削除の実行とプレビュー反映（完了後にAI形状診断も実行）
- */
-// ユーザーが画像を選んだあと、まずAI背景透過を実行し、その切り抜き後画像に対してAI形状判定を実行する一連のフローです
+
+// 写真選択後の背景透過パイプライン：AI切抜→プレビュー反映→形状認識による自動カテゴリセットを順次実行します
 async function processClosetImageWithAi(source) {
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        // 1. @imgly AI で背景を透明化した Blob 画像を受け取ります
+        // 定数 blob を宣言し、値（await runAiBackgroundRemoval(source)）をセットします
         const blob = await runAiBackgroundRemoval(source);
-        // Blob を <img src> や保存用に扱いやすい DataURL（Base64文字列）へ変換するため FileReader を使います
+        // 選択された画像ファイルをブラウザメモリ内 DataURL へ変換するための FileReader を生成します
         const reader = new FileReader();
+        // 変数・配列項目 reader.onload の値を更新・計算します
         reader.onload = async function (evt) {
-            // 透過済み画像URLをステートに保存し、プレビュー枠とトースト通知を更新します
+            // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
             currentClosetUploadDataUrl = evt.target.result;
+            // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
             isCurrentUploadTransparent = true;
+            // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
             updateClosetPreviewUI(currentClosetUploadDataUrl, true);
+            // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToastNotification('✨ AIが服の背景を綺麗に切り抜きました！');
 
-            // 背景透過後の画像でAI形状診断を実行
-            // 透明背景になった輪郭だけの画像を使うことで形状解析の精度をさらに高めます
+            // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
             updateAiDiagnosisUI(null, true);
+            // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
             currentAiAnalysisResult = await analyzeClothingItemShape(currentClosetUploadDataUrl);
+            // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
             updateAiDiagnosisUI(currentAiAnalysisResult, false);
         };
-        // Blob の読み込みを開始します（完了すると上の onload が発火します）
+        // 選択ファイルをブラウザ内でそのまま画像表示できる DataURL 文字列へ非同期変換開始します
         reader.readAsDataURL(blob);
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
-        // AI透過に失敗した場合（オフライン等）は元の画像をそのままセットし、元画像で形状診断だけ行います
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('AI背景削除に失敗、元画像を使用:', err);
+        // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
         currentClosetUploadDataUrl = originalClosetUploadDataUrl;
+        // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
         isCurrentUploadTransparent = false;
+        // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
         updateClosetPreviewUI(currentClosetUploadDataUrl, false);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('AI背景切り抜きをスキップし、元の写真を設定しました');
 
-        // 元画像でAI形状診断を実行
+        // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
         updateAiDiagnosisUI(null, true);
+        // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
         currentAiAnalysisResult = await analyzeClothingItemShape(currentClosetUploadDataUrl);
+        // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
         updateAiDiagnosisUI(currentAiAnalysisResult, false);
     }
 }
 
-/**
- * クイック写真の選択（公式プリセットは自動でAI診断適合済みに設定）
- */
-// 手持ち写真がない場合のお試し用ボタン（黒キャップ、白スニーカー等）を押したときにフォームを一括入力する関数です
+
+// サンプルプリセットチップ（黒キャップ・白スニーカー等）が選ばれたときにフォームへ名前・カテゴリ・画像を自動セットします
 function selectPresetImage(presetKey, presetName) {
-    // 定義済みプリセット辞書から該当データを引きます
+    // 定数 preset を宣言し、値（PRESET_CLOSET_PRESETS[presetKey]）をセットします
     const preset = PRESET_CLOSET_PRESETS[presetKey];
+    // 条件（!preset）が成り立つか判定し、該当する場合の処理を実行します
     if (!preset) return;
 
-    // 元画像・現在画像の両方にプリセット画像のパスを設定します（プリセットは透過処理不要）
+    // 変数・配列項目 originalClosetUploadDataUrl の値を更新・計算します
     originalClosetUploadDataUrl = preset.image;
+    // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
     currentClosetUploadDataUrl = preset.image;
+    // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
     isCurrentUploadTransparent = false;
 
-    // プレビュー欄に画像を表示します
+    // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
     updateClosetPreviewUI(preset.image, false);
 
-    // 商品名入力欄へプリセット名を自動入力します
+    // HTML 要素 #closet-item-name を取得して変数 nameInput に格納します
     const nameInput = document.getElementById('closet-item-name');
+    // 条件（nameInput）が成り立つか判定し、該当する場合の処理を実行します
     if (nameInput) nameInput.value = preset.name;
 
-    // 該当カテゴリのラジオボタンをチェック状態にします
+    // CSS セレクタに最初に一致した HTML 要素を取得して変数 catRadio に入れます
     const catRadio = document.querySelector(`input[name="closet_category"][value="${preset.category}"]`);
+    // 条件（catRadio）が成り立つか判定し、該当する場合の処理を実行します
     if (catRadio) catRadio.checked = true;
 
-    // 色と着用季節のセレクトボックスもプリセットに合わせてセットします
+    // HTML 要素 #closet-item-color を取得して変数 colorSelect に格納します
     const colorSelect = document.getElementById('closet-item-color');
+    // 条件（colorSelect）が成り立つか判定し、該当する場合の処理を実行します
     if (colorSelect) colorSelect.value = preset.color;
 
+    // HTML 要素 #closet-item-season を取得して変数 seasonSelect に格納します
     const seasonSelect = document.getElementById('closet-item-season');
+    // 条件（seasonSelect）が成り立つか判定し、該当する場合の処理を実行します
     if (seasonSelect) seasonSelect.value = preset.season;
 
-    // プリセット用AI診断結果を設定
-    // 公式データは事前に検証済みのため適合度 100% として診断カードを即座に OK 表示にします
+    // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
     currentAiAnalysisResult = {
+        // 有効なファッションアイテム画像として許可するかどうかの真偽値
         isValid: true,
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: preset.category,
+        // AI 形状判定の信頼度スコア（%）
         confidence: 100,
+        // モーダル見出しまたはコーデ保存タイトル
         title: `✨ クイック写真: ${preset.name}`,
+        // 画面に表示する補足説明文
         desc: '公式アイテムとしてマイクローゼットに登録可能です。'
     };
+    // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
     updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
-/**
- * ファイル選択プレビュー（AI背景削除・AI形状診断連動）
- */
-// <input type="file"> でユーザーが画像ファイルを選んだ瞬間に呼ばれるイベントハンドラです
+
+// ファイル入力欄(<input type='file'>)で選ばれた写真を FileReader で読み込み、AI背景削除・形状分析を開始します
 function handleClosetImageSelect(e) {
-    // 選択された先頭のファイルオブジェクトを取得します（キャンセル時はそのまま終了）
+    // 定数 file を宣言し、値（e.target.files[0]）をセットします
     const file = e.target.files[0];
+    // 条件（!file）が成り立つか判定し、該当する場合の処理を実行します
     if (!file) return;
 
-    // まず元画像をブラウザ内で読み込み、プレビューおよび元写真復元用に保存します
+    // 選択された画像ファイルをブラウザメモリ内 DataURL へ変換するための FileReader を生成します
     const reader = new FileReader();
+    // 変数・配列項目 reader.onload の値を更新・計算します
     reader.onload = async function (evt) {
+        // 変数・配列項目 originalClosetUploadDataUrl の値を更新・計算します
         originalClosetUploadDataUrl = evt.target.result;
+        // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
         currentClosetUploadDataUrl = evt.target.result;
+        // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
         isCurrentUploadTransparent = false;
 
-        // 診断中ステータスを表示
+        // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
         updateAiDiagnosisUI(null, true);
 
-        // 「✨ AIで背景を自動透過する」チェックボックスがONになっているか確認します（?. は要素がnullでもエラーにしないオプショナルチェーン）
+        // HTML 要素 #check-auto-remove-bg を取得して変数 autoRemove に格納します
         const autoRemove = document.getElementById('check-auto-remove-bg')?.checked;
 
+        // 条件（autoRemove）が成り立つか判定し、該当する場合の処理を実行します
         if (autoRemove) {
-            // 自動でAI背景削除を実行（完了ハンドラ内で形状診断が走ります）
+            // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+            // 選んだ画像またはリサイズ済み画像に対して AI 背景透過と形状分析パイプラインを実行します
             await processClosetImageWithAi(file);
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 通常の元写真表示で即時形状診断
+            // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+            // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToastNotification('服の写真を読み込みました');
+            // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
             currentAiAnalysisResult = await analyzeClothingItemShape(originalClosetUploadDataUrl);
+            // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
             updateAiDiagnosisUI(currentAiAnalysisResult, false);
         }
     };
-    // ローカルファイルを Base64 DataURL として読み込み開始します
+    // 選択ファイルをブラウザ内でそのまま画像表示できる DataURL 文字列へ非同期変換開始します
     reader.readAsDataURL(file);
 }
 
-/**
- * 手動で「🪄 背景を透過」ボタンをクリックした時
- */
-// 自動透過がOFFのときに後から手動で背景切り抜きをかけたい場合に呼ばれる関数です
+
+// 「もう一度 AI で背景を切り抜く」手動やり直しボタンが押されたときの再処理関数です
 async function triggerManualBgRemoval() {
-    // 元画像（または現在の画像）を対象にAI透過フローを実行します
+    // 定数 target を宣言し、値（originalClosetUploadDataUrl || current…）をセットします
     const target = originalClosetUploadDataUrl || currentClosetUploadDataUrl;
+    // 条件（!target）が成り立つか判定し、該当する場合の処理を実行します
     if (!target) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('先に服の写真を選択してください');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 選んだ画像またはリサイズ済み画像に対して AI 背景透過と形状分析パイプラインを実行します
     await processClosetImageWithAi(target);
 }
 
-/**
- * 「↺ 元写真に戻す」ボタンをクリックした時
- */
-// 背景切り抜きを取り消して最初に選んだ元画像に戻し、改めて形状判定を実行する関数です
+
+// 背景透過前の元の写真へワンクリックで切り替えるボタン処理です
 async function restoreOriginalUploadImage() {
+    // 条件（!originalClosetUploadDataUrl）が成り立つか判定し、該当する場合の処理を実行します
     if (!originalClosetUploadDataUrl) return;
+    // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
     currentClosetUploadDataUrl = originalClosetUploadDataUrl;
+    // 変数・配列項目 isCurrentUploadTransparent の値を更新・計算します
     isCurrentUploadTransparent = false;
+    // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
     updateClosetPreviewUI(originalClosetUploadDataUrl, false);
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification('元の写真に戻しました');
 
-    // 元写真に対して再度AI形状診断を実行します
+    // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
     updateAiDiagnosisUI(null, true);
+    // 変数・配列項目 currentAiAnalysisResult の値を更新・計算します
     currentAiAnalysisResult = await analyzeClothingItemShape(originalClosetUploadDataUrl);
+    // 関連処理 updateAiDiagnosisUI() を呼び出して処理・画面を更新します
     updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
-// クローゼット追加・削除操作の順番を記録し、古いGET取得結果での上書きを防ぐ世代カウンターです
+
+// ==========================================================================
+//  7. クローゼット MySQL CRUD ＆ スタジオ試着状態のデバウンス自動保存
+// ==========================================================================
+// 再代入可能な変数 _closetMutationSeq を宣言し、値（0）をセットします
 let _closetMutationSeq = 0;
 
-// 外部ファイル（shop.js の購入後クローゼット自動保存等）からも操作カウンターを進められるようにするヘルパー関数です
+
+// クローゼットの登録・削除時に最新操作を保証する連番ミューテーションカウンタを進めます
 function bumpClosetMutationSeq() {
+    // 変数・配列項目 _closetMutationSeq の値を更新・計算します
     _closetMutationSeq++;
 }
 
-/**
- * 新規手持ち服の登録（AI形状チェック付き：アウター/ボトムス/トップス/靴/帽子のみ保存可能）
- */
-// 手持ち服登録モーダルのフォーム送信時に呼ばれ、AI検証とアカウント別保存・MySQL送信を行う関数です
-function handleAddClosetItem(e) {
-    // フォーム標準のページ再読み込みを防ぎます
+
+// 「クローゼットに登録する」送信時処理：入力チェック・POST /api/closet/add 保存・UI再描画・モーダル閉鎖を行います
+async function handleAddClosetItem(e) {
+    // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
 
-    // 1. 画像チェック
-    // 画像がまだ選択されていない場合はアップロード枠までスクロールして入力を促します
+    // 条件（!currentClosetUploadDataUrl）が成り立つか判定し、該当する場合の処理を実行します
     if (!currentClosetUploadDataUrl) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('⚠️ 服の写真を選択または撮影してください');
+        // HTML 要素 #closet-upload-box を取得して変数 uploadBox に格納します
         const uploadBox = document.getElementById('closet-upload-box');
+        // 条件（uploadBox）が成り立つか判定し、該当する場合の処理を実行します
         if (uploadBox) uploadBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 2. AI形状・アイテム診断チェック（非衣類・不適合画像はブロック）
-    // analyzeClothingItemShape() が対象外（食べ物・風景・書類など）と判定した写真は登録を拒否します
+    // 条件（currentAiAnalysisResult && !currentAiAnalysisResult.…）が成り立つか判定し、該当する場合の処理を実行します
     if (currentAiAnalysisResult && !currentAiAnalysisResult.isValid) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`⚠️ 登録できません: ${currentAiAnalysisResult.title}。アウター、ボトムス、トップス、靴、帽子の写真のみ登録可能です`);
+        // HTML 要素 #ai-diagnosis-card を取得して変数 diagCard に格納します
         const diagCard = document.getElementById('ai-diagnosis-card');
+        // 条件（diagCard）が成り立つか判定し、該当する場合の処理を実行します
         if (diagCard) diagCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 服の名前を取得し、空文字ならフォーカスを当てて入力を促します
+    // HTML 要素 #closet-item-name を取得して変数 nameInput に格納します
     const nameInput = document.getElementById('closet-item-name');
+    // 定数 name を宣言し、値（nameInput ? nameInput.value.trim() : '…）をセットします
     const name = nameInput ? nameInput.value.trim() : '';
+    // 条件（!name）が成り立つか判定し、該当する場合の処理を実行します
     if (!name) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('服の名前を入力してください');
+        // 条件（nameInput）が成り立つか判定し、該当する場合の処理を実行します
         if (nameInput) nameInput.focus();
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
-    // 未ログイン状態での登録を防ぎ、必ず特定アカウントへ紐付けます
-    if (!AppState.currentUser || !AppState.currentUser.id) {
-        showToastNotification('⚠️ クローゼットへの登録にはログインが必要です');
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('⚠️ クローゼットをMySQLに保存するにはログインが必要です');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 userId を宣言し、値（AppState.currentUser.id）をセットします
     const userId = AppState.currentUser.id;
 
-    // 選択されたカテゴリ（ラジオボタン）、メインの色、着用季節をフォームから取得します
+    // CSS セレクタに最初に一致した HTML 要素を取得して変数 catInput に入れます
     const catInput = document.querySelector('input[name="closet_category"]:checked');
+    // 定数 category を宣言し、値（catInput ? catInput.value : 'BOTTOMS'）をセットします
     const category = catInput ? catInput.value : 'BOTTOMS';
 
+    // HTML 要素 #closet-item-color を取得して変数 colorSelect に格納します
     const colorSelect = document.getElementById('closet-item-color');
+    // 定数 color を宣言し、値（colorSelect ? colorSelect.value : 'BLA…）をセットします
     const color = colorSelect ? colorSelect.value : 'BLACK';
 
+    // HTML 要素 #closet-item-season を取得して変数 seasonSelect に格納します
     const seasonSelect = document.getElementById('closet-item-season');
+    // 定数 season を宣言し、値（seasonSelect ? seasonSelect.value : '通…）をセットします
     const season = seasonSelect ? seasonSelect.value : '通年';
 
-    // クローゼット更新世代カウンターを進め、非同期取得の上書きを防ぎます
+    // HTML 要素 #btn-closet-submit を取得して変数 submitBtn に格納します
+    const submitBtn = document.getElementById('btn-closet-submit');
+    // 定数 originalBtnText を宣言し、値（submitBtn ? submitBtn.textContent : ''）をセットします
+    const originalBtnText = submitBtn ? submitBtn.textContent : '';
+    // 条件（submitBtn）が成り立つか判定し、該当する場合の処理を実行します
+    if (submitBtn) {
+        // 変数・配列項目 submitBtn.disabled の値を更新・計算します
+        submitBtn.disabled = true;
+        // 文字要素 submitBtn の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+        submitBtn.textContent = 'MySQLへ登録中...';
+    }
+
+    // 変数・配列項目 _closetMutationSeq の値を更新・計算します
     _closetMutationSeq++;
-    // 新規登録する手持ち服オブジェクトを構築します
+    // 定数 newItem を宣言し、値（{）をセットします
     const newItem = {
-        // 'c-ユーザーID-タイムスタンプ' で他アカウントと衝突しない固有IDを作成します
+        // レコード・商品・コーデを識別する ID プロパティをセットします
         id: 'c-' + userId + '-' + Date.now(),
+        // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
         user_id: userId,
+        // 商品名またはアイテム名称
         name: name,
+        // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
         category: category,
+        // カラー名
         color: color,
+        // 着用シーズン
         season: season,
-        // 背景透過済みまたは元画像の DataURL / パス
+        // 画像ファイルパスまたは DataURL
         image: currentClosetUploadDataUrl,
-        // ユーザーが登録した手持ち品であることを示すフラグです
-        isOwned: true,
-        // MySQL送信完了までは未同期印（offlinePending）を立てておきます
-        offlinePending: true
+        // ユーザーの手持ち私物であるかどうかのフラグ
+        isOwned: true
     };
 
-    // リストの先頭へ追加し、すぐにアカウント専用LocalStorageへ保存して画面反映に備えます
-    AppState.myCloset.unshift(newItem);
-    saveScopedData('manekin_my_closet', AppState.myCloset, userId);
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+        ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
 
-    // MySQL (closet_items テーブル) にも即座に保存
-    // サーバー接続URLを自動判定し、POST /api/closet/add を実行します
-    const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-    fetch(`${apiBase}/api/closet/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            user_id: userId,
-            id: newItem.id,
-            name: newItem.name,
-            category: newItem.category,
-            color: newItem.color,
-            season: newItem.season,
-            image: newItem.image,
-            isOwned: true,
-            isPurchased: false
-        })
-    }).then(res => {
-        // HTTP応答が失敗なら catch ブロックへ流します
-        if (!res.ok) throw new Error('API Error');
-        // 成功レスポンスをJSONとして読み取ります
-        return res.json();
-    }).then(data => {
-        // MySQL側で正しく保存されたら未同期フラグを外しLocalStorageを更新します
-        if (data.status === 'success') {
-            delete newItem.offlinePending;
-            saveScopedData('manekin_my_closet', AppState.myCloset, userId);
-            console.log('✨ [MySQL] マイクローゼットにアイテムを保存しました:', data);
-        } else {
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    try {
+        // Flask バックエンド API（/api/closet/add）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/closet/add`, {
+            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+            method: 'POST',
+            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
+            headers: { 'Content-Type': 'application/json' },
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
+            body: JSON.stringify({
+                // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
+                user_id: userId,
+                // レコード・商品・コーデを識別する ID プロパティをセットします
+                id: newItem.id,
+                // 商品名またはアイテム名称
+                name: newItem.name,
+                // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
+                category: newItem.category,
+                // カラー名
+                color: newItem.color,
+                // 着用シーズン
+                season: newItem.season,
+                // 画像ファイルパスまたは DataURL
+                image: newItem.image,
+                // ユーザーの手持ち私物であるかどうかのフラグ
+                isOwned: true,
+                // ストアで購入してクローゼット取り込みされた品かどうかのフラグ
+                isPurchased: false
+            })
+        });
+        // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
+        const data = await res.json().catch(() => ({}));
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
+        if (!res.ok || data.status !== 'success') {
+            // 処理を中断して呼び出し元の catch へエラー内容（throw new Error(data.message || 'API Error…）を渡します
             throw new Error(data.message || 'API Error');
         }
-    }).catch(err => {
-        // サーバー停止時は未同期フラグを保ったまま警告を出し、後から一括同期できるようにします
-        newItem.offlinePending = true;
-        saveScopedData('manekin_my_closet', AppState.myCloset, userId);
-        console.warn('MySQLクローゼット保存はオフライン（ローカルストレージに保存済み）:', err);
-    });
+        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
 
-    // 登録通知を出し、モーダルを閉じ、スタジオ全体の描画（バッジ件数や左カラムリスト）を更新します
-    showToastNotification(`「${name}」をマイクローゼット(MySQL)に登録しました！`);
-    closeAddClosetModal();
-
-    // 画面再描画
-    renderManekinStudio(AppState.studioActiveTab);
+        // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入して即画面反映します
+        AppState.myCloset.unshift(newItem);
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.log('✨ [MySQL] マイクローゼットにアイテムを保存しました:', data);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification(`「${name}」をマイクローゼット(MySQL)に登録しました！`);
+        // 関連処理 closeAddClosetModal() を呼び出して処理・画面を更新します
+        closeAddClosetModal();
+        // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
+        renderManekinStudio(AppState.studioActiveTab);
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+    } catch (err) {
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLクローゼット保存エラー:', err);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification(`⚠️ MySQLへの手持ち服保存に失敗しました（${err.message || 'サーバー接続を確認してください'}）`);
+    // 成功・失敗に関わらず最後に必ず実行される後始末(finally)ブロックです
+    } finally {
+        // 条件（submitBtn）が成り立つか判定し、該当する場合の処理を実行します
+        if (submitBtn) {
+            // 変数・配列項目 submitBtn.disabled の値を更新・計算します
+            submitBtn.disabled = false;
+            // 文字要素 submitBtn の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+            submitBtn.textContent = originalBtnText || 'クローゼットに登録する';
+        }
+    }
 }
 
-/**
- * 手持ち服の削除（ログインアカウント分のみ）
- */
-// クローゼットから指定アイテムを1件削除する関数です
-function deleteClosetItem(itemId) {
-    // ログインユーザー確認
-    if (!AppState.currentUser || !AppState.currentUser.id) {
+
+// マイクローゼットから指定アイテムを MySQL（DELETE /api/closet/delete/...）と着用中スロット両方から削除します
+async function deleteClosetItem(itemId) {
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification('⚠️ ログインが必要です');
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 userId を宣言し、値（AppState.currentUser.id）をセットします
     const userId = AppState.currentUser.id;
-    // 削除確認ダイアログで「OK」が押されたときのみ実行します
-    if (confirm('この手持ちの服をクローゼットから削除しますか？')) {
-        // もし現在着用中なら脱がす
-        // 削除しようとしている服をマネキンが着ている場合は着用スロットから先に外します
+    // 条件（!confirm('この手持ちの服をクローゼットから削除しますか？')）が成り立つか判定し、該当する場合の処理を実行します
+    if (!confirm('この手持ちの服をクローゼットから削除しますか？')) return;
+
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+    const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+        ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+        : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    try {
+        // Flask バックエンド API（/api/closet/delete/${encodeURIComponent）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/closet/delete/${encodeURIComponent(itemId)}?user_id=${userId}`, {
+            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+            method: 'DELETE',
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include'
+        });
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
+        if (!res.ok) throw new Error('Delete failed');
+        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
+
+        // 再代入可能な変数 wasWearingDeleted を宣言し、値（false）をセットします
         let wasWearingDeleted = false;
+        // 配列要素やインデックスを順番に繰り返すループ処理（for (const slotKey in AppState.currentOutfit) {）を開始します
         for (const slotKey in AppState.currentOutfit) {
+            // 条件（AppState.currentOutfit[slotKey] && String(AppState.c…）が成り立つか判定し、該当する場合の処理を実行します
             if (AppState.currentOutfit[slotKey] && String(AppState.currentOutfit[slotKey].id) === String(itemId)) {
+                // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
                 AppState.currentOutfit[slotKey] = null;
+                // 変数・配列項目 wasWearingDeleted の値を更新・計算します
                 wasWearingDeleted = true;
             }
         }
-        // 更新した試着状態と、もし脱がせた場合はバックエンドへも即時保存します
-        saveScopedData('manekin_current_outfit', AppState.currentOutfit, userId);
+        // 条件（wasWearingDeleted）が成り立つか判定し、該当する場合の処理を実行します
         if (wasWearingDeleted) {
-            syncStudioStateToBackend({ immediate: true });
+            // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
+            await syncStudioStateToBackend({ immediate: true });
         }
 
-        // filter() で該当ID以外の服だけを残して配列から削除し、変更世代カウンターを進めます
+        // アプリ全体状態 AppState.myCloset を最新値（AppState.myCloset.filter(c => String(c…）に更新します
         AppState.myCloset = AppState.myCloset.filter(c => String(c.id) !== String(itemId));
+        // 変数・配列項目 _closetMutationSeq の値を更新・計算します
         _closetMutationSeq++;
-        saveScopedData('manekin_my_closet', AppState.myCloset, userId);
 
-        // MySQL からも該当アカウント分のみ削除
-        // サーバー上の該当ユーザー所有データだけを狙って DELETE リクエストを送ります
-        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-        fetch(`${apiBase}/api/closet/delete/${encodeURIComponent(itemId)}?user_id=${userId}`, { method: 'DELETE' })
-            .catch(err => console.warn('MySQLクローゼット削除オフライン:', err));
-
-        // 通知を出しスタジオを再描画します
-        showToastNotification('手持ちの服を削除しました');
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('手持ちの服をMySQLから削除しました');
+        // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+    } catch (err) {
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLクローゼット削除エラー:', err);
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+        showToastNotification('⚠️ MySQLから手持ち服を削除できませんでした（サーバー接続を確認してください）');
     }
 }
 
-/**
- * MySQLからログイン中アカウントだけのマイクローゼットを同期取得
- */
-// ログイン直後や画面初期化時に MySQL の closet_items テーブルから手持ち服・購入品を取得する関数です
+
+// ログイン会員の登録服＆購入済み服を MySQL（GET /api/closet/...）から取得してスタジオへ反映します
 async function syncClosetFromBackend() {
-    // 未ログインならクローゼットを空にして即終了します（他人のデータを絶対に残さないため）
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
+        // アプリ全体状態 AppState.myCloset を最新値（[]）に更新します
         AppState.myCloset = [];
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
-    // サーバー発行IDでない場合はMySQL問い合わせをスキップします
+    // 条件（typeof isServerUserId === 'function' && !isServerUse…）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        // アプリ全体状態 AppState.myCloset を最新値（[]）に更新します
+        AppState.myCloset = [];
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
-    // 通信開始時点の操作カウンターを控えます
+    // 定数 fetchStartSeq を宣言し、値（_closetMutationSeq）をセットします
     const fetchStartSeq = _closetMutationSeq;
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        const apiBase = (window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '';
-        // 指定ユーザー専用のクローゼットアイテム一覧を取得します
-        const res = await fetch(`${apiBase}/api/closet/${targetUserId}`);
+        // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
+        const apiBase = (typeof getApiBaseUrl === 'function')
+            // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
+            ? getApiBaseUrl()
+            // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
+            : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+        // Flask バックエンド API（/api/closet/${targetUserId}）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/closet/${targetUserId}`, {
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // ブラウザが昔の通信結果をキャッシュ再利用しないよう 'no-store' を指定します
+            cache: 'no-store'
+        });
+        // 条件（res.ok）が成り立つか判定し、該当する場合の処理を実行します
         if (res.ok) {
+            // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
             const data = await res.json();
-            // 通信中にログアウト／ユーザー切り替えが起きていたら古いレスポンスを破棄します
+            // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
-            // 通信中にローカルで追加・削除・購入自動保存が走った場合も古い取得結果で上書きしません
+            // 条件（fetchStartSeq !== _closetMutationSeq）が成り立つか判定し、該当する場合の処理を実行します
             if (fetchStartSeq !== _closetMutationSeq) return;
+            // 条件（data.closet_items && Array.isArray(data.closet_items…）が成り立つか判定し、該当する場合の処理を実行します
             if (data.closet_items && Array.isArray(data.closet_items)) {
-                // DBのカラム名（スネークケース: product_id, is_owned 等）をJS側プロパティ（キャメルケース）へ変換します
+                // 定数 mysqlItems を宣言し、値（data.closet_items.map(it => ({）をセットします
                 const mysqlItems = data.closet_items.map(it => ({
+                    // レコード・商品・コーデを識別する ID プロパティをセットします
                     id: it.item_uid || it.id,
+                    // 紐づくブランド商品の元 ID
                     productId: it.product_id,
+                    // 商品名またはアイテム名称
                     name: it.name,
+                    // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                     category: it.category,
+                    // カラー名
                     color: it.color,
+                    // 着用シーズン
                     season: it.season || '通年',
+                    // 画像ファイルパスまたは DataURL
                     image: it.image || it.image_url,
+                    // ユーザーの手持ち私物であるかどうかのフラグ
                     isOwned: Boolean(it.is_owned),
+                    // ストアで購入してクローゼット取り込みされた品かどうかのフラグ
                     isPurchased: Boolean(it.is_purchased),
+                    // 単価・価格（円）
                     price: it.price || 0,
+                    // 購入した日付
                     purchaseDate: it.purchase_date
                 }));
 
-                // 同一アカウントでオフライン作成した未同期アイテムのみ保持
-                // まだサーバーに届いていない新規手持ち服が消えないよう先頭へ残します
-                const offlinePending = (AppState.myCloset || []).filter(localItem =>
-                    localItem &&
-                    localItem.offlinePending === true &&
-                    (!localItem.user_id || String(localItem.user_id) === String(targetUserId)) &&
-                    !mysqlItems.some(m => String(m.id) === String(localItem.id))
-                );
-
-                // 未同期分 ＋ MySQL分 を結合し、状態およびLocalStorageへ反映します
-                AppState.myCloset = [...offlinePending, ...mysqlItems];
-                saveScopedData('manekin_my_closet', AppState.myCloset, targetUserId);
+                // アプリ全体状態 AppState.myCloset を最新値（mysqlItems）に更新します
+                AppState.myCloset = mysqlItems;
+                // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.log(`✨ [MySQL] マイクローゼット同期完了 (user_id=${targetUserId}): ${AppState.myCloset.length} 点`);
 
-                // スタジオ上部タブ・スマホタブ・ホーム統計カードの所持点数表示を更新します
+                // HTML 要素 #studio-closet-badge を取得して変数 closetBadge に格納します
                 const closetBadge = document.getElementById('studio-closet-badge');
+                // 条件（closetBadge）が成り立つか判定し、該当する場合の処理を実行します
                 if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
+                // HTML 要素 #mob-closet-cnt を取得して変数 mobClosetCnt に格納します
                 const mobClosetCnt = document.getElementById('mob-closet-cnt');
+                // 条件（mobClosetCnt）が成り立つか判定し、該当する場合の処理を実行します
                 if (mobClosetCnt) mobClosetCnt.textContent = AppState.myCloset.length;
+                // HTML 要素 #home-stat-closet を取得して変数 homeCloset に格納します
                 const homeCloset = document.getElementById('home-stat-closet');
+                // 条件（homeCloset）が成り立つか判定し、該当する場合の処理を実行します
                 if (homeCloset) homeCloset.innerHTML = `${AppState.myCloset.length} <small>点</small>`;
 
-                // 左カラムおよび現在「マイクローゼット一覧」タブを開いているなら即座に再描画します
+                // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
                 if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+                // 条件（AppState.studioActiveTab === 'closet' && typeof rend…）が成り立つか判定し、該当する場合の処理を実行します
                 if (AppState.studioActiveTab === 'closet' && typeof renderPaneClosetGrid === 'function') {
+                    // 関連処理 renderPaneClosetGrid() を呼び出して処理・画面を更新します
                     renderPaneClosetGrid();
                 }
             }
         }
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
-        // サーバー未起動時はローカルデータをそのまま使って表示を維持します
-        console.log('MySQLクローゼット同期待機中 (アカウント別ローカルストレージを使用)');
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLクローゼット取得エラー:', e);
     }
 }
 
-/**
- * おすすめプリセットコーデの適用（ホームバナー用）
- */
-// サンプルのお手本全身コーディネートを一発でマネキンへ着せる関数です
+
+// AIおすすめコーデバナーからトレンチコート中心のデモコーデを一括着用させます
 function applyPresetLook(lookKey) {
-    // 例: 手持ち黒ボトムス + 白スニーカー + トレンチコート
-    // クローゼットからボトムス・靴を探し、見つからない場合は標準画像データで補います
+    // 定数 blackPants を宣言し、値（AppState.myCloset.find(c => c.category…）をセットします
     const blackPants = AppState.myCloset.find(c => c.category === 'BOTTOMS') || {
+        // レコード・商品・コーデを識別する ID プロパティをセットします
         id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/men/ストレートレープセミフレアスラックス.png'
     };
+    // 定数 whiteSneakers を宣言し、値（AppState.myCloset.find(c => c.category…）をセットします
     const whiteSneakers = AppState.myCloset.find(c => c.category === 'SHOES') || {
+        // レコード・商品・コーデを識別する ID プロパティをセットします
         id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: getCategoryFallbackImage('SHOES')
     };
-    // 商品マスタからID:1のトレンチコートを取得します
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して trenchCoat に入れます
     const trenchCoat = SAMPLE_PRODUCTS.find(p => p.id === 1) || SAMPLE_PRODUCTS[0];
 
-    // 4アイテムを組み合わせた着用オブジェクトを現在のコーデへセットします
+    // アプリ全体状態 AppState.currentOutfit を最新値（{）に更新します
     AppState.currentOutfit = {
+        // オブジェクトの 'hat' プロパティ値を設定します
         hat: null,
+        // オブジェクトの 'outer' プロパティ値を設定します
         outer: { id: trenchCoat.id, name: trenchCoat.name, category: trenchCoat.category, color: 'CHARCOAL', price: trenchCoat.price, image: trenchCoat.image, isOwned: false },
+        // オブジェクトの 'tops' プロパティ値を設定します
         tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'OFF WHITE', price: 3490, image: 'assets/images/men/アーバングレイジップフーディ.png', isOwned: false },
+        // オブジェクトの 'bottoms' プロパティ値を設定します
         bottoms: { id: blackPants.id, name: blackPants.name, category: blackPants.category, color: blackPants.color, isOwned: true, image: blackPants.image },
+        // オブジェクトの 'shoes' プロパティ値を設定します
         shoes: { id: whiteSneakers.id, name: whiteSneakers.name, category: whiteSneakers.category, color: whiteSneakers.color, isOwned: true, image: whiteSneakers.image }
     };
-    // LocalStorageとMySQLへ保存し、試着作成画面へ移動します
-    saveScopedData('manekin_current_outfit', AppState.currentOutfit);
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
     syncStudioStateToBackend({ immediate: true });
 
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification('AIおすすめコーデをマネキンにセットしました');
+    // 専用ヘルパー関数 switchStudioTab() を実行して状態や表示ラベルを更新します
     switchStudioTab('create');
 }
 
-// --------------------------------------------------------------------------
-// 15.7.5 スタジオ試着状態（着用服・微調整・性別）のMySQLアカウント別双方向同期
-// --------------------------------------------------------------------------
-// スライダーを連続操作したときに毎ミリ秒サーバー通信しないためのデバウンスタイマーIDと世代番号です
-let _studioStateSyncTimer = null;
-let _studioStateSyncSeq = 0;
 
-// 試着中の服・微調整位置・性別のスナップショットを MySQL の user_studio_states テーブルへ保存するHTTP通信関数です
+// 再代入可能な変数 _studioStateSyncTimer を宣言し、値（null）をセットします
+let _studioStateSyncTimer = null;
+// 再代入可能な変数 _studioStateSyncSeq を宣言し、値（0）をセットします
+let _studioStateSyncSeq = 0;
+// 再代入可能な変数 _lastStudioSyncErrorToastAt を宣言し、値（0）をセットします
+let _lastStudioSyncErrorToastAt = 0;
+
+
+// 現在のマネキン着用状態・位置調整・性別設定を MySQL（POST /api/studio-state/save）へ送信します（keepalive対応）
 async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot) {
-    // サーバー発行アカウントでなければ通信せず false を返します
+    // 条件（typeof isServerUserId === 'function' && !isServerUse…）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
+        // 処理結果の基準値として false を呼び出し元へ返して関数を終了します
         return false;
     }
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
         ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
         : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        // スタジオ状態保存APIへPOST送信します
+        // Flask バックエンド API（/api/studio-state/save）へ非同期リクエストを送信し、応答を待ち受けます
         const res = await fetch(`${apiBase}/api/studio-state/save`, {
+            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
             method: 'POST',
+            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
             headers: { 'Content-Type': 'application/json' },
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
             body: JSON.stringify({
+                // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
                 user_id: targetUserId,
+                // マネキンの全5部位着用状態オブジェクトを送信データにセットします
                 current_outfit: outfitSnapshot,
+                // 部位ごとの X/Y・拡大率・サイズ設定マップを送信データにセットします
                 fitting_offsets: offsetsSnapshot,
+                // 現在のマネキン性別設定（'MEN' / 'WOMEN'）をセットします
                 studio_gender: genderSnapshot
             })
         });
-        // エラー応答なら catch へ渡して dirty 印を付けます
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
         if (!res.ok) throw new Error('Studio state save failed');
-        // 正常保存できたので「未送信変更（dirty）」印を削除して true を返します
-        removeScopedData('manekin_studio_dirty', targetUserId);
+        // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
         return true;
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
-        // オフライン等で保存失敗した場合は「あとで同期が必要」印をLocalStorageへ残します
-        saveScopedData('manekin_studio_dirty', true, targetUserId);
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLスタジオ状態保存エラー:', e);
+        // 定数 now を宣言し、値（Date.now()）をセットします
+        const now = Date.now();
+        // 条件（now - _lastStudioSyncErrorToastAt > 3000）が成り立つか判定し、該当する場合の処理を実行します
+        if (now - _lastStudioSyncErrorToastAt > 3000) {
+            // 変数・配列項目 _lastStudioSyncErrorToastAt の値を更新・計算します
+            _lastStudioSyncErrorToastAt = now;
+            // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+            showToastNotification('⚠️ スタジオ試着状態のMySQL保存に失敗しました（サーバー接続を確認してください）');
+        }
+        // 処理結果の基準値として false を呼び出し元へ返して関数を終了します
         return false;
     }
 }
 
-// アカウント切り替え／ログアウト直前に、まだ送信待ち（400msタイマー待機中）の変更があれば即座に送り切る関数です
+
+// 遅延保存(デバウンス)待ちのスタジオ変更が残っていればタイマーを即解除して先に MySQL 送信を完了させます
 function flushPendingStudioStateSync() {
-    // 待機中タイマーが無ければ何もしません
-    if (!_studioStateSyncTimer) return;
-    // タイマーをキャンセルし、その場で送信を実行します
+    // 条件（!_studioStateSyncTimer）が成り立つか判定し、該当する場合の処理を実行します
+    if (!_studioStateSyncTimer) return Promise.resolve(false);
+    // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
     clearTimeout(_studioStateSyncTimer);
+    // 変数・配列項目 _studioStateSyncTimer の値を更新・計算します
     _studioStateSyncTimer = null;
 
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
-        return;
-    }
-    // 切り替え直前の現在ユーザーと各試着データの独立コピーを作成して送信します
-    const targetUserId = AppState.currentUser.id;
-    const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
-    const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
-    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
-    sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
-}
-
-// スタジオ状態の変更をバックエンドへ同期する窓口関数です（immediate: true なら即送信、通常時は400ms後に送信）
-function syncStudioStateToBackend(options = {}) {
-    if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 結果（Promise.resolve(false)）を呼び出し元へ返却します
         return Promise.resolve(false);
     }
+    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
+    // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して outfitSnapshot に保存します
+    const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
+    // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
+    const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
+    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
+    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    // 結果（sendStudioStateRequest(targetUserId, outfitSnaps…）を呼び出し元へ返却します
+    return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
+}
+
+
+// 試着や位置微調整の連続操作をまとめるデバウンス付き(220ms後)MySQL自動保存スケジューラです
+function syncStudioStateToBackend(options = {}) {
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 結果（Promise.resolve(false)）を呼び出し元へ返却します
+        return Promise.resolve(false);
+    }
+    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
+    const targetUserId = AppState.currentUser.id;
+    // 定数 immediate を宣言し、値（!!options.immediate）をセットします
     const immediate = !!options.immediate;
 
-    // 前回の送信予約タイマーが残っていれば取り消し（デバウンス）、最後の操作から一定時間後に1回だけ送ります
+    // 条件（_studioStateSyncTimer）が成り立つか判定し、該当する場合の処理を実行します
     if (_studioStateSyncTimer) {
+        // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
         clearTimeout(_studioStateSyncTimer);
+        // 変数・配列項目 _studioStateSyncTimer の値を更新・計算します
         _studioStateSyncTimer = null;
     }
 
-    // 現時点の状態スナップショットと世代番号を作ります
+    // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して outfitSnapshot に保存します
     const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
+    // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
     const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
+    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
     const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    // 定数 seq を宣言し、値（++_studioStateSyncSeq）をセットします
     const seq = ++_studioStateSyncSeq;
 
-    // 着替えボタンクリック時など即時送信指定なら待たずにすぐ送信します
+    // 条件（immediate）が成り立つか判定し、該当する場合の処理を実行します
     if (immediate) {
+        // 結果（sendStudioStateRequest(targetUserId, outfitSnaps…）を呼び出し元へ返却します
         return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
     }
 
-    // スライダー操作時などは 400ミリ秒待って連続変更が落ち着いてからMySQLへ送ります
+    // 非同期完了を await で待てる Promise オブジェクトを作成して返します
     return new Promise((resolve) => {
+        // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
         _studioStateSyncTimer = setTimeout(async () => {
+            // 変数・配列項目 _studioStateSyncTimer の値を更新・計算します
             _studioStateSyncTimer = null;
-            // 400msの間にログアウトや別ユーザー切替・さらに新しい変更が発生していれば今回の送信は見送ります
+            // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
             if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId) || seq !== _studioStateSyncSeq) {
+                // 非同期 Promise を完了し、結果値（false）を呼び出し元へ返します
                 resolve(false);
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
+            // 定数 ok を宣言し、値（await sendStudioStateRequest(targetUse…）をセットします
             const ok = await sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
+            // 非同期 Promise を完了し、結果値（ok）を呼び出し元へ返します
             resolve(ok);
+        // 上の処理を指定ミリ秒後（400ms 後）に実行するタイマー呼び出しを閉じます
         }, 400);
     });
 }
 
-// ログイン直後に MySQL から該当アカウントの前回試着状態・微調整オフセット・性別を取得し復元する関数です
+
+// ログイン後・スタジオ遷移時に MySQL（GET /api/studio-state/...）から前回の試着服と微調整値を復元します
 async function syncStudioStateFromBackend() {
+    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
+        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
-    // ローカル側にまだサーバー未送信の変更（dirtyフラグ）があるか確認します
-    const isDirty = loadScopedData('manekin_studio_dirty', false, targetUserId) === true;
+    // 定数 fetchStartSeq を宣言し、値（_studioStateSyncSeq）をセットします
     const fetchStartSeq = _studioStateSyncSeq;
+    // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
+        // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
         ? getApiBaseUrl()
+        // 三項演算子・偽(False)の場合の選択値（((window.location.protocol === 'file:' || …）
         : ((window.location.protocol === 'file:' || window.location.port !== '8080') ? 'http://127.0.0.1:8080' : '');
 
+    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
-        // 指定ユーザーのスタジオ状態を取得します
-        const res = await fetch(`${apiBase}/api/studio-state/${targetUserId}`);
+        // Flask バックエンド API（/api/studio-state/${targetUserId}）へ非同期リクエストを送信し、応答を待ち受けます
+        const res = await fetch(`${apiBase}/api/studio-state/${targetUserId}`, {
+            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+            credentials: 'include',
+            // ブラウザが昔の通信結果をキャッシュ再利用しないよう 'no-store' を指定します
+            cache: 'no-store'
+        });
+        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
         if (!res.ok) throw new Error('Studio state fetch failed');
+        // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
         const data = await res.json();
-        // 通信中に別の操作・ユーザー切替があれば古い応答は無視します
+        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
         if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
+        // 条件（fetchStartSeq !== _studioStateSyncSeq）が成り立つか判定し、該当する場合の処理を実行します
         if (fetchStartSeq !== _studioStateSyncSeq) return;
 
-        // ローカルに未送信の変更が残っていた場合は、サーバーのデータで上書きせずローカル側を即時サーバーへ送って優先します
-        if (isDirty) {
-            await syncStudioStateToBackend({ immediate: true });
-            return;
-        }
-
-        // MySQLに保存されたスタジオ状態が見つかった場合はアプリ状態・LocalStorage・画面すべてを復元します
+        // 条件（data.exists && data.studio_state）が成り立つか判定し、該当する場合の処理を実行します
         if (data.exists && data.studio_state) {
+            // アプリ全体状態 AppState.currentOutfit を最新値（data.studio_state.current_outfit || { …）に更新します
             AppState.currentOutfit = data.studio_state.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+            // アプリ全体状態 AppState.fittingOffsets を最新値（data.studio_state.fitting_offsets || g…）に更新します
             AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
+            // アプリ全体状態 AppState.studioGender を最新値（(data.studio_state.studio_gender === '…）に更新します
             AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
-
-            saveScopedData('manekin_current_outfit', AppState.currentOutfit, targetUserId);
-            saveScopedData('manekin_fitting_offsets', AppState.fittingOffsets, targetUserId);
-            saveScopedData('manekin_studio_gender', AppState.studioGender, targetUserId);
-
-            syncGenderToggleUI();
-            if (typeof renderMannequinStage === 'function') renderMannequinStage();
-            if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
-            if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
-            if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        } else {
+            // アプリ全体状態 AppState.currentOutfit を最新値（{ hat: null, outer: null, tops: null, …）に更新します
+            AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+            // アプリ全体状態 AppState.fittingOffsets を最新値（getDefaultFittingOffsets()）に更新します
+            AppState.fittingOffsets = getDefaultFittingOffsets();
+            // アプリ全体状態 AppState.studioGender を最新値（'MEN'）に更新します
+            AppState.studioGender = 'MEN';
         }
+
+        // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
+        syncGenderToggleUI();
+        // 条件（typeof renderMannequinStage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        if (typeof renderMannequinStage === 'function') renderMannequinStage();
+        // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+        // 条件（typeof renderStudioBrandList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        // 条件（typeof updateAIStylingComment === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
+    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
-        console.log('MySQLスタジオ状態同期待機中 (アカウント別ローカルストレージを使用)');
+        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
+        console.warn('MySQLスタジオ状態取得エラー:', e);
     }
 }
 
-/**
- * 体型プロフィールの保存（マネキンシミュレーション用ローカル設定）
- */
-// ユーザーが画面上で入力した体型設定をアカウント別LocalStorageに保存する関数です
+
+// 身長・体型・好みのテイスト設定をメモリ反映してスタジオプロフィール完了通知を出します
 function handleSaveBodyProfile(e) {
-    // フォームの通常リロードを止めます
+    // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     e.preventDefault();
-    // 入力要素から身長・体型・スタイル好みを読み取ります
+    // HTML 要素 #body-height を取得して変数 height に格納します
     const height = document.getElementById('body-height')?.value || 172;
+    // HTML 要素 #body-type を取得して変数 type に格納します
     const type = document.getElementById('body-type')?.value || 'REGULAR';
+    // HTML 要素 #style-taste を取得して変数 taste に格納します
     const taste = document.getElementById('style-taste')?.value || 'MINIMAL';
 
-    // 状態へ格納し、現在のユーザー専用領域に保存します
+    // アプリ全体状態 AppState.userBodyProfile を最新値（{ height, bodyType: type, styleTaste: …）に更新します
     AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
-    saveScopedData('manekin_body_profile', AppState.userBodyProfile);
 
-    showToastNotification('体型および好みの設定を保存しました');
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+    showToastNotification('体型および好みの設定を反映しました');
 }
 
-// --------------------------------------------------------------------------
-// 15.8 ユーティリティ
-// --------------------------------------------------------------------------
 
-// 英語カテゴリコード（OUTER / TOPS / BOTTOMS / SHOES / HAT）を日本語表示名に変換する関数です
+// ==========================================================================
+//  8. 日本語カテゴリ／カラーHEX変換・通知用補助ヘルパー関数
+// ==========================================================================
+// 英語カテゴリ('HAT'〜'SHOES')を見やすい日本語表示名へ変換する補助関数です
 function getCategoryNameJP(cat) {
-    // switch 文で引数の値に応じた日本語文字を返します
+    // 値（cat)）に応じて処理ケースを分岐する switch 文を開始します
     switch (cat) {
+        // 値が 'OUTER' 系だった場合、対応値 'アウター' を即返却します
         case 'OUTER': return 'アウター';
+        // 値が 'TOPS' 系だった場合、対応値 'トップス' を即返却します
         case 'TOPS': return 'トップス';
+        // 値が 'BOTTOMS' 系だった場合、対応値 'ボトムス' を即返却します
         case 'BOTTOMS': return 'ボトムス';
+        // 値が 'SHOES' 系だった場合、対応値 '靴' を即返却します
         case 'SHOES': return '靴';
+        // 値が 'HAT' 系だった場合、対応値 '帽子' を即返却します
         case 'HAT': case 'HATS': case 'CAP': return '帽子';
+        // オブジェクトの 'default' プロパティ値を設定します
         default: return cat;
     }
 }
 
-// 色名文字列（'BLACK', 'NAVY' 等）をCSSやHTML背景色に使える16進数カラーコード（#111111 等）へ変換する関数です
+
+// カラー名('BLACK'/'WHITE'/'NAVY'等)からAIカラーパレットドット用の16進カラーコードを返します
 function getColorHex(colorName) {
-    // 登録済みの代表的ファッションカラーに対応するHEXカラーコードを返します
+    // 値（colorName)）に応じて処理ケースを分岐する switch 文を開始します
     switch (colorName) {
+        // 値が 'BLACK' 系だった場合、対応値 '#111111' を即返却します
         case 'BLACK': return '#111111';
+        // 値が 'WHITE' 系だった場合、対応値 '#ffffff' を即返却します
         case 'WHITE': return '#ffffff';
+        // 値が 'CHARCOAL' 系だった場合、対応値 '#333333' を即返却します
         case 'CHARCOAL': return '#333333';
+        // 値が 'GREY' 系だった場合、対応値 '#888888' を即返却します
         case 'GREY': case 'ASH GREY': case 'HEATHER GREY': return '#888888';
+        // 値が 'NAVY' 系だった場合、対応値 '#1a2a44' を即返却します
         case 'NAVY': return '#1a2a44';
+        // 値が 'BEIGE' 系だった場合、対応値 '#e8ddcb' を即返却します
         case 'BEIGE': case 'ECRU': return '#e8ddcb';
+        // 値が 'BROWN' 系だった場合、対応値 '#593822' を即返却します
         case 'BROWN': case 'DARK BROWN': return '#593822';
+        // 値が 'BLUE' 系だった場合、対応値 '#2b5876' を即返却します
         case 'BLUE': case 'VINTAGE BLUE': return '#2b5876';
+        // オブジェクトの 'default' プロパティ値を設定します
         default: return '#666666';
     }
 }
 
-// スタジオ内からトースト通知を出したいときに shop.js 側の showToast() を安全に呼び出すラッパー関数です
+
+// toast.js の showToast があればそちらを使い、無ければコンソール代替する通知ラッパーです
 function showToastNotification(message) {
+    // 条件（typeof showToast === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof showToast === 'function') {
+        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(message);
     }
 }
 
-// 他ファイルやセッション管理処理から直接参照できるよう studio.js 側の主要関数を window へ登録します
-window.syncClosetFromBackend = syncClosetFromBackend;
-window.syncOutfitsFromBackend = syncOutfitsFromBackend;
-window.syncStudioStateToBackend = syncStudioStateToBackend;
-window.syncStudioStateFromBackend = syncStudioStateFromBackend;
-window.flushPendingStudioStateSync = flushPendingStudioStateSync;
-window.syncGenderToggleUI = syncGenderToggleUI;
-window.bumpClosetMutationSeq = bumpClosetMutationSeq;
 
+// 変数・配列項目 window.syncClosetFromBackend の値を更新・計算します
+window.syncClosetFromBackend = syncClosetFromBackend;
+// 変数・配列項目 window.syncOutfitsFromBackend の値を更新・計算します
+window.syncOutfitsFromBackend = syncOutfitsFromBackend;
+// メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
+window.syncStudioStateToBackend = syncStudioStateToBackend;
+// 変数・配列項目 window.syncStudioStateFromBacken… の値を更新・計算します
+window.syncStudioStateFromBackend = syncStudioStateFromBackend;
+// デバウンス待ち中の試着変更があれば先に MySQL へ確定送信してから後続処理へ進みます
+window.flushPendingStudioStateSync = flushPendingStudioStateSync;
+// 変数・配列項目 window.syncGenderToggleUI の値を更新・計算します
+window.syncGenderToggleUI = syncGenderToggleUI;
+// 変数・配列項目 window.bumpClosetMutationSeq の値を更新・計算します
+window.bumpClosetMutationSeq = bumpClosetMutationSeq;

@@ -1,4242 +1,4222 @@
 @charset "UTF-8";
 /* ========================================================================== */
-/* MANEKIN FASHION - MANEKIN AI STUDIO（試着スタジオ）スタイル (studio.css)
-/* ========================================================================== */
-/* --- 22. レスポンシブ対応 (メディアクエリ) --- */
-/* ※全コンポーネントのブレークポイント（1100px / 992px / 768px / 480px）はスタイルシート末尾のレスポンシブ統合セクションに体系化されています */
-
-/* ========================================================================== */
-/* 15. MANEKIN AI STUDIO（会員限定 AIコーデシミュレーション）スタイル       */
+/*  MANEKIN FASHION - MANEKIN AI試着スタジオ専用スタイル (css/studio.css) */
+/*  3列スタジオ、マネキン試着ステージ、アイテム棚、AI背景透過・診断、微調整パネルを定義します。 */
 /* ========================================================================== */
 
-/* ↓ 試着スタジオ画面全体の最大幅と上下左右の余白を決める大枠 */
+
+
+/* -------------------------------------------------------------------------- */
+/* 1. スタジオ全体レイアウト & 会員ヘッダー／サブタブ切り替え */
+/* -------------------------------------------------------------------------- */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-container） */
 .studio-container {
-    /* ↓ 大きなPC画面でも横幅が1320px以上に広がりすぎないように制限します */
+    /* 横幅の最大上限を 1320px に制限し、はみ出しを防ぎます */
     max-width: 1320px;
-    /* ↓ 左右の余白をautoにして画面の中央に配置します */
+    /* 要素の外側余白（margin）を「上下 0（余白なし）・左右 auto（ブラウザが自動で均等計算）」に設定します */
     margin: 0 auto;
-    /* ↓ 上30px・左右20px・下80pxの内側余白を空けます */
+    /* 枠の内側余白（padding）を「上 30px・左右 20px・下 80px」に設定します */
     padding: 30px 20px 80px;
 }
 
-/* --- スタジオヘッダー --- */
-/* ↓ スタジオ画面上部の白いタイトルカード（左にタイトル、右に会員チップ） */
+/* ヘッダー・MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-header-card） */
 .studio-header-card {
-    /* ↓ 子要素を横並びにするFlexbox */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 左右の要素を両端に離して配置します */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦方向の中央に揃えます */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 背景を純白に */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄いグレーの1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 四隅を8px丸めます */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上下24px・左右30pxの内側余白 */
+    /* 枠の内側余白（padding）を「上下 24px・左右 30px」に設定します */
     padding: 24px 30px;
-    /* ↓ 下に24pxの外側余白 */
+    /* 要素の下側の外側余白を 24px に設定します */
     margin-bottom: 24px;
-    /* ↓ 共通変数で定義されたわずかな影を付けます */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
-/* ↓ タイトル上の小さなバッジ2つを横並びにする枠 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-title-badge） */
 .studio-title-badge {
-    /* ↓ Flexboxで横並びにします */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ バッジ同士の間隔を8px空けます */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 下の見出しとの間を8px空けます */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
 }
 
-/* ↓ 「AI STYLING」などの黒いピル型きらめきバッジ */
+/* セレクタ「.badge-sparkle」に対するスタイル定義を開始します（対象: .badge-sparkle） */
 .badge-sparkle {
-    /* ↓ 約11.5pxの小さめ文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 太字（700） */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 英字が映えるよう文字間隔を少し広げます */
+    /* 文字どうしの横間隔（トラッキング）を 0.08em に調整します */
     letter-spacing: 0.08em;
-    /* ↓ 黒から濃いグレーへの斜め135度グラデーション背景 */
+    /* 背景の色・グラデーション・画像を一括で（linear-gradient(135deg, #111111 0%, #444444 100%)）に設定します */
     background: linear-gradient(135deg, #111111 0%, #444444 100%);
-    /* ↓ 白抜き文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 上下3px・左右10pxの余白 */
+    /* 枠の内側余白（padding）を「上下 3px・左右 10px」に設定します */
     padding: 3px 10px;
-    /* ↓ 左右が半円になるカプセル型 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
-    /* ↓ 中身を横並びにするインラインFlex */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
 }
 
-/* ↓ 「MEMBER ONLY」など白地に黒枠の限定バッジ */
+/* セレクタ「.badge-exclusive」に対するスタイル定義を開始します（対象: .badge-exclusive） */
 .badge-exclusive {
-    /* ↓ 約11.2pxの小文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.7rem に設定します */
     font-size: 0.7rem;
-    /* ↓ セミボールド（600） */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 文字間隔をやや広めに */
+    /* 文字どうしの横間隔（トラッキング）を 0.06em に調整します */
     letter-spacing: 0.06em;
-    /* ↓ 1pxの黒い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #111111 に設定します */
     border: 1px solid #111111;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を #111111 に設定します */
     color: #111111;
-    /* ↓ 上下2px・左右8pxの余白 */
+    /* 枠の内側余白（padding）を「上下 2px・左右 8px」に設定します */
     padding: 2px 8px;
-    /* ↓ カプセル型の丸角 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
 }
 
-/* ↓ スタジオの大見出し「MANEKIN AI STUDIO」 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-title） */
 .studio-title {
-    /* ↓ 約25.6pxの大きめ見出し */
+    /* 文字の大きさ（フォントサイズ）を 1.6rem に設定します */
     font-size: 1.6rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 少し文字間を空けてブランド感を出します */
+    /* 文字どうしの横間隔（トラッキング）を 0.04em に調整します */
     letter-spacing: 0.04em;
-    /* ↓ 下の説明文との間を6px空けます */
+    /* 要素の下側の外側余白を 6px に設定します */
     margin-bottom: 6px;
-    /* ↓ 黒色変数 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ スタジオタイトル下の案内文 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-subtitle） */
 .studio-subtitle {
-    /* ↓ 約14.4pxの読みやすい文字サイズ */
+    /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
     font-size: 0.9rem;
-    /* ↓ 落ち着いた中間グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 不要な初期マージンを消します */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
 }
 
-/* ↓ ヘッダー右側のユーザー表示カプセル（アバター＋名前＋ランク） */
+/* セレクタ「.user-chip」に対するスタイル定義を開始します（対象: .user-chip） */
 .user-chip {
-    /* ↓ 横並び配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ アバターと文字の間を12px空けます */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 12px に設定します */
     gap: 12px;
-    /* ↓ ごく薄いグレーの背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 上下8px・左右16pxの内側余白 */
+    /* 枠の内側余白（padding）を「上下 8px・左右 16px」に設定します */
     padding: 8px 16px;
-    /* ↓ 大きく丸めたカプセル形状 */
+    /* 四角形の角の丸み（角丸半径）を 40px に設定します */
     border-radius: 40px;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
 }
 
-/* ↓ ユーザー名の頭文字を入れる黒い丸アイコン */
+/* セレクタ「.user-chip-avatar」に対するスタイル定義を開始します（対象: .user-chip-avatar） */
 .user-chip-avatar {
-    /* ↓ 幅38px */
+    /* 横幅を 38px に設定します */
     width: 38px;
-    /* ↓ 高さ38px */
+    /* 高さを 38px に設定します */
     height: 38px;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 50%で完全な円形にします */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ Flexboxで頭文字を上下左右中央に配置します */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 16px */
+    /* 文字の大きさ（フォントサイズ）を 1rem に設定します */
     font-size: 1rem;
 }
 
-/* ↓ ユーザー名と会員ランクを縦に積む入れ物 */
+/* セレクタ「.user-chip-info」に対するスタイル定義を開始します（対象: .user-chip-info） */
 .user-chip-info {
-    /* ↓ Flexbox有効化 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦方向に並べます */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
 }
 
-/* ↓ 会員名の文字スタイル */
+/* セレクタ「.user-chip-name」に対するスタイル定義を開始します（対象: .user-chip-name） */
 .user-chip-name {
-    /* ↓ 約14px */
+    /* 文字の大きさ（フォントサイズ）を 0.88rem に設定します */
     font-size: 0.88rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 「VIP MEMBER」などのサブランク文字 */
+/* セレクタ「.user-chip-rank」に対するスタイル定義を開始します（対象: .user-chip-rank） */
 .user-chip-rank {
-    /* ↓ 11.2pxの小文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.7rem に設定します */
     font-size: 0.7rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 少し文字間を空けます */
+    /* 文字どうしの横間隔（トラッキング）を 0.04em に調整します */
     letter-spacing: 0.04em;
 }
 
-/* --- スタジオサブナビ（タブ） --- */
-/* ↓ ホーム・マイクローゼット・コーデ作成などの切り替えタブバー */
+/* ナビゲーションメニュー・MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-nav-tabs） */
 .studio-nav-tabs {
-    /* ↓ タブボタンを横一列に並べます */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ タブ同士の隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 下側に1pxの仕切り線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
-    /* ↓ 下のコンテンツと28px離します */
+    /* 要素の下側の外側余白を 28px に設定します */
     margin-bottom: 28px;
-    /* ↓ 画面幅が狭い時はタブバーだけ横スクロールできるようにします */
+    /* 横方向のはみ出し制御（auto で横スクロールバー発生等を調整）を設定します */
     overflow-x: auto;
-    /* ↓ 下線とのわずかな余白2px */
+    /* 下側の内側余白を 2px に設定します */
     padding-bottom: 2px;
-    /* ↓ iOS Safariで横スクロールを慣性付きで滑らかにします */
+    /* iOS サファリ等で慣性付きの滑らかなタッチスクロールを有効にします */
     -webkit-overflow-scrolling: touch;
 }
 
-/* ↓ 各タブのボタン */
+/* ボタンパーツ・MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-tab-btn） */
 .studio-tab-btn {
-    /* ↓ アイコンと文字を横並びにするインラインFlex */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ アイコン・文字・バッジの間隔8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 普段は透明背景 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 初期枠線なし */
+    /* 要素を囲む枠線（太さ 0px の none なら枠線消し）を指定します */
     border: none;
-    /* ↓ 押しやすい上下12px・左右18px余白 */
+    /* 枠の内側余白（padding）を「上下 12px・左右 18px」に設定します */
     padding: 12px 18px;
-    /* ↓ 約14.7px */
+    /* 文字の大きさ（フォントサイズ）を 0.92rem に設定します */
     font-size: 0.92rem;
-    /* ↓ 中くらいの太さ（500） */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
-    /* ↓ 非選択時はグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 指カーソルに */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 下線切り替え時に高さが変わらないよう最初から2px透明線を用意します */
+    /* 下辺だけの境界線を 2px solid transparent に設定します */
     border-bottom: 2px solid transparent;
-    /* ↓ ホバーや選択時のアニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ タブラベルが2行に折り返されるのを防ぎます */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ 上側の角だけ6px丸めます */
+    /* 四角形の角の丸み（角丸半径）を 6px 6px 0 0 に設定します */
     border-radius: 6px 6px 0 0;
 }
 
-/* ↓ タブにマウスを乗せた時 */
+/* ボタンパーツ・MANEKIN AI試着スタジオのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .studio-tab-btn:hover） */
 .studio-tab-btn:hover {
-    /* ↓ 文字を黒くします */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ ほんのり薄い黒を重ねて反応を伝えます */
+    /* 背景の色・グラデーション・画像を一括で（rgba(0, 0, 0, 0.02)）に設定します */
     background: rgba(0, 0, 0, 0.02);
 }
 
-/* ↓ 現在開いているタブ */
+/* ボタンパーツ・MANEKIN AI試着スタジオの選択中(.active)に対するスタイル定義を開始します（対象: .studio-tab-btn.active） */
 .studio-tab-btn.active {
-    /* ↓ 文字をはっきりした黒に */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 太字にして強調 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下線を真っ黒にして現在位置を示します */
+    /* 下側の枠線色だけを var(--color-black) に変更します */
     border-bottom-color: var(--color-black);
-    /* ↓ ごく薄い背景色でタブ全体を目立たせます */
+    /* 背景の色・グラデーション・画像を一括で（rgba(0, 0, 0, 0.03)）に設定します */
     background: rgba(0, 0, 0, 0.03);
 }
 
-/* ↓ タブ内のSVGアイコンサイズ */
+/* セレクタ「.tab-svg」に対するスタイル定義を開始します（対象: .tab-svg） */
 .tab-svg {
-    /* ↓ 幅18px */
+    /* 横幅を 18px に設定します */
     width: 18px;
-    /* ↓ 高さ18px */
+    /* 高さを 18px に設定します */
     height: 18px;
 }
 
-/* ↓ タブ横の所持点数カウントバッジ */
+/* セレクタ「.tab-badge」に対するスタイル定義を開始します（対象: .tab-badge） */
 .tab-badge {
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-light)）に設定します */
     background: var(--color-gray-light);
-    /* ↓ 濃いグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
-    /* ↓ 12pxの小文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 上下1px・左右7px余白 */
+    /* 枠の内側余白（padding）を「上下 1px・左右 7px」に設定します */
     padding: 1px 7px;
-    /* ↓ 丸角12px */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
 }
 
-/* ↓ 選択中タブの中にあるカウントバッジは黒反転させます */
+/* ボタンパーツ・MANEKIN AI試着スタジオの選択中(.active)に対するスタイル定義を開始します（対象: .studio-tab-btn.active .tab-badge） */
 .studio-tab-btn.active .tab-badge {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* ↓ 「AI」や「MAIN」など強調用小タグ */
+/* セレクタ「.tab-highlight-tag」に対するスタイル定義を開始します（対象: .tab-highlight-tag） */
 .tab-highlight-tag {
-    /* ↓ 10.4pxの極小文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#111111）に設定します */
     background: #111111;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 上下2px・左右6px余白 */
+    /* 枠の内側余白（padding）を「上下 2px・左右 6px」に設定します */
     padding: 2px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 文字間広め */
+    /* 文字どうしの横間隔（トラッキング）を 0.05em に調整します */
     letter-spacing: 0.05em;
 }
 
-/* --- タブコンテンツパネル --- */
-/* ↓ 各タブに対応する画面コンテンツ（普段は非表示） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-pane） */
 .studio-pane {
-    /* ↓ 選択されていないタブの中身は隠します */
+    /* この要素を画面に表示せずレイアウト領域ごと隠します */
     display: none;
-    /* ↓ 表示される時に0.3秒でふわっと下から浮かぶアニメーションを実行 */
+    /* @keyframes で定義した動きのアニメーション（fadeInPane 0.3s ease）を再生させます */
     animation: fadeInPane 0.3s ease;
 }
 
-/* ↓ .active クラスが付いたタブの画面だけ表示します */
+/* MANEKIN AI試着スタジオの選択中(.active)に対するスタイル定義を開始します（対象: .studio-pane.active） */
 .studio-pane.active {
-    /* ↓ ブロック要素として画面に描画 */
+    /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
     display: block;
 }
 
-/* ↓ タブ切り替え時のフェードイン＆6px上昇アニメーション定義 */
+/* CSSアニメーションの動きのコマ割り「fadeInPane」を定義します */
 @keyframes fadeInPane {
-    /* ↓ 開始時点（透明＆6px下） */
+
+    /* アニメーション進行度「from」時点での状態スタイルを設定します */
     from {
-        /* ↓ 完全に透明 */
+        /* 要素全体の不透明度を 0（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 0;
-        /* ↓ 少し下にずらしておきます */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(6px)） */
         transform: translateY(6px);
     }
 
-    /* ↓ 終了時点（不透明＆定位置） */
+    /* アニメーション進行度「to」時点での状態スタイルを設定します */
     to {
-        /* ↓ くっきり表示 */
+        /* 要素全体の不透明度を 1（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 1;
-        /* ↓ 本来の高さに戻る */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(0)） */
         transform: translateY(0);
     }
 }
 
-/* --- パネル共通アクションバー --- */
-/* ↓ 各タブ上部にあるタイトル（左）と登録ボタンなど（右）のバー */
+/* セレクタ「.pane-action-bar」に対するスタイル定義を開始します（対象: .pane-action-bar） */
 .pane-action-bar {
-    /* ↓ 左右並べ */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端揃え */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下のコンテンツと24px空けます */
+    /* 要素の下側の外側余白を 24px に設定します */
     margin-bottom: 24px;
-    /* ↓ 狭い画面では自動で折り返して2段にします */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 要素間16px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 16px に設定します */
     gap: 16px;
 }
 
-/* ↓ パネル内の見出し文字 */
+/* セレクタ「.pane-title」に対するスタイル定義を開始します（対象: .pane-title） */
 .pane-title {
-    /* ↓ 約22.4px */
+    /* 文字の大きさ（フォントサイズ）を 1.4rem に設定します */
     font-size: 1.4rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下の説明文との隙間4px */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
 }
 
-/* ↓ 見出しの下に添える補足文 */
+/* セレクタ「.pane-desc」に対するスタイル定義を開始します（対象: .pane-desc） */
 .pane-desc {
-    /* ↓ 約14px */
+    /* 文字の大きさ（フォントサイズ）を 0.88rem に設定します */
     font-size: 0.88rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 余白ゼロ */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
 }
 
-/* --- パネル1: ホーム（ダッシュボードサマリー） --- */
-/* ↓ 「登録アイテム数」「保存コーデ数」などの統計カード3列グリッド */
+
+/* -------------------------------------------------------------------------- */
+/* 2. ホームタブ（登録点数サマリー・おすすめバナー・クイックカード） */
+/* -------------------------------------------------------------------------- */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-stats-grid） */
 .studio-stats-grid {
-    /* ↓ CSS Gridを有効化 */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 均等な3列に分けます */
+    /* Grid の横方向の列数と幅の割り振り（repeat(3, 1fr)）を定義します */
     grid-template-columns: repeat(3, 1fr);
-    /* ↓ カード間の隙間20px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
-    /* ↓ 下のバナーとの間を28px空けます */
+    /* 要素の下側の外側余白を 28px に設定します */
     margin-bottom: 28px;
 }
 
-/* ↓ 統計カードの1枚分 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-stat-card） */
 .studio-stat-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上下20px・左右24px余白 */
+    /* 枠の内側余白（padding）を「上下 20px・左右 24px」に設定します */
     padding: 20px 24px;
-    /* ↓ 左アイコンと右数値を横並びに */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 間隔18px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 18px に設定します */
     gap: 18px;
-    /* ↓ さりげない影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
-/* ↓ 統計カードの左側絵文字アイコン枠 */
+/* セレクタ「.stat-icon-wrap」に対するスタイル定義を開始します（対象: .stat-icon-wrap） */
 .stat-icon-wrap {
-    /* ↓ 大きめの絵文字サイズ（28.8px） */
+    /* 文字の大きさ（フォントサイズ）を 1.8rem に設定します */
     font-size: 1.8rem;
-    /* ↓ 正方形の幅52px */
+    /* 横幅を 52px に設定します */
     width: 52px;
-    /* ↓ 高さ52px */
+    /* 高さを 52px に設定します */
     height: 52px;
-    /* ↓ 薄いグレーの四角背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 角丸12px */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 中央配置用Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
 }
 
-/* ↓ 「クローゼット登録数」などのラベル文字 */
+/* セレクタ「.stat-card-label」に対するスタイル定義を開始します（対象: .stat-card-label） */
 .stat-card-label {
-    /* ↓ 1行ブロックとして数値の上に置きます */
+    /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
     display: block;
-    /* ↓ 約13px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 下の数字との間を2px空けます */
+    /* 要素の下側の外側余白を 2px に設定します */
     margin-bottom: 2px;
 }
 
-/* ↓ 統計数字（大きく見せる） */
+/* セレクタ「.stat-card-val」に対するスタイル定義を開始します（対象: .stat-card-val） */
 .stat-card-val {
-    /* ↓ 約25.6px */
+    /* 文字の大きさ（フォントサイズ）を 1.6rem に設定します */
     font-size: 1.6rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 数字の横の単位（「着」「コーデ」など） */
+/* セレクタ「.stat-card-val small」に対するスタイル定義を開始します（対象: .stat-card-val small） */
 .stat-card-val small {
-    /* ↓ 約14.4pxと控えめサイズに */
+    /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
     font-size: 0.9rem;
-    /* ↓ 普通の太さ（500） */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 数字との間に2px隙間 */
+    /* 要素の左側の外側余白を 2px に設定します */
     margin-left: 2px;
 }
 
-/* ↓ スタジオホームの黒いおすすめ案内バナー */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-recommend-banner） */
 .studio-recommend-banner {
-    /* ↓ 黒からダークグレーの高級感あるグラデーション */
+    /* 背景の色・グラデーション・画像を一括で（linear-gradient(135deg, #111111 0%, #2a2a2a 100%)）に設定します */
     background: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
-    /* ↓ 白抜き文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 角丸12px */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 上下36px・左右40pxのゆったり余白 */
+    /* 枠の内側余白（padding）を「上下 36px・左右 40px」に設定します */
     padding: 36px 40px;
-    /* ↓ 下のクイックカードとの間を30px空けます */
+    /* 要素の下側の外側余白を 30px に設定します */
     margin-bottom: 30px;
-    /* ↓ 浮き上がるカード影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-card)）を付けます */
     box-shadow: var(--shadow-card);
 }
 
-/* ↓ バナー左上の半透明タグ */
+/* セレクタ「.banner-badge」に対するスタイル定義を開始します（対象: .banner-badge） */
 .banner-badge {
-    /* ↓ 幅が中身に合うインラインブロック */
+    /* 横に並べられるインライン性質と、幅・高さ・上下余白を持てる性質を両立させます */
     display: inline-block;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 文字間広め */
+    /* 文字どうしの横間隔（トラッキング）を 0.1em に調整します */
     letter-spacing: 0.1em;
-    /* ↓ 18%透明の白背景 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(255, 255, 255, 0.18)）に設定します */
     background: rgba(255, 255, 255, 0.18);
-    /* ↓ 30%透明の白い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid rgba(255, 255, 255, 0.3) に設定します */
     border: 1px solid rgba(255, 255, 255, 0.3);
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 4px・左右 12px」に設定します */
     padding: 4px 12px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
-    /* ↓ 下余白12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
 }
 
-/* ↓ 黒バナー内のタイトル見出し */
+/* セレクタ「.banner-title」に対するスタイル定義を開始します（対象: .banner-title） */
 .banner-title {
-    /* ↓ 約23.2px */
+    /* 文字の大きさ（フォントサイズ）を 1.45rem に設定します */
     font-size: 1.45rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下の本文との間を10px空けます */
+    /* 要素の下側の外側余白を 10px に設定します */
     margin-bottom: 10px;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* ↓ 黒バナー内の説明文 */
+/* セレクタ「.banner-desc」に対するスタイル定義を開始します（対象: .banner-desc） */
 .banner-desc {
-    /* ↓ 約15.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.95rem に設定します */
     font-size: 0.95rem;
-    /* ↓ 読みやすい行間1.7倍 */
+    /* 1行あたりの高さ（行間・1.7）を設定して文章の読みやすさを調整します */
     line-height: 1.7;
-    /* ↓ 真っ白より少し柔らかい薄グレーで長時間読みやすくします */
+    /* 文字色（テキストカラー）を #cccccc に設定します */
     color: #cccccc;
-    /* ↓ 文章が横に長くなりすぎないよう最大820pxで折り返します */
+    /* 横幅の最大上限を 820px に制限し、はみ出しを防ぎます */
     max-width: 820px;
-    /* ↓ 下のボタン群との間を22px空けます */
+    /* 要素の下側の外側余白を 22px に設定します */
     margin-bottom: 22px;
 }
 
-/* ↓ バナー内のボタン横並び容器 */
+/* セレクタ「.banner-actions」に対するスタイル定義を開始します（対象: .banner-actions） */
 .banner-actions {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ ボタン間14px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 14px に設定します */
     gap: 14px;
-    /* ↓ スマホ幅で折り返せるように */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
 }
 
-/* ↓ 黒バナー内のメインボタン（背景色と文字色を白黒反転させて目立たせます） */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .banner-actions .btn-primary） */
 .banner-actions .btn-primary {
-    /* ↓ 白ボタン */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を #111111 に設定します */
     color: #111111;
 }
 
-/* ↓ 白ボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .banner-actions .btn-primary:hover） */
 .banner-actions .btn-primary:hover {
-    /* ↓ わずかに暗めの白 */
+    /* 背景の色・グラデーション・画像を一括で（#f0f0f0）に設定します */
     background: #f0f0f0;
 }
 
-/* ↓ 黒バナー内のサブボタン（半透明枠線のみのアウトラインボタン） */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .banner-actions .btn-outline） */
 .banner-actions .btn-outline {
-    /* ↓ 50%透明の白い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid rgba(255, 255, 255, 0.5) に設定します */
     border: 1px solid rgba(255, 255, 255, 0.5);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 透過背景 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 上下10px・左右20px余白 */
+    /* 枠の内側余白（padding）を「上下 10px・左右 20px」に設定します */
     padding: 10px 20px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ なめらか変化 */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ アウトラインボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .banner-actions .btn-outline:hover） */
 .banner-actions .btn-outline:hover {
-    /* ↓ 10%透明の白背景でうっすら光ります */
+    /* 背景の色・グラデーション・画像を一括で（rgba(255, 255, 255, 0.1)）に設定します */
     background: rgba(255, 255, 255, 0.1);
-    /* ↓ 枠線をくっきりした白に */
+    /* 枠線の色だけを #ffffff に変更します（主に選択・ホバー強調用） */
     border-color: #ffffff;
 }
 
-/* ↓ ホーム下部にある機能ショートカット3カード列 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-quick-cards） */
 .studio-quick-cards {
-    /* ↓ CSS Gridで均等3列 */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 1fr x 3 */
+    /* Grid の横方向の列数と幅の割り振り（repeat(3, 1fr)）を定義します */
     grid-template-columns: repeat(3, 1fr);
-    /* ↓ 間隔20px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
 }
 
-/* ↓ 各機能ショートカットカード */
+/* セレクタ「.quick-card」に対するスタイル定義を開始します（対象: .quick-card） */
 .quick-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 24px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 24px に設定します */
     padding: 24px;
-    /* ↓ クリックして別タブへ飛べるため指カーソルに */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-normal)） */
     transition: all var(--transition-normal);
 }
 
-/* ↓ ショートカットカードにマウスを乗せた時 */
+/* セレクタ「.quick-card:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .quick-card:hover） */
 .quick-card:hover {
-    /* ↓ 枠線を黒くします */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 3px上に浮かせてクリックできる感を強調 */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(-3px)） */
     transform: translateY(-3px);
-    /* ↓ 影を深めます */
+    /* 立体感を出す影や内枠リング（var(--shadow-card)）を付けます */
     box-shadow: var(--shadow-card);
 }
 
-/* ↓ ショートカットカード上部の絵文字 */
+/* セレクタ「.quick-card-icon」に対するスタイル定義を開始します（対象: .quick-card-icon） */
 .quick-card-icon {
-    /* ↓ 約28.8px */
+    /* 文字の大きさ（フォントサイズ）を 1.8rem に設定します */
     font-size: 1.8rem;
-    /* ↓ 下余白12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
 }
 
-/* ↓ カード見出し */
+/* セレクタ「.quick-card h4」に対するスタイル定義を開始します（対象: .quick-card h4） */
 .quick-card h4 {
-    /* ↓ 約16.8px */
+    /* 文字の大きさ（フォントサイズ）を 1.05rem に設定します */
     font-size: 1.05rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下余白6px */
+    /* 要素の下側の外側余白を 6px に設定します */
     margin-bottom: 6px;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ カード説明文 */
+/* セレクタ「.quick-card p」に対するスタイル定義を開始します（対象: .quick-card p） */
 .quick-card p {
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 余白ゼロ */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
-    /* ↓ 行間1.5倍 */
+    /* 1行あたりの高さ（行間・1.5）を設定して文章の読みやすさを調整します */
     line-height: 1.5;
 }
 
-/* --- パネル2: マイクローゼット --- */
-/* ↓ カテゴリ絞り込みピル（「すべて」「トップス」「ボトムス」など）の並び */
+
+/* -------------------------------------------------------------------------- */
+/* 3. マイクローゼット管理タブ（絞り込みピル・所持服カード・着用中枠線） */
+/* -------------------------------------------------------------------------- */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-filter-bar） */
 .closet-filter-bar {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ ボタン間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 下のグリッドとの間を24px空けます */
+    /* 要素の下側の外側余白を 24px に設定します */
     margin-bottom: 24px;
-    /* ↓ 入りきらない時は折り返し */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
 }
 
-/* ↓ 各絞り込みピルボタン */
+/* セレクタ「.filter-pill」に対するスタイル定義を開始します（対象: .filter-pill） */
 .filter-pill {
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 上下8px・左右16px余白 */
+    /* 枠の内側余白（padding）を「上下 8px・左右 16px」に設定します */
     padding: 8px 16px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ 太さ500 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
-    /* ↓ 濃いグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ なめらか変化 */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ 絞り込みボタンホバー時 */
+/* セレクタ「.filter-pill:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .filter-pill:hover） */
 .filter-pill:hover {
-    /* ↓ 枠線を黒く */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* ↓ 選択中の絞り込みボタン */
+/* セレクタ「.filter-pill.active」の選択中(.active)に対するスタイル定義を開始します（対象: .filter-pill.active） */
 .filter-pill.active {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* ↓ マイクローゼットのアイテムカードを敷き詰めるレスポンシブグリッド */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-grid） */
 .closet-grid {
-    /* ↓ Gridレイアウト */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 最小220px以上を確保しつつ横幅いっぱいに列数を自動計算して並べます */
+    /* Grid の横方向の列数と幅の割り振り（repeat(auto-fill, minmax(220px, 1fr))）を定義します */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    /* ↓ カード間20px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
 }
 
-/* ↓ クローゼットの服カード1枚分 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card） */
 .closet-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ はみ出した画像角をカード角丸に合わせてカットします */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ Flexboxで画像と本文を縦に積みます */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦向き配置 */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ ホバーアニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-normal)） */
     transition: all var(--transition-normal);
-    /* ↓ 内部要素配置の基準用 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
 }
 
-/* ↓ カードホバー時 */
+/* マイクローゼット棚のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .closet-card:hover） */
 .closet-card:hover {
-    /* ↓ 影を強く */
+    /* 立体感を出す影や内枠リング（var(--shadow-card)）を付けます */
     box-shadow: var(--shadow-card);
-    /* ↓ 枠線を濃いめのグレーに */
+    /* 枠線の色だけを #999999 に変更します（主に選択・ホバー強調用） */
     border-color: #999999;
 }
 
-/* ↓ マネキンに現在着用中のカード */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card.is-wearing） */
 .closet-card.is-wearing {
-    /* ↓ 2pxの太い黒枠で着用中であることを一目で伝えます */
+    /* 要素周囲の枠線（太さ・線種・色）を 2px solid var(--color-black) に設定します */
     border: 2px solid var(--color-black);
-    /* ↓ 外側にも3pxの薄い黒リングを足して強調 */
+    /* 立体感を出す影や内枠リング（0 0 0 3px rgba(0, 0, 0, 0.1)）を付けます */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ↓ クローゼットカードの上半分（服写真エリア） */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-thumb-wrap） */
 .closet-card-thumb-wrap {
-    /* ↓ 横幅いっぱい */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 高さ200px固定 */
+    /* 高さを 200px に設定します */
     height: 200px;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f4f4f4）に設定します */
     background: #f4f4f4;
-    /* ↓ バッジを絶対配置する基準位置 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ ホバーで写真が少し拡大しても枠外に出ないようにします */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 中央配置用Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
 }
 
-/* ↓ クローゼットカードの服画像 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-img） */
 .closet-card-img {
-    /* ↓ 幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 高さ100% */
+    /* 高さを 100%（親要素いっぱい） に設定します */
     height: 100%;
-    /* ↓ 縦横比を崩さず枠全体を埋め尽くします */
+    /* 枠いっぱいに縦横比を保ったまま隙間なく画像をトリミング配置します（cover） */
     object-fit: cover;
-    /* ↓ 拡大アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（transform var(--transition-normal)） */
     transition: transform var(--transition-normal);
 }
 
-/* ↓ カードホバー時に写真だけを1.03倍に軽くズームします */
+/* マイクローゼット棚のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .closet-card:hover .closet-card-img） */
 .closet-card:hover .closet-card-img {
-    /* ↓ 3%ズーム */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1.03)） */
     transform: scale(1.03);
 }
 
-/* ↓ 写真左上の「私物・購入品」バッジ */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-badge-owned） */
 .closet-badge-owned {
-    /* ↓ 写真枠左上から10pxの位置に浮かべます */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 上10px */
+    /* 基準位置の上端からの縦位置を 10px に指定します */
     top: 10px;
-    /* ↓ 左10px */
+    /* 基準位置の左端からの横位置を 10px に指定します */
     left: 10px;
-    /* ↓ 半透明の黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(17, 17, 17, 0.85)）に設定します */
     background: rgba(17, 17, 17, 0.85);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 極小文字（10.4px） */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 文字間広め */
+    /* 文字どうしの横間隔（トラッキング）を 0.06em に調整します */
     letter-spacing: 0.06em;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 3px・左右 8px」に設定します */
     padding: 3px 8px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 背景の服写真を軽くぼかすすりガラス効果 */
+    /* 背後に透けて見える背景にぼかし（すりガラス効果: blur(4px)）を掛けます */
     backdrop-filter: blur(4px);
 }
 
-/* ↓ 写真右上の「着用中」バッジ */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-badge-wearing） */
 .closet-badge-wearing {
-    /* ↓ 写真枠右上から10pxの位置に浮かべます */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 上10px */
+    /* 基準位置の上端からの縦位置を 10px に指定します */
     top: 10px;
-    /* ↓ 右10px */
+    /* 基準位置の右端からの横位置を 10px に指定します */
     right: 10px;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#111111）に設定します */
     background: #111111;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 約10.9px */
+    /* 文字の大きさ（フォントサイズ）を 0.68rem に設定します */
     font-size: 0.68rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 3px・左右 8px」に設定します */
     padding: 3px 8px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ アイコンと文字を横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間4px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 4px に設定します */
     gap: 4px;
 }
 
-/* ↓ クローゼットカードの下半分（カテゴリ・名前・ボタン類） */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-body） */
 .closet-card-body {
-    /* ↓ 内側14px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 14px に設定します */
     padding: 14px;
-    /* ↓ 縦Flexboxにして操作ボタンを最下部に揃えやすくします */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 余った高さを埋めてカード同士の高さを揃えます */
+    /* 余りスペースがあるときに子要素をどれだけ伸ばすか（比率 1）を指定します */
     flex-grow: 1;
 }
 
-/* ↓ カテゴリ名とカラー丸を左右に置く行 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-meta） */
 .closet-card-meta {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下の服名との間を6px空けます */
+    /* 要素の下側の外側余白を 6px に設定します */
     margin-bottom: 6px;
 }
 
-/* ↓ カテゴリ表記（「TOPS」「OUTER」など） */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-cat） */
 .closet-card-cat {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 文字間広め */
+    /* 文字どうしの横間隔（トラッキング）を 0.05em に調整します */
     letter-spacing: 0.05em;
 }
 
-/* ↓ 服の色を示す小さな丸印 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-color-dot） */
 .closet-color-dot {
-    /* ↓ 幅12px */
+    /* 横幅を 12px に設定します */
     width: 12px;
-    /* ↓ 高さ12px */
+    /* 高さを 12px に設定します */
     height: 12px;
-    /* ↓ 真円 */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ 白っぽい色の服でも境目が分かるよう薄い黒枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid rgba(0, 0, 0, 0.15) に設定します */
     border: 1px solid rgba(0, 0, 0, 0.15);
-    /* ↓ インラインブロック表示 */
+    /* 横に並べられるインライン性質と、幅・高さ・上下余白を持てる性質を両立させます */
     display: inline-block;
 }
 
-/* ↓ アイテム名（最大2行で省略記号 ... を付けます） */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-name） */
 .closet-card-name {
-    /* ↓ 約14.7px */
+    /* 文字の大きさ（フォントサイズ）を 0.92rem に設定します */
     font-size: 0.92rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 下余白8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 行間1.4倍 */
+    /* 1行あたりの高さ（行間・1.4）を設定して文章の読みやすさを調整します */
     line-height: 1.4;
-    /* ↓ 2行以上のはみ出しを隠します */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 末尾に「...」を付けます */
+    /* 枠からはみ出たテキスト末尾を「...」で自動省略表示させます */
     text-overflow: ellipsis;
-    /* ↓ 複数行省略用のWebKitボックス指定 */
+    /* 複数行省略（line-clamp）を効かせるための古い WebKit ボックス表示を有効にします */
     display: -webkit-box;
-    /* ↓ 最大2行までに制限 */
+    /* 文章が長い場合に最大 2 行目までで切り、末尾を「...」省略させます */
     -webkit-line-clamp: 2;
-    /* ↓ 縦方向に並べて切り詰め判定します */
+    /* 複数行省略（line-clamp）のため縦方向スタックを指定します */
     -webkit-box-orient: vertical;
 }
 
-/* ↓ シーズンタグなどの補足行 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-season） */
 .closet-card-season {
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 下のボタンとの間を12px空けます */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
 }
 
-/* ↓ 「マネキンに着せる」ボタンと「削除」ゴミ箱ボタンの横並び */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-card-actions） */
 .closet-card-actions {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ ボタン間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ margin-top: auto により名前の長さが違っても常にカード最下部にピタッと揃います */
+    /* 要素の上側の外側余白を auto（ブラウザが自動で均等計算） に設定します */
     margin-top: auto;
 }
 
-/* ↓ 「着せる / 外す」切り替えボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-wear-toggle） */
 .btn-wear-toggle {
-    /* ↓ 削除ボタン以外の残り横幅いっぱいに広げます */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ 上下8px・左右10px余白 */
+    /* 枠の内側余白（padding）を「上下 8px・左右 10px」に設定します */
     padding: 8px 10px;
-    /* ↓ 約12.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
     font-size: 0.8rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 黒枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-black) に設定します */
     border: 1px solid var(--color-black);
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ なめらか変化 */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ 着せるボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-wear-toggle:hover） */
 .btn-wear-toggle:hover {
-    /* ↓ 少し明るい黒 */
+    /* 背景の色・グラデーション・画像を一括で（#333333）に設定します */
     background: #333333;
 }
 
-/* ↓ すでに着用中の時は「白地に黒文字」へ反転させます */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-wear-toggle.is-active） */
 .btn-wear-toggle.is-active {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* ↓ クローゼットからの削除ボタン */
+/* ボタンパーツ・マイクローゼット棚に対するスタイル定義を開始します（対象: .btn-closet-del） */
 .btn-closet-del {
-    /* ↓ 幅34px正方形 */
+    /* 横幅を 34px に設定します */
     width: 34px;
-    /* ↓ 高さ34px */
+    /* 高さを 34px に設定します */
     height: 34px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 薄いグレー枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ グレーアイコン色 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ アイコンを中央に配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ ホバー時アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ 削除ボタンにマウスを乗せた時は赤系にして誤操作を防ぎます */
+/* ボタンパーツ・マイクローゼット棚のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-closet-del:hover） */
 .btn-closet-del:hover {
-    /* ↓ 淡い赤背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffebee）に設定します */
     background: #ffebee;
-    /* ↓ 赤文字色変数 */
+    /* 文字色（テキストカラー）を var(--color-accent) に設定します */
     color: var(--color-accent);
-    /* ↓ 赤枠線 */
+    /* 枠線の色だけを var(--color-accent) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-accent);
 }
 
-/* クローゼットが空のとき */
-/* ↓ まだ1着も登録されていない時の案内枠 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-empty-card） */
 .closet-empty-card {
-    /* ↓ グリッドの左端から右端まで全列をまたいで横いっぱいに表示します */
+    /* Grid内でこの要素が何列目から何列目までを占めるか（1 / -1）を指定します */
     grid-column: 1 / -1;
-    /* ↓ 文字中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 上下60px・左右20px余白 */
+    /* 枠の内側余白（padding）を「上下 60px・左右 20px」に設定します */
     padding: 60px 20px;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 破線枠で「ここに追加されます」という雰囲気を出します */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px dashed var(--color-gray-light) に設定します */
     border: 1px dashed var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
 }
 
-/* ↓ 空カード内の大きなハンガーアイコン */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-empty-icon） */
 .closet-empty-icon {
-    /* ↓ 48px */
+    /* 文字の大きさ（フォントサイズ）を 3rem に設定します */
     font-size: 3rem;
-    /* ↓ 下余白16px */
+    /* 要素の下側の外側余白を 16px に設定します */
     margin-bottom: 16px;
 }
 
-/* ↓ 空カードのタイトル */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-empty-title） */
 .closet-empty-title {
-    /* ↓ 約19.2px */
+    /* 文字の大きさ（フォントサイズ）を 1.2rem に設定します */
     font-size: 1.2rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下余白8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
 }
 
-/* ↓ 空カードの説明文 */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-empty-desc） */
 .closet-empty-desc {
-    /* ↓ 約14.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
     font-size: 0.9rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 最大幅480pxで読みやすく制限 */
+    /* 横幅の最大上限を 480px に制限し、はみ出しを防ぎます */
     max-width: 480px;
-    /* ↓ 中央配置＋下に24px余白 */
+    /* 要素の外側余白（margin）を「上 0・左右 auto・下 24px」に設定します */
     margin: 0 auto 24px;
 }
 
-/* ========================================================================== */
-/* パネル4: ★ コーデ作成 (3カラムAIシミュレーションスタジオ)                 */
-/* ========================================================================== */
 
-/* モバイル用ビュー切り替え */
-/* ↓ スマホ表示時に「私物」「マネキン」「商品」の3列を切り替えるタブ群（PCでは非表示） */
+/* -------------------------------------------------------------------------- */
+/* 4. コーデ作成ワークスペース（PC用3カラム: 左手持ち / 中試着台 / 右ブランド） */
+/* -------------------------------------------------------------------------- */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-mobile-tabs） */
 .studio-mobile-tabs {
-    /* ↓ 普段（デスクトップ幅）は隠します */
+    /* この要素を画面に表示せずレイアウト領域ごと隠します */
     display: none;
-    /* ↓ スマホ有効時は均等3列のグリッドボタンになります */
+    /* Grid の横方向の列数と幅の割り振り（repeat(3, 1fr)）を定義します */
     grid-template-columns: repeat(3, 1fr);
-    /* ↓ ボタン同士の隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 下のコンテンツとの隙間16px */
+    /* 要素の下側の外側余白を 16px に設定します */
     margin-bottom: 16px;
 }
 
-/* ↓ スマホ用列切り替えタブの各ボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .mobile-tab-btn） */
 .mobile-tab-btn {
-    /* ↓ 内側10px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 10px に設定します */
     padding: 10px;
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ スマホ用タブで選択中のボタン */
+/* ボタンパーツの選択中(.active)に対するスタイル定義を開始します（対象: .mobile-tab-btn.active） */
 .mobile-tab-btn.active {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* 3カラムスタジオグリッド */
-/* ↓ 左(マイクローゼット)・中央(マネキン舞台)・右(ショップ商品)の3列ワークスペース */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-workspace-grid） */
 .studio-workspace-grid {
-    /* ↓ CSS Gridを有効化 */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 左列310px固定・中央列は最小360px以上で残り幅いっぱい・右列340px固定の3列構成 */
+    /* Grid の横方向の列数と幅の割り振り（310px minmax(360px, 1fr) 340px）を定義します */
     grid-template-columns: 310px minmax(360px, 1fr) 340px;
-    /* ↓ 列と列の間を20px空けます */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
-    /* ↓ 各列を上端基準で揃えます（中身が少なくても勝手に引き伸ばされない） */
+    /* 交差軸（通常は上下方向）の揃え位置を start に設定します */
     align-items: start;
-    /* ↓ 下部のAIコメント・コーデ保存パネルとの間を28px空けます */
+    /* 要素の下側の外側余白を 28px に設定します */
     margin-bottom: 28px;
 }
 
-/* ↓ 3列それぞれの白いカード枠 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-col） */
 .studio-col {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 内側18px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 18px に設定します */
     padding: 18px;
-    /* ↓ さりげない影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
-/* ↓ 各列の一番上にある見出しバー */
+/* ヘッダーに対するスタイル定義を開始します（対象: .col-header） */
 .col-header {
-    /* ↓ 左タイトルと右ボタンを横並びに */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下との余白12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
-    /* ↓ 下線との内側余白10px */
+    /* 下側の内側余白を 10px に設定します */
     padding-bottom: 10px;
-    /* ↓ 1pxの仕切り線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
-/* ↓ 列見出しの文字とバッジをまとめる枠 */
+/* セレクタ「.col-title-wrap」に対するスタイル定義を開始します（対象: .col-title-wrap） */
 .col-title-wrap {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ 列のタイトル見出し（「私物・購入済」「BRAND ITEMS」など） */
+/* セレクタ「.col-title」に対するスタイル定義を開始します（対象: .col-title） */
 .col-title {
-    /* ↓ 約16.8px */
+    /* 文字の大きさ（フォントサイズ）を 1.05rem に設定します */
     font-size: 1.05rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 余白ゼロ */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 「OWNED」などの小さいタグバッジ */
+/* セレクタ「.col-badge」に対するスタイル定義を開始します（対象: .col-badge） */
 .col-badge {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 濃いグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
-    /* ↓ 上下2px・左右6px余白 */
+    /* 枠の内側余白（padding）を「上下 2px・左右 6px」に設定します */
     padding: 2px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 文字間 */
+    /* 文字どうしの横間隔（トラッキング）を 0.05em に調整します */
     letter-spacing: 0.05em;
 }
 
-/* ↓ 右列「BRAND」用の黒反転バッジ */
+/* セレクタ「.col-badge.brand-badge」に対するスタイル定義を開始します（対象: .col-badge.brand-badge） */
 .col-badge.brand-badge {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#111111）に設定します */
     background: #111111;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* ↓ お気に入り限定時のオレンジ系バッジ */
+/* セレクタ「.col-badge.col-badge-fav」に対するスタイル定義を開始します（対象: .col-badge.col-badge-fav） */
 .col-badge.col-badge-fav {
-    /* ↓ 8%透明のアクセントオレンジ背景 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(224, 86, 36, 0.08)）に設定します */
     background: rgba(224, 86, 36, 0.08);
-    /* ↓ オレンジ系文字色 */
+    /* 文字色（テキストカラー）を var(--color-accent) に設定します */
     color: var(--color-accent);
-    /* ↓ 25%透明オレンジの枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid rgba(224, 86, 36, 0.25) に設定します */
     border: 1px solid rgba(224, 86, 36, 0.25);
 }
 
-/* ↓ 「+ 手持ち追加」などの極小アウトラインボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-outline-xs） */
 .btn-outline-xs {
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 上下4px・左右10pxのコンパクト余白 */
+    /* 枠の内側余白（padding）を「上下 4px・左右 10px」に設定します */
     padding: 4px 10px;
-    /* ↓ 黒枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-black) に設定します */
     border: 1px solid var(--color-black);
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ 極小ボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-outline-xs:hover） */
 .btn-outline-xs:hover {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* お気に入り絞り込みトグル */
-/* ↓ 「♥ お気に入りのみ」チェックボックスとラベル全体 */
+/* セレクタ「.fav-filter-toggle」に対するスタイル定義を開始します（対象: .fav-filter-toggle） */
 .fav-filter-toggle {
-    /* ↓ 横並び */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 濃いグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 連打しても文字が青く選択されないようにします */
+    /* ドラッグ操作やボタン連続クリック時に誤って文字選択されないようにします */
     user-select: none;
-    /* ↓ 上下3px・左右8px余白 */
+    /* 枠の内側余白（padding）を「上下 3px・左右 8px」に設定します */
     padding: 3px 8px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 背景アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（background-color 0.2s ease） */
     transition: background-color 0.2s ease;
 }
 
-/* ↓ お気に入りトグルホバー時 */
+/* セレクタ「.fav-filter-toggle:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .fav-filter-toggle:hover） */
 .fav-filter-toggle:hover {
-    /* ↓ 薄いグレー背景に */
+    /* 背景の塗りつぶし色を var(--color-gray-bg) に設定します */
     background-color: var(--color-gray-bg);
 }
 
-/* ↓ お気に入り切り替えチェックボックスの大きさ・色カスタマイズ */
+/* セレクタ「.fav-filter-toggle input[type="checkbox"]」に対するスタイル定義を開始します（対象: .fav-filter-toggle input[type="checkbox"]） */
 .fav-filter-toggle input[type="checkbox"] {
-    /* ↓ タッチしやすい大きめ22px幅 */
+    /* 横幅を 22px に設定します */
     width: 22px;
-    /* ↓ 高さ22px */
+    /* 高さを 22px に設定します */
     height: 22px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ チェック時の塗色をブランドアクセント色にします */
+    /* チェックボックスやラジオボタン・スライダー等の強調カラーを var(--color-accent) に揃えます */
     accent-color: var(--color-accent);
-    /* ↓ 既定マージン削除 */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
 }
 
-/* ↓ トグル内のハートマーク色 */
+/* セレクタ「.fav-heart-icon」に対するスタイル定義を開始します（対象: .fav-heart-icon） */
 .fav-heart-icon {
-    /* ↓ アクセント色 */
+    /* 文字色（テキストカラー）を var(--color-accent) に設定します */
     color: var(--color-accent);
-    /* ↓ 約15.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.95rem に設定します */
     font-size: 0.95rem;
 }
 
-/* ミニフィルターバー */
-/* ↓ 左右の列の上部にある極小カテゴリ切り替えチップ列 */
+/* セレクタ「.mini-filter-bar」に対するスタイル定義を開始します（対象: .mini-filter-bar） */
 .mini-filter-bar {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間5px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 5px に設定します */
     gap: 5px;
-    /* ↓ 下のリストとの隙間14px */
+    /* 要素の下側の外側余白を 14px に設定します */
     margin-bottom: 14px;
-    /* ↓ はみ出たら横スクロール */
+    /* 横方向のはみ出し制御（auto で横スクロールバー発生等を調整）を設定します */
     overflow-x: auto;
-    /* ↓ スクロールバーとの隙間2px */
+    /* 下側の内側余白を 2px に設定します */
     padding-bottom: 2px;
 }
 
-/* ↓ 各ミニカテゴリボタン */
+/* セレクタ「.mini-chip」に対するスタイル定義を開始します（対象: .mini-chip） */
 .mini-chip {
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 14px に設定します */
     border-radius: 14px;
-    /* ↓ 上下4px・左右10px */
+    /* 枠の内側余白（padding）を「上下 4px・左右 10px」に設定します */
     padding: 4px 10px;
-    /* ↓ 約11.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.74rem に設定します */
     font-size: 0.74rem;
-    /* ↓ 中太 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
-    /* ↓ 濃いめグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 文字折り返し禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ なめらか変化 */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ ミニチップホバー時 */
+/* セレクタ「.mini-chip:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .mini-chip:hover） */
 .mini-chip:hover {
-    /* ↓ 枠線を濃いグレーに */
+    /* 枠線の色だけを #999999 に変更します（主に選択・ホバー強調用） */
     border-color: #999999;
 }
 
-/* ↓ 選択中のミニチップ */
+/* セレクタ「.mini-chip.active」の選択中(.active)に対するスタイル定義を開始します（対象: .mini-chip.active） */
 .mini-chip.active {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* アイテムスクロールリスト */
-/* ↓ 左右カラム内でアイテム一覧を高さ580pxまでに制限して縦スクロールさせる箱 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-list） */
 .studio-item-list {
-    /* ↓ Flexでカードを縦一列に積みます */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦向き配置 */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ カード同士の間隔10px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 10px に設定します */
     gap: 10px;
-    /* ↓ マネキンステージと高さが釣り合うよう最大580pxで内部スクロールにします */
+    /* 縦方向の最大高さを 580px に制限します */
     max-height: 580px;
-    /* ↓ 縦方向のみスクロールバーを有効化 */
+    /* 縦方向のはみ出し制御（auto で縦スクロール可否などを制御）を設定します */
     overflow-y: auto;
-    /* ↓ 右端スクロールバーに中身が重ならないよう4px余白 */
+    /* 右側の内側余白を 4px に設定します */
     padding-right: 4px;
 }
 
-/* ↓ スクロールバー全体の太さをすっきり細く（Chrome/Safari/Edge向け擬似要素） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-list::-webkit-scrollbar） */
 .studio-item-list::-webkit-scrollbar {
-    /* ↓ 横幅5pxの細いスクロールバー */
+    /* 横幅を 5px に設定します */
     width: 5px;
 }
 
-/* ↓ スクロールバーの動くつまみ部分 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-list::-webkit-scrollbar-thumb） */
 .studio-item-list::-webkit-scrollbar-thumb {
-    /* ↓ 薄いグレー */
+    /* 背景の色・グラデーション・画像を一括で（#d4d4d4）に設定します */
     background: #d4d4d4;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
 }
 
-/* スタジオ用アイテムカード（コンパクト） */
-/* ↓ 左右のスクロール欄に並ぶ1着分のコンパクトな服カード */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-card） */
 .studio-item-card {
-    /* ↓ 写真とテキスト情報を横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 写真と文字の隙間12px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 12px に設定します */
     gap: 12px;
-    /* ↓ 内側8px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 8px に設定します */
     padding: 8px;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ クリック・ドラッグできることを示す指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ ホバー時アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ 相対位置 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
 }
 
-/* ↓ カードホバー時 */
+/* MANEKIN AI試着スタジオのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .studio-item-card:hover） */
 .studio-item-card:hover {
-    /* ↓ 枠線を少し濃く */
+    /* 枠線の色だけを #999999 に変更します（主に選択・ホバー強調用） */
     border-color: #999999;
-    /* ↓ ごく薄いオフホワイト背景に */
+    /* 背景の色・グラデーション・画像を一括で（#fafafa）に設定します */
     background: #fafafa;
 }
 
-/* ↓ 現在マネキンに着せているカード（選択中ハイライト） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-card.is-active） */
 .studio-item-card.is-active {
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 淡いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f7f7f7）に設定します */
     background: #f7f7f7;
-    /* ↓ 外周にも1pxの黒線を描いて二重線風に強調します */
+    /* 立体感を出す影や内枠リング（0 0 0 1px var(--color-black)）を付けます */
     box-shadow: 0 0 0 1px var(--color-black);
 }
 
-/* ↓ コンパクトカード左側の小さな服サムネイル */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-card-img） */
 .studio-item-card-img {
-    /* ↓ 幅60px */
+    /* 横幅を 60px に設定します */
     width: 60px;
-    /* ↓ 高さ72px */
+    /* 高さを 72px に設定します */
     height: 72px;
-    /* ↓ 縦横比を保って枠いっぱいに収めます */
+    /* 枠いっぱいに縦横比を保ったまま隙間なく画像をトリミング配置します（cover） */
     object-fit: cover;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 読み込み中の背景グレー */
+    /* 背景の色・グラデーション・画像を一括で（#eeeeee）に設定します */
     background: #eeeeee;
-    /* ↓ テキストが長くても画像が潰れないよう縮み禁止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ カード右側の文字エリア */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-item-card-info） */
 .studio-item-card-info {
-    /* ↓ 残り横幅をすべて使います */
+    /* 余りスペースがあるときに子要素をどれだけ伸ばすか（比率 1）を指定します */
     flex-grow: 1;
-    /* ↓ 長い商品名を省略記号(...)で切るために必要な最小幅0指定 */
+    /* どんなに画面が狭くても最低 0（余白なし） の横幅を保つ（0 の場合はフレックス縮みバグ防止）ようにします */
     min-width: 0;
 }
 
-/* ↓ カテゴリ名と「着用中」バッジを並べる上段 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-card-cat-row） */
 .studio-card-cat-row {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 下2px */
+    /* 要素の下側の外側余白を 2px に設定します */
     margin-bottom: 2px;
 }
 
-/* ↓ カテゴリ名（「TOPS」など） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-card-cat） */
 .studio-card-cat {
-    /* ↓ 約10.9px */
+    /* 文字の大きさ（フォントサイズ）を 0.68rem に設定します */
     font-size: 0.68rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 商品名（1行に収まらなければ「...」で切り詰めます） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-card-name） */
 .studio-card-name {
-    /* ↓ 約13.1px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 行間1.35倍 */
+    /* 1行あたりの高さ（行間・1.35）を設定して文章の読みやすさを調整します */
     line-height: 1.35;
-    /* ↓ 下4px */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
-    /* ↓ 改行せず1行に収めます */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ はみ出し非表示 */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 末尾を「...」に省略 */
+    /* 枠からはみ出たテキスト末尾を「...」で自動省略表示させます */
     text-overflow: ellipsis;
 }
 
-/* ↓ 価格や色などのサブ情報行 */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-card-sub） */
 .studio-card-sub {
-    /* ↓ 約11.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.74rem に設定します */
     font-size: 0.74rem;
-    /* ↓ 濃いめグレー */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
 }
 
-/* ↓ 「着用中」バッジ（右端に自動配置） */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-card-badge-wearing） */
 .studio-card-badge-wearing {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 上下2px・左右6px余白 */
+    /* 枠の内側余白（padding）を「上下 2px・左右 6px」に設定します */
     padding: 2px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ Flexbox内で左マージンをautoにして行の右端に寄せています */
+    /* 要素の左側の外側余白を auto（ブラウザが自動で均等計算） に設定します */
     margin-left: auto;
-    /* ↓ 縮み防止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ========================================================================== */
-/* ◆ 中央カラム: マネキン試着室                                              */
-/* ========================================================================== */
 
-/* ↓ マネキンステージ上部の操作ツールバー */
+/* -------------------------------------------------------------------------- */
+/* 5. マネキンステージツールバー & 5部位重ね着レイヤー制御 */
+/* z-index 3(靴)->4(ボトムス)->5(トップス)->6(アウター)->7(帽子) で重ね、 */
+/* JSがセットする --offset-x / --offset-y / --scale で位置とサイズを変形。 */
+/* -------------------------------------------------------------------------- */
+/* マネキン試着ステージに対するスタイル定義を開始します（対象: .mannequin-toolbar） */
 .mannequin-toolbar {
-    /* ↓ Flexbox有効 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 上段(見出し)・下段(操作ボタン群)の2段構成 */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 左端揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を flex-start に設定します */
     align-items: flex-start;
-    /* ↓ 下12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
-    /* ↓ 下線までの内側余白10px */
+    /* 下側の内側余白を 10px に設定します */
     padding-bottom: 10px;
-    /* ↓ 仕切り線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
-    /* ↓ 段間の隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ 上段のタイトル容器 */
+/* セレクタ「.toolbar-left」に対するスタイル定義を開始します（対象: .toolbar-left） */
 .toolbar-left {
-    /* ↓ 横幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
 }
 
-/* ↓ 「MANEKIN STAGE」見出しタグ */
+/* マネキン着用ステージに対するスタイル定義を開始します（対象: .stage-tag） */
 .stage-tag {
-    /* ↓ 約15.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.95rem に設定します */
     font-size: 0.95rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 改行禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ ブロック表示 */
+    /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
     display: block;
 }
 
-/* ↓ 下段の各種ボタン並び（位置微調整、MEN/WOMEN切替、全リセット） */
+/* セレクタ「.toolbar-right」に対するスタイル定義を開始します（対象: .toolbar-right） */
 .toolbar-right {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 左詰め配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを flex-start に設定します */
     justify-content: flex-start;
-    /* ↓ ボタン間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 入り切らない時は自動改行 */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 横幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
 }
 
-/* ↓ MEN / WOMEN 性別切り替えスイッチ枠 */
+/* セレクタ「.gender-toggle-wrap」に対するスタイル定義を開始します（対象: .gender-toggle-wrap） */
 .gender-toggle-wrap {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 内部ボタンの角を枠に合わせます */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 縮み禁止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ MEN / WOMEN 個別ボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-gender） */
 .btn-gender {
-    /* ↓ 非選択時は透明 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 枠線なし */
+    /* 要素を囲む枠線（太さ 0px の none なら枠線消し）を指定します */
     border: none;
-    /* ↓ 上下4px・左右8px */
+    /* 枠の内側余白（padding）を「上下 4px・左右 8px」に設定します */
     padding: 4px 8px;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 濃いめグレー */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 1行維持 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* ↓ 選択中の性別ボタン（黒反転） */
+/* ボタンパーツの選択中(.active)に対するスタイル定義を開始します（対象: .btn-gender.active） */
 .btn-gender.active {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* ↓ 「すべて外す」クリアボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-toolbar-clear） */
 .btn-toolbar-clear {
-    /* ↓ アイコンと文字を横並び */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間3px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 3px に設定します */
     gap: 3px;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 太さ500 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 透明背景 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 4px・左右 7px」に設定します */
     padding: 4px 7px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ 改行禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ 縮み防止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ クリアボタンホバー時（ほんのり赤く警告色） */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-toolbar-clear:hover） */
 .btn-toolbar-clear:hover {
-    /* ↓ 赤系文字 */
+    /* 文字色（テキストカラー）を var(--color-accent) に設定します */
     color: var(--color-accent);
-    /* ↓ 赤系枠線 */
+    /* 枠線の色だけを var(--color-accent) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-accent);
-    /* ↓ ごく淡いピンク背景 */
+    /* 背景の色・グラデーション・画像を一括で（#fff5f5）に設定します */
     background: #fff5f5;
 }
 
-/* マネキンビジュアルステージ（ゴーストマネキン試着ステージ） */
-/* ↓ 中央の試着ディスプレイ空間全体 */
+/* マネキン試着ステージ・マネキン着用ステージに対するスタイル定義を開始します（対象: .mannequin-stage-box） */
 .mannequin-stage-box {
-    /* ↓ 上から下に白っぽく淡いグレーへ移ろうスタジオ照明風グラデーション */
+    /* 背景の色・グラデーション・画像を一括で（linear-gradient(180deg, #fafafa 0%, #f4f6f8 100%)）に設定します */
     background: linear-gradient(180deg, #fafafa 0%, #f4f6f8 100%);
-    /* ↓ 1.5pxの枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1.5px solid var(--color-gray-light) に設定します */
     border: 1.5px solid var(--color-gray-light);
-    /* ↓ 角丸12px */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 内部ポップアップなどの絶対配置基準 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 上16px・左右16px・下14px余白 */
+    /* 枠の内側余白（padding）を「上 16px・左右 16px・下 14px」に設定します */
     padding: 16px 16px 14px;
-    /* ↓ 縦Flexboxで中央揃え */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦配置 */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 横方向中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 最低560pxの高さを保ち見栄えを良くします */
+    /* 最低限確保する高さを 560px に設定します */
     min-height: 560px;
-    /* ↓ 上ヒント・中マネキン・下着用チップを上下均等に配分 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ ドラッグ＆ドロップ時の強調アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.25s ease） */
     transition: all 0.25s ease;
-    /* ↓ はみ出し防止 */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
 }
 
-/* ↓ 服カードをステージ上へドラッグして乗せている最中の強調スタイル */
+/* マネキン試着ステージ・マネキン着用ステージに対するスタイル定義を開始します（対象: .mannequin-stage-box.is-dragover） */
 .mannequin-stage-box.is-dragover {
-    /* ↓ 黒枠線で「ここにドロップ可能」を示します */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 少しクールな青白背景に変化 */
+    /* 背景の色・グラデーション・画像を一括で（#f1f5f9）に設定します */
     background: #f1f5f9;
-    /* ↓ 外側リング */
+    /* 立体感を出す影や内枠リング（0 0 0 3px rgba(0, 0, 0, 0.1)）を付けます */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ↓ ステージ上部の「ドラッグまたはクリックで着せ替えできます」ヒントピル */
+/* マネキン着用ステージに対するスタイル定義を開始します（対象: .stage-guide-hint） */
 .stage-guide-hint {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ スレートグレー文字 */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ 半透明白背景 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(255, 255, 255, 0.9)）に設定します */
     background: rgba(255, 255, 255, 0.9);
-    /* ↓ 枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e2e8f0 に設定します */
     border: 1px solid #e2e8f0;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 5px・左右 14px」に設定します */
     padding: 5px 14px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
-    /* ↓ 下8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
-    /* ↓ 文字間 */
+    /* 文字どうしの横間隔（トラッキング）を 0.02em に調整します */
     letter-spacing: 0.02em;
-    /* ↓ ドロップ操作の邪魔にならないようマウス当たり判定を無視します */
+    /* クリックやマウス操作をこの要素に反応させず、背後の要素へ透過させます（none） */
     pointer-events: none;
-    /* ↓ うっすら影 */
+    /* 立体感を出す影や内枠リング（0 1px 3px rgba(0, 0, 0, 0.04)）を付けます */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* ↓ マネキン本体と5部位の服レイヤーを重ね合わせる 280x480px の舞台キャンバス */
+/* マネキン試着ステージに対するスタイル定義を開始します（対象: .mannequin-model-wrap） */
 .mannequin-model-wrap {
-    /* ↓ 各部位(.layer-slot)はこの要素を座標(0,0)基準にして絶対配置されます */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 幅280px */
+    /* 横幅を 280px に設定します */
     width: 280px;
-    /* ↓ 高さ480px */
+    /* 高さを 480px に設定します */
     height: 480px;
-    /* ↓ 中央揃え */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
 }
 
-/* マネキンベースSVG（クロームスタンドのみ表示） */
-/* ↓ 背景に立つマネキン土台シルエットのSVG領域 */
+/* マネキン試着ステージに対するスタイル定義を開始します（対象: .mannequin-base-silhouette） */
 .mannequin-base-silhouette {
-    /* ↓ 280pxいっぱい */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 480pxいっぱい */
+    /* 高さを 100%（親要素いっぱい） に設定します */
     height: 100%;
-    /* ↓ ステージ背面にぴったり重ねます */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 上端0 */
+    /* 基準位置の上端からの縦位置を 0 に指定します */
     top: 0;
-    /* ↓ 左端0 */
+    /* 基準位置の左端からの横位置を 0 に指定します */
     left: 0;
-    /* ↓ 重なり順 z-index: 1（すべての服レイヤーより背面） */
+    /* 重なり順（奥行き）の優先度を 1 に設定し、大きい値ほど手前に表示します */
     z-index: 1;
-    /* ↓ スタンドはクリック操作不要なので透過 */
+    /* クリックやマウス操作をこの要素に反応させず、背後の要素へ透過させます（none） */
     pointer-events: none;
-    /* ↓ 90%の不透明度で服より主張しすぎないようにします */
+    /* 要素全体の不透明度を 0.9（0＝完全に透明、1＝くっきり不透明）に設定します */
     opacity: 0.9;
 }
 
-/* ↓ 「位置・サイズ調整」アコーディオンを開くボタン */
+/* ボタンパーツ・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .btn-toolbar-adjust） */
 .btn-toolbar-adjust {
-    /* ↓ 横並び */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間4px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 4px に設定します */
     gap: 4px;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 濃いグレー枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-dark) に設定します */
     border: 1px solid var(--color-gray-dark);
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 4px・左右 7px」に設定します */
     padding: 4px 7px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ 改行禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ 縮み防止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ 調整ボタンホバー・パネル展開中状態 */
+/* ボタンパーツ・位置・サイズ微調整操作のマウスを乗せたとき(hover) / 選択中(.active)に対するスタイル定義を開始します（対象: .btn-toolbar-adjust:hover, .btn-toolbar-adjust.active） */
 .btn-toolbar-adjust:hover,
 .btn-toolbar-adjust.active {
-    /* ↓ 黒反転 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* 4層の試着レイヤー（ゴーストマネキン仕様・クリック操作可能） */
-/* ↓ 帽子・アウター・トップス・ボトムス・靴の各レイヤー共通スタイル */
+/* セレクタ「.layer-slot」に対するスタイル定義を開始します（対象: .layer-slot） */
 .layer-slot {
-    /* ↓ .mannequin-model-wrap を基準に自由な座標へ配置 */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ まず左端を50%位置に置き、下の translate(-50%) で水平中央に揃えます */
+    /* 基準位置の左端からの横位置を 50% に指定します */
     left: 50%;
-    /* ↓ CSS変数(--offset-x, --offset-y, --scale)を使ってJSからのリアルタイム位置・サイズ微調整を即反映します */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translate(calc(-50% + var(--offset-x, 0px)), var(--offset-y, 0px)) scale(var(--scale, 1))） */
     transform: translate(calc(-50% + var(--offset-x, 0px)), var(--offset-y, 0px)) scale(var(--scale, 1));
-    /* ↓ 拡大縮小の中心点もパーツの中央にします */
+    /* 拡大縮小・回転の基準となる中心座標（center center）を指定します */
     transform-origin: center center;
-    /* ↓ 中身を中央配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ テキスト中央 */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 何も着ていない空スロットは背面へのクリックや下の服のクリックを妨げないよう当たり判定OFF */
+    /* クリックやマウス操作をこの要素に反応させず、背後の要素へ透過させます（none） */
     pointer-events: none;
-    /* 未着用時は透過 */
-    /* ↓ ドラッグやクリックで青い選択範囲が出ないよう禁止 */
+    /* ドラッグ操作やボタン連続クリック時に誤って文字選択されないようにします */
     user-select: none;
-    /* ↓ スライダーで動かした時に滑らかに追従するトランジション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（transform 0.08s ease-out, filter 0.2s） */
     transition: transform 0.08s ease-out, filter 0.2s;
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
 }
 
-/* ↓ アイテム着用中のスロットはクリックしてクイック着せ替え等が開けるよう当たり判定を復活させます */
+/* セレクタ「.layer-slot.has-item」に対するスタイル定義を開始します（対象: .layer-slot.has-item） */
 .layer-slot.has-item {
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ クリック可能に戻す */
+    /* マウスイベント受付設定（auto）を指定します */
     pointer-events: auto;
-    /* 着用時のみ操作可能 */
 }
 
-/* ↓ 着用中アイテムにマウスを乗せるとわずかに明るく光ります */
+/* セレクタ「.layer-slot.has-item:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .layer-slot.has-item:hover） */
 .layer-slot.has-item:hover {
-    /* ↓ 明るさ3%アップ */
+    /* プロパティ filter を brightness(1.03) に設定します */
     filter: brightness(1.03);
 }
 
-/* レイヤー配置位置（服とパンツが自然に重なり合う黄金バランス） */
-/* ↓ 足元（シューズ）スロット：一番奥のz-index 3（パンツの裾が靴にかぶるように） */
+/* セレクタ「.layer-shoes」に対するスタイル定義を開始します（対象: .layer-shoes） */
 .layer-shoes {
-    /* ↓ 上から410px位置 */
+    /* 基準位置の上端からの縦位置を 410px に指定します */
     top: 410px;
-    /* ↓ 幅140px */
+    /* 横幅を 140px に設定します */
     width: 140px;
-    /* ↓ 高さ65px */
+    /* 高さを 65px に設定します */
     height: 65px;
-    /* ↓ 重なり順 3 */
+    /* 重なり順（奥行き）の優先度を 3 に設定し、大きい値ほど手前に表示します */
     z-index: 3;
 }
 
-/* ↓ 下半身（ボトムス）スロット：重なり順 z-index 4（トップスより奥で自然にタックイン風） */
+/* セレクタ「.layer-bottoms」に対するスタイル定義を開始します（対象: .layer-bottoms） */
 .layer-bottoms {
-    /* ↓ 上から230px位置 */
+    /* 基準位置の上端からの縦位置を 230px に指定します */
     top: 230px;
-    /* ↓ 幅180px */
+    /* 横幅を 180px に設定します */
     width: 180px;
-    /* ↓ 高さ230px */
+    /* 高さを 230px に設定します */
     height: 230px;
-    /* ↓ 重なり順 4 */
+    /* 重なり順（奥行き）の優先度を 4 に設定し、大きい値ほど手前に表示します */
     z-index: 4;
 }
 
-/* ↓ 上半身インナー（トップス）スロット：重なり順 z-index 5 */
+/* セレクタ「.layer-tops」に対するスタイル定義を開始します（対象: .layer-tops） */
 .layer-tops {
-    /* ↓ 上から80px位置 */
+    /* 基準位置の上端からの縦位置を 80px に指定します */
     top: 80px;
-    /* ↓ 幅200px */
+    /* 横幅を 200px に設定します */
     width: 200px;
-    /* ↓ 高さ200px */
+    /* 高さを 200px に設定します */
     height: 200px;
-    /* ↓ 重なり順 5 */
+    /* 重なり順（奥行き）の優先度を 5 に設定し、大きい値ほど手前に表示します */
     z-index: 5;
 }
 
-/* ↓ 羽織り物（アウター）スロット：トップスのさらに上から重ねるため z-index 6 */
+/* セレクタ「.layer-outer」に対するスタイル定義を開始します（対象: .layer-outer） */
 .layer-outer {
-    /* ↓ 上から70px位置 */
+    /* 基準位置の上端からの縦位置を 70px に指定します */
     top: 70px;
-    /* ↓ 幅230px */
+    /* 横幅を 230px に設定します */
     width: 230px;
-    /* ↓ 高さ250px */
+    /* 高さを 250px に設定します */
     height: 250px;
-    /* ↓ 重なり順 6 */
+    /* 重なり順（奥行き）の優先度を 6 に設定し、大きい値ほど手前に表示します */
     z-index: 6;
 }
 
-/* ↓ 頭部（帽子）スロット：最前面の z-index 7 */
+/* セレクタ「.layer-hat」に対するスタイル定義を開始します（対象: .layer-hat） */
 .layer-hat {
-    /* ↓ 上から40px位置 */
+    /* 基準位置の上端からの縦位置を 40px に指定します */
     top: 40px;
-    /* ↓ 幅125px */
+    /* 横幅を 125px に設定します */
     width: 125px;
-    /* ↓ 高さ75px */
+    /* 高さを 75px に設定します */
     height: 75px;
-    /* ↓ 重なり順 7（一番手前） */
+    /* 重なり順（奥行き）の優先度を 7 に設定し、大きい値ほど手前に表示します */
     z-index: 7;
 }
 
-/* ↓ スロット内で服画像を包むコンテナ */
+/* セレクタ「.layer-content」に対するスタイル定義を開始します（対象: .layer-content） */
 .layer-content {
-    /* ↓ 幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 高さ100% */
+    /* 高さを 100%（親要素いっぱい） に設定します */
     height: 100%;
-    /* ↓ 相対位置 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 中央配置用Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
 }
 
-/* ↓ マネキンに着せられた服・靴画像そのもの */
+/* セレクタ「.layer-img」に対するスタイル定義を開始します（対象: .layer-img） */
 .layer-img {
-    /* ↓ スロット枠からはみ出さない最大幅100% */
+    /* 横幅の最大上限を 100%（親要素いっぱい） に制限し、はみ出しを防ぎます */
     max-width: 100%;
-    /* ↓ スロット枠からはみ出さない最大高さ100% */
+    /* 縦方向の最大高さを 100%（親要素いっぱい） に制限します */
     max-height: 100%;
-    /* ↓ 服が切り取られず全体が綺麗に入る object-fit: contain */
+    /* 画像全体が見切れないように枠内に収めます（contain） */
     object-fit: contain;
-    /* ↓ 背景透過画像の輪郭に沿って立体的なドロップシャドウ（影）を落とし、マネキンに着ている浮き立ち感を演出します */
+    /* プロパティ filter を drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16)) に設定します */
     filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16));
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 着用した瞬間にぽんと弾むスプリング風アニメーション（wearPop） */
+    /* @keyframes で定義した動きのアニメーション（wearPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)）を再生させます */
     animation: wearPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-
-/* ↓ 服を着せた瞬間のポップ登場アニメーション定義 */
+/* CSSアニメーションの動きのコマ割り「wearPop」を定義します */
 @keyframes wearPop {
-    /* ↓ 開始時は90%サイズ＆半透明 */
+
+    /* アニメーション進行度「0%」時点での状態スタイルを設定します */
     0% {
-        /* ↓ 0.9倍に少し小さく */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(0.9)） */
         transform: scale(0.9);
-        /* ↓ 半透明 */
+        /* 要素全体の不透明度を 0.5（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 0.5;
     }
 
-    /* ↓ 完了時は等倍＆くっきり表示 */
+    /* アニメーション進行度「100%」時点での状態スタイルを設定します */
     100% {
-        /* ↓ 等倍 */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1)） */
         transform: scale(1);
-        /* ↓ 不透明 */
+        /* 要素全体の不透明度を 1（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 1;
     }
 }
 
-/* スロット空状態のガイドボタン（非表示） */
-/* ↓ 開発時の旧ガイドボタン残存スタイル（現在は見た目スッキリ化のため非表示設定） */
+/* 部位スロット(頭/アウター/トップス/ボトムス/靴)に対するスタイル定義を開始します（対象: .slot-empty-label） */
 .slot-empty-label {
-    /* ↓ 確実に隠す */
+    /* この要素を画面に表示せずレイアウト領域ごと隠します（!important で優先上書き） */
     display: none !important;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を #475569 に設定します */
     color: #475569;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 破線枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1.5px dashed #94a3b8 に設定します */
     border: 1.5px dashed #94a3b8;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 6px・左右 14px」に設定します */
     padding: 6px 14px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 20px に設定します */
     border-radius: 20px;
-    /* ↓ 半透明白背景 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(255, 255, 255, 0.95)）に設定します */
     background: rgba(255, 255, 255, 0.95);
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（0 2px 8px rgba(0, 0, 0, 0.05)）を付けます */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.2s ease） */
     transition: all 0.2s ease;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間4px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 4px に設定します */
     gap: 4px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
 }
 
-/* ↓ 空ガイドホバー時スタイル */
+/* 部位スロット(頭/アウター/トップス/ボトムス/靴)のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .layer-slot:hover .slot-empty-label） */
 .layer-slot:hover .slot-empty-label {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 少し拡大 */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1.05)） */
     transform: scale(1.05);
-    /* ↓ 濃い影 */
+    /* 立体感を出す影や内枠リング（0 4px 12px rgba(0, 0, 0, 0.15)）を付けます */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* クイックアイテム選択ポップオーバー */
-/* ↓ ステージの服をクリックした時に下からせり上がって別候補を選べる小窓 */
+
+/* -------------------------------------------------------------------------- */
+/* 6. 部位別クイック選択ポップアップ & フィッティング位置・サイズ微調整パネル */
+/* -------------------------------------------------------------------------- */
+/* マネキン着用ステージに対するスタイル定義を開始します（対象: .stage-quick-picker） */
 .stage-quick-picker {
-    /* ↓ ステージ内下端に重ねて表示 */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 下12px */
+    /* 基準位置の下端からの縦位置を 12px に指定します */
     bottom: 12px;
-    /* ↓ 左12px */
+    /* 基準位置の左端からの横位置を 12px に指定します */
     left: 12px;
-    /* ↓ 右12px */
+    /* 基準位置の右端からの横位置を 12px に指定します */
     right: 12px;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 1.5px黒枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1.5px solid var(--color-black) に設定します */
     border: 1.5px solid var(--color-black);
-    /* ↓ 角丸12px */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 内側14px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 14px に設定します */
     padding: 14px;
-    /* ↓ 浮かぶ大きな影 */
+    /* 立体感を出す影や内枠リング（0 10px 30px rgba(0, 0, 0, 0.2)）を付けます */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    /* ↓ 最前面に表示（z-index: 50） */
+    /* 重なり順（奥行き）の優先度を 50 に設定し、大きい値ほど手前に表示します */
     z-index: 50;
-    /* ↓ 下からスライド表示 */
+    /* @keyframes で定義した動きのアニメーション（slideUp 0.22s ease-out）を再生させます */
     animation: slideUp 0.22s ease-out;
 }
 
-/* ↓ クイックピッカー出現時の下→上スライドアニメーション */
+/* CSSアニメーションの動きのコマ割り「slideUp」を定義します */
 @keyframes slideUp {
-    /* ↓ 開始時点（20px下・透明） */
+
+    /* アニメーション進行度「from」時点での状態スタイルを設定します */
     from {
-        /* ↓ 20px下 */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(20px)） */
         transform: translateY(20px);
-        /* ↓ 透明 */
+        /* 要素全体の不透明度を 0（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 0;
     }
 
-    /* ↓ 完了時点（定位置・不透明） */
+    /* アニメーション進行度「to」時点での状態スタイルを設定します */
     to {
-        /* ↓ 原点へ */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(0)） */
         transform: translateY(0);
-        /* ↓ 不透明 */
+        /* 要素全体の不透明度を 1（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 1;
     }
 }
 
-/* ↓ ピッカー小窓のヘッダー（タイトルと×ボタン） */
+/* ヘッダーに対するスタイル定義を開始します（対象: .quick-picker-header） */
 .quick-picker-header {
-    /* ↓ 左右配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端揃え */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下10px */
+    /* 要素の下側の外側余白を 10px に設定します */
     margin-bottom: 10px;
-    /* ↓ 下余白6px */
+    /* 下側の内側余白を 6px に設定します */
     padding-bottom: 6px;
-    /* ↓ 薄い仕切り線 */
+    /* 下辺だけの境界線を 1px solid #f1f5f9 に設定します */
     border-bottom: 1px solid #f1f5f9;
 }
 
-/* ↓ ピッカー見出し（例：「TOPS を選択」） */
+/* セレクタ「.quick-picker-title」に対するスタイル定義を開始します（対象: .quick-picker-title） */
 .quick-picker-title {
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ ピッカー右上の閉じる×ボタン */
+/* セレクタ「.quick-picker-close」に対するスタイル定義を開始します（対象: .quick-picker-close） */
 .quick-picker-close {
-    /* ↓ 背景なし */
+    /* 背景の色・グラデーション・画像を一括で（none）に設定します */
     background: none;
-    /* ↓ 枠なし */
+    /* 要素を囲む枠線（太さ 0px の none なら枠線消し）を指定します */
     border: none;
-    /* ↓ 大きめ× */
+    /* 文字の大きさ（フォントサイズ）を 1.2rem に設定します */
     font-size: 1.2rem;
-    /* ↓ 行高1 */
+    /* 1行あたりの高さ（行間・1）を設定して文章の読みやすさを調整します */
     line-height: 1;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 左右4px余白 */
+    /* 枠の内側余白（padding）を「上下 0（余白なし）・左右 4px」に設定します */
     padding: 0 4px;
 }
 
-/* ↓ 閉じるボタンホバー時 */
+/* セレクタ「.quick-picker-close:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .quick-picker-close:hover） */
 .quick-picker-close:hover {
-    /* ↓ 黒く強調 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ ピッカー内の候補サムネイル一覧グリッド */
+/* セレクタ「.quick-picker-body」に対するスタイル定義を開始します（対象: .quick-picker-body） */
 .quick-picker-body {
-    /* ↓ グリッド表示 */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 最小80pxで横に自動敷き詰め */
+    /* Grid の横方向の列数と幅の割り振り（repeat(auto-fill, minmax(80px, 1fr))）を定義します */
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 多すぎる時は最大180pxで縦スクロール */
+    /* 縦方向の最大高さを 180px に制限します */
     max-height: 180px;
-    /* ↓ 縦スクロール有効 */
+    /* 縦方向のはみ出し制御（auto で縦スクロール可否などを制御）を設定します */
     overflow-y: auto;
-    /* ↓ 右端4px余白 */
+    /* 右側の内側余白を 4px に設定します */
     padding-right: 4px;
 }
 
-/* ↓ ピッカー内の候補カード1枚分 */
+/* セレクタ「.quick-picker-card」に対するスタイル定義を開始します（対象: .quick-picker-card） */
 .quick-picker-card {
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e2e8f0 に設定します */
     border: 1px solid #e2e8f0;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 余白6px */
+    /* 枠の内側余白（padding）を全方向一律で 6px に設定します */
     padding: 6px;
-    /* ↓ 中央揃え */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ なめらか変化 */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.15s） */
     transition: all 0.15s;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
 }
 
-/* ↓ 候補カードホバー時 */
+/* セレクタ「.quick-picker-card:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .quick-picker-card:hover） */
 .quick-picker-card:hover {
-    /* ↓ 黒枠 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 2px上に浮く */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（translateY(-2px)） */
     transform: translateY(-2px);
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（0 4px 10px rgba(0, 0, 0, 0.08)）を付けます */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* ↓ 候補カード内の商品写真 */
+/* セレクタ「.quick-picker-card img」に対するスタイル定義を開始します（対象: .quick-picker-card img） */
 .quick-picker-card img {
-    /* ↓ 幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 高さ60px */
+    /* 高さを 60px に設定します */
     height: 60px;
-    /* ↓ 全体収容 */
+    /* 画像全体が見切れないように枠内に収めます（contain） */
     object-fit: contain;
-    /* ↓ 下4px余白 */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
 }
 
-/* ↓ 候補カード下の短いアイテム名 */
+/* セレクタ「.quick-picker-card-name」に対するスタイル定義を開始します（対象: .quick-picker-card-name） */
 .quick-picker-card-name {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 1行省略表示 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ はみ出し隠し */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 末尾「...」 */
+    /* 枠からはみ出たテキスト末尾を「...」で自動省略表示させます */
     text-overflow: ellipsis;
 }
 
-/* 服の位置・サイズ微調整パネル */
-/* ↓ ステージ下の「着用アイテム位置・サイズ調整」コントロールパネル */
+/* 位置・サイズ微調整パネル・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .fitting-adjust-panel） */
 .fitting-adjust-panel {
-    /* ↓ 横幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ グレー枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-medium) に設定します */
     border: 1px solid var(--color-gray-medium);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上14px余白 */
+    /* 要素の上側の外側余白を 14px に設定します */
     margin-top: 14px;
-    /* ↓ 上下12px・左右14px内側余白 */
+    /* 枠の内側余白（padding）を「上下 12px・左右 14px」に設定します */
     padding: 12px 14px;
-    /* ↓ 浮き上がり影 */
+    /* 立体感を出す影や内枠リング（0 4px 16px rgba(0, 0, 0, 0.08)）を付けます */
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    /* ↓ フェードイン */
+    /* @keyframes で定義した動きのアニメーション（fadeIn 0.2s ease-in-out）を再生させます */
     animation: fadeIn 0.2s ease-in-out;
-    /* ↓ 前面 z-index */
+    /* 重なり順（奥行き）の優先度を 10 に設定し、大きい値ほど手前に表示します */
     z-index: 10;
 }
 
-/* ↓ 微調整パネル上部バー */
+/* ヘッダー・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-panel-header） */
 .adjust-panel-header {
-    /* ↓ 左右並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下10px */
+    /* 要素の下側の外側余白を 10px に設定します */
     margin-bottom: 10px;
-    /* ↓ 下線余白6px */
+    /* 下側の内側余白を 6px に設定します */
     padding-bottom: 6px;
-    /* ↓ 薄い仕切り線 */
+    /* 下辺だけの境界線を 1px solid #f0f0f0 に設定します */
     border-bottom: 1px solid #f0f0f0;
 }
 
-/* ↓ パネル左上の見出し＋アイコン */
+/* ヘッダー・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-header-title） */
 .adjust-header-title {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 約13.1px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ パネル右上のリセット・閉じるボタン群 */
+/* ヘッダー・ボタンパーツに対するスタイル定義を開始します（対象: .adjust-header-btns） */
 .adjust-header-btns {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
 }
 
-/* ↓ 「初期位置に戻す」リセットボタン */
+/* ボタンパーツ・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .btn-adjust-reset） */
 .btn-adjust-reset {
-    /* ↓ 透明背景 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 約11.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.7rem に設定します */
     font-size: 0.7rem;
-    /* ↓ 濃いめグレー */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
-    /* ↓ 上下2px・左右8px */
+    /* 枠の内側余白（padding）を「上下 2px・左右 8px」に設定します */
     padding: 2px 8px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 背景アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（background 0.15s） */
     transition: background 0.15s;
 }
 
-/* ↓ リセットボタンホバー時 */
+/* ボタンパーツ・位置・サイズ微調整操作のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-adjust-reset:hover） */
 .btn-adjust-reset:hover {
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f3f4f6）に設定します */
     background: #f3f4f6;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ パネル右上の×閉じボタン */
+/* ボタンパーツ・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .btn-adjust-close） */
 .btn-adjust-close {
-    /* ↓ 透明 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 枠なし */
+    /* 要素を囲む枠線（太さ 0px の none なら枠線消し）を指定します */
     border: none;
-    /* ↓ 大きめ文字 */
+    /* 文字の大きさ（フォントサイズ）を 1.1rem に設定します */
     font-size: 1.1rem;
-    /* ↓ 行高1 */
+    /* 1行あたりの高さ（行間・1）を設定して文章の読みやすさを調整します */
     line-height: 1;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 0（余白なし）・左右 4px」に設定します */
     padding: 0 4px;
 }
 
-/* ↓ どの部位（帽子/アウター/トップス/ボトムス/靴）を調整するか選ぶ5連タブ */
+/* 部位スロット(頭/アウター/トップス/ボトムス/靴)・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-slot-tabs） */
 .adjust-slot-tabs {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間4px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 4px に設定します */
     gap: 4px;
-    /* ↓ 下12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
 }
 
-/* ↓ 各部位切り替えタブボタン */
+/* ボタンパーツ・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-tab-btn） */
 .adjust-tab-btn {
-    /* ↓ 5つのボタンが均等幅になるよう flex: 1 */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ 上下5px・左右1px */
+    /* 枠の内側余白（padding）を「上下 5px・左右 1px」に設定します */
     padding: 5px 1px;
-    /* ↓ ごく薄いブルーグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f8fafc）に設定します */
     background: #f8fafc;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e2e8f0 に設定します */
     border: 1px solid #e2e8f0;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 約11.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.70rem に設定します */
     font-size: 0.70rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.15s） */
     transition: all 0.15s;
-    /* ↓ 改行禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* ↓ 選択中の調整部位タブ */
+/* ボタンパーツ・位置・サイズ微調整操作の選択中(.active)に対するスタイル定義を開始します（対象: .adjust-tab-btn.active） */
 .adjust-tab-btn.active {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
 }
 
-/* ↓ 上下・左右・拡大率スライダー3本を縦に積むエリア */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-sliders-body） */
 .adjust-sliders-body {
-    /* ↓ 縦Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ スライダー間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ スライダー1本分の横行（左ラベル＋右スライダー入力） */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-slider-row） */
 .adjust-slider-row {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 両端 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ スライダー左側の項目名（「上下 Y」等）と現在数値（「+4px」等） */
+/* セレクタ「.slider-meta」に対するスタイル定義を開始します（対象: .slider-meta） */
 .slider-meta {
-    /* ↓ 幅96px固定で3行の縦軸が綺麗に揃うようにします */
+    /* 横幅を 96px に設定します */
     width: 96px;
-    /* ↓ 左右配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 濃いめグレー */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
 }
 
-/* ↓ 「上下位置」などの項目ラベル */
+/* セレクタ「.slider-name」に対するスタイル定義を開始します（対象: .slider-name） */
 .slider-name {
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
 }
 
-/* ↓ 現在の調整値（「100%」「0px」等） */
+/* セレクタ「.slider-val」に対するスタイル定義を開始します（対象: .slider-val） */
 .slider-val {
-    /* ↓ スライダーを動かしても桁ブレしない等幅数字 */
+    /* 数字の幅を等幅（tabular-nums）にして、金額や数値変化時にガタつかないようにします */
     font-variant-numeric: tabular-nums;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ －ボタン ＋ レンジスライダー ＋ ＋ボタン のまとまり */
+/* セレクタ「.slider-input-wrap」に対するスタイル定義を開始します（対象: .slider-input-wrap） */
 .slider-input-wrap {
-    /* ↓ 残り横幅いっぱい */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
 }
 
-/* ↓ 1pxずつ細かく押せる － / ＋ ステップボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-step） */
 .btn-step {
-    /* ↓ 幅22px */
+    /* 横幅を 22px に設定します */
     width: 22px;
-    /* ↓ 高さ22px */
+    /* 高さを 22px に設定します */
     height: 22px;
-    /* ↓ パディングなし */
+    /* 枠の内側余白（padding）を全方向一律で 0（余白なし） に設定します */
     padding: 0;
-    /* ↓ 中央配置用インラインFlex */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f1f5f9）に設定します */
     background: #f1f5f9;
-    /* ↓ 枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #cbd5e1 に設定します */
     border: 1px solid #cbd5e1;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 濃紺グレー文字 */
+    /* 文字色（テキストカラー）を #334155 に設定します */
     color: #334155;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.1s） */
     transition: all 0.1s;
 }
 
-/* ↓ ＋/－ステップボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-step:hover） */
 .btn-step:hover {
-    /* ↓ やや濃いグレーに */
+    /* 背景の色・グラデーション・画像を一括で（#e2e8f0）に設定します */
     background: #e2e8f0;
-    /* ↓ 黒文字近く */
+    /* 文字色（テキストカラー）を #0f172a に設定します */
     color: #0f172a;
 }
 
-/* ↓ 位置調整用スライダーバー本体（input type="range"） */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-range） */
 .adjust-range {
-    /* ↓ 中央エリアいっぱいに伸びます */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ バーの太さ4px */
+    /* 高さを 4px に設定します */
     height: 4px;
-    /* ↓ バー背景色 */
+    /* 背景の色・グラデーション・画像を一括で（#cbd5e1）に設定します */
     background: #cbd5e1;
-    /* ↓ 角丸2px */
+    /* 四角形の角の丸み（角丸半径）を 2px に設定します */
     border-radius: 2px;
-    /* ↓ フォーカス枠非表示 */
+    /* フォーカス時などにブラウザ標準で出る青い外枠を無効化します */
     outline: none;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ つまみの色をブランド黒に設定 */
+    /* チェックボックスやラジオボタン・スライダー等の強調カラーを var(--color-black) に揃えます */
     accent-color: var(--color-black);
 }
 
-/* ↓ 微調整パネル下部のヒント注記エリア */
+/* 位置・サイズ微調整操作・サイト下部フッターに対するスタイル定義を開始します（対象: .adjust-panel-footer） */
 .adjust-panel-footer {
-    /* ↓ 上10px */
+    /* 要素の上側の外側余白を 10px に設定します */
     margin-top: 10px;
-    /* ↓ 内上余白6px */
+    /* 上側の内側余白を 6px に設定します */
     padding-top: 6px;
-    /* ↓ 破線区切り */
+    /* 上辺だけの境界線を 1px dashed #f0f0f0 に設定します */
     border-top: 1px dashed #f0f0f0;
-    /* ↓ 中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
 }
 
-/* ↓ パネル下部の小さい説明文 */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-hint） */
 .adjust-hint {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 薄グレー */
+    /* 文字色（テキストカラー）を #94a3b8 に設定します */
     color: #94a3b8;
 }
 
-/* 対象アイテム判別ステータスバー */
-/* ↓ 調整対象が「ブランド商品」か「私物クローゼット品」か「未着用」かを示す表示バー */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-status） */
 .adjust-item-status {
-    /* ↓ ごく薄いブルーグレー */
+    /* 背景の色・グラデーション・画像を一括で（#f8fafc）に設定します */
     background: #f8fafc;
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e2e8f0 に設定します */
     border: 1px solid #e2e8f0;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 上下6px・左右10px */
+    /* 枠の内側余白（padding）を「上下 6px・左右 10px」に設定します */
     padding: 6px 10px;
-    /* ↓ 下10px */
+    /* 要素の下側の外側余白を 10px に設定します */
     margin-bottom: 10px;
-    /* ↓ 左右並べ */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 両端揃え */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
 }
 
-/* ↓ 左側のバッジ＋服名グループ */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-meta-left） */
 .adjust-item-meta-left {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ はみ出し防止 */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
 }
 
-/* ↓ 種別タグ共通スタイル（BRAND / CLOSET / EMPTY） */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-tag） */
 .adjust-item-tag {
-    /* ↓ インラインブロック */
+    /* 横に並べられるインライン性質と、幅・高さ・上下余白を持てる性質を両立させます */
     display: inline-block;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 1px・左右 6px」に設定します */
     padding: 1px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 約9.9px */
+    /* 文字の大きさ（フォントサイズ）を 0.62rem に設定します */
     font-size: 0.62rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 0.5px文字間 */
+    /* 文字どうしの横間隔（トラッキング）を 0.5px に調整します */
     letter-spacing: 0.5px;
-    /* ↓ 折り返し禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* ↓ ブランド販売商品用タグ（水色：サイズXS〜XLのみ調整可モード） */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-tag.brand） */
 .adjust-item-tag.brand {
-    /* ↓ 水色背景 */
+    /* 背景の色・グラデーション・画像を一括で（#e0f2fe）に設定します */
     background: #e0f2fe;
-    /* ↓ 青文字 */
+    /* 文字色（テキストカラー）を #0284c7 に設定します */
     color: #0284c7;
-    /* ↓ 水色枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #bae6fd に設定します */
     border: 1px solid #bae6fd;
 }
 
-/* ↓ 私物・クローゼット商品用タグ（オレンジ：位置X/Yと倍率を自由調整可モード） */
+/* マイクローゼット棚・位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-tag.closet） */
 .adjust-item-tag.closet {
-    /* ↓ クリームオレンジ背景 */
+    /* 背景の色・グラデーション・画像を一括で（#fef3c7）に設定します */
     background: #fef3c7;
-    /* ↓ 濃いオレンジ文字 */
+    /* 文字色（テキストカラー）を #d97706 に設定します */
     color: #d97706;
-    /* ↓ オレンジ枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #fde68a に設定します */
     border: 1px solid #fde68a;
 }
 
-/* ↓ 何も着用していないスロット用タグ（グレー） */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-tag.empty） */
 .adjust-item-tag.empty {
-    /* ↓ グレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f1f5f9）に設定します */
     background: #f1f5f9;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ グレー枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #cbd5e1 に設定します */
     border: 1px solid #cbd5e1;
 }
 
-/* ↓ 現在調整中の服の名前 */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-name） */
 .adjust-item-name {
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ ダークネイビー文字 */
+    /* 文字色（テキストカラー）を #1e293b に設定します */
     color: #1e293b;
-    /* ↓ はみ出し非表示 */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 末尾「...」 */
+    /* 枠からはみ出たテキスト末尾を「...」で自動省略表示させます */
     text-overflow: ellipsis;
-    /* ↓ 1行表示 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ 最大幅130px */
+    /* 横幅の最大上限を 130px に制限し、はみ出しを防ぎます */
     max-width: 130px;
 }
 
-/* ↓ 右側の動作モード解説テキスト */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-item-type-desc） */
 .adjust-item-type-desc {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ スレートグレー */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ 折り返し禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* 販売商品用 5段階サイズスライダー */
-/* ↓ ブランド商品専用の5段階サイズ(XS〜XL)スライダーを包む伸縮コンテナ */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-slider-row-brand .brand-slider-container） */
 .adjust-slider-row-brand .brand-slider-container {
-    /* ↓ 残り横幅いっぱいにスライダー容器を広げます */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ スライダーバーと下のサイズ目盛りラベルを縦に並べるためFlexboxにします */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦方向に積み上げ */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 垂直方向の中央に揃えます */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 子要素配置の基準位置に指定 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ ツマミの位置とバランスを取るため上に2pxだけ余白を追加 */
+    /* 上側の内側余白を 2px に設定します */
     padding-top: 2px;
 }
 
-/* ↓ スライダー直下に横一列で並ぶ「XS / S / M / L / XL」の目盛りラベル列 */
+/* セレクタ「.brand-size-ticks」に対するスタイル定義を開始します（対象: .brand-size-ticks） */
 .brand-size-ticks {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 5つのサイズ表記をスライダーの左右両端に合わせて均等間隔で配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 端の「XS」「XL」がスライダーの両端つまみ位置と一致するよう左右に4px余白 */
+    /* 枠の内側余白（padding）を「上下 0（余白なし）・左右 4px」に設定します */
     padding: 0 4px;
-    /* ↓ 上のスライダー本体との隙間を4px空けます */
+    /* 要素の上側の外側余白を 4px に設定します */
     margin-top: 4px;
 }
 
-/* ↓ 目盛りラベル1つ分（XS・S・M・L・XL各文字ボタン）の通常時スタイル */
+/* セレクタ「.brand-size-tick」に対するスタイル定義を開始します（対象: .brand-size-tick） */
 .brand-size-tick {
-    /* ↓ 約10.9pxの小さめ文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.68rem に設定します */
     font-size: 0.68rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 未選択時は控えめなスレートグレー色 */
+    /* 文字色（テキストカラー）を #94a3b8 に設定します */
     color: #94a3b8;
-    /* ↓ 直接クリックしてもサイズ切替できることを示す指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 目盛りを連打した時に文字が青く選択反転しないようにします */
+    /* ドラッグ操作やボタン連続クリック時に誤って文字選択されないようにします */
     user-select: none;
-    /* ↓ 色・背景の変化を0.15秒で滑らかにアニメーションさせます */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.15s ease） */
     transition: all 0.15s ease;
-    /* ↓ 文字を中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 各サイズ文字の当たり判定横幅を24pxに統一 */
+    /* 横幅を 24px に設定します */
     width: 24px;
-    /* ↓ 上下1px・左右0の内側余白 */
+    /* 枠の内側余白（padding）を「上下 1px・左右 0（余白なし）」に設定します */
     padding: 1px 0;
-    /* ↓ 小さな角丸3px */
+    /* 四角形の角の丸み（角丸半径）を 3px に設定します */
     border-radius: 3px;
 }
 
-/* ↓ サイズ目盛り（XS〜XL）にマウスを乗せた時 */
+/* セレクタ「.brand-size-tick:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .brand-size-tick:hover） */
 .brand-size-tick:hover {
-    /* ↓ 文字色を濃いネイビーに */
+    /* 文字色（テキストカラー）を #0f172a に設定します */
     color: #0f172a;
-    /* ↓ 背景を薄いグレーに */
+    /* 背景の色・グラデーション・画像を一括で（#f1f5f9）に設定します */
     background: #f1f5f9;
 }
 
-/* ↓ 現在選択中のサイズ目盛り（黒反転で目立たせます） */
+/* セレクタ「.brand-size-tick.active」の選択中(.active)に対するスタイル定義を開始します（対象: .brand-size-tick.active） */
 .brand-size-tick.active {
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 濃い黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#0f172a）に設定します */
     background: #0f172a;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 5%だけ拡大して立体感を出します */
+    /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1.05)） */
     transform: scale(1.05);
 }
 
-/* ↓ 左上などに「M」「L」と現在サイズを表示する黒い丸みバッジ */
+/* セレクタ「.brand-size-badge」に対するスタイル定義を開始します（対象: .brand-size-badge） */
 .brand-size-badge {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#0f172a）に設定します */
     background: #0f172a;
-    /* ↓ 確実に白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します（!important で優先上書き） */
     color: #ffffff !important;
-    /* ↓ 上下1px・左右8px */
+    /* 枠の内側余白（padding）を「上下 1px・左右 8px」に設定します */
     padding: 1px 8px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 約11.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.7rem に設定します */
     font-size: 0.7rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 幅が文字サイズに合うようインラインブロック */
+    /* 横に並べられるインライン性質と、幅・高さ・上下余白を持てる性質を両立させます */
     display: inline-block;
-    /* ↓ SでもXLでも横幅が極端に縮まない最低幅26px */
+    /* どんなに画面が狭くても最低 26px の横幅を保つ（0 の場合はフレックス縮みバグ防止）ようにします */
     min-width: 26px;
-    /* ↓ 文字中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
 }
 
-/* 無効化（未着用）状態 */
-/* ↓ 選択部位にまだ何も着ていない時はスライダー全体を薄くして操作無効にします */
+/* 位置・サイズ微調整操作に対するスタイル定義を開始します（対象: .adjust-sliders-body.disabled-mode） */
 .adjust-sliders-body.disabled-mode {
-    /* ↓ 50%の半透明にして「いま無効」と視覚で伝えます */
+    /* 要素全体の不透明度を 0.5（0＝完全に透明、1＝くっきり不透明）に設定します */
     opacity: 0.5;
-    /* ↓ クリックやドラッグ操作を完全に受け付けなくします */
+    /* クリックやマウス操作をこの要素に反応させず、背後の要素へ透過させます（none） */
     pointer-events: none;
 }
 
-
-/* 着用中スロットチップバー */
-/* ↓ マネキン足元に並ぶ「着用中アイテム一覧」の小さな取り外しタグ群 */
+/* セレクタ「.wearing-slots-bar」に対するスタイル定義を開始します（対象: .wearing-slots-bar） */
 .wearing-slots-bar {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 横幅を超えたら2段目に折り返します */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 中央揃え */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 横幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 上に14px余白 */
+    /* 要素の上側の外側余白を 14px に設定します */
     margin-top: 14px;
-    /* ↓ ベースより前面に表示 */
+    /* 重なり順（奥行き）の優先度を 10 に設定し、大きい値ほど手前に表示します */
     z-index: 10;
 }
 
-/* ↓ 着用中タグ1個分（「TOPS: 〇〇 ×」） */
+/* セレクタ「.wearing-chip」に対するスタイル定義を開始します（対象: .wearing-chip） */
 .wearing-chip {
-    /* ↓ インラインFlex */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 文字と×ボタンの間を6px空けます */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 1px黒枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-black) に設定します */
     border: 1px solid var(--color-black);
-    /* ↓ 上下4px・左右10px */
+    /* 枠の内側余白（padding）を「上下 4px・左右 10px」に設定します */
     padding: 4px 10px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 16px に設定します */
     border-radius: 16px;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 小さな影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
-    /* ↓ 着用時にふわっと現れるアニメ */
+    /* @keyframes で定義した動きのアニメーション（fadeInPane 0.25s ease）を再生させます */
     animation: fadeInPane 0.25s ease;
 }
 
-/* ↓ 着用タグ右端の個別解除×ボタン */
+/* セレクタ「.wearing-chip-del」に対するスタイル定義を開始します（対象: .wearing-chip-del） */
 .wearing-chip-del {
-    /* ↓ 透明背景 */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 枠なし */
+    /* 要素を囲む枠線（太さ 0px の none なら枠線消し）を指定します */
     border: none;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を #999999 に設定します */
     color: #999999;
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 余白ゼロ */
+    /* 枠の内側余白（padding）を全方向一律で 0（余白なし） に設定します */
     padding: 0;
-    /* ↓ 行高1 */
+    /* 1行あたりの高さ（行間・1）を設定して文章の読みやすさを調整します */
     line-height: 1;
-    /* ↓ 左に2px隙間 */
+    /* 要素の左側の外側余白を 2px に設定します */
     margin-left: 2px;
 }
 
-/* ↓ 解除×ボタンホバー時に赤強調 */
+/* セレクタ「.wearing-chip-del:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .wearing-chip-del:hover） */
 .wearing-chip-del:hover {
-    /* ↓ アクセント赤 */
+    /* 文字色（テキストカラー）を var(--color-accent) に設定します */
     color: var(--color-accent);
 }
 
-/* ブランド服購入サマリーバー */
-/* ↓ ステージ下の「着用中の販売アイテム合計金額＋一括カート追加ボタン」バー */
+/* マネキン着用ステージに対するスタイル定義を開始します（対象: .stage-brand-summary） */
 .stage-brand-summary {
-    /* ↓ 左右両端並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 上14px */
+    /* 要素の上側の外側余白を 14px に設定します */
     margin-top: 14px;
-    /* ↓ 上下12px・左右14px */
+    /* 枠の内側余白（padding）を「上下 12px・左右 14px」に設定します */
     padding: 12px 14px;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f4f4f4）に設定します */
     background: #f4f4f4;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 隙間12px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 12px に設定します */
     gap: 12px;
-    /* ↓ 狭い幅ではボタンを次の行へ折り返します */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
 }
 
-/* ↓ 左側の点数＆合計金額まとまり */
+/* セレクタ「.brand-sum-info」に対するスタイル定義を開始します（対象: .brand-sum-info） */
 .brand-sum-info {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
 }
 
-/* ↓ 「着用中の販売商品 (○点)」ラベル */
+/* セレクタ「.sum-items-count」に対するスタイル定義を開始します（対象: .sum-items-count） */
 .sum-items-count {
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 濃いグレー */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
 }
 
-/* ↓ 合計金額の強調数値 */
+/* セレクタ「.sum-total-price」に対するスタイル定義を開始します（対象: .sum-total-price） */
 .sum-total-price {
-    /* ↓ 約17.6px */
+    /* 文字の大きさ（フォントサイズ）を 1.1rem に設定します */
     font-size: 1.1rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ========================================================================== */
-/* ▼ 下部エリア: AIコメント & コーデ保存                                       */
-/* ========================================================================== */
 
-/* ↓ スタジオ下段の「AIスタイリスト講評(左)」と「コーデ保存フォーム(右)」2列エリア */
+/* -------------------------------------------------------------------------- */
+/* 7. 下部パネル（AIスタイリング診断コメントカード & Lookbook保存カード） */
+/* -------------------------------------------------------------------------- */
+/* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-bottom-panel） */
 .studio-bottom-panel {
-    /* ↓ Grid表示 */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 左1.6:右1の幅比率で配置 */
+    /* Grid の横方向の列数と幅の割り振り（1.6fr 1fr）を定義します */
     grid-template-columns: 1.6fr 1fr;
-    /* ↓ 列間20px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
-    /* ↓ 左と右のカードの高さをぴったり揃えて揃えます */
+    /* 交差軸（通常は上下方向）の揃え位置を stretch に設定します */
     align-items: stretch;
 }
 
-/* AIコメントカード */
-/* ↓ AIがリアルタイムにスコアや着こなしアドバイスを出してくれる白いカード */
+/* セレクタ「.ai-comment-card」に対するスタイル定義を開始します（対象: .ai-comment-card） */
 .ai-comment-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上下24px・左右28px */
+    /* 枠の内側余白（padding）を「上下 24px・左右 28px」に設定します */
     padding: 24px 28px;
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
-    /* ↓ 縦Flexboxにして本文が短くてもカラーパレット行が底に揃うようにします */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 上中下を均等に広げます */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
 }
 
-/* ↓ AIカード上部バー（左タイトル、右スコア） */
+/* ヘッダーに対するスタイル定義を開始します（対象: .ai-comment-header） */
 .ai-comment-header {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
-    /* ↓ 下線余白10px */
+    /* 下側の内側余白を 10px に設定します */
     padding-bottom: 10px;
-    /* ↓ 仕切り線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
 }
 
-/* ↓ 左側のドット・タイトル・エンジンタグ */
+/* ヘッダーに対するスタイル定義を開始します（対象: .ai-header-left） */
 .ai-header-left {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ AI稼働中を示す鼓動アニメーション付きの黒い点 */
+/* セレクタ「.ai-sparkle-dot」に対するスタイル定義を開始します（対象: .ai-sparkle-dot） */
 .ai-sparkle-dot {
-    /* ↓ 8px幅 */
+    /* 横幅を 8px に設定します */
     width: 8px;
-    /* ↓ 8px高さ */
+    /* 高さを 8px に設定します */
     height: 8px;
-    /* ↓ 真円 */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ 黒色 */
+    /* 背景の色・グラデーション・画像を一括で（#111111）に設定します */
     background: #111111;
-    /* ↓ 外周3pxに半透明のリング影 */
+    /* 立体感を出す影や内枠リング（0 0 0 3px rgba(0, 0, 0, 0.12)）を付けます */
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
-    /* ↓ 2秒周期で無限に拡大縮小する pulseDot アニメを適用 */
+    /* @keyframes で定義した動きのアニメーション（pulseDot 2s infinite）を再生させます */
     animation: pulseDot 2s infinite;
 }
 
-/* ↓ 点滅・鼓動アニメーション定義 */
+/* CSSアニメーションの動きのコマ割り「pulseDot」を定義します */
 @keyframes pulseDot {
 
-    /* ↓ 最初と最後(0%, 100%)は等倍でくっきり */
+    /* アニメーション進行度「0%, 100%」時点での状態スタイルを設定します */
     0%,
     100% {
-        /* ↓ 等倍 */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1)） */
         transform: scale(1);
-        /* ↓ 不透明 */
+        /* 要素全体の不透明度を 1（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 1;
     }
 
-    /* ↓ 中間地点(50%)で1.3倍に膨らんで少し透けます */
+    /* アニメーション進行度「50%」時点での状態スタイルを設定します */
     50% {
-        /* ↓ 1.3倍拡大 */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（scale(1.3)） */
         transform: scale(1.3);
-        /* ↓ やや透過 */
+        /* 要素全体の不透明度を 0.7（0＝完全に透明、1＝くっきり不透明）に設定します */
         opacity: 0.7;
     }
 }
 
-/* ↓ 「AI STYLIST ADVICE」ラベル */
+/* セレクタ「.ai-label」に対するスタイル定義を開始します（対象: .ai-label） */
 .ai-label {
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 文字間広め */
+    /* 文字どうしの横間隔（トラッキング）を 0.06em に調整します */
     letter-spacing: 0.06em;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 「v2.6 RULE ENGINE」などの技術バッジ */
+/* セレクタ「.ai-engine-tag」に対するスタイル定義を開始します（対象: .ai-engine-tag） */
 .ai-engine-tag {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 濃いめグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
-    /* ↓ 上下2px・左右6px */
+    /* 枠の内側余白（padding）を「上下 2px・左右 6px」に設定します */
     padding: 2px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ プログラム風等幅フォントで表示 */
+    /* この要素で使用する書体フォント（monospace）を指定します */
     font-family: monospace;
 }
 
-/* ↓ 右側のコーデ相性スコア表示部 */
+/* ヘッダーに対するスタイル定義を開始します（対象: .ai-header-right） */
 .ai-header-right {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 1行維持 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
-    /* ↓ 縮み防止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ 「相性スコア:」の文字 */
+/* セレクタ「.ai-score-label」に対するスタイル定義を開始します（対象: .ai-score-label） */
 .ai-score-label {
-    /* ↓ 約12.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
     font-size: 0.8rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 改行禁止 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* ↓ 星アイコン表示枠（現在は数値のみスッキリ見せるため非表示化） */
+/* セレクタ「.ai-score-stars」に対するスタイル定義を開始します（対象: .ai-score-stars） */
 .ai-score-stars {
-    /* ↓ 強制非表示 */
+    /* この要素を画面に表示せずレイアウト領域ごと隠します（!important で優先上書き） */
     display: none !important;
 }
 
-/* ↓ スコア点数（「92 / 100」など） */
+/* セレクタ「.ai-score-val」に対するスタイル定義を開始します（対象: .ai-score-val） */
 .ai-score-val {
-    /* ↓ 約15.2px */
+    /* 文字の大きさ（フォントサイズ）を 0.95rem に設定します */
     font-size: 0.95rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 1行 */
+    /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
 }
 
-/* ↓ AIアドバイス本文を包む欄 */
+/* セレクタ「.ai-comment-body」に対するスタイル定義を開始します（対象: .ai-comment-body） */
 .ai-comment-body {
-    /* ↓ 下16px */
+    /* 要素の下側の外側余白を 16px に設定します */
     margin-bottom: 16px;
 }
 
-/* ↓ AIコメント段落テキスト */
+/* セレクタ「.ai-comment-text」に対するスタイル定義を開始します（対象: .ai-comment-text） */
 .ai-comment-text {
-    /* ↓ 約15px */
+    /* 文字の大きさ（フォントサイズ）を 0.94rem に設定します */
     font-size: 0.94rem;
-    /* ↓ 読みやすい行間1.7倍 */
+    /* 1行あたりの高さ（行間・1.7）を設定して文章の読みやすさを調整します */
     line-height: 1.7;
-    /* ↓ 濃いグレー文字 */
+    /* 文字色（テキストカラー）を var(--color-dark) に設定します */
     color: var(--color-dark);
-    /* ↓ 余白ゼロ */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
 }
 
-/* ↓ AIカード最下部のスタイルタグ＋色パレット表示行 */
+/* セレクタ「.ai-meta-bar」に対するスタイル定義を開始します（対象: .ai-meta-bar） */
 .ai-meta-bar {
-    /* ↓ 左右配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端揃え */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 狭い幅では改行 */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 隙間12px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 12px に設定します */
     gap: 12px;
-    /* ↓ 上内側余白12px */
+    /* 上側の内側余白を 12px に設定します */
     padding-top: 12px;
-    /* ↓ 上部に破線の仕切り */
+    /* 上辺だけの境界線を 1px dashed var(--color-gray-light) に設定します */
     border-top: 1px dashed var(--color-gray-light);
 }
 
-/* ↓ スタイルタグの並び */
+/* セレクタ「.ai-tags-wrap」に対するスタイル定義を開始します（対象: .ai-tags-wrap） */
 .ai-tags-wrap {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 折り返し許可 */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
 }
 
-/* ↓ 「#モード」「#モノトーン」などのタグ1個分 */
+/* セレクタ「.ai-tag」に対するスタイル定義を開始します（対象: .ai-tag） */
 .ai-tag {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ ダークグレー */
+    /* 文字色（テキストカラー）を #444444 に設定します */
     color: #444444;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 上下3px・左右9px */
+    /* 枠の内側余白（padding）を「上下 3px・左右 9px」に設定します */
     padding: 3px 9px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
 }
 
-/* ↓ 右側の使用カラー丸一覧ブロック */
+/* セレクタ「.ai-palette-wrap」に対するスタイル定義を開始します（対象: .ai-palette-wrap） */
 .ai-palette-wrap {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ 「COLOR PALETTE」等の小さい文字 */
+/* セレクタ「.palette-label」に対するスタイル定義を開始します（対象: .palette-label） */
 .palette-label {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 色丸同士の横並び容器 */
+/* セレクタ「.palette-dots」に対するスタイル定義を開始します（対象: .palette-dots） */
 .palette-dots {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間4px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 4px に設定します */
     gap: 4px;
 }
 
-/* ↓ 着用服から抽出された色の丸ドット1個 */
+/* セレクタ「.palette-dot」に対するスタイル定義を開始します（対象: .palette-dot） */
 .palette-dot {
-    /* ↓ 幅14px */
+    /* 横幅を 14px に設定します */
     width: 14px;
-    /* ↓ 高さ14px */
+    /* 高さを 14px に設定します */
     height: 14px;
-    /* ↓ 真円 */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ 白等の色も見分けがつくよう15%透明の黒枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid rgba(0, 0, 0, 0.15) に設定します */
     border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* コーデ保存カード */
-/* ↓ 右側の「このコーディネートを名前を付けて保存」ボックス */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .outfit-save-card） */
 .outfit-save-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上下22px・左右24px */
+    /* 枠の内側余白（padding）を「上下 22px・左右 24px」に設定します */
     padding: 22px 24px;
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
-    /* ↓ 縦Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
 }
 
-/* ↓ 保存カード見出し */
+/* セレクタ「.save-card-title」に対するスタイル定義を開始します（対象: .save-card-title） */
 .save-card-title {
-    /* ↓ 約16.8px */
+    /* 文字の大きさ（フォントサイズ）を 1.05rem に設定します */
     font-size: 1.05rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下4px */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 保存カード補足説明 */
+/* セレクタ「.save-card-desc」に対するスタイル定義を開始します（対象: .save-card-desc） */
 .save-card-desc {
-    /* ↓ 約13.1px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 下14px */
+    /* 要素の下側の外側余白を 14px に設定します */
     margin-bottom: 14px;
 }
 
-/* ↓ ワンクリック入力できる定番コーデ名チップ列（「休日カフェ」「通勤クリーン」など） */
+/* セレクタ「.preset-name-chips」に対するスタイル定義を開始します（対象: .preset-name-chips） */
 .preset-name-chips {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 折り返し */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 下14px */
+    /* 要素の下側の外側余白を 14px に設定します */
     margin-bottom: 14px;
 }
 
-/* ↓ 各プリセット名チップボタン */
+/* セレクタ「.preset-chip」に対するスタイル定義を開始します（対象: .preset-chip） */
 .preset-chip {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 上下3px・左右8px */
+    /* 枠の内側余白（padding）を「上下 3px・左右 8px」に設定します */
     padding: 3px 8px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 12px に設定します */
     border-radius: 12px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ プリセット名チップホバー時 */
+/* セレクタ「.preset-chip:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .preset-chip:hover） */
 .preset-chip:hover {
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ コーデ名入力ボックスと保存ボタンの縦積みグループ */
+/* セレクタ「.save-input-group」に対するスタイル定義を開始します（対象: .save-input-group） */
 .save-input-group {
-    /* ↓ Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 隙間10px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 10px に設定します */
     gap: 10px;
 }
 
-/* ↓ コーデ名テキスト入力欄 */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .outfit-name-input） */
 .outfit-name-input {
-    /* ↓ 横幅いっぱい */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
 }
 
-/* ↓ 保存実行ボタン */
+/* ボタンパーツ・コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .save-outfit-btn） */
 .save-outfit-btn {
-    /* ↓ 横幅いっぱい */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ アイコンと文字を横並び中央 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 横中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ========================================================================== */
-/* パネル5: 保存したコーデ (LOOKBOOK)                                        */
-/* ========================================================================== */
 
-/* ↓ ルックブック（保存コーデ一覧）のグリッド配置 */
+/* -------------------------------------------------------------------------- */
+/* 8. 保存済みコーディネート一覧（Lookbook） & プロフィール設定カード */
+/* -------------------------------------------------------------------------- */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfits-grid） */
 .saved-outfits-grid {
-    /* ↓ CSS Grid */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 最小幅320px以上で列数を自動計算して並べます */
+    /* Grid の横方向の列数と幅の割り振り（repeat(auto-fill, minmax(320px, 1fr))）を定義します */
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    /* ↓ カード間22px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 22px に設定します */
     gap: 22px;
 }
 
-/* ↓ 保存されたコーデ1枚分のカード */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfit-card） */
 .saved-outfit-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 内側20px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 20px に設定します */
     padding: 20px;
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
-    /* ↓ 縦Flexでボタン位置を下に揃えます */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ ホバー時アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-normal)） */
     transition: all var(--transition-normal);
 }
 
-/* ↓ 保存カードホバー時 */
+/* コーデ保存・Lookbookのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .saved-outfit-card:hover） */
 .saved-outfit-card:hover {
-    /* ↓ カード影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-card)）を付けます */
     box-shadow: var(--shadow-card);
-    /* ↓ 枠色強調 */
+    /* 枠線の色だけを #999999 に変更します（主に選択・ホバー強調用） */
     border-color: #999999;
 }
 
-/* ↓ 保存カード上部のコーデ名・日付・削除ボタン行 */
+/* ヘッダー・コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfit-header） */
 .saved-outfit-header {
-    /* ↓ 左右配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 上揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を flex-start に設定します */
     align-items: flex-start;
-    /* ↓ 下12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
 }
 
-/* ↓ 保存コーデのタイトル名 */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfit-title） */
 .saved-outfit-title {
-    /* ↓ 約17.6px */
+    /* 文字の大きさ（フォントサイズ）を 1.1rem に設定します */
     font-size: 1.1rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下2px */
+    /* 要素の下側の外側余白を 2px に設定します */
     margin-bottom: 2px;
-    /* ↓ 黒 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ 保存日時文字 */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfit-date） */
 .saved-outfit-date {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 保存コーデに使われている服サムネイルの横並び帯 */
+/* セレクタ「.saved-items-preview-strip」に対するスタイル定義を開始します（対象: .saved-items-preview-strip） */
 .saved-items-preview-strip {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ 余白10px */
+    /* 枠の内側余白（padding）を全方向一律で 10px に設定します */
     padding: 10px;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 下14px */
+    /* 要素の下側の外側余白を 14px に設定します */
     margin-bottom: 14px;
-    /* ↓ 5点並んでも横スクロール可能に */
+    /* 横方向のはみ出し制御（auto で横スクロールバー発生等を調整）を設定します */
     overflow-x: auto;
 }
 
-/* ↓ 帯の中の小さな服サムネ1枠 */
+/* セレクタ「.saved-strip-item」に対するスタイル定義を開始します（対象: .saved-strip-item） */
 .saved-strip-item {
-    /* ↓ 幅54px */
+    /* 横幅を 54px に設定します */
     width: 54px;
-    /* ↓ 高さ64px */
+    /* 高さを 64px に設定します */
     height: 64px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ はみ出し切り取り */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 1px枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 相対位置（下部部位名タグ用） */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 縮み禁止 */
+    /* スペースが足りないときに縮める倍率（0 なら縮小禁止・現在 0）を指定します */
     flex-shrink: 0;
 }
 
-/* ↓ 帯内の服写真 */
+/* セレクタ「.saved-strip-img」に対するスタイル定義を開始します（対象: .saved-strip-img） */
 .saved-strip-img {
-    /* ↓ 幅100% */
+    /* 横幅を 100%（親要素いっぱい） に設定します */
     width: 100%;
-    /* ↓ 高さ100% */
+    /* 高さを 100%（親要素いっぱい） に設定します */
     height: 100%;
-    /* ↓ 枠いっぱい */
+    /* 枠いっぱいに縦横比を保ったまま隙間なく画像をトリミング配置します（cover） */
     object-fit: cover;
 }
 
-/* ↓ サムネ画像の下端に載せる部位名リボン（「TOPS」など） */
+/* セレクタ「.saved-strip-tag」に対するスタイル定義を開始します（対象: .saved-strip-tag） */
 .saved-strip-tag {
-    /* ↓ 下端に固定配置 */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 下0 */
+    /* 基準位置の下端からの縦位置を 0 に指定します */
     bottom: 0;
-    /* ↓ 左0 */
+    /* 基準位置の左端からの横位置を 0 に指定します */
     left: 0;
-    /* ↓ 右0 */
+    /* 基準位置の右端からの横位置を 0 に指定します */
     right: 0;
-    /* ↓ 75%黒の半透明帯 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(0, 0, 0, 0.75)）に設定します */
     background: rgba(0, 0, 0, 0.75);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 極小8.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.55rem に設定します */
     font-size: 0.55rem;
-    /* ↓ 中央揃え */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 上下1px */
+    /* 枠の内側余白（padding）を全方向一律で 1px に設定します */
     padding: 1px;
 }
 
-/* ↓ 保存当時のAIコメント抜粋メモ枠 */
+/* セレクタ「.saved-comment-excerpt」に対するスタイル定義を開始します（対象: .saved-comment-excerpt） */
 .saved-comment-excerpt {
-    /* ↓ 約13.1px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ 行間1.5倍 */
+    /* 1行あたりの高さ（行間・1.5）を設定して文章の読みやすさを調整します */
     line-height: 1.5;
-    /* ↓ 濃いめグレー */
+    /* 文字色（テキストカラー）を var(--color-gray-dark) に設定します */
     color: var(--color-gray-dark);
-    /* ↓ 下16px */
+    /* 要素の下側の外側余白を 16px に設定します */
     margin-bottom: 16px;
-    /* ↓ 長い文章・短い文章に関わらず下のボタン行を最下段に揃える伸縮 */
+    /* 余りスペースがあるときに子要素をどれだけ伸ばすか（比率 1）を指定します */
     flex-grow: 1;
-    /* ↓ 極薄グレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#fafafa）に設定します */
     background: #fafafa;
-    /* ↓ 上下10px・左右12px */
+    /* 枠の内側余白（padding）を「上下 10px・左右 12px」に設定します */
     padding: 10px 12px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 左端だけに3pxの黒い引用線 */
+    /* 左辺だけの境界線を 3px solid var(--color-black) に設定します */
     border-left: 3px solid var(--color-black);
 }
 
-/* ↓ 「マネキンに着せてみる」ボタンと削除ボタン行 */
+/* コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .saved-outfit-actions） */
 .saved-outfit-actions {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ カード最下部に揃え */
+    /* 要素の上側の外側余白を auto（ブラウザが自動で均等計算） に設定します */
     margin-top: auto;
 }
 
-/* ↓ 「試着室で復元する」ボタン */
+/* ボタンパーツ・コーデ保存・Lookbookに対するスタイル定義を開始します（対象: .btn-restore-outfit） */
 .btn-restore-outfit {
-    /* ↓ 残り横幅いっぱい */
+    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
     flex: 1;
-    /* ↓ 上下8px・左右12px */
+    /* 枠の内側余白（padding）を「上下 8px・左右 12px」に設定します */
     padding: 8px 12px;
-    /* ↓ 約13.1px */
+    /* 文字の大きさ（フォントサイズ）を 0.82rem に設定します */
     font-size: 0.82rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-black)）に設定します */
     background: var(--color-black);
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-black) に設定します */
     border: 1px solid var(--color-black);
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ 復元ボタンホバー時 */
+/* ボタンパーツ・コーデ保存・Lookbookのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-restore-outfit:hover） */
 .btn-restore-outfit:hover {
-    /* ↓ やや明るめの黒 */
+    /* 背景の色・グラデーション・画像を一括で（#333333）に設定します */
     background: #333333;
 }
 
-/* ========================================================================== */
-/* パネル6: プロフィール & 体型設定                                          */
-/* ========================================================================== */
-
-/* ↓ プロフィール確認パネルの2列レイアウト */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-settings-layout） */
 .profile-settings-layout {
-    /* ↓ Grid */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 1:1.25比率 */
+    /* Grid の横方向の列数と幅の割り振り（1fr 1.25fr）を定義します */
     grid-template-columns: 1fr 1.25fr;
-    /* ↓ 隙間20px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
     gap: 20px;
-    /* ↓ 最大820px幅 */
+    /* 横幅の最大上限を 820px に制限し、はみ出しを防ぎます */
     max-width: 820px;
-    /* ↓ 中央配置 */
+    /* 要素の外側余白（margin）を「上下 0（余白なし）・左右 auto（ブラウザが自動で均等計算）」に設定します */
     margin: 0 auto;
 }
 
-/* ↓ プロフィール用白カード */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-card） */
 .profile-card {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 上下20px・左右22px */
+    /* 枠の内側余白（padding）を「上下 20px・左右 22px」に設定します */
     padding: 20px 22px;
-    /* ↓ 影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
-/* ↓ プロフィールカード内セクション見出し */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-section-title） */
 .profile-section-title {
-    /* ↓ 約16.8px */
+    /* 文字の大きさ（フォントサイズ）を 1.05rem に設定します */
     font-size: 1.05rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 下14px */
+    /* 要素の下側の外側余白を 14px に設定します */
     margin-bottom: 14px;
-    /* ↓ 下線余白8px */
+    /* 下側の内側余白を 8px に設定します */
     padding-bottom: 8px;
-    /* ↓ 下線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ 「NEW」や「SOON」などの拡張バッジ */
+/* セレクタ「.future-tag」に対するスタイル定義を開始します（対象: .future-tag） */
 .future-tag {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#111111）に設定します */
     background: #111111;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 上下2px・左右6px */
+    /* 枠の内側余白（padding）を「上下 2px・左右 6px」に設定します */
     padding: 2px 6px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
 }
 
-/* ↓ プロフィール情報の1項目行（左ラベル・右値） */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-field-row） */
 .profile-field-row {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 上下10px余白 */
+    /* 枠の内側余白（padding）を「上下 10px・左右 0（余白なし）」に設定します */
     padding: 10px 0;
-    /* ↓ 下線 */
+    /* 下辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-bottom: 1px solid var(--color-gray-light);
-    /* ↓ 約14.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
     font-size: 0.9rem;
 }
 
-/* ↓ 項目ラベル（「お名前」など） */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-label） */
 .profile-label {
-    /* ↓ グレー文字 */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 登録されている値（「山田 太郎」など） */
+/* 体型・スタイル設定UIに対するスタイル定義を開始します（対象: .profile-val） */
 .profile-val {
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 太さ500 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 500 に設定します */
     font-weight: 500;
 }
 
-/* ========================================================================== */
-/* マイクローゼット登録モーダル                                              */
-/* ========================================================================== */
 
-/* ↓ 「手持ち服を登録」モーダルのダイアログ本体 */
+/* -------------------------------------------------------------------------- */
+/* 9. 手持ち服登録モーダル・チェッカーボード透過プレビュー・AI透過進捗バー */
+/* -------------------------------------------------------------------------- */
+/* マイクローゼット棚・ポップアップモーダルに対するスタイル定義を開始します（対象: .modal-dialog-closet） */
 .modal-dialog-closet {
-    /* ↓ 最大幅580px */
+    /* 横幅の最大上限を 580px に制限し、はみ出しを防ぎます */
     max-width: 580px;
-    /* ↓ 画面幅90% */
+    /* 横幅を 90% に設定します */
     width: 90%;
-    /* ↓ 画面高さの88%までに収めます */
+    /* 縦方向の最大高さを 88vh に制限します */
     max-height: 88vh;
-    /* ↓ 縦が収まらない時はモーダル内部だけでスクロールできます */
+    /* 縦方向のはみ出し制御（auto で縦スクロール可否などを制御）を設定します */
     overflow-y: auto;
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
 }
 
-/* ↓ 写真ドラッグ＆選択用の破線ドロップゾーン */
+/* マイクローゼット棚に対するスタイル定義を開始します（対象: .closet-upload-box） */
 .closet-upload-box {
-    /* ↓ 2pxの破線枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 2px dashed var(--color-gray-light) に設定します */
     border: 2px dashed var(--color-gray-light);
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 24px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 24px に設定します */
     padding: 24px;
-    /* ↓ 中央揃え */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 薄いグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
-    /* ↓ ホバーアニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ 下8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
-    /* ↓ AIローディング幕を全面に重ねる基準 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 角丸からはみ出さないように */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
 }
 
-/* ↓ ドロップゾーンホバー時 */
+/* マイクローゼット棚のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .closet-upload-box:hover） */
 .closet-upload-box:hover {
-    /* ↓ 黒破線に強調 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 背景を白く明るくします */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
 }
 
-/* ↓ アップロード雲アイコン */
+/* セレクタ「.upload-icon」に対するスタイル定義を開始します（対象: .upload-icon） */
 .upload-icon {
-    /* ↓ 幅36px */
+    /* 横幅を 36px に設定します */
     width: 36px;
-    /* ↓ 高さ36px */
+    /* 高さを 36px に設定します */
     height: 36px;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 下8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
 }
 
-/* ↓ 「写真を選択・撮影」太字案内 */
+/* セレクタ「.upload-main-text」に対するスタイル定義を開始します（対象: .upload-main-text） */
 .upload-main-text {
-    /* ↓ ブロック表示 */
+    /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
     display: block;
-    /* ↓ 約14.7px */
+    /* 文字の大きさ（フォントサイズ）を 0.92rem に設定します */
     font-size: 0.92rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
-    /* ↓ 下4px */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
 }
 
-/* ↓ 対応ファイル形式などの小さめ案内 */
+/* セレクタ「.upload-sub-text」に対するスタイル定義を開始します（対象: .upload-sub-text） */
 .upload-sub-text {
-    /* ↓ ブロック表示 */
+    /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
     display: block;
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 画像選択後のプレビュー写真＋「変更する」テキスト縦並び */
+/* セレクタ「.upload-preview」に対するスタイル定義を開始します（対象: .upload-preview） */
 .upload-preview {
-    /* ↓ Flex */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦並び */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ プレビュー画像サムネイル */
+/* セレクタ「.upload-preview img」に対するスタイル定義を開始します（対象: .upload-preview img） */
 .upload-preview img {
-    /* ↓ 最大幅140px */
+    /* 横幅の最大上限を 140px に制限し、はみ出しを防ぎます */
     max-width: 140px;
-    /* ↓ 最大高さ140px */
+    /* 縦方向の最大高さを 140px に制限します */
     max-height: 140px;
-    /* ↓ 枠に合わせて綺麗に収めます */
+    /* 枠いっぱいに縦横比を保ったまま隙間なく画像をトリミング配置します（cover） */
     object-fit: cover;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 小さな影 */
+    /* 立体感を出す影や内枠リング（var(--shadow-subtle)）を付けます */
     box-shadow: var(--shadow-subtle);
 }
 
-/* ↓ 「別の写真を選び直す」リンク文字 */
+/* セレクタ「.upload-change-text」に対するスタイル定義を開始します（対象: .upload-change-text） */
 .upload-change-text {
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
-    /* ↓ 下線 */
+    /* 文字の飾り線（underline）を指定します */
     text-decoration: underline;
 }
 
-/* AI背景削除用ツールバー & アクション */
-/* ↓ 自動背景透過のON/OFFスイッチと手動再実行・元画像復元ボタンバー */
+/* AI背景透過ツールUIに対するスタイル定義を開始します（対象: .ai-cutout-toolbar） */
 .ai-cutout-toolbar {
-    /* ↓ 下12px */
+    /* 要素の下側の外側余白を 12px に設定します */
     margin-bottom: 12px;
-    /* ↓ 上下8px・左右12px */
+    /* 枠の内側余白（padding）を「上下 8px・左右 12px」に設定します */
     padding: 8px 12px;
-    /* ↓ 薄い青グレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f8fafc）に設定します */
     background: #f8fafc;
-    /* ↓ 枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e2e8f0 に設定します */
     border: 1px solid #e2e8f0;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 横並び両端配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 両端 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 狭い時折り返し */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ 「AI背景自動切り抜き ON」チェックラベル */
+/* セレクタ「.ai-toggle-label」に対するスタイル定義を開始します（対象: .ai-toggle-label） */
 .ai-toggle-label {
-    /* ↓ インラインFlex */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 約12.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
     font-size: 0.8rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ 濃いグレー */
+    /* 文字色（テキストカラー）を #1e293b に設定します */
     color: #1e293b;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ テキスト選択抑止 */
+    /* ドラッグ操作やボタン連続クリック時に誤って文字選択されないようにします */
     user-select: none;
 }
 
-/* ↓ AI背景切り抜きチェックボックス */
+/* セレクタ「.ai-toggle-label input[type="checkbox"]」に対するスタイル定義を開始します（対象: .ai-toggle-label input[type="checkbox"]） */
 .ai-toggle-label input[type="checkbox"] {
-    /* ↓ チェック色を黒系に */
+    /* チェックボックスやラジオボタン・スライダー等の強調カラーを #0f172a に揃えます */
     accent-color: #0f172a;
-    /* ↓ 15px幅 */
+    /* 横幅を 15px に設定します */
     width: 15px;
-    /* ↓ 15px高 */
+    /* 高さを 15px に設定します */
     height: 15px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
 }
 
-/* ↓ 「ブラウザ内無料AI」などのバッジ */
+/* セレクタ「.ai-free-badge」に対するスタイル定義を開始します（対象: .ai-free-badge） */
 .ai-free-badge {
-    /* ↓ 水色背景 */
+    /* 背景の色・グラデーション・画像を一括で（#e0f2fe）に設定します */
     background: #e0f2fe;
-    /* ↓ 青文字 */
+    /* 文字色（テキストカラー）を #0284c7 に設定します */
     color: #0284c7;
-    /* ↓ 枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #bae6fd に設定します */
     border: 1px solid #bae6fd;
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 余白 */
+    /* 枠の内側余白（padding）を「上下 1px・左右 6px」に設定します */
     padding: 1px 6px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 10px に設定します */
     border-radius: 10px;
-    /* ↓ 左4px */
+    /* 要素の左側の外側余白を 4px に設定します */
     margin-left: 4px;
-    /* ↓ 行中央揃え */
+    /* 文字やアイコンの縦位置ベースライン合わせ（middle）を設定します */
     vertical-align: middle;
 }
 
-/* ↓ 右側の「もう一度切り抜く」「元画像に戻す」ボタン並び */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .ai-action-btns） */
 .ai-action-btns {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
 }
 
-/* ↓ AIツールバー内の小ボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .btn-ai-action） */
 .btn-ai-action {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ グレー枠 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #cbd5e1 に設定します */
     border: 1px solid #cbd5e1;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 上下3px・左右8px */
+    /* 枠の内側余白（padding）を「上下 3px・左右 8px」に設定します */
     padding: 3px 8px;
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ セミボールド */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ スレート文字 */
+    /* 文字色（テキストカラー）を #334155 に設定します */
     color: #334155;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.15s ease） */
     transition: all 0.15s ease;
 }
 
-/* ↓ 小ボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .btn-ai-action:hover） */
 .btn-ai-action:hover {
-    /* ↓ 黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#0f172a）に設定します */
     background: #0f172a;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 黒枠 */
+    /* 枠線の色だけを #0f172a に変更します（主に選択・ホバー強調用） */
     border-color: #0f172a;
 }
 
-/* AI背景処理中オーバーレイ */
-/* ↓ 背景透過や形状判定の実行中にアップロード枠全体を覆う半透明の進捗表示幕 */
+/* セレクタ「.ai-processing-overlay」に対するスタイル定義を開始します（対象: .ai-processing-overlay） */
 .ai-processing-overlay {
-    /* ↓ 親(.closet-upload-box)の端から端まで全画面カバー */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ top/right/bottom/left すべて 0 の省略書き方 */
+    /* 上下左右 4 方向の位置オフセットを一括で 0 に設定します */
     inset: 0;
-    /* ↓ 95%不透明の白幕 */
+    /* 背景の色・グラデーション・画像を一括で（rgba(255, 255, 255, 0.95)）に設定します */
     background: rgba(255, 255, 255, 0.95);
-    /* ↓ 中身を縦中央揃え */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦積み */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 横中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 縦中央 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを center に設定します */
     justify-content: center;
-    /* ↓ 16px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 16px に設定します */
     padding: 16px;
-    /* ↓ 最前面 z-index 20 */
+    /* 重なり順（奥行き）の優先度を 20 に設定し、大きい値ほど手前に表示します */
     z-index: 20;
-    /* ↓ 中央寄せ */
+    /* 文字やインライン要素の水平揃え（left / center / right）を center に設定します */
     text-align: center;
-    /* ↓ 背後の画像を軽くぼかします */
+    /* 背後に透けて見える背景にぼかし（すりガラス効果: blur(2px)）を掛けます */
     backdrop-filter: blur(2px);
 }
 
-/* ↓ くるくる回る青い読み込みスピナー（円の一部だけ色を塗って回転させています） */
+/* セレクタ「.ai-spinner」に対するスタイル定義を開始します（対象: .ai-spinner） */
 .ai-spinner {
-    /* ↓ 32px */
+    /* 横幅を 32px に設定します */
     width: 32px;
-    /* ↓ 32px */
+    /* 高さを 32px に設定します */
     height: 32px;
-    /* ↓ 基本は薄いグレーの太さ3pxの輪 */
+    /* 要素周囲の枠線（太さ・線種・色）を 3px solid #e2e8f0 に設定します */
     border: 3px solid #e2e8f0;
-    /* ↓ 上辺1/4だけ明るい青色にします */
+    /* 上側の枠線色だけを #0284c7 に変更します（スピナーの回転弧などに使用） */
     border-top-color: #0284c7;
-    /* ↓ 50%で真円に */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ 0.8秒で1回転するアニメを等速(linear)で無限ループ */
+    /* @keyframes で定義した動きのアニメーション（spin-ai-cutout 0.8s linear infinite）を再生させます */
     animation: spin-ai-cutout 0.8s linear infinite;
-    /* ↓ 下8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
 }
 
-/* ↓ 360度連続回転アニメーション */
+/* CSSアニメーションの動きのコマ割り「spin-ai-cutout」を定義します */
 @keyframes spin-ai-cutout {
-    /* ↓ 終了時に1周(360deg)回転 */
+
+    /* アニメーション進行度「to」時点での状態スタイルを設定します */
     to {
-        /* ↓ Z軸回転360度 */
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（rotate(360deg)） */
         transform: rotate(360deg);
     }
 }
 
-/* ↓ 進捗オーバーレイのタイトル文字（「AI解析中...」） */
+/* セレクタ「.ai-status-title」に対するスタイル定義を開始します（対象: .ai-status-title） */
 .ai-status-title {
-    /* ↓ 約13.6px */
+    /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
     font-size: 0.85rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 黒文字 */
+    /* 文字色（テキストカラー）を #0f172a に設定します */
     color: #0f172a;
-    /* ↓ 下2px */
+    /* 要素の下側の外側余白を 2px に設定します */
     margin-bottom: 2px;
 }
 
-/* ↓ サブメッセージ */
+/* セレクタ「.ai-status-subtitle」に対するスタイル定義を開始します（対象: .ai-status-subtitle） */
 .ai-status-subtitle {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を #64748b に設定します */
     color: #64748b;
-    /* ↓ 下8px */
+    /* 要素の下側の外側余白を 8px に設定します */
     margin-bottom: 8px;
 }
 
-/* ↓ 進捗バー（プログレスバー）の背景レール */
+/* セレクタ「.ai-progress-track」に対するスタイル定義を開始します（対象: .ai-progress-track） */
 .ai-progress-track {
-    /* ↓ 幅80% */
+    /* 横幅を 80% に設定します */
     width: 80%;
-    /* ↓ 最大200px */
+    /* 横幅の最大上限を 200px に制限し、はみ出しを防ぎます */
     max-width: 200px;
-    /* ↓ 高さ6px */
+    /* 高さを 6px に設定します */
     height: 6px;
-    /* ↓ レール背景 */
+    /* 背景の色・グラデーション・画像を一括で（#e2e8f0）に設定します */
     background: #e2e8f0;
-    /* ↓ 角丸3px */
+    /* 四角形の角の丸み（角丸半径）を 3px に設定します */
     border-radius: 3px;
-    /* ↓ 中身の伸びるバーの角を丸く切り抜きます */
+    /* 領域からはみ出した中身の扱い（hidden で切り取り／auto でスクロール: hidden）を設定します */
     overflow: hidden;
-    /* ↓ 下4px */
+    /* 要素の下側の外側余白を 4px に設定します */
     margin-bottom: 4px;
 }
 
-/* ↓ 0%〜100%で伸びる青グラデーション進捗バー中身 */
+/* セレクタ「.ai-progress-fill」に対するスタイル定義を開始します（対象: .ai-progress-fill） */
 .ai-progress-fill {
-    /* ↓ 初期幅0%（JSでリアルタイムに % を書き換えます） */
+    /* 横幅を 0% に設定します */
     width: 0%;
-    /* ↓ レールと同じ高さ100% */
+    /* 高さを 100%（親要素いっぱい） に設定します */
     height: 100%;
-    /* ↓ 左から右へ濃い青→水色のグラデーション */
+    /* 背景の色・グラデーション・画像を一括で（linear-gradient(90deg, #0284c7, #38bdf8)）に設定します */
     background: linear-gradient(90deg, #0284c7, #38bdf8);
-    /* ↓ バーの幅変化を滑らかに */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（width 0.2s ease） */
     transition: width 0.2s ease;
 }
 
-/* ↓ 「65%」などのパーセント数値文字 */
+/* セレクタ「.ai-progress-percent」に対するスタイル定義を開始します（対象: .ai-progress-percent） */
 .ai-progress-percent {
-    /* ↓ 約11.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
     font-size: 0.72rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 青文字 */
+    /* 文字色（テキストカラー）を #0284c7 に設定します */
     color: #0284c7;
-    /* ↓ 数字のガタつき防止の等幅数字 */
+    /* 数字の幅を等幅（tabular-nums）にして、金額や数値変化時にガタつかないようにします */
     font-variant-numeric: tabular-nums;
 }
 
-/* ↓ 小さな補足テキスト */
+/* セレクタ「.ai-hint-small」に対するスタイル定義を開始します（対象: .ai-hint-small） */
 .ai-hint-small {
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 薄グレー */
+    /* 文字色（テキストカラー）を #94a3b8 に設定します */
     color: #94a3b8;
-    /* ↓ 上6px */
+    /* 要素の上側の外側余白を 6px に設定します */
     margin-top: 6px;
 }
 
-/* 透過写真プレビュー用の市松模様背景 */
-/* ↓ 背景が透明(PNG透過)になったことを一目で分からせるPhotoshop風の白×グレー市松模様 */
+/* セレクタ「.upload-preview.is-transparent」に対するスタイル定義を開始します（対象: .upload-preview.is-transparent） */
 .upload-preview.is-transparent {
-    /* ↓ 「切り抜き済み」バッジ配置用基準 */
+    /* 元の位置を保ったまま、内部の子要素（absolute）が位置計算する基準点にします */
     position: relative;
-    /* ↓ 周囲8px余白 */
+    /* 枠の内側余白（padding）を全方向一律で 8px に設定します */
     padding: 8px;
-    /* ↓ 角丸8px */
+    /* 四角形の角の丸み（角丸半径）を 8px に設定します */
     border-radius: 8px;
-    /* ↓ 市松模様の基本下地カラー */
+    /* 背景の塗りつぶし色を #f8fafc に設定します */
     background-color: #f8fafc;
-    /* ↓ 4枚の斜め45度線形グラデーションを組み合わせて14x14pxのチェック柄(市松模様)を描きます */
+    /* 背景画像やチェック模様などの複数グラデーションレイヤーを指定します */
     background-image:
         linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
         linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
         linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
-    /* ↓ 市松1マスのサイズ 14x14px */
+    /* 背景画像・パターン1単位のサイズを 14px 14px に設定します */
     background-size: 14px 14px;
-    /* ↓ 4つの三角形グラデーションを半マス(7px)ずつずらして完璧なチェッカー柄に噛み合わせます */
+    /* 背景画像・パターンの表示開始位置を 0 0, 0 7px, 7px -7px, -7px 0px に設定します */
     background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
 }
 
-/* ↓ 透過画像自体のドロップシャドウ調整 */
+/* セレクタ「.upload-preview.is-transparent img」に対するスタイル定義を開始します（対象: .upload-preview.is-transparent img） */
 .upload-preview.is-transparent img {
-    /* ↓ 画像枠自身の背景は完全透明に */
+    /* 背景の色・グラデーション・画像を一括で（transparent）に設定します */
     background: transparent;
-    /* ↓ 切り抜かれた服の形に沿って影を落とし、浮かび上がらせます */
+    /* プロパティ filter を drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12)) に設定します */
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
 }
 
-/* ↓ プレビュー右上の「✨ 透過済み」バッジ */
+/* セレクタ「.preview-badge-transparent」に対するスタイル定義を開始します（対象: .preview-badge-transparent） */
 .preview-badge-transparent {
-    /* ↓ 右上に浮かせます */
+    /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* ↓ 上4px */
+    /* 基準位置の上端からの縦位置を 4px に指定します */
     top: 4px;
-    /* ↓ 右4px */
+    /* 基準位置の右端からの横位置を 4px に指定します */
     right: 4px;
-    /* ↓ 濃い黒背景 */
+    /* 背景の色・グラデーション・画像を一括で（#0f172a）に設定します */
     background: #0f172a;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
-    /* ↓ 約10.4px */
+    /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
     font-size: 0.65rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 上下2px・左右7px */
+    /* 枠の内側余白（padding）を「上下 2px・左右 7px」に設定します */
     padding: 2px 7px;
-    /* ↓ カプセル丸角 */
+    /* 四角形の角の丸み（角丸半径）を 10px に設定します */
     border-radius: 10px;
-    /* ↓ 小さな影 */
+    /* 立体感を出す影や内枠リング（0 2px 4px rgba(0, 0, 0, 0.15)）を付けます */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* ↓ 「サンプルイラストから選ぶ」プリセットボタン並び */
+/* セレクタ「.preset-img-selector」に対するスタイル定義を開始します（対象: .preset-img-selector） */
 .preset-img-selector {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 折り返し */
+    /* 子要素が収まりきらない場合に「次の行へ折り返す(wrap)」よう指定します */
     flex-wrap: wrap;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
 }
 
-/* ↓ 「イラスト例:」ラベル */
+/* セレクタ「.preset-label」に対するスタイル定義を開始します（対象: .preset-label） */
 .preset-label {
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ グレー */
+    /* 文字色（テキストカラー）を var(--color-gray-medium) に設定します */
     color: var(--color-gray-medium);
 }
 
-/* ↓ 各サンプルイラスト選択ボタン */
+/* ボタンパーツに対するスタイル定義を開始します（対象: .preset-img-btn） */
 .preset-img-btn {
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 上下4px・左右10px */
+    /* 枠の内側余白（padding）を「上下 4px・左右 10px」に設定します */
     padding: 4px 10px;
-    /* ↓ 丸角14px */
+    /* 四角形の角の丸み（角丸半径）を 14px に設定します */
     border-radius: 14px;
-    /* ↓ 12px */
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
     font-size: 0.75rem;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
 }
 
-/* ↓ サンプルボタンホバー時 */
+/* ボタンパーツのマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .preset-img-btn:hover） */
 .preset-img-btn:hover {
-    /* ↓ 黒枠線 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 薄グレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
 }
 
-/* ↓ 服登録モーダル内のカテゴリ（アウター/トップス/ボトムス/靴/帽子）2列ラジオ選択格子 */
+/* セレクタ「.category-radio-grid」に対するスタイル定義を開始します（対象: .category-radio-grid） */
 .category-radio-grid {
-    /* ↓ Gridレイアウト */
+    /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
     display: grid;
-    /* ↓ 均等2列 */
+    /* Grid の横方向の列数と幅の割り振り（1fr 1fr）を定義します */
     grid-template-columns: 1fr 1fr;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
 }
 
-/* ↓ カテゴリ選択ラジオボタン1枠 */
+/* セレクタ「.cat-radio-label」に対するスタイル定義を開始します（対象: .cat-radio-label） */
 .cat-radio-label {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 隙間8px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 8px に設定します */
     gap: 8px;
-    /* ↓ 上下10px・左右12px */
+    /* 枠の内側余白（padding）を「上下 10px・左右 12px」に設定します */
     padding: 10px 12px;
-    /* ↓ 薄い枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid var(--color-gray-light) に設定します */
     border: 1px solid var(--color-gray-light);
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 指カーソル */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
-    /* ↓ 約12.8px */
+    /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
     font-size: 0.8rem;
-    /* ↓ アニメーション */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all var(--transition-fast)） */
     transition: all var(--transition-fast);
-    /* ↓ 白背景 */
+    /* 背景の色・グラデーション・画像を一括で（#ffffff）に設定します */
     background: #ffffff;
 }
 
-/* ↓ カテゴリ選択ラジオボタンにマウスを重ねた時のスタイル */
+/* セレクタ「.cat-radio-label:hover」のマウスを乗せたとき(hover)に対するスタイル定義を開始します（対象: .cat-radio-label:hover） */
 .cat-radio-label:hover {
-    /* ↓ 枠線の色を少し濃いグレーに変更して反応を示します */
+    /* 枠線の色だけを #999999 に変更します（主に選択・ホバー強調用） */
     border-color: #999999;
 }
 
-/* ↓ チェックされたラジオボタンの直後(+)にある<span>ラベルの装飾（CSSセレクタ機能） */
+/* セレクタ「.cat-radio-label input:checked+span」に対するスタイル定義を開始します（対象: .cat-radio-label input:checked+span） */
 .cat-radio-label input:checked+span {
-    /* ↓ 選択中の文字を太字にします */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 文字色をくっきりした黒色にします */
+    /* 文字色（テキストカラー）を var(--color-black) に設定します */
     color: var(--color-black);
 }
 
-/* ↓ CSSの:has()擬似クラスを使い「チェック済みのinputを含むラベル枠全体」を強調します */
+/* セレクタ「.cat-radio-label:has(input:checked)」に対するスタイル定義を開始します（対象: .cat-radio-label:has(input:checked)） */
 .cat-radio-label:has(input:checked) {
-    /* ↓ 外枠線を黒色に変更 */
+    /* 枠線の色だけを var(--color-black) に変更します（主に選択・ホバー強調用） */
     border-color: var(--color-black);
-    /* ↓ 背景色を薄いグレーにして選択状態をわかりやすくします */
+    /* 背景の色・グラデーション・画像を一括で（var(--color-gray-bg)）に設定します */
     background: var(--color-gray-bg);
 }
 
-/* ↓ モーダルダイアログ下部の操作ボタン配置エリア（「キャンセル」「登録する」等） */
+/* ポップアップモーダルに対するスタイル定義を開始します（対象: .modal-actions） */
 .modal-actions {
-    /* ↓ Flexboxで横並びに配置 */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 右端寄せ（決定ボタンを右下に置くUIの定番配置） */
+    /* 主軸（通常は横方向）の配置・間隔揃えを flex-end に設定します */
     justify-content: flex-end;
-    /* ↓ 縦方向中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ ボタン同士の間隔を12px空けます */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 12px に設定します */
     gap: 12px;
-    /* ↓ 上のフォームとの余白24px */
+    /* 要素の上側の外側余白を 24px に設定します */
     margin-top: 24px;
-    /* ↓ 仕切り線との間の内側上余白18px */
+    /* 上側の内側余白を 18px に設定します */
     padding-top: 18px;
-    /* ↓ 上部に薄い区切り線を表示 */
+    /* 上辺だけの境界線を 1px solid var(--color-gray-light) に設定します */
     border-top: 1px solid var(--color-gray-light);
 }
 
-/* ↓ モーダル下部エリア内にあるボタンサイズ・文字の個別指定 */
+/* ボタンパーツ・ポップアップモーダルに対するスタイル定義を開始します（対象: .modal-actions .btn） */
 .modal-actions .btn {
-    /* ↓ 上下12px・左右24pxの押しやすい余白 */
+    /* 枠の内側余白（padding）を「上下 12px・左右 24px」に設定します */
     padding: 12px 24px;
-    /* ↓ 約14.7pxの読みやすい文字サイズ */
+    /* 文字の大きさ（フォントサイズ）を 0.92rem に設定します */
     font-size: 0.92rem;
-    /* ↓ セミボールドの太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
-    /* ↓ マウスカーソルを指アイコンに */
+    /* マウスカーソルを乗せたときの見た目（指マーク pointer）を指定します */
     cursor: pointer;
 }
 
-/* ========================================================================== */
-/* 21-b. AI形状・アイテム診断結果カード（アウター/ボトムス/トップス/靴/帽子） */
-/* ========================================================================== */
-/* ↓ 手持ち服アップロード時に「服画像かどうか」「どのカテゴリか」のAI判定結果を示すカード */
+
+/* -------------------------------------------------------------------------- */
+/* 10. AI形状・アイテム種別自動判定カード（解析中青 / OK緑 / 非対象赤） */
+/* -------------------------------------------------------------------------- */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card） */
 .ai-diagnosis-card {
-    /* ↓ 上12px・左右0・下16pxの外側余白 */
+    /* 要素の外側余白（margin）を「上 12px・左右 0・下 16px」に設定します */
     margin: 12px 0 16px;
-    /* ↓ 上下12px・左右14pxの内側余白 */
+    /* 枠の内側余白（padding）を「上下 12px・左右 14px」に設定します */
     padding: 12px 14px;
-    /* ↓ 角丸6px */
+    /* 四角形の角の丸み（角丸半径）を 6px に設定します */
     border-radius: 6px;
-    /* ↓ 標準時の薄いニュートラルグレー背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f8f9fa）に設定します */
     background: #f8f9fa;
-    /* ↓ 薄い1px枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 1px solid #e5e7eb に設定します */
     border: 1px solid #e5e7eb;
-    /* ↓ 左端だけ4pxの太いアクセントバーにして診断カードの視認性を高めます */
+    /* 左辺だけの境界線を 4px solid #111827 に設定します */
     border-left: 4px solid #111827;
-    /* ↓ 色変化を0.25秒でなめらかにアニメーションさせます */
+    /* 色や位置などの数値変化をアニメーション化して滑らかに繋ぎます（all 0.25s ease） */
     transition: all 0.25s ease;
 }
 
-/* ↓ AIが画像解析・推論を実行している待機中のカード色（インディゴブルー系） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-analyzing） */
 .ai-diagnosis-card.is-analyzing {
-    /* ↓ 左アクセント線を青紫色に */
+    /* 左側の枠線色だけを #6366f1 に変更します */
     border-left-color: #6366f1;
-    /* ↓ 淡い青系背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f5f7ff）に設定します */
     background: #f5f7ff;
 }
 
-/* ↓ AIが「衣服・指定アイテムとして有効」と判定した時のカード色（グリーン系） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-valid） */
 .ai-diagnosis-card.is-valid {
-    /* ↓ 左アクセント線をエメラルドグリーンに */
+    /* 左側の枠線色だけを #10b981 に変更します */
     border-left-color: #10b981;
-    /* ↓ 淡い緑背景 */
+    /* 背景の色・グラデーション・画像を一括で（#f0fdf4）に設定します */
     background: #f0fdf4;
-    /* ↓ 淡い緑色の枠線 */
+    /* 枠線の色だけを #bbf7d0 に変更します（主に選択・ホバー強調用） */
     border-color: #bbf7d0;
 }
 
-/* ↓ AIが「衣服ではない画像（風景・人物のみ等）やNG」と判定した時の警告カード色（レッド系） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-invalid） */
 .ai-diagnosis-card.is-invalid {
-    /* ↓ 左アクセント線を警告の赤色に */
+    /* 左側の枠線色だけを #ef4444 に変更します */
     border-left-color: #ef4444;
-    /* ↓ 淡い赤色背景 */
+    /* 背景の色・グラデーション・画像を一括で（#fef2f2）に設定します */
     background: #fef2f2;
-    /* ↓ 淡い赤枠線 */
+    /* 枠線の色だけを #fecaca に変更します（主に選択・ホバー強調用） */
     border-color: #fecaca;
 }
 
-/* ↓ 診断カードの上段ヘッダー（左にステータスバッジ、右にAI信頼度スコア） */
+/* ヘッダー・AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-header） */
 .ai-diagnosis-header {
-    /* ↓ 横並び */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 両端配置 */
+    /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
     justify-content: space-between;
-    /* ↓ 縦中央揃え */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ 下余白6px */
+    /* 要素の下側の外側余白を 6px に設定します */
     margin-bottom: 6px;
 }
 
-/* ↓ 診断ステータスを表す角丸ラベルバッジ（「AI解析中」「判定OK」「登録不可」など） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-badge） */
 .ai-diagnosis-badge {
-    /* ↓ 横並びのインラインFlex（スピナーと文字を並べるため） */
+    /* 横並びインラインサイズでありつつ内部で Flexbox 配置を使えるようにします */
     display: inline-flex;
-    /* ↓ 縦中央 */
+    /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* ↓ スピナーと文字の隙間6px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 6px に設定します */
     gap: 6px;
-    /* ↓ 約12.2pxの小ぶり文字 */
+    /* 文字の大きさ（フォントサイズ）を 0.76rem に設定します */
     font-size: 0.76rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 英字が映える文字間隔 */
+    /* 文字どうしの横間隔（トラッキング）を 0.05em に調整します */
     letter-spacing: 0.05em;
-    /* ↓ 上下2px・左右8px余白 */
+    /* 枠の内側余白（padding）を「上下 2px・左右 8px」に設定します */
     padding: 2px 8px;
-    /* ↓ 角丸4px */
+    /* 四角形の角の丸み（角丸半径）を 4px に設定します */
     border-radius: 4px;
-    /* ↓ 基本の濃紺背景 */
+    /* 背景の色・グラデーション・画像を一括で（#111827）に設定します */
     background: #111827;
-    /* ↓ 白文字 */
+    /* 文字色（テキストカラー）を #ffffff に設定します */
     color: #ffffff;
 }
 
-/* ↓ 判定OK（有効）時のバッジ背景色（濃いグリーン） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-valid .ai-diagnosis-badge） */
 .ai-diagnosis-card.is-valid .ai-diagnosis-badge {
-    /* ↓ 緑背景に変更 */
+    /* 背景の色・グラデーション・画像を一括で（#059669）に設定します */
     background: #059669;
 }
 
-/* ↓ 判定NG（登録不可）時のバッジ背景色（濃い赤） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-invalid .ai-diagnosis-badge） */
 .ai-diagnosis-card.is-invalid .ai-diagnosis-badge {
-    /* ↓ 赤背景に変更 */
+    /* 背景の色・グラデーション・画像を一括で（#dc2626）に設定します */
     background: #dc2626;
 }
 
-/* ↓ 右側に表示されるAI信頼度パーセンテージ数値 */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diag-confidence） */
 .ai-diag-confidence {
-    /* ↓ 約12.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.78rem に設定します */
     font-size: 0.78rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 緑文字 */
+    /* 文字色（テキストカラー）を #059669 に設定します */
     color: #059669;
-    /* ↓ 数字ごとの横幅を等幅に揃えて数値変化時のガタつきを防ぎます */
+    /* 数字の幅を等幅（tabular-nums）にして、金額や数値変化時にガタつかないようにします */
     font-variant-numeric: tabular-nums;
 }
 
-/* ↓ 判定NG時の信頼度・警告スコアの色（赤字に変更） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-invalid .ai-diag-confidence） */
 .ai-diagnosis-card.is-invalid .ai-diag-confidence {
-    /* ↓ 赤文字 */
+    /* 文字色（テキストカラー）を #dc2626 に設定します */
     color: #dc2626;
 }
 
-/* ↓ 診断カードの本文エリア（タイトル行と説明行を縦積み） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-body） */
 .ai-diagnosis-body {
-    /* ↓ Flexbox */
+    /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
     display: flex;
-    /* ↓ 縦方向に積み上げ */
+    /* Flexbox の並べる向きを「縦方向（上から下）」に設定します */
     flex-direction: column;
-    /* ↓ 行間3px */
+    /* Flexbox や Grid で並べた要素どうしの間隔を 3px に設定します */
     gap: 3px;
 }
 
-/* ↓ 診断タイトル見出し */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diag-title） */
 .ai-diag-title {
-    /* ↓ 既定マージン削除 */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
-    /* ↓ 約14px */
+    /* 文字の大きさ（フォントサイズ）を 0.88rem に設定します */
     font-size: 0.88rem;
-    /* ↓ 太字 */
+    /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* ↓ 濃い黒文字 */
+    /* 文字色（テキストカラー）を #111827 に設定します */
     color: #111827;
 }
 
-/* ↓ 判定NG時のタイトル文字色（深い赤） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-invalid .ai-diag-title） */
 .ai-diagnosis-card.is-invalid .ai-diag-title {
-    /* ↓ 赤茶文字 */
+    /* 文字色（テキストカラー）を #991b1b に設定します */
     color: #991b1b;
 }
 
-/* ↓ 診断の詳細理由・解説文 */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diag-desc） */
 .ai-diag-desc {
-    /* ↓ 既定マージン削除 */
+    /* 要素の外側余白（margin）を全方向一律で 0（余白なし） に設定します */
     margin: 0;
-    /* ↓ 約12.5px */
+    /* 文字の大きさ（フォントサイズ）を 0.78rem に設定します */
     font-size: 0.78rem;
-    /* ↓ 行間1.45倍 */
+    /* 1行あたりの高さ（行間・1.45）を設定して文章の読みやすさを調整します */
     line-height: 1.45;
-    /* ↓ 落ち着いた濃いグレー文字 */
+    /* 文字色（テキストカラー）を #4b5563 に設定します */
     color: #4b5563;
 }
 
-/* ↓ 判定NG時の詳細エラー・拒否理由文（赤字） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diagnosis-card.is-invalid .ai-diag-desc） */
 .ai-diagnosis-card.is-invalid .ai-diag-desc {
-    /* ↓ 赤色文字 */
+    /* 文字色（テキストカラー）を #b91c1c に設定します */
     color: #b91c1c;
 }
 
-/* ↓ 解析中バッジ内でくるくる回る小さなローディングリング（CSSスピナー） */
+/* AIコーデ診断結果カードに対するスタイル定義を開始します（対象: .ai-diag-spinner） */
 .ai-diag-spinner {
-    /* ↓ テキストと横並び配置 */
+    /* 横に並べられるインライン性質と、幅・高さ・上下余白を持てる性質を両立させます */
     display: inline-block;
-    /* ↓ 幅10px */
+    /* 横幅を 10px に設定します */
     width: 10px;
-    /* ↓ 高さ10px */
+    /* 高さを 10px に設定します */
     height: 10px;
-    /* ↓ 3辺を半透明白にした2px円枠線 */
+    /* 要素周囲の枠線（太さ・線種・色）を 2px solid rgba(255, 255, 255, 0.3) に設定します */
     border: 2px solid rgba(255, 255, 255, 0.3);
-    /* ↓ 上辺1箇所だけくっきり白くすることで回転時に円弧が回って見えます */
+    /* 上側の枠線色だけを #ffffff に変更します（スピナーの回転弧などに使用） */
     border-top-color: #ffffff;
-    /* ↓ 真円にする */
+    /* 角丸を 50% にして完全な正円・楕円形を作ります */
     border-radius: 50%;
-    /* ↓ 0.8秒かけて等速で360度回転し続けるアニメーション */
+    /* @keyframes で定義した動きのアニメーション（ai-diag-spin 0.8s linear infinite）を再生させます */
     animation: ai-diag-spin 0.8s linear infinite;
 }
 
-/* ↓ スピナー用の回転アニメーション定義（0度→360度） */
+/* CSSアニメーションの動きのコマ割り「ai-diag-spin」を定義します */
 @keyframes ai-diag-spin {
-    /* ↓ 終了時点(100%)で360度回転させます */
-    to { transform: rotate(360deg); }
-}
 
-/* ========================================================================== */
-/* 22. 洗練されたレスポンシブ画面設計（無駄な重複を排除したカスケード設計）     */
-/* デスクトップの美しさを継承し、タブレット・スマホ全サイズで滑らかにフィット   */
-/* ========================================================================== */
+    /* アニメーション進行度「to」時点での状態スタイルを設定します */
+    to {
+        /* 要素の位置移動・拡大縮小・回転などの変形演出を行います（rotate(360deg)） */
+        transform: rotate(360deg);
+    }
+}

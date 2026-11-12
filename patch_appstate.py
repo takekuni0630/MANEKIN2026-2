@@ -1,30 +1,29 @@
 # ==============================================================================
-# js/app.js の AppState 定義へ selectedGender を追加するための補助パッチスクリプト
+#  js/app.js の AppState に selectedGender プロパティを追加する使い切り補助スクリプト
+#  ※ 過去の修正時に性別絞り込み状態を追加するために使ったファイルです（通常は再実行不要）
 # ==============================================================================
 
-# 'js/app.js' を読み込み専用('r')・文字コードUTF-8で開き、閉じ忘れを防ぐ with 構文で変数 f に割り当てます
+# js/app.js を UTF-8 の読み取りモード('r')で開き、終了時に自動で閉じる with ブロックを開始します
 with open('js/app.js', 'r', encoding='utf-8') as f:
-    # ファイルの中身を丸ごと文字列として読み込み、変数 c に保存します
+    # 開いた js/app.js の中身すべてを 1 つの大きな文字列として変数 c に読み込みます
     c = f.read()
 
-# 書き換えたい元の記述パターン（選択カテゴリと並び順の行）を探しやすいように変数 target に入れます
+# ファイル内で書き換え位置の目印にする既存の文字列（selectedCategory と selectedSort）を変数 target に用意します
 target = '    selectedCategory: "ALL",\n    selectedSort: "default"'
-# 上のパターンの先頭に「selectedGender: "ALL",」を追加した新しい文字列を変数 replacement に作ります
+# 目印の先頭に 'selectedGender: "ALL",' を差し込んだ新しい文字列を変数 replacement に用意します
 replacement = '    selectedGender: "ALL",\n    selectedCategory: "ALL",\n    selectedSort: "default"'
 
-# 読み込んだ js/app.js の中身（c）の中に、目的の文字列（target）が存在するかを判定します
+# 読み込んだコード文字列 c の中に target が本当に含まれているか確認します
 if target in c:
-    # 最初に見つかった1か所（第3引数の 1）だけを新しい文字列（replacement）に置換して c を更新します
+    # 見つかった最初の 1 か所だけ target を replacement に置き換えます
     c = c.replace(target, replacement, 1)
-    # 今度は同じ 'js/app.js' を書き込み専用('w')・UTF-8で開き直します（既存内容は上書きされます）
+    # js/app.js を UTF-8 の書き込みモード('w')で開き直します
     with open('js/app.js', 'w', encoding='utf-8') as f:
-        # 置換済みの新しいプログラム文字列をファイルへ書き戻します
+        # 置き換え後の全テキスト c をファイルに上書き保存します
         f.write(c)
-    # 正常にパッチが当たったことを画面へ表示します
+    # 追記が成功したことをコンソール画面に表示します
     print("selectedGender added to AppState!")
-# もし target の文字列が見つからなかった場合（すでに適用済みかコード変更後など）の処理です
+# 目印となる文字列が見つからなかった（すでに適用済み等の）場合の分岐です
 else:
-    # 対象が見つからず何も変更しなかったことを画面へ知らせます
+    # 書き換えは行わずに、対象が見つからなかったことをコンソールへ表示します
     print("Target not found")
-
-

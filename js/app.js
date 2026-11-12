@@ -1,737 +1,727 @@
 // ==========================================================================
-// MANEKIN FASHION - メインアプリケーション制御 (app.js)a
-// アプリケーション全体の状態管理、ルーティング、初期化、イベント登録
+//  MANEKIN FASHION - メイン制御・画面ルーティング (js/app.js)
+//  ・サイト全体の状態管理（AppState）、SPA画面切り替え（handleRouting）、
+//  ・ページ起動時の MySQL セッション復元（Cookie 認証）、全UIイベント登録を行います。
 // ==========================================================================
 
-// 2. アプリケーション状態管理（State - アカウント別に厳密分離）
-// --------------------------------------------------------------------------
-// ↓ ブラウザの localStorage から前回ログインしていたユーザー情報を即時実行関数（IIFE）で安全に読み込みます
-const _initialUser = (() => {
-    // ↓ 保存データが壊れていて JSON.parse でエラーが出てもアプリが止まらないよう try-catch で囲みます
-    try {
-        // ↓ 'manekin_user' キーのJSON文字列を取り出してオブジェクトに戻し、無ければ null を返します
-        return JSON.parse(localStorage.getItem('manekin_user')) || null;
-    // ↓ 読み込み・変換に失敗した場合の受け皿
-    } catch (e) {
-        // ↓ 安全に未ログイン状態(null)として扱います
-        return null;
-    }
-})();
-// ↓ ログイン済みユーザーが見つかればそのID(_initialUser.id)を、未ログインなら null を初期ユーザーIDとします
-const _initialUid = (_initialUser && _initialUser.id) ? _initialUser.id : null;
-
-// ↓ アプリ全体の現在状態（ログインユーザー、カート、お気に入り、試着中アイテム等）を一元管理するオブジェクト
+// 1. アプリケーション状態管理（AppState）: メモリ上で画面状態を一元管理（※永続化は MySQL のみ）
+// 現在ログイン中のユーザーやカート・試着状態などをまとめる管理オブジェクト AppState を定義します
 const AppState = {
-    // お気に入り登録IDリスト（アカウント別、未ログイン時はゲスト専用キー）
-    // ↓ ユーザーIDに紐づく専用キーから、過去に保存したお気に入り商品ID配列を読み込みます
-    favorites: loadScopedData('manekin_favorites', [], _initialUid),
-    // ログイン中の会員情報（初期値は未ログイン）
-    // ↓ 先ほど復元したログインユーザー情報（名前・ID・保有ポイント等）をセットします
-    currentUser: _initialUser,
-    // ショッピングカート内アイテム（アカウント別、未ログイン時はゲスト専用キー）
-    // ↓ ユーザー別のカート配列を読み込みます
-    cart: loadScopedData('manekin_cart', [], _initialUid),
-    // ↓ 商品詳細ページで今開いている商品のID（初期値1番）
+    // お気に入り登録した商品IDを並べる配列（ログイン後に MySQL favorites テーブルから同期します）
+    favorites: [],
+    // ログイン中の会員情報オブジェクト（未ログイン時は null）
+    currentUser: null,
+    // ショッピングカート内の商品リスト配列（ログイン中は MySQL cart_items と連動します）
+    cart: [],
+    // 商品詳細ページで現在表示対象になっている商品ID（初期値は 1 番）
     currentDetailId: 1,
-    // ↓ 詳細ページでユーザーが選択中のカラー名（初期値WHITE）
+    // 商品詳細ページで選択中のカラー名（初期値は WHITE）
     selectedColor: "WHITE",
-    // ↓ 詳細ページでユーザーが選択中のサイズ（初期値M）
+    // 商品詳細ページで選択中のサイズ名（初期値は M）
     selectedSize: "M",
-    // 注文履歴データ（ログイン中アカウント分のみ読み込み）
-    // ↓ ログイン中のアカウントがある場合のみ、その人の注文履歴を読み込みます（未ログイン時は空配列）
-    orderHistory: _initialUid ? loadScopedData('manekin_orders', [], _initialUid) : [],
-    // ↓ 商品一覧ページでのカテゴリ絞り込み状態（'ALL'＝全件）
+    // ログインユーザーの注文履歴配列（MySQL orders テーブルから取得します）
+    orderHistory: [],
+    // 商品一覧ページのカテゴリ絞り込み状態（'ALL' は全カテゴリ表示）
     selectedCategory: "ALL",
-    // ↓ 商品一覧ページの並び替え基準（'default'＝標準順）
+    // 商品一覧ページの並び順（'default' はおすすめ順）
     selectedSort: "default",
-    // 未ログイン時のアクセス制御復帰ターゲット ('checkout' または 'manekin')
-    // ↓ ログイン必須ページに未ログインで入ろうとした際、認証完了後に自動で戻す先のURL目印
+    // 未ログインで認証必須画面へ入った場合の、ログイン完了後の自動復帰先（'manekin' / 'checkout'）
     pendingAuthTarget: null,
 
-    // =========================================================================
-    // ■ AIコーデシミュレーション（MANEKIN AI STUDIO）状態管理
-    // =========================================================================
-    // マイクローゼット（ログイン中アカウント分のみ読み込み）
-    // ↓ スタジオに登録した自分の服・購入済み商品リストを読み込みます
-    myCloset: _initialUid ? loadScopedData('manekin_my_closet', [], _initialUid) : [],
-    // マネキン現在着用スロット
-    // ↓ マネキンが今着ている5部位のアイテムデータ（ログイン時のみ復元、未ログイン時はすべて空）
-    currentOutfit: _initialUid ? loadScopedData('manekin_current_outfit', {
-        // ↓ 帽子スロット（未着用時は null）
+    // AI試着スタジオ用：自分の登録服や購入済みアイテム一覧配列（MySQL closet_items から取得）
+    myCloset: [],
+    // AI試着スタジオ用：マネキンに今着せている5部位のスロット管理オブジェクト
+    currentOutfit: {
+        // 帽子スロット（未着用時は null）
         hat: null,
-        // ↓ アウタースロット
+        // アウタースロット（未着用時は null）
         outer: null,
-        // ↓ トップススロット
+        // トップススロット（未着用時は null）
         tops: null,
-        // ↓ ボトムススロット
+        // ボトムススロット（未着用時は null）
         bottoms: null,
-        // ↓ シューズスロット
-        shoes: null
-    }, _initialUid) : {
-        // ↓ 未ログイン時の初期帽子スロット
-        hat: null,
-        // ↓ 未ログイン時の初期アウタースロット
-        outer: null,
-        // ↓ 未ログイン時の初期トップススロット
-        tops: null,
-        // ↓ 未ログイン時の初期ボトムススロット
-        bottoms: null,
-        // ↓ 未ログイン時の初期シューズスロット
+        // シューズスロット（未着用時は null）
         shoes: null
     },
-    // 保存したコーデ一覧（ルックブック：ログイン中アカウント分のみ読み込み）
-    // ↓ ユーザーが「コーデを保存」で登録したルックブック配列
-    savedOutfits: _initialUid ? loadScopedData('manekin_saved_outfits', [], _initialUid) : [],
-    // スタジオ内のUI状態
-    // ↓ スタジオ画面で現在開いているタブ（初期タブはメインの 'create'＝コーデ作成）
+    // スタジオで保存したコーディネート一覧配列（MySQL saved_outfits から取得）
+    savedOutfits: [],
+    // スタジオ画面で今開いている左/下パネルのタブ名（初期値 'create'）
     studioActiveTab: 'create',
-    // ↓ マネキンの性別シルエット（MEN / WOMEN）
-    studioGender: _initialUid ? loadScopedData('manekin_studio_gender', 'MEN', _initialUid) : 'MEN',
-    // ↓ スタジオ左列「マイ服」のカテゴリ絞り込み状態
+    // マネキンの性別モデル設定（'MEN' または 'WOMEN'）
+    studioGender: 'MEN',
+    // スタジオ内のマイクローゼット絞り込みカテゴリ（'ALL' は全表示）
     studioClosetFilter: 'ALL',
-    // ↓ スタジオ右列「BRAND」のカテゴリ絞り込み状態
+    // スタジオ内のブランド商品絞り込みカテゴリ（'ALL' は全表示）
     studioBrandFilter: 'ALL',
-    // ↓ ブランド商品一覧を「お気に入り商品のみ」に絞るチェック状態（false＝全表示）
+    // ブランド商品リストを「お気に入りのみ」に絞るかどうかの真偽フラグ
     studioBrandFavOnly: false,
-    // ↓ スマホ表示時のスタジオ3タブのうち現在見ている列（'closet' / 'mannequin' / 'brand'）
+    // スマホ画面幅でスタジオを表示するときのアクティブ表示切り替え（'mannequin' 優先）
     studioMobileView: 'mannequin',
-    // ↓ 位置・サイズ微調整パネルで現在選ばれている部位スロット
+    // 位置・拡大率調整パネルで現在操作中の部位キー（初期値 'outer'）
     activeAdjustSlot: 'outer',
-    // ↓ 各部位のX/Y座標・拡大率(scale)のズレ調整値マップを読み込みます
-    fittingOffsets: loadScopedData('manekin_fitting_offsets', getDefaultFittingOffsets(), _initialUid),
-    // ↓ 体型プロフィール互換オブジェクトを読み込みます
-    userBodyProfile: loadScopedData('manekin_body_profile', getDefaultBodyProfile(), _initialUid)
+    // 部位ごとの X/Y ズレ・拡大率・サイズ設定を shop.js のヘルパーから初期化します
+    fittingOffsets: getDefaultFittingOffsets(),
+    // 身長・体型・スタイル設定の初期値を shop.js のヘルパーから初期化します
+    userBodyProfile: getDefaultBodyProfile()
 };
 
-// --------------------------------------------------------------------------
-// 3. アプリケーション初期化処理
-// --------------------------------------------------------------------------
-// ↓ HTMLの解析（DOM構築）が終わった瞬間に自動実行される起動メイン処理
-document.addEventListener('DOMContentLoaded', () => {
-    // ↓ アカウント共有バグの原因になっていた古い無印（非スコープ）localStorageキーを掃除します
-    if (typeof purgeLegacyGlobalStorage === 'function') purgeLegacyGlobalStorage();
-    // ↓ 以前の壊れたダミー画像URLデータがあれば新しいSVGデータ等へ自動修復します
-    migrateOldBrokenAssets();
-    // ↓ ヘッダー等のお気に入り件数バッジを最新数に更新します
+// 起動時 MySQL セッション復元が先に終わるまでルート判定を待たせるための同期制御変数
+// 起動直後の MySQL ログイン状態確認（/api/auth/me）が完了したかどうかを記録するフラグ
+let _authBootstrapDone = false;
+// 上記確認処理の完了を他関数が await して待つための Promise 参照を保持します
+let _authBootstrapPromise = null;
+
+// 2. アプリ起動時の初期化処理（HTML読込完了時 DOMContentLoaded に1回だけ実行）
+// HTML要素がすべて解析されたタイミング(DOMContentLoaded)で非同期初期化処理を開始します
+document.addEventListener('DOMContentLoaded', async () => {
+    // 過去バージョン等のブラウザ側キャッシュ（manekin* キー）が残っていれば最初に完全削除します
+    if (typeof purgeAllManekinLocalStorage === 'function') purgeAllManekinLocalStorage();
+    // ヘッダー等のお気に入り件数バッジを初期値(0)で描画します
     updateFavoriteBadges();
-    // ↓ ヘッダーのカートアイコン上の商品数量バッジを更新します
+    // ヘッダーのカート点数バッジを初期値(0)で描画します
     updateCartBadge();
-    // ↓ ログイン状態に応じて右上の認証ナビ表示（ログイン / マイページ）を切り替えます
+    // ヘッダー右のログイン／マイページ表示を未ログイン状態で初期更新します
     updateAuthNavUI();
-    // ↓ ボタンクリックやフォーム送信などの操作イベントを一括で配線します
+    // URL変更・クリック・フォーム送信などの各種イベントリスナーをまとめて登録します
     setupEventListeners();
-    // ↓ トップページの新着・おすすめ商品カードを描画します
+    // トップページのおすすめ・PICK UP商品カードを描画します
     renderHomeProducts();
-    // ↓ 商品一覧ページの商品グリッドを描画します
+    // 全商品カタログ画面の商品カードを描画します
     renderCatalogProducts();
-    // ↓ NEW ARRIVALS（新着）ページの商品を描画します
+    // 新作一覧画面（NEW ITEM）の商品カードを描画します
     renderNewItems();
-    // ↓ スタジオのメンズ／ウィメンズ切り替えボタンの見た目を現在状態に合わせます
+    // スタジオ性別切替ボタンの見た目（MEN/WOMEN）を AppState に合わせて同期します
     if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
-    // ↓ ログイン中ならサーバー(MySQL)から最新のカート内容を取得して同期します
-    if (typeof syncCartFromBackend === 'function') syncCartFromBackend();
-    // ↓ MySQLから最新の注文履歴データを取得して同期します
-    syncOrdersFromBackend();
-    // ↓ MySQLからお気に入り一覧を取得して同期します
-    if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
-    // ↓ MySQLからマイクローゼット一覧を取得して同期します
-    if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
-    // ↓ MySQLから保存済みコーディネート一覧を取得して同期します
-    if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
-    // ↓ MySQLから試着中の服や位置微調整オフセットなどを取得して同期します
-    if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
-    // ↓ ブラウザURLの末尾（#home や #items など）を読み取って最初の画面を表示します
-    handleRouting();
+
+    // サーバー側の HttpOnly セッション Cookie を検証し、ログイン中アカウントを復元する非同期処理を開始します
+    _authBootstrapPromise = (async () => {
+        // 通信失敗等でも初期化が止まらないよう try 〜 finally で保護します
+        try {
+            // shop.js のセッション復元関数が読込済みなら実行し、ログインユーザー情報を取得します
+            const restoredUser = (typeof restoreAuthSessionFromBackend === 'function')
+                // バックエンド API（/api/auth/me）へ問い合わせて認証済みユーザーを受け取ります
+                ? await restoreAuthSessionFromBackend()
+                // 関数未定義時や未ログイン時は null として扱います
+                : null;
+            // 有効な会員情報が返ってきて、セッション適用関数が利用可能かチェックします
+            if (restoredUser && typeof applyAccountSession === 'function') {
+                // そのアカウント専用のカート・注文・お気に入り・スタジオ状態を MySQL から一括復元します
+                await applyAccountSession(restoredUser, { fromSessionRestore: true });
+            // 未ログイン（ゲスト状態）だった場合の分岐です
+            } else {
+                // 未ログイン状態の注文リストは空として安全に同期終了します
+                await syncOrdersFromBackend();
+            }
+        // 成功・失敗に関わらず最後に必ず実行される後処理ブロックです
+        } finally {
+            // 認証確認の完了フラグを true にして、ルーティング処理が進めるようにします
+            _authBootstrapDone = true;
+        }
+    })();
+    // 上記の MySQL セッション復元処理が完全に終わるまでここで待機します
+    await _authBootstrapPromise;
+
+    // 復元データ内に古い画像ファイル名があれば現在の正しい画像パスへメモリ上で補正します
+    migrateOldBrokenAssets();
+    // 現在のブラウザURLのハッシュ（例: #home, #mypage）に応じた最初の画面を表示します
+    await handleRouting();
 });
 
-// --------------------------------------------------------------------------
-// 4. ルーティング（SPA画面切り替え）
-// --------------------------------------------------------------------------
-// ↓ URLの「#〇〇」部分に応じて、リロードなしで表示ページを切り替えるSPAルーター関数
-function handleRouting() {
-    // ↓ 現在のURLハッシュを取得（空なら初期ルート '#home' として扱います）
+// 3. SPAルーティング（URL末尾の #〇〇 を読み取り、リロードなしで画面を表示切替）
+// URL末尾の #〇〇 に合わせて画面セクションを切り替えるメインルーター関数です
+async function handleRouting() {
+    // まだ起動時のセッション復元が終わっていなければ、未ログイン誤判定を防ぐため完了を待ちます
+    if (!_authBootstrapDone && _authBootstrapPromise) {
+        // 復元処理の Promise が完了するまで await で待機します
+        await _authBootstrapPromise;
+    }
+    // 現在のURLハッシュを取得します（空の場合はトップ画面 '#home' を既定値にします）
     const hash = window.location.hash || '#home';
-    // ↓ パラメータを除いた純粋な画面ルート名を入れておく変数
+    // パラメータ分離前の純粋な画面名を入れる変数 routeName を用意します
     let routeName = hash;
-    // ↓ 「?id=123」のような詳細ページ用商品IDを入れておく変数
+    // 商品詳細ページの '?id=3' 等から取り出す数値ID用変数を null で初期化します
     let paramId = null;
 
-    // ↓ URLハッシュに「?id=」が含まれている場合（商品詳細画面など）
+    // ハッシュ文字列に詳細ID指定の '?id=' が含まれているか判定します
     if (hash.includes('?id=')) {
-        // ↓ 「?id=」の前後で文字列を2つに分割します
+        // '?id=' を境に文字列を前半（ルート名）と後半（ID文字）へ分割します
         const parts = hash.split('?id=');
-        // ↓ 前半（例: '#item-detail'）をルート名にセット
+        // 分割した前半を遷移先ルート名（例: '#item-detail'）としてセットします
         routeName = parts[0];
-        // ↓ 後半の商品ID文字列を10進数の整数に変換して保持
+        // 後半の数字文字列を 10 進数の整数（例: 3）に変換して paramId に入れます
         paramId = parseInt(parts[1], 10);
     }
 
-    // ↓ HTML内にあるすべての画面コンテナ（.page-view）を取得します
+    // HTML内のすべての画面コンテナ（.page-view）を取得します
     const allViews = document.querySelectorAll('.page-view');
-    // ↓ いったん全画面から active クラスを外してすべて非表示にします
+    // いったんすべての画面から .active クラスを外して非表示に戻します
     allViews.forEach(view => view.classList.remove('active'));
 
-    // ↓ PCナビ・モバイルナビの全リンクを取得します
+    // PC用およびモバイル用の全ナビゲーションリンク要素を取得します
     const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
-    // ↓ ナビリンクの現在地ハイライト（active）もすべてリセットします
+    // すべてのメニュー項目の選択強調（.active クラス）をいったん解除します
     navLinks.forEach(link => link.classList.remove('active'));
 
-    // ↓ 取り出したルート名ごとに表示すべき画面と実行関数を分岐させます
+    // 切り替えるルート名（routeName）ごとの分岐処理を開始します
     switch (routeName) {
-        // ↓ トップページ
+        // '#home'（トップページ）の場合の処理
         case '#home':
-            // ↓ ホーム画面を表示
+            // トップ画面要素（#view-home）に active を付けて表示します
             showView('view-home');
-            // ↓ メニューの HOME を黒字太線ハイライト
+            // ナビゲーションの HOME ボタンを選択状態にします
             highlightNavLink('home');
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 全商品一覧ページ
+        // '#items'（全商品一覧）の場合の処理
         case '#items':
-            // ↓ 性別指定を「ALL（メンズ・ウィメンズ両方）」に
+            // 性別フィルタを 'ALL'（メンズ・ウィメンズ両方）に戻します
             AppState.selectedGender = 'ALL';
-            // ↓ カタログ画面を表示
+            // 商品一覧画面（#view-items）を表示します
             showView('view-items');
-            // ↓ ITEMS メニューをハイライト
+            // 対応するメニュー項目を選択状態にします
             highlightNavLink('items');
-            // ↓ 全商品を画面に描画
+            // 現在のフィルタ・並び順設定で商品カード一覧を再描画します
             renderCatalogProducts();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ メンズ商品一覧ページ
+        // '#men'（メンズ商品一覧）の場合の処理
         case '#men':
-            // ↓ 性別フィルターを MEN に設定
+            // 性別フィルタを 'MEN' に切り替えます
             AppState.selectedGender = 'MEN';
-            // ↓ カタログ画面を再利用して表示
+            // 共通の商品一覧画面（#view-items）を表示します
             showView('view-items');
-            // ↓ MEN メニューをハイライト
+            // ナビゲーションの MEN ボタンを選択状態にします
             highlightNavLink('men');
-            // ↓ メンズ商品だけを描画
+            // メンズ商品だけに絞ってカタログを再描画します
             renderCatalogProducts();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ ウィメンズ商品一覧ページ
+        // '#women'（ウィメンズ商品一覧）の場合の処理
         case '#women':
-            // ↓ 性別フィルターを WOMEN に設定
+            // 性別フィルタを 'WOMEN' に切り替えます
             AppState.selectedGender = 'WOMEN';
-            // ↓ カタログ画面を表示
+            // 共通の商品一覧画面（#view-items）を表示します
             showView('view-items');
-            // ↓ WOMEN メニューをハイライト
+            // ナビゲーションの WOMEN ボタンを選択状態にします
             highlightNavLink('women');
-            // ↓ ウィメンズ商品だけを描画
+            // ウィメンズ商品だけに絞ってカタログを再描画します
             renderCatalogProducts();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 新着商品ページ
+        // '#new-items'（新作一覧）の場合の処理
         case '#new-items':
-            // ↓ 新着ページを表示
+            // 新作商品画面（#view-new-items）を表示します
             showView('view-new-items');
-            // ↓ NEW メニューをハイライト
+            // 新作ナビゲーションを選択状態にします
             highlightNavLink('new-items');
-            // ↓ 新着アイテムを描画
+            // isNew が true の新作商品カードを抽出して描画します
             renderNewItems();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ お気に入り一覧ページ
+        // '#favorites'（お気に入り一覧）の場合の処理
         case '#favorites':
-            // ↓ お気に入り画面を表示
+            // お気に入り一覧画面（#view-favorites）を表示します
             showView('view-favorites');
-            // ↓ FAVORITES をハイライト
+            // お気に入りナビを選択状態にします
             highlightNavLink('favorites');
-            // ↓ お気に入り済みアイテムを描画
+            // 現在のお気に入り配列に応じた商品カードを描画します
             renderFavoriteProducts();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 商品詳細ページ
+        // '#item-detail'（商品詳細画面）の場合の処理
         case '#item-detail':
-            // ↓ 詳細画面を表示
+            // 商品詳細画面（#view-item-detail）を表示します
             showView('view-item-detail');
-            // ↓ URLに商品IDが正しく付いていた場合
+            // URLに有効な商品ID（paramId）が指定されているか確認します
             if (paramId) {
-                // ↓ 開いている商品IDを状態に保存
+                // 現在開いている商品IDとして AppState.currentDetailId を更新します
                 AppState.currentDetailId = paramId;
-                // ↓ 指定IDの商品情報・色・サイズボタンなどを描画
+                // 該当商品の写真・カラー・サイズボタン・在庫説明を描画します
                 renderItemDetail(paramId);
-            // ↓ ID指定無しで来た場合
+            // ID指定が無かった場合のフォールバック処理です
             } else {
-                // ↓ 商品一覧ページへ安全にリダイレクトします
+                // 不正な空詳細ページを防ぐため一覧画面 '#items' へ戻します
                 window.location.hash = '#items';
             }
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ カート・購入手続き（チェックアウト）ページ
+        // '#checkout'（ショッピングカート・購入手続き）の場合の処理
         case '#checkout':
-            // ↓ チェックアウト画面を表示
+            // 購入手続き画面（#view-checkout）を表示します
             showView('view-checkout');
-            // ↓ ハイライト更新
+            // カート／チェックアウトナビを選択状態にします
             highlightNavLink('checkout');
-            // ↓ カート内容・合計金額・ポイント欄を描画
+            // 現在 AppState.cart に入っている商品明細と小計・送料・ポイント割引を描画します
             renderCheckoutPage();
-            // ↓ ログイン中ならサーバー側カートとも最新同期
+            // ログイン中なら MySQL cart_items とも最新同期してズレを防ぎます
             if (typeof syncCartFromBackend === 'function') syncCartFromBackend();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ ログインページ
+        // '#login'（ログイン画面）の場合の処理
         case '#login':
-            // ↓ ログイン画面を表示
+            // ログイン画面（#view-login）を表示します
             showView('view-login');
-            // ↓ ハイライト更新
+            // ナビの LOGIN ボタンを選択状態にします
             highlightNavLink('login');
-            // ↓ 購入やスタジオからの強制誘導なら赤／橙の案内バナーを表示
+            // 遷移前の保護ページ案内（チェックアウト／スタジオ誘導バナー）を更新します
             updateAuthNoticeBanner();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 新規会員登録ページ
+        // '#register'（新規会員登録画面）の場合の処理
         case '#register':
-            // ↓ 会員登録画面を表示
+            // 会員登録画面（#view-register）を表示します
             showView('view-register');
-            // ↓ ハイライト更新
+            // 登録用ナビを選択状態にします
             highlightNavLink('register');
-            // ↓ 誘導元に応じた案内バナーを更新
+            // 誘導バナーが表示対象なら文言を最新化します
             updateAuthNoticeBanner();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 会員マイページ
+        // '#mypage'（マイページ）の場合の処理
         case '#mypage':
-            // ↓ マイページを表示
+            // マイページ画面（#view-mypage）を表示します
             showView('view-mypage');
-            // ↓ ハイライト更新
+            // ナビの MYPAGE ボタンを選択状態にします
             highlightNavLink('mypage');
-            // ↓ 保有ポイント・プロフィール・統計・注文履歴を描画
+            // 会員プロフィール・保有ポイント・注文履歴・お気に入りタブの現在内容を描画します
             renderMyPage();
-            // ↓ MySQLから最新注文履歴を再取得して反映
+            // バックエンド（MySQL）から最新の注文履歴を取り直して画面に反映します
             syncOrdersFromBackend();
-            // ↓ MySQLからお気に入りを再取得して同期
+            // バックエンド（MySQL）からお気に入りリストも最新同期します
             if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ MANEKIN AI試着スタジオ（旧ハッシュ #manekin も互換対応）
+        // '#manekin' または '#manekin-studio'（AI試着スタジオ）の両ルートを受け付けます
         case '#manekin':
+        // AI試着スタジオ画面のルート指定です
         case '#manekin-studio':
-            // ↓ 未ログイン状態なら試着スタジオへは入れないようにガードします
+            // まだログインしていない（AppState.currentUser が null）かチェックするアクセス制御です
             if (!AppState.currentUser) {
-                // ↓ ログイン後にスタジオへ戻すための目印を記録
+                // ログイン完了後に自動でスタジオへ戻すための目的地 'manekin' を記憶します
                 AppState.pendingAuthTarget = 'manekin';
-                // ↓ 画面右下にトースト通知で理由をお知らせ
+                // ログインが必要なことを右下のトースト通知で案内します
                 showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
-                // ↓ ログイン画面へ移動します
+                // 強制的にログイン画面（#login）へ誘導します
                 window.location.hash = '#login';
-                // ↓ 以降のスタジオ描画処理を行わずにここで中断します
+                // 未ログイン時はここで処理を打ち切り、スタジオ画面を開かせません
                 return;
             }
-            // ↓ ログイン済みなので試着スタジオ画面を表示
+            // ログイン済みなので AI試着スタジオ画面（#view-manekin-studio）を表示します
             showView('view-manekin-studio');
-            // ↓ スタジオボタンをハイライト
+            // ナビの MANEKIN AI ボタンを選択状態にします
             highlightNavLink('manekin-studio');
-            // ↓ 最新のマイクローゼットをMySQLから同期
+            // MySQL からこの会員の登録クローゼット一覧（closet_items）を最新取得します
             if (typeof syncClosetFromBackend === 'function') syncClosetFromBackend();
-            // ↓ 最新の保存コーデをMySQLから同期
+            // MySQL から保存済みコーデ一覧（saved_outfits）を最新取得します
             if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
-            // ↓ 最新の着用状態と位置微調整をMySQLから同期
+            // MySQL からマネキン着用中スロット＆位置調整値（user_studio_states）を最新取得します
             if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
-            // ↓ 前回開いていたスタジオ内タブ（無ければ 'create'）を描画
+            // スタジオ全体（マネキン・棚リスト・調整パネル）を描画します
             renderManekinStudio(AppState.studioActiveTab || 'create');
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
 
-        // ↓ 存在しないハッシュURLに来た時のフォールバック
+        // どの定義済みルートにも当てはまらない URL ハッシュだった場合の安全フォールバック
         default:
-            // ↓ 安全のためトップページを表示します
+            // トップ画面（#view-home）を表示します
             showView('view-home');
-            // ↓ HOMEハイライト
+            // HOME ナビを選択状態にします
             highlightNavLink('home');
-            // ↓ 分岐終了
+            // switch 分岐を抜けます
             break;
     }
 
-    // ↓ 画面切り替え後は毎回ページ一番上へなめらかにスクロールします
+    // ページ切り替え時に前のスクロール位置を引き継がないよう、画面一番上へ滑らかに戻します
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ↓ ログイン／登録画面にある「〇〇機能にはログインが必要です」注意バナーの表示内容を切り替える関数
+// 4. 未ログイン保護ページ遷移時の案内バナー文言切り替え関数
+// 未ログインリダイレクト時に表示する警告バナー（ログイン・会員登録両画面用）を更新する関数です
 function updateAuthNoticeBanner() {
-    // ↓ ログイン画面の警告枠要素
+    // ログイン画面側の誘導アラートボックス要素を取得します
     const loginAlert = document.getElementById('login-checkout-notice');
-    // ↓ 登録画面の警告枠要素
+    // 会員登録画面側の誘導アラートボックス要素を取得します
     const regAlert = document.getElementById('reg-checkout-notice');
-    // ↓ ログイン警告枠の見出し
+    // ログイン画面側アラートの見出しテキスト要素を取得します
     const loginTitle = document.getElementById('login-notice-title');
-    // ↓ ログイン警告枠の説明文
+    // ログイン画面側アラートの説明文要素を取得します
     const loginDesc = document.getElementById('login-notice-desc');
-    // ↓ 登録警告枠の見出し
+    // 会員登録画面側アラートの見出しテキスト要素を取得します
     const regTitle = document.getElementById('reg-notice-title');
-    // ↓ 登録警告枠の説明文
+    // 会員登録画面側アラートの説明文要素を取得します
     const regDesc = document.getElementById('reg-notice-desc');
 
-    // ↓ 試着スタジオから弾かれてログイン画面へ来たケース
+    // 直前に MANEKIN AIスタジオへ入ろうとして弾かれた場合の専用文言を設定します
     if (AppState.pendingAuthTarget === 'manekin') {
-        // ↓ 両フォームの警告バナーを表示
+        // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
+        // 会員登録画面側の警告バナーを表示状態にします
         if (regAlert) regAlert.style.display = 'block';
-        // ↓ スタジオ用の見出し文言
+        // AI試着スタジオ利用にはアカウントが必要である見出し文言を用意します
         const titleText = '⚠️ MANEKIN AIスタジオのご利用には会員登録またはログインが必要です';
-        // ↓ スタジオ用の詳細案内（完了後に自動復帰する説明付き）
+        // ログイン後に自動でAIスタジオへ戻る旨の案内HTML文言を用意します
         const descText = 'バーチャル試着やAIコーデ診断機能をご利用いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にMANEKINスタジオへ移動します。';
-        // ↓ それぞれのHTML要素に文言を流し込みます
+        // ログイン画面側アラートの見出しを書き換えます
         if (loginTitle) loginTitle.textContent = titleText;
+        // ログイン画面側アラートの本文をHTMLとして反映します
         if (loginDesc) loginDesc.innerHTML = descText;
+        // 会員登録画面側アラートの見出しを書き換えます
         if (regTitle) regTitle.textContent = titleText;
+        // 会員登録画面側アラートの本文をHTMLとして反映します
         if (regDesc) regDesc.innerHTML = descText;
-    // ↓ 購入（チェックアウト）から弾かれてログイン画面へ来たケース
+    // 直前に注文手続きページ（checkout）から認証誘導された場合の分岐です
     } else if (AppState.pendingAuthTarget === 'checkout') {
-        // ↓ 両フォームの警告バナーを表示
+        // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
+        // 会員登録画面側の警告バナーを表示状態にします
         if (regAlert) regAlert.style.display = 'block';
-        // ↓ 購入手続き用の見出し文言
+        // 購入手続きにはログインが必要である見出し文言を用意します
         const titleText = '⚠️ ご購入手続きには会員登録またはログインが必要です';
-        // ↓ 購入手続き用の案内文
+        // ログイン後に自動で注文画面へ戻る旨の案内HTML文言を用意します
         const descText = '商品をご購入いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。';
-        // ↓ 各要素へ反映
+        // ログイン画面側アラートの見出しを書き換えます
         if (loginTitle) loginTitle.textContent = titleText;
+        // ログイン画面側アラートの本文を反映します
         if (loginDesc) loginDesc.innerHTML = descText;
+        // 会員登録画面側アラートの見出しを書き換えます
         if (regTitle) regTitle.textContent = titleText;
+        // 会員登録画面側アラートの本文を反映します
         if (regDesc) regDesc.innerHTML = descText;
-    // ↓ ヘッダー等から普通にログイン／登録を開いた場合
+    // 通常のログイン／新規登録アクセス（誘導元なし）の場合の分岐です
     } else {
-        // ↓ 不要なので警告バナーを非表示にします
+        // ログイン画面側の誘導バナーを非表示にします
         if (loginAlert) loginAlert.style.display = 'none';
+        // 会員登録画面側の誘導バナーを非表示にします
         if (regAlert) regAlert.style.display = 'none';
     }
 }
 
-// ↓ 指定したIDの .page-view 要素に active クラスを付けて画面上に表示する小さな補助関数
+// 5. 指定IDの画面(.page-view)だけ表示し、対応するナビリンクをアクティブにする補助関数
+// 指定したIDのセクション(.page-view)に .active クラスを付けて画面に表示する関数です
 function showView(viewId) {
-    // ↓ IDでDOM要素を検索
+    // 引数 viewId に対応するHTML要素を検索します
     const targetView = document.getElementById(viewId);
-    // ↓ 要素が存在すれば表示クラスを追加
+    // 要素が存在すれば .active クラスを追加して画面に現します
     if (targetView) targetView.classList.add('active');
 }
 
-// ↓ デスクトップメニューとスマホドロワーメニューの該当項目を同時に選択中状態にする関数
+// 現在開いている画面に対応するPC・スマホ両方のナビゲーションリンクに下線等を付ける関数です
 function highlightNavLink(navKey) {
-    // ↓ data-nav 属性が一致するPCリンクを探して active 付与
+    // data-nav 属性が一致するPC版ナビリンク要素を探します
     const desktopLink = document.querySelector(`.nav-link[data-nav="${navKey}"]`);
-    // ↓ 見つかったら active クラス追加
+    // 見つかれば .active クラスを付与します
     if (desktopLink) desktopLink.classList.add('active');
-    // ↓ data-mobile-nav 属性が一致するスマホリンクを探して active 付与
+    // data-mobile-nav 属性が一致するスマホドロワー内リンクを探します
     const mobileLink = document.querySelector(`.mobile-nav-link[data-mobile-nav="${navKey}"]`);
-    // ↓ 見つかったら active クラス追加
+    // 見つかれば .active クラスを付与します
     if (mobileLink) mobileLink.classList.add('active');
 }
 
-// --------------------------------------------------------------------------
-
-
-// 14. イベントリスナー一括登録
-// --------------------------------------------------------------------------
-// ↓ ユーザー操作（クリック・入力・フォーム送信・URL変化）に対する反応を一括登録する関数
+// 6. 画面上のボタン・フォーム・モーダル等へクリック／送信イベントを一括登録
+// ページ全体のクリック・入力変更・フォーム送信イベントリスナーを初期設定する関数です
 function setupEventListeners() {
-    // ↓ URL末尾の #〇〇 が変わったりブラウザの戻るボタンが押されたら画面を切り替えます
+    // URLの #〇〇（ハッシュ）が切り替わるたびに自動で handleRouting() を走らせます
     window.addEventListener('hashchange', handleRouting);
 
-    // ↓ ナビやドロワー内の「MANEKINスタジオ」ボタンが押された時の処理
+    // ヘッダーやスマホメニュー内にあるすべての MANEKIN AI ボタンを取得して繰り返します
     document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn').forEach(btn => {
-        // ↓ クリックイベント登録
+        // ボタンクリック時にカスタムハンドラを実行します
         btn.addEventListener('click', (e) => {
-            // ↓ リンクの標準挙動を抑止し
+            // リンクの通常ジャンプ前にイベント既定動作を明示的に制御します
             e.preventDefault();
-            // ↓ ハッシュを書き換えてルーター経由でスタジオ画面へ遷移させます
+            // ハッシュを '#manekin-studio' に変更し、上記の hashchange で画面遷移を発火させます
             window.location.hash = '#manekin-studio';
         });
     });
 
-    // ↓ 詳細モーダルの「×」ボタン要素
+    // 汎用モーダルウィンドウの右上「×」ボタン要素を取得します
     const modalCloseBtn = document.getElementById('modal-close-btn');
-    // ↓ 詳細モーダルの「OK」ボタン要素
+    // 汎用モーダルの「OK」ボタン要素を取得します
     const modalOkBtn = document.getElementById('modal-ok-btn');
-    // ↓ モーダル背景オーバーレイ全体要素
+    // 汎用モーダル全体の暗い背景ラッパー要素を取得します
     const manekinModal = document.getElementById('manekin-modal');
 
-    // ↓ ×ボタンでモーダルを閉じます
+    // 「×」ボタンが押されたら汎用モーダルを閉じます
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeManekinModal);
-    // ↓ OKボタンでモーダルを閉じます
+    // 「OK」ボタンが押されたら汎用モーダルを閉じます
     if (modalOkBtn) modalOkBtn.addEventListener('click', closeManekinModal);
-    // ↓ 黒い半透明の背景部分をクリックした時もモーダルを閉じる親切設計
+    // モーダル本体が存在する場合に背景クリックでの閉じる動作を設定します
     if (manekinModal) {
-        // ↓ クリックリスナー
+        // モーダル上のどこかがクリックされたときの判定処理です
         manekinModal.addEventListener('click', (e) => {
-            // ↓ 内側の白い箱ではなく背景自身(e.target === manekinModal)が押された時だけ閉じます
+            // 内側ボックスではなく外側の暗い背景自体が押されたときだけモーダルを閉じます
             if (e.target === manekinModal) closeManekinModal();
         });
     }
 
-    // ↓ 「マイ服を追加」モーダルの背景要素
+    // クローゼットアイテム登録モーダルの外側ラッパー要素を取得します
     const closetModal = document.getElementById('modal-add-closet');
-    // ↓ 背景クリックで閉じられるように設定
+    // クローゼットモーダルが存在する場合に背景クリック処理を登録します
     if (closetModal) {
-        // ↓ クリックリスナー
+        // モーダルクリック時の判定を行います
         closetModal.addEventListener('click', (e) => {
-            // ↓ モーダル外側クリック時に閉じる関数を呼び出し
+            // 外側の暗い背景部分がクリックされた場合のみ登録モーダルを閉じます
             if (e.target === closetModal) closeAddClosetModal();
         });
     }
 
-    // ↓ マイ服追加モーダル内の送信フォーム要素
+    // クローゼットアイテム新規追加フォーム（#form-add-closet）を取得します
     const closetForm = document.getElementById('form-add-closet');
-    // ↓ 送信時にハンドラ（AI判定＋登録処理）が走るよう紐付け
+    // フォームが存在する場合に送信イベントを設定します
     if (closetForm) {
-        // ↓ submit イベント登録
+        // フォーム送信時にページリロードせず studio.js の handleAddClosetItem を実行します
         closetForm.addEventListener('submit', handleAddClosetItem);
     }
 
-    // ↓ スマホ用ハンバーガーメニューボタン
+    // スマホ用ハンバーガーメニュー（三本線）ボタンを取得します
     const hamburgerBtn = document.getElementById('hamburger-btn');
-    // ↓ スマホドロワー内の閉じるボタン
+    // モバイルメニュー内の「×」閉じるボタンを取得します
     const drawerCloseBtn = document.getElementById('drawer-close-btn');
-    // ↓ ドロワー背後の暗い幕オーバーレイ
+    // モバイルメニュー表示中に背後を暗くするオーバーレイ要素を取得します
     const menuOverlay = document.getElementById('menu-overlay');
 
-    // ↓ ハンバーガーボタンでドロワーを開く
+    // ハンバーガーボタン押下で横からスマホメニューを開きます
     if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMobileDrawer);
-    // ↓ 閉じるボタンでドロワーを閉じる
+    // 閉じるボタン押下でスマホメニューを閉じます
     if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeMobileDrawer);
-    // ↓ 背景クリックでもドロワーを閉じる
+    // 暗いオーバーレイ押下でもスマホメニューを閉じます
     if (menuOverlay) menuOverlay.addEventListener('click', closeMobileDrawer);
 
-    // ↓ スマホメニュー内のリンクを押したらページ移動と同時にドロワーを自動で閉じます
+    // スマホメニュー内のすべての項目リンクを取得してループします
     document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        // ↓ クリック時にドロワー閉鎖
+        // どれか項目をタップして画面遷移したら、自動でスマホメニューを閉じます
         link.addEventListener('click', closeMobileDrawer);
     });
 
-    // ↓ 商品一覧ページ上部のカテゴリボタン群（ALL / OUTER / TOPS / BOTTOMS）
+    // 商品一覧ページのカテゴリ絞り込みボタングループ（ALL/TOPS 等）を取得します
     const filterGroup = document.getElementById('category-filter-group');
-    // ↓ 要素があれば各ボタンへクリック処理を登録
+    // カタログ絞り込みグループが存在する場合のみイベント設定を行います
     if (filterGroup) {
-        // ↓ カテゴリボタンをループ
+        // グループ内の各フィルタボタンに対してクリック処理を設定します
         filterGroup.querySelectorAll('.filter-btn').forEach(btn => {
-            // ↓ クリックされたボタンだけ active にし、選択カテゴリを更新して再描画
+            // カテゴリボタンがクリックされたときの処理です
             btn.addEventListener('click', () => {
-                // ↓ いったんすべてのボタンから選択状態を解除
+                // いったん全カテゴリボタンから選択状態(.active)を外します
                 filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                // ↓ 押されたボタンを選択状態に
+                // 今クリックしたボタンだけに選択状態(.active)を付けます
                 btn.classList.add('active');
-                // ↓ HTMLの data-category 属性からカテゴリ名を読み取り AppState に保存
+                // ボタンの data-category 属性（'OUTER' など）を読み取って AppState を更新します
                 AppState.selectedCategory = btn.getAttribute('data-category');
-                // ↓ 商品一覧を新しい条件で描き直します
+                // 新しいカテゴリ条件で商品カタログを再描画します
                 renderCatalogProducts();
             });
         });
     }
 
-    // ↓ 並び替えドロップダウン（おすすめ順／価格の安い順／高い順）
+    // 商品一覧ページの並び替えドロップダウン（おすすめ順／価格順）を取得します
     const sortSelect = document.getElementById('sort-select');
-    // ↓ 選択肢変更時に並び順を再計算して描画し直します
+    // 並び替えセレクトボックスが存在する場合に選択変更イベントを設定します
     if (sortSelect) {
-        // ↓ change イベント登録
+        // ユーザーが並び順を変更（change）したときの処理です
         sortSelect.addEventListener('change', (e) => {
-            // ↓ 選ばれた並び順値を保存
+            // 選ばれた値（例: 'price-asc'）を AppState.selectedSort へ保存します
             AppState.selectedSort = e.target.value;
-            // ↓ 一覧を再描画
+            // 新しい並び順で商品カタログを再描画します
             renderCatalogProducts();
         });
     }
 
-    // ↓ ログイン画面の「ワンクリック デモアカウントでログイン」ボタン
+    // ワンクリックお試し体験用「デモアカウントでログイン」ボタンを取得します
     const demoBtn = document.getElementById('demo-login-btn');
-    // ↓ デモログイン処理を実行
+    // クリックされたら shop.js の handleDemoLogin を呼んで即ログインします
     if (demoBtn) demoBtn.addEventListener('click', handleDemoLogin);
 
-    // ↓ 通常ログインフォーム
+    // 通常ログインフォームを取得します
     const loginForm = document.getElementById('login-form');
-    // ↓ 送信時にログインAPI呼び出しを実行
+    // 送信（submit）時に handleLogin を呼び出してバックエンド認証を行います
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
-    // ↓ 新規会員登録フォーム
+    // 新規会員登録フォームを取得します
     const registerForm = document.getElementById('register-form');
-    // ↓ 送信時に会員登録API（初期1000pt付与含む）を実行
+    // 送信時に handleRegister を呼び出して MySQL users テーブルへ会員を作成します
     if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
-    // ↓ マイページ内のログアウトボタン
+    // ログアウトボタンを取得します
     const logoutBtn = document.getElementById('logout-btn');
-    // ↓ ログアウト処理（別ユーザー混在防止のセッション清掃付き）を実行
+    // クリック時にサーバーセッション Cookie 破棄とメモリリセットを行う handleLogout を呼びます
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
-    // ↓ チェックアウトページの「注文を確定する」ボタン
+    // 購入手続きページの「注文を確定する」ボタンを取得します
     const placeOrderBtn = document.getElementById('btn-place-order');
-    // ↓ 注文確定処理へ接続
+    // 注文確定ボタンが存在する場合にクリック処理を登録します
     if (placeOrderBtn) {
-        // ↓ クリック時に注文送信・ポイント処理・自動クローゼット追加を実行
+        // クリック時に在庫確認・ポイント清算・MySQL注文保存を行う handlePlaceOrder を呼びます
         placeOrderBtn.addEventListener('click', handlePlaceOrder);
     }
 
-    // ↓ チェックアウト画面の支払い方法ラジオボタン群（クレカ / 代引き / コンビニ等）
+    // 支払い方法選択用の全ラジオボタン（クレカ／代金引換等）を取得してループします
     document.querySelectorAll('.payment-option-label input[type="radio"]').forEach(radio => {
-        // ↓ 選択変更時にカードの選択枠クラスを付け替え、クレカ時だけカード番号入力欄を開きます
+        // 選択が切り替わったときのUI更新イベントを設定します
         radio.addEventListener('change', () => {
-            // ↓ すべてのカードラベルから selected を外す
+            // すべての支払い方法カード枠から選択枠線(.selected)をいったん外します
             document.querySelectorAll('.payment-option-label').forEach(lbl => lbl.classList.remove('selected'));
-            // ↓ 選ばれたラジオボタンを包む親ラベルに selected を付与
+            // チェックされたラジオボタンを包む親ラベルだけに .selected 枠線を付けます
             radio.closest('.payment-option-label').classList.add('selected');
 
-            // ↓ クレジットカード専用の追加入力フォーム要素を取得
+            // クレジットカード番号等を入力するサブフォーム要素を取得します
             const cardSubform = document.getElementById('credit-card-subform');
-            // ↓ 値が 'クレジットカード' の時だけ flex 表示し、それ以外なら非表示にします
+            // カード入力欄が存在する場合に表示状態を切り替えます
             if (cardSubform) {
+                // 'クレジットカード' が選ばれたときだけ flex 表示し、他方法なら隠します
                 cardSubform.style.display = (radio.value === 'クレジットカード') ? 'flex' : 'none';
             }
         });
     });
 
-    // ↓ マイページ内のタブ切り替えボタン（注文履歴 / お気に入り / アカウント設定等）
+    // マイページ上部のタブ切り替えボタン群（プロフィール／注文履歴／お気に入り等）を取得します
     const mypageTabBtns = document.querySelectorAll('.mypage-tab-btn');
-    // ↓ 各タブにクリックリスナーを設定
+    // 各タブボタンへクリックイベントを設定します
     mypageTabBtns.forEach(btn => {
-        // ↓ クリック時にタブボタンと中身パネル両方の active クラスを切り替えます
+        // タブボタンがクリックされたときの切り替え処理です
         btn.addEventListener('click', () => {
-            // ↓ 全タブボタンの active を解除
+            // すべてのタブボタンから .active をいったん外します
             mypageTabBtns.forEach(b => b.classList.remove('active'));
-            // ↓ 押されたタブを active に
+            // クリックされたタブボタンだけに .active を付けます
             btn.classList.add('active');
-            // ↓ data-tab 属性から対象タブ名（例: 'orders'）を取得
+            // data-tab 属性から切り替え対象のタブ識別名（例: 'orders'）を取得します
             const targetTab = btn.getAttribute('data-tab');
-            // ↓ いったんすべてのタブ本文パネルを非表示にします
+            // マイページ内の全タブ中身コンテナを取得してループします
             document.querySelectorAll('.mypage-tab-content').forEach(content => {
-                // ↓ active クラス除去
+                // いったんすべてのタブコンテンツを非表示にします
                 content.classList.remove('active');
             });
-            // ↓ ID名「tab-〇〇」に一致するパネルを探します
+            // 'tab-' + タブ識別名 のIDを持つ表示対象コンテナを取得します
             const activeContent = document.getElementById(`tab-${targetTab}`);
-            // ↓ 該当パネルだけ active を付けて画面表示します
+            // 対象のタブ中身だけに .active を付けて表示します
             if (activeContent) activeContent.classList.add('active');
         });
     });
 }
 
-
-
-// ==========================================================================
-// 15.9 グローバル関数登録（HTMLのonclick/onsubmitからの確実な呼び出し保証）
-// ==========================================================================
-// ↓ HTML属性内の onclick="..." やモジュール外スクリプトから直接呼べるよう window オブジェクトへ公開します
-// ↓ 「手持ち服追加モーダルを開く」関数をグローバル公開
+// 7. HTMLの onclick 属性等から直接呼び出せるよう主要関数を window グローバルへ公開
+// HTML側の onclick='openAddClosetModal()' 等から参照できるよう window オブジェクトに公開します
 window.openAddClosetModal = openAddClosetModal;
-// ↓ 「手持ち服追加モーダルを閉じる」関数をグローバル公開
+// クローゼット追加モーダルを閉じる関数をグローバル公開します
 window.closeAddClosetModal = closeAddClosetModal;
-// ↓ 手持ち服追加の送信処理を公開
+// クローゼット新規登録処理関数をグローバル公開します
 window.handleAddClosetItem = handleAddClosetItem;
-// ↓ ファイル選択時のAI背景透過・形状判定ハンドラを公開
+// 画像ファイル選択時のプレビュー＆AI切抜処理関数を公開します
 window.handleClosetImageSelect = handleClosetImageSelect;
-// ↓ プリセット画像選択ハンドラを公開
+// プリセット服画像の選択関数を公開します
 window.selectPresetImage = selectPresetImage;
-// ↓ クローゼットアイテム削除関数を公開
+// クローゼットアイテム削除関数を公開します
 window.deleteClosetItem = deleteClosetItem;
-// ↓ スタジオ内タブ切り替え関数を公開
+// AI試着スタジオ内のタブ切り替え関数を公開します
 window.switchStudioTab = switchStudioTab;
-// ↓ マネキン着脱トグル関数を公開
+// マネキンに服を着せる／脱がすトグル関数を公開します
 window.toggleWearItem = toggleWearItem;
-// ↓ 特定スロットを外す関数を公開
+// 指定部位スロットを脱がす関数を公開します
 window.unwearSlot = unwearSlot;
-// ↓ マネキンの着用服を全脱ぎリセットする関数を公開
+// マネキンの全着用服をまとめてリセットする関数を公開します
 window.clearMannequin = clearMannequin;
-// ↓ マネキンの性別切り替え関数を公開
+// マネキンの性別（MEN / WOMEN）切り替え関数を公開します
 window.setMannequinGender = setMannequinGender;
-// ↓ スマホ表示用スタジオ列切り替え関数を公開
+// スマホ表示時のマネキン画面／操作パネル切り替え関数を公開します
 window.switchMobileStudioView = switchMobileStudioView;
-// ↓ 現在のコーデをルックブックに保存する関数を公開
+// 現在のコーディネートを MySQL saved_outfits へ保存する関数を公開します
 window.handleSaveOutfit = handleSaveOutfit;
-// ↓ クイックコーデ名チップ入力関数を公開
+// コーデ名の入力プリセット反映関数を公開します
 window.applyPresetName = applyPresetName;
-// ↓ おまかせサンプルコーデ適用関数を公開
+// おすすめルックの一括試着適用関数を公開します
 window.applyPresetLook = applyPresetLook;
-// ↓ 保存済みコーデをマネキンに復元する関数を公開
+// 保存済みコーデをマネキンへワンクリック復元する関数を公開します
 window.restoreOutfit = restoreOutfit;
-// ↓ 保存済みコーデを削除する関数を公開
+// 保存済みコーデ削除関数を公開します
 window.deleteSavedOutfit = deleteSavedOutfit;
-// ↓ 着用中のショップ商品をまとめてカートに入れる関数を公開
+// 試着中の自社ブランド商品をまとめてカートへ追加する関数を公開します
 window.addCurrentBrandItemsToCart = addCurrentBrandItemsToCart;
-// ↓ 注文商品をマイクローゼットへ取り込む関数を公開
+// 注文履歴の購入商品をマイクローゼットへ取り込む関数を公開します
 window.importOrderToCloset = importOrderToCloset;
-// ↓ クローゼットタブ内のカテゴリ絞り込み関数を公開
+// 右棚パネルのクローゼット絞り込み関数を公開します
 window.handlePaneClosetFilter = handlePaneClosetFilter;
-// ↓ スタジオ左列のカテゴリ絞り込み関数を公開
+// スタジオ全体のクローゼット絞り込み関数を公開します
 window.handleStudioClosetFilter = handleStudioClosetFilter;
-// ↓ スタジオ右列のカテゴリ絞り込み関数を公開
+// ブランド商品リストの部位絞り込み関数を公開します
 window.handleStudioBrandFilter = handleStudioBrandFilter;
-// ↓ お気に入り絞り込みチェック切り替え関数を公開
+// ブランドリストのお気に入り限定トグル関数を公開します
 window.toggleBrandFavFilter = toggleBrandFavFilter;
-// ↓ 旧プロフィール保存関数（互換用）を公開
+// 体型プロフィール（身長・体型・好み）保存関数を公開します
 window.handleSaveBodyProfile = handleSaveBodyProfile;
-// ↓ 位置・サイズ微調整アコーディオン開閉関数を公開
+// 位置・サイズ微調整パネルの開閉関数を公開します
 window.toggleFittingAdjustPanel = toggleFittingAdjustPanel;
-// ↓ 微調整対象スロットの切り替え関数を公開
+// 位置調整対象スロット切替関数を公開します
 window.switchAdjustSlot = switchAdjustSlot;
-// ↓ スライダー入力時のリアルタイム調整関数を公開
+// スライダー入力による微調整値反映関数を公開します
 window.handleAdjustInput = handleAdjustInput;
-// ↓ +/- ボタンによる1段階微調整関数を公開
+// 微調整＋／－ボタン刻み変更関数を公開します
 window.stepAdjust = stepAdjust;
-// ↓ 位置調整をデフォルト位置にリセットする関数を公開
+// 調整中スロットの位置・拡大率初期化関数を公開します
 window.resetFittingOffsets = resetFittingOffsets;
-// ↓ 調整数値を実際のマネキン画像スタイルへ反映する関数を公開
+// 微調整値の確定保存関数を公開します
 window.applyFittingOffsets = applyFittingOffsets;
-// ↓ ブランドアイテムのサイズ（XS〜XL）変更関数を公開
+// ブランドサイズ（S〜XL 等）入力変更関数を公開します
 window.handleBrandSizeInput = handleBrandSizeInput;
-// ↓ ブランドサイズの +/- 切り替え関数を公開
+// ブランドサイズのステップ変更関数を公開します
 window.stepBrandSize = stepBrandSize;
-// ↓ 手動のAI背景透過再実行ボタン用関数を公開
+// 手動での背景透過やり直し起動関数を公開します
 window.triggerManualBgRemoval = triggerManualBgRemoval;
-// ↓ 背景透過前の元画像へ戻すボタン用関数を公開
+// 切り抜き前の元画像へ戻す関数を公開します
 window.restoreOriginalUploadImage = restoreOriginalUploadImage;
 
-
-
-// ↓ マネキンステージ上の各スロット枠クリックハンドラを公開
+// マネキンステージの部位スロットクリック処理をグローバル公開します
 window.handleStageSlotClick = handleStageSlotClick;
-// ↓ クイックアイテム選択ピッカーを開く関数を公開
+// 部位スロット用のクイック服選びポップアップを開く関数を公開します
 window.openStageQuickPicker = openStageQuickPicker;
-// ↓ クイックアイテム選択ピッカーを閉じる関数を公開
+// クイック服選びポップアップを閉じる関数を公開します
 window.closeStageQuickPicker = closeStageQuickPicker;
-// ↓ カードのドラッグ開始イベントハンドラを公開
+// 商品カード／クローゼットカードのドラッグ開始処理を公開します
 window.handleCardDragStart = handleCardDragStart;
-// ↓ ステージ上へのドラッグオーバーハンドラを公開
+// マネキンステージ上へのドラッグ中ホバー処理を公開します
 window.handleStageDragOver = handleStageDragOver;
-// ↓ ステージからのドラッグ離脱ハンドラを公開
+// マネキンステージ外へドラッグが離れたときの処理を公開します
 window.handleStageDragLeave = handleStageDragLeave;
-// ↓ ステージ上へのドロップ着せ替えハンドラを公開
+// マネキンステージへのドロップ着せ替え処理を公開します
 window.handleStageDrop = handleStageDrop;
-// ↓ カテゴリ別代替SVGイラスト取得関数を公開
+// カテゴリ別のフォールバック画像取得関数を公開します
 window.getCategoryFallbackImage = getCategoryFallbackImage;
-// ↓ 古い無効アセットパス自動修復関数を公開
+// 旧画像パスを現行パスへ補正する関数を公開します
 window.migrateOldBrokenAssets = migrateOldBrokenAssets;
-// ↓ 利用ポイント数入力変更ハンドラを公開
+// 注文画面でのポイント利用数入力変更処理を公開します
 window.handlePointsInputChange = handlePointsInputChange;
-// ↓ 「保有ポイントをすべて使う」ボタン関数を公開
+// 保有ポイント全額使用ボタン処理を公開します
 window.handleUseAllPoints = handleUseAllPoints;
-// ↓ 「ポイント利用をリセット」ボタン関数を公開
+// ポイント利用取り消しボタン処理を公開します
 window.handleResetPoints = handleResetPoints;
-// ↓ 現在ユーザーの保有ポイント取得関数を公開
+// 現在ログインユーザーの保有ポイント取得関数を公開します
 window.getUserPoints = getUserPoints;
-// ↓ 保有ポイント更新・画面反映関数を公開
+// 現在ログインユーザーのポイント数更新関数を公開します
 window.setUserPoints = setUserPoints;
-// ↓ カートデータのMySQL送信関数を公開
+// カート内容を MySQL cart_items へ保存同期する関数を公開します
 window.syncCartToBackend = syncCartToBackend;
-// ↓ カートデータのMySQL取得関数を公開
+// MySQL cart_items からカートを読み込む関数を公開します
 window.syncCartFromBackend = syncCartFromBackend;
-// ↓ クローゼットのMySQL取得関数を公開
+// MySQL closet_items からクローゼットを読み込む関数を公開します
 window.syncClosetFromBackend = syncClosetFromBackend;
-// ↓ お気に入りのMySQL取得関数を公開
+// MySQL favorites からお気に入りを読み込む関数を公開します
 window.syncFavoritesFromBackend = syncFavoritesFromBackend;
-// ↓ 保存済みコーデのMySQL取得関数を公開
+// MySQL saved_outfits から保存コーデを読み込む関数を公開します
 window.syncOutfitsFromBackend = syncOutfitsFromBackend;
-// ↓ スタジオ状態のMySQL送信関数を公開
+// マネキンの試着状態を MySQL user_studio_states へ保存する関数を公開します
 window.syncStudioStateToBackend = syncStudioStateToBackend;
-// ↓ スタジオ状態のMySQL取得関数を公開
+// MySQL user_studio_states から試着状態を復元する関数を公開します
 window.syncStudioStateFromBackend = syncStudioStateFromBackend;
-// ↓ マイページの手動全データ同期ボタン用関数を公開
-window.handleSyncAllToMySQL = handleSyncAllToMySQL;
+// 画面内の最新MySQL再取得ボタン用リフレッシュ関数を公開します
+window.handleRefreshFromMySQL = handleRefreshFromMySQL;
+// 旧互換エイリアス（handleSyncAllToMySQL）として同期リフレッシュ関数を公開します
+window.handleSyncAllToMySQL = handleRefreshFromMySQL;

@@ -1,141 +1,160 @@
 # ==============================================================================
-# MANEKIN FASHION - MySQLデータベース初期化スクリプト (setup_db.py)
-# ユーザー様が自分で作った写真を入れやすい分かりやすいファイル名に設定
+#  MySQL データベース初期化・初期商品画像マッピング更新スクリプト (setup_db.py)
+#  manekin_db の作成確認と、products / product_variants テーブルの商品画像パスを登録します
 # ==============================================================================
 
-# Pythonの実行環境に関する情報や機能を使うための標準モジュール「sys」を読み込みます
+# Python のシステム機能を提供する標準ライブラリ sys を読み込みます
 import sys
-# ファイルやフォルダの操作（OS機能）を使うための標準モジュール「os」を読み込みます
+# OS のパス・環境操作を行う標準ライブラリ os を読み込みます
 import os
-# PythonからMySQLデータベースへ接続してSQLを実行するための外部ライブラリ「pymysql」を読み込みます
+# Python から MySQL へ接続して SQL を実行するための pymysql を読み込みます
 import pymysql
-# データベースの検索結果を番号ではなく列名（辞書形式）で受け取れるようにする機能「DictCursor」を読み込みます
+# SQL 結果を辞書形式で扱うための DictCursor を読み込みます
 from pymysql.cursors import DictCursor
 
-# MySQLデータベースへ接続するための設定情報をまとめた辞書（DB_CONFIG）を定義します
+# データベース作成前でも接続できるよう、database 名を指定しない初期接続設定を定義します
 DB_CONFIG = {
-    'host': '127.0.0.1',      # データベースが動いているコンピュータの住所（127.0.0.1は自分のパソコン＝localhostを指します）
-    'port': 3306,             # MySQLが通信を待ち受けるポート番号（XAMPPの標準は3306番です）
-    'user': 'root',           # MySQLにログインするユーザー名（初期状態では管理者アカウントのrootを使用します）
-    'password': '',           # MySQLのパスワード（XAMPPの初期設定では空文字＝パスワードなしです）
-    'charset': 'utf8mb4'      # 日本語や絵文字も文字化けせず保存できる最新のUTF-8文字コード設定です
+    # 接続先 MySQL の IP アドレス（127.0.0.1 ＝ ローカル環境）です
+    'host': '127.0.0.1',
+    # XAMPP の MySQL 標準ポート番号（3306）です
+    'port': 3306,
+    # MySQL の接続ユーザー名（XAMPP 既定の root）です
+    'user': 'root',
+    # MySQL の接続パスワード（XAMPP 初期設定は空文字）です
+    'password': '',
+    # 日本語・絵文字対応の UTF-8 文字コード（utf8mb4）を指定します
+    'charset': 'utf8mb4'
 }
 
-# 操作対象となるこのアプリ専用のデータベース名を定数「DB_NAME」に入れます
+# 作成および操作対象にするデータベース名 'manekin_db' を定数に入れます
 DB_NAME = 'manekin_db'
 
-# ==============================================================================
-# ★【ユーザー様用 写真差し替え対応リスト】
-# ここに指定されている画像ファイル（assets/images/...）をご自身の写真に上書き保存するだけでOKです
-# ==============================================================================
-# 商品ごとのカラーバリエーションと画像パスの組み合わせをリスト（タプルの配列）として定義します
+# (商品ID, カラー名, 色見本コード, 画像パス) の組み合わせ一覧を配列で定義します
 PRODUCT_IMAGE_MAPPING = [
-    # 1. プレミアム コットン リラックス Tシャツ（商品ID=1 の3色展開: 白・黒・ヘザーグレー）
-    (1, 'WHITE',        '#ffffff', 'assets/images/tshirt_white.jpg'),   # 商品1: ホワイト用のカラーコードと画像パス
-    (1, 'BLACK',        '#111111', 'assets/images/tshirt_black.jpg'),   # 商品1: ブラック用のカラーコードと画像パス
-    (1, 'HEATHER GREY', '#999999', 'assets/images/tshirt_grey.jpg'),    # 商品1: ヘザーグレー用のカラーコードと画像パス
+    # 商品ID 1 の WHITE カラー用色コードと画像パスを定義します
+    (1, 'WHITE',        '#ffffff', 'assets/images/tshirt_white.jpg'),
+    # 商品ID 1 の BLACK カラー用色コードと画像パスを定義します
+    (1, 'BLACK',        '#111111', 'assets/images/tshirt_black.jpg'),
+    # 商品ID 1 の HEATHER GREY カラー用色コードと画像パスを定義します
+    (1, 'HEATHER GREY', '#999999', 'assets/images/tshirt_grey.jpg'),
 
-    # 2. スマート テーラード ジャケット（商品ID=2 の3色展開: 黒・チャコール・ネイビー）
-    (2, 'BLACK',        '#111111', 'assets/images/jacket_black.jpg'),   # 商品2: ブラック用のカラーコードと画像パス
-    (2, 'CHARCOAL',     '#333333', 'assets/images/jacket_charcoal.jpg'),# 商品2: チャコール用のカラーコードと画像パス
-    (2, 'NAVY',         '#1a237e', 'assets/images/jacket_navy.jpg'),    # 商品2: ネイビー用のカラーコードと画像パス
+    # 商品ID 2 の BLACK カラー用色コードと画像パスを定義します
+    (2, 'BLACK',        '#111111', 'assets/images/jacket_black.jpg'),
+    # 商品ID 2 の CHARCOAL カラー用色コードと画像パスを定義します
+    (2, 'CHARCOAL',     '#333333', 'assets/images/jacket_charcoal.jpg'),
+    # 商品ID 2 の NAVY カラー用色コードと画像パスを定義します
+    (2, 'NAVY',         '#1a237e', 'assets/images/jacket_navy.jpg'),
 
-    # 3. ワイド ドレープ タック スラックス（商品ID=3 の3色展開: チャコール・黒・ダークブラウン）
-    (3, 'CHARCOAL',     '#444444', 'assets/images/pants_charcoal.jpg'), # 商品3: チャコール用のカラーコードと画像パス
-    (3, 'BLACK',        '#111111', 'assets/images/pants_black.jpg'),    # 商品3: ブラック用のカラーコードと画像パス
-    (3, 'DARK BROWN',   '#4e342e', 'assets/images/pants_brown.jpg'),    # 商品3: ダークブラウン用のカラーコードと画像パス
+    # 商品ID 3 の CHARCOAL カラー用色コードと画像パスを定義します
+    (3, 'CHARCOAL',     '#444444', 'assets/images/pants_charcoal.jpg'),
+    # 商品ID 3 の BLACK カラー用色コードと画像パスを定義します
+    (3, 'BLACK',        '#111111', 'assets/images/pants_black.jpg'),
+    # 商品ID 3 の DARK BROWN カラー用色コードと画像パスを定義します
+    (3, 'DARK BROWN',   '#4e342e', 'assets/images/pants_brown.jpg'),
 
-    # 4. ファイン クルーネック ニットセーター（商品ID=4 の3色展開: ライトグレー・黒・オフホワイト）
-    (4, 'LIGHT GREY',   '#d6d6d6', 'assets/images/knit_grey.jpg'),      # 商品4: ライトグレー用のカラーコードと画像パス
-    (4, 'BLACK',        '#111111', 'assets/images/knit_black.jpg'),     # 商品4: ブラック用のカラーコードと画像パス
-    (4, 'OFF WHITE',    '#fafafa', 'assets/images/knit_white.jpg'),     # 商品4: オフホワイト用のカラーコードと画像パス
+    # 商品ID 4 の LIGHT GREY カラー用色コードと画像パスを定義します
+    (4, 'LIGHT GREY',   '#d6d6d6', 'assets/images/knit_grey.jpg'),
+    # 商品ID 4 の BLACK カラー用色コードと画像パスを定義します
+    (4, 'BLACK',        '#111111', 'assets/images/knit_black.jpg'),
+    # 商品ID 4 の OFF WHITE カラー用色コードと画像パスを定義します
+    (4, 'OFF WHITE',    '#fafafa', 'assets/images/knit_white.jpg'),
 
-    # 5. ミニマル ステンカラー ロングコート（商品ID=5 の2色展開: 黒・チャコール）
-    (5, 'BLACK',        '#111111', 'assets/images/coat_black.jpg'),     # 商品5: ブラック用のカラーコードと画像パス
-    (5, 'CHARCOAL',     '#333333', 'assets/images/coat_charcoal.jpg'),  # 商品5: チャコール用のカラーコードと画像パス
+    # 商品ID 5 の BLACK カラー用色コードと画像パスを定義します
+    (5, 'BLACK',        '#111111', 'assets/images/coat_black.jpg'),
+    # 商品ID 5 の CHARCOAL カラー用色コードと画像パスを定義します
+    (5, 'CHARCOAL',     '#333333', 'assets/images/coat_charcoal.jpg'),
 
-    # 6. ヘビーウェイト ボクシー スウェット（商品ID=6 の3色展開: オフホワイト・黒・アッシュグレー）
-    (6, 'OFF WHITE',    '#fafafa', 'assets/images/sweat_white.jpg'),    # 商品6: オフホワイト用のカラーコードと画像パス
-    (6, 'BLACK',        '#111111', 'assets/images/sweat_black.jpg'),    # 商品6: ブラック用のカラーコードと画像パス
-    (6, 'ASH GREY',     '#9e9e9e', 'assets/images/sweat_grey.jpg'),     # 商品6: アッシュグレー用のカラーコードと画像パス
+    # 商品ID 6 の OFF WHITE カラー用色コードと画像パスを定義します
+    (6, 'OFF WHITE',    '#fafafa', 'assets/images/sweat_white.jpg'),
+    # 商品ID 6 の BLACK カラー用色コードと画像パスを定義します
+    (6, 'BLACK',        '#111111', 'assets/images/sweat_black.jpg'),
+    # 商品ID 6 の ASH GREY カラー用色コードと画像パスを定義します
+    (6, 'ASH GREY',     '#9e9e9e', 'assets/images/sweat_grey.jpg'),
 
-    # 7. リラックス アンクル テーパードパンツ（商品ID=7 の2色展開: 黒・チャコール）
-    (7, 'BLACK',        '#111111', 'assets/images/tapered_black.jpg'),  # 商品7: ブラック用のカラーコードと画像パス
-    (7, 'CHARCOAL',     '#424242', 'assets/images/tapered_charcoal.jpg')# 商品7: チャコール用のカラーコードと画像パス
+    # 商品ID 7 の BLACK カラー用色コードと画像パスを定義します
+    (7, 'BLACK',        '#111111', 'assets/images/tapered_black.jpg'),
+    # 商品ID 7 の CHARCOAL カラー用色コードと画像パスを定義します
+    (7, 'CHARCOAL',     '#424242', 'assets/images/tapered_charcoal.jpg')
 ]
 
-# データベースと商品画像マッピングを更新するメイン関数「setup_database」を定義します
+
+# データベース作成と商品画像マッピングの一括更新を実行する関数 setup_database() を定義します
 def setup_database():
-    # コンソール（黒い画面）に区切り線の「=」を60個並べて表示します
+    # 開始メッセージ上部の区切り線を表示します
     print("=" * 60)
-    # 処理が開始されたことを知らせるメッセージを表示します
+    # データベース更新処理の開始メッセージを画面に表示します
     print("MANEKIN FASHION - データベース画像マッピング更新を開始します...")
-    # 再び区切り線を60文字分表示します
+    # 開始メッセージ下部の区切り線を表示します
     print("=" * 60)
 
-    # データベース接続やSQL実行でエラーが起きても安全に捕捉できるよう try ブロックを開始します
+    # MySQL 接続や SQL 実行の失敗に備えて try ブロックを開始します
     try:
-        # **DB_CONFIG で辞書の接続設定を展開して渡し、MySQLサーバーに接続（conn）します
+        # DB_CONFIG の設定を使って MySQL サーバーへ接続します
         conn = pymysql.connect(**DB_CONFIG)
-        # SQL文をデータベースに送信して実行するためのカーソル（操作窓口）を作成します
+        # SQL クエリを送るためのカーソルオブジェクトを作成します
         cursor = conn.cursor()
 
-        # もし指定名のデータベースがまだ存在しなければ、UTF-8（utf8mb4）対応で新規作成するSQLを実行します
+        # manekin_db が未作成なら utf8mb4 文字コード設定付きで新しくデータベースを作成します
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
-        # これから実行するSQLの操作対象として、先ほどのデータベース（manekin_db）を選択します
+        # 以降の SQL 命令を実行する対象データベースを manekin_db に切り替えます
         cursor.execute(f"USE `{DB_NAME}`;")
 
-        # 代表商品画像のパスを更新
-        # 商品一覧などで最初に表示される各商品のメイン画像パスを (商品ID, 画像パス) のペアでリスト化します
+        # 各商品カードに最初に表示される代表画像パス (商品ID, 画像パス) の一覧を用意します
         main_images = [
-            (1, 'assets/images/tshirt_white.jpg'),   # 商品1（Tシャツ）の代表画像パス
-            (2, 'assets/images/jacket_black.jpg'),   # 商品2（ジャケット）の代表画像パス
-            (3, 'assets/images/pants_charcoal.jpg'), # 商品3（スラックス）の代表画像パス
-            (4, 'assets/images/knit_grey.jpg'),      # 商品4（ニット）の代表画像パス
-            (5, 'assets/images/coat_black.jpg'),     # 商品5（コート）の代表画像パス
-            (6, 'assets/images/sweat_white.jpg'),    # 商品6（スウェット）の代表画像パス
-            (7, 'assets/images/tapered_black.jpg'),  # 商品7（テーパードパンツ）の代表画像パス
+            # 商品ID 1 の代表画像パスをセットします
+            (1, 'assets/images/tshirt_white.jpg'),
+            # 商品ID 2 の代表画像パスをセットします
+            (2, 'assets/images/jacket_black.jpg'),
+            # 商品ID 3 の代表画像パスをセットします
+            (3, 'assets/images/pants_charcoal.jpg'),
+            # 商品ID 4 の代表画像パスをセットします
+            (4, 'assets/images/knit_grey.jpg'),
+            # 商品ID 5 の代表画像パスをセットします
+            (5, 'assets/images/coat_black.jpg'),
+            # 商品ID 6 の代表画像パスをセットします
+            (6, 'assets/images/sweat_white.jpg'),
+            # 商品ID 7 の代表画像パスをセットします
+            (7, 'assets/images/tapered_black.jpg'),
         ]
-        # main_images リストから商品ID（pid）と画像パス（img）を1件ずつ取り出してループします
+        # 代表画像リストを 1 件ずつ順番に取り出しながらループ処理します
         for pid, img in main_images:
-            # 対象IDの商品の image 列を新しい画像パスで上書き更新（UPDATE）します（%s はSQLインジェクションを防ぐプレースホルダ）
+            # プレースホルダ %s を安全に使って products テーブルの代表画像列を更新します
             cursor.execute("UPDATE `products` SET `image` = %s WHERE `id` = %s;", (img, pid))
 
-        # 削除された商品（id: 8）があればテーブルから削除
-        # 旧バージョンに存在した不要な商品ID=8のレコードを products テーブルから削除します
+        # 旧データ仕様で残っていた不要な商品（ID=8）があれば削除します
         cursor.execute("DELETE FROM `products` WHERE `id` = 8;")
 
-        # バリエーションテーブルのデータを全削除して再投入
-        # 古い色バリエーションデータが残って重複しないよう、product_variants テーブルを一度空にします
+        # 古い色バリエーション設定を一度リセットするため product_variants を全削除します
         cursor.execute("DELETE FROM `product_variants`;")
-        # 4つの値（商品ID, 色名, カラーコード, 画像URL）をバリエーションテーブルに挿入するSQL文を用意します
+        # product_variants テーブルへ 4 列（商品ID・色名・色コード・画像URL）を挿入する複数行SQL文を定義します
         insert_variant_sql = """
         INSERT INTO `product_variants` (`product_id`, `color`, `color_code`, `image_url`)
         VALUES (%s, %s, %s, %s);
         """
-        # executemany を使って PRODUCT_IMAGE_MAPPING の全レコードを一括で INSERT（登録）します
+        # PRODUCT_IMAGE_MAPPING の全データを executemany() で一気に一括登録します
         cursor.executemany(insert_variant_sql, PRODUCT_IMAGE_MAPPING)
 
-        # これまで実行した更新・削除・登録内容をデータベースに正式確定（コミット）させます
+        # UPDATE / DELETE / INSERT の変更をすべてデータベースへ保存確定（commit）します
         conn.commit()
-        # 使い終わったカーソル（操作窓口）を閉じます
+        # 使い終わったカーソルを閉じます
         cursor.close()
-        # MySQLサーバーとの接続を安全に切断します
+        # MySQL サーバーとの接続を閉じます
         conn.close()
 
-        # すべての更新処理が成功したことを表示します
+        # 画像マッピングの更新が正常完了したことを画面に表示します
         print("[+] MySQLの画像ファイルパスをわかりやすい名称に更新完了！")
-        # 成功を意味する True を呼び出し元に返します
+        # 処理成功を表す True を呼び出し元へ返します
         return True
 
-    # try ブロック内で何らかの例外（接続エラーやSQLエラーなど）が発生した場合の処理です
+    # 途中で例外エラーが発生した場合の処理を受け持ちます
     except Exception as e:
-        # 発生したエラー内容（e）を画面に表示して原因を分かるようにします
+        # エラー内容を画面に表示します
         print(f"[!] エラー: {e}")
-        # 失敗を意味する False を呼び出し元に返します
+        # 処理失敗を表す False を返します
         return False
 
-# このファイルが他のファイルから読み込まれたのではなく、直接「python setup_db.py」として実行されたときだけ動く判定です
+
+# コマンドプロンプト等から「python setup_db.py」で直接起動された場合だけ実行します
 if __name__ == '__main__':
-    # データベース更新処理関数を呼び出して実行します
+    # setup_database() を呼び出して更新を実行します
     setup_database()
