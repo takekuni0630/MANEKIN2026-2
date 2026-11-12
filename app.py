@@ -23,6 +23,7 @@ from datetime import datetime
 import secrets
 
 # Web サーバー本体の Flask、JSON応答の jsonify、受信取得の request 等を読み込みます
+# pyrefly: ignore[missing-import]
 from flask import Flask, jsonify, request, send_from_directory, make_response
 # 別オリジン（別ポートの XAMPP や localhost 等）からの Cookie 付き API 通信を許可する CORS を読み込みます
 from flask_cors import CORS
