@@ -7,29 +7,121 @@
 // ==========================================================================
 //  1. 認証・セッション管理 & API通信基盤（MySQL一本化・Cookieセッション復元）
 // ==========================================================================
-// 過去バージョン等で使われていたブラウザ保存(localStorage/sessionStorage)の 'manekin*' キーを全削除し、MySQL単一管理へ徹底します
+// スマホ版かどうかを判定します（スマホ版ではPythonサーバーとMySQLが使用できないためlocalStorageを使用します）
+function isMobileLocalStorageMode() {
+    try {
+        if (window.innerWidth > 0 && window.innerWidth <= 768) return true;
+        if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) return true;
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent || '')) return true;
+        if (typeof AppState !== 'undefined' && AppState.currentUser && AppState.currentUser.isLocalStorage) return true;
+    } catch (e) {}
+    return false;
+}
+
+// スマホ版 localStorage 安全読み書きヘルパー
+function lsGetJson(key, fallback) {
+    try {
+        const raw = window.localStorage.getItem(key);
+        if (raw === null || raw === undefined) return fallback;
+        return JSON.parse(raw);
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function lsSetJson(key, val) {
+    try {
+        window.localStorage.setItem(key, JSON.stringify(val));
+        return true;
+    } catch (e) {
+        console.warn('localStorage 保存失敗:', key, e);
+        return false;
+    }
+}
+
+// スマホ版：新規ユーザー用の初期手持ち服3点セット
+function getDefaultMobileClosetItems() {
+    return [
+        {
+            id: 'c1',
+            name: '黒ワイドスラックス',
+            category: 'BOTTOMS',
+            color: 'BLACK',
+            season: 'オールシーズン',
+            image: 'assets/images/men/ストレートレープセミフレアスラックス.png',
+            isOwned: true,
+            isPurchased: false
+        },
+        {
+            id: 'c2',
+            name: '白オックスフォードシャツ',
+            category: 'TOPS',
+            color: 'WHITE',
+            season: '春・秋',
+            image: 'assets/images/men/スカイオックスフォードシャツ.png',
+            isOwned: true,
+            isPurchased: false
+        },
+        {
+            id: 'c3',
+            name: '黒レザーローファー',
+            category: 'SHOES',
+            color: 'BLACK',
+            season: 'オールシーズン',
+            image: 'assets/images/men/アーバンレザースニーカー.png',
+            isOwned: true,
+            isPurchased: false
+        }
+    ];
+}
+
+// スマホ版：ユーザーの初期データ（初回限定10%OFFクーポン・初期クローゼット等）をlocalStorageに準備します
+function ensureMobileUserInitialized(user) {
+    if (!user || !user.id) return;
+    const uid = String(user.id);
+    if (lsGetJson(`manekin_ls_coupons_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_coupons_${uid}`, [
+            {
+                id: 1,
+                code: 'WELCOME10',
+                name: '【初回限定】1割引クーポン (10% OFF)',
+                discount_rate: 0.10,
+                discount_label: '1割引 (10% OFF)',
+                is_used: 0
+            }
+        ]);
+    }
+    if (lsGetJson(`manekin_ls_closet_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_closet_${uid}`, getDefaultMobileClosetItems());
+    }
+    if (lsGetJson(`manekin_ls_cart_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_cart_${uid}`, []);
+    }
+    if (lsGetJson(`manekin_ls_orders_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_orders_${uid}`, []);
+    }
+    if (lsGetJson(`manekin_ls_favorites_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_favorites_${uid}`, []);
+    }
+    if (lsGetJson(`manekin_ls_outfits_${uid}`, null) === null) {
+        lsSetJson(`manekin_ls_outfits_${uid}`, []);
+    }
+}
+
+// 過去バージョン等で使われていた不要なブラウザ保存キーを削除します（※スマホ版用の manekin_ls_* キーは保護します）
 function purgeAllManekinLocalStorage() {
-    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     [window.localStorage, window.sessionStorage].forEach(storage => {
-        // 条件（!storage）が成り立つか判定し、該当する場合の処理を実行します
         if (!storage) return;
-        // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
         try {
-            // 定数 targetKeys を宣言し、値（[]）をセットします
             const targetKeys = [];
-            // 配列要素やインデックスを順番に繰り返すループ処理（for (let i = 0; i < storage.length; i++) {）を開始します
             for (let i = 0; i < storage.length; i++) {
-                // 定数 k を宣言し、値（storage.key(i)）をセットします
                 const k = storage.key(i);
-                // 条件（k && k.startsWith('manekin')）が成り立つか判定し、該当する場合の処理を実行します
-                if (k && k.startsWith('manekin')) {
-                    // 配列の末尾に新しい要素を追加します（targetKeys.push(k);）
+                // スマホ版で保存する manekin_ls_ プレフィックスのキーは削除せず保持します
+                if (k && k.startsWith('manekin') && !k.startsWith('manekin_ls_')) {
                     targetKeys.push(k);
                 }
             }
-            // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
             targetKeys.forEach(k => storage.removeItem(k));
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) { }
     });
 }
@@ -56,9 +148,20 @@ function isServerUserId(uid) {
 }
 
 
-// ページ読込時にバックエンド(/api/auth/me)へ Cookie 付きリクエストを送り、MySQL の有効ログイン会員を復元します
+// ページ読込時にログイン会員を復元します（スマホ版はlocalStorageから、PC版はバックエンド /api/auth/me から復元）
 async function restoreAuthSessionFromBackend() {
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    // スマホ版の場合は localStorage からログインセッションを復元します
+    if (isMobileLocalStorageMode()) {
+        const savedUser = lsGetJson('manekin_ls_current_user', null);
+        if (savedUser && isServerUserId(savedUser.id)) {
+            savedUser.isLocalStorage = true;
+            ensureMobileUserInitialized(savedUser);
+            return savedUser;
+        }
+        return null;
+    }
+
+    // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
         // Flask バックエンド API（/api/auth/me）へ非同期リクエストを送信し、応答を待ち受けます
         const res = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
@@ -666,7 +769,7 @@ function bumpCartUserSeq(uid) {
 }
 
 
-// 現在の AppState.cart 配列を直列チェーン化し、MySQL cart_items テーブルへ保存同期します
+// 現在の AppState.cart 配列を直列チェーン化し、保存同期します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncCartToBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -677,6 +780,13 @@ async function syncCartToBackend() {
     const targetUserId = AppState.currentUser.id;
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して snapshot に保存します
     const snapshot = JSON.parse(JSON.stringify(AppState.cart || []));
+
+    // スマホ版の場合は localStorage にカート内容を保存します
+    if (isMobileLocalStorageMode()) {
+        bumpCartUserSeq(targetUserId);
+        return lsSetJson(`manekin_ls_cart_${targetUserId}`, snapshot);
+    }
+
     // 定数 seq を宣言し、値（bumpCartUserSeq(targetUserId)）をセットします
     const seq = bumpCartUserSeq(targetUserId);
 
@@ -725,7 +835,7 @@ async function syncCartToBackend() {
 }
 
 
-// MySQL cart_items から該当ユーザーのカートを取得し（ゲストカート引き継ぎ指定があれば加算合算して）画面更新します
+// 該当ユーザーのカートを取得し（ゲストカート引き継ぎ指定があれば加算合算して）画面更新します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncCartFromBackend(options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -738,6 +848,30 @@ async function syncCartFromBackend(options = {}) {
     const targetUserId = AppState.currentUser.id;
     // 定数 mergeItems を宣言し、値（Array.isArray(options.mergeItems) ? op…）をセットします
     const mergeItems = Array.isArray(options.mergeItems) ? options.mergeItems : [];
+
+    // スマホ版の場合は localStorage からカート内容を取得・マージします
+    if (isMobileLocalStorageMode()) {
+        const savedItems = lsGetJson(`manekin_ls_cart_${targetUserId}`, []);
+        const finalCart = Array.isArray(savedItems) ? [...savedItems] : [];
+        if (mergeItems.length > 0) {
+            mergeItems.forEach(item => {
+                const idx = finalCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                if (idx > -1) {
+                    finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
+                } else {
+                    finalCart.push({ ...item });
+                }
+            });
+            lsSetJson(`manekin_ls_cart_${targetUserId}`, finalCart);
+        }
+        AppState.cart = finalCart;
+        updateCartBadge();
+        if (window.location.hash === '#checkout' && typeof renderCheckoutPage === 'function') {
+            renderCheckoutPage();
+        }
+        return;
+    }
+
     // 定数 fetchStartSeq を宣言し、値（getCartUserSeq(targetUserId)）をセットします
     const fetchStartSeq = getCartUserSeq(targetUserId);
 
@@ -1153,12 +1287,23 @@ function getUserPoints() {
 }
 
 
-// 注文でのポイント増減後に AppState.currentUser.points と表示UIを最新値へ更新します
+// 注文でのポイント増減後に AppState.currentUser.points と表示UIを最新値へ更新します（スマホ版はlocalStorageも更新）
 function setUserPoints(points) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return;
     // アプリ全体状態 AppState.currentUser.points を最新値（Math.max(0, points)）に更新します
     AppState.currentUser.points = Math.max(0, points);
+
+    // スマホ版の場合は localStorage のユーザー情報にもポイント残高を反映します
+    if (isMobileLocalStorageMode()) {
+        lsSetJson('manekin_ls_current_user', AppState.currentUser);
+        const users = lsGetJson('manekin_ls_users', []);
+        const uIdx = users.findIndex(u => String(u.id) === String(AppState.currentUser.id));
+        if (uIdx > -1) {
+            users[uIdx].points = AppState.currentUser.points;
+            lsSetJson('manekin_ls_users', users);
+        }
+    }
 
     // HTML 要素 #mypage-points を取得して変数 mypagePoints に格納します
     const mypagePoints = document.getElementById('mypage-points');
@@ -1175,13 +1320,29 @@ let checkoutUsedPoints = 0;
 // 現在チェックアウトで適用されているクーポンオブジェクト（未適用時は null）
 let currentAppliedCoupon = null;
 
-// ユーザーの保有クーポン一覧を API から取得して同期します
+// ユーザーの保有クーポン一覧を取得して同期します（スマホ版はlocalStorage、PC版はAPI）
 async function fetchUserCoupons() {
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         AppState.userCoupons = [];
         renderCheckoutCoupons();
         return [];
     }
+    const uid = AppState.currentUser.id;
+
+    // スマホ版の場合は localStorage から所持クーポンを読み込みます
+    if (isMobileLocalStorageMode()) {
+        ensureMobileUserInitialized(AppState.currentUser);
+        const savedCoupons = lsGetJson(`manekin_ls_coupons_${uid}`, []);
+        AppState.userCoupons = Array.isArray(savedCoupons) ? savedCoupons : [];
+        renderCheckoutCoupons();
+        const mypageCouponCount = document.getElementById('mypage-coupon-count');
+        if (mypageCouponCount) {
+            const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
+            mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
+        }
+        return AppState.userCoupons;
+    }
+
     const apiBase = getApiBaseUrl();
     try {
         const resp = await fetch(`${apiBase}/api/coupons?user_id=${AppState.currentUser.id}`, {
@@ -1457,7 +1618,7 @@ function handleResetPoints() {
 }
 
 
-// 注文履歴から過去の購入服をワンクリックでマイクローゼット（MySQL closet_items）へ取り込みます
+// 注文履歴から過去の購入服をワンクリックでマイクローゼットへ取り込みます（スマホ版はlocalStorage、PC版はMySQL）
 async function importOrderToCloset(idx) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -1483,6 +1644,48 @@ async function importOrderToCloset(idx) {
     let failed = 0;
     // 条件（typeof bumpClosetMutationSeq === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof bumpClosetMutationSeq === 'function') bumpClosetMutationSeq();
+
+    // スマホ版の場合は localStorage のクローゼットに直接追加します
+    if (isMobileLocalStorageMode()) {
+        for (let i = 0; i < itemsList.length; i++) {
+            const it = itemsList[i];
+            const itName = it.name || it.product_name || '購入商品';
+            const itColor = it.color || 'BLACK';
+            const itId = it.id || it.product_id || Date.now();
+            const productMaster = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.find(p => p.id === itId) : null;
+            const itCategory = it.category || (productMaster ? productMaster.category : 'TOPS');
+            const itImg = it.image || it.image_url || 'assets/images/men/スカイオックスフォードシャツ.png';
+            const itPrice = it.price || it.unit_price || 0;
+
+            const exists = AppState.myCloset.some(c => c.name === itName && c.color === itColor);
+            if (!exists) {
+                const newItem = {
+                    id: 'purchased-' + itId + '-' + (order.order_no || Date.now()) + '-' + i,
+                    productId: itId,
+                    name: itName,
+                    category: itCategory,
+                    color: itColor,
+                    season: '通年',
+                    image: itImg,
+                    isOwned: true,
+                    isPurchased: true,
+                    price: itPrice,
+                    purchaseDate: order.date || ''
+                };
+                AppState.myCloset.unshift(newItem);
+                added++;
+            }
+        }
+        if (added > 0) {
+            lsSetJson(`manekin_ls_closet_${userId}`, AppState.myCloset);
+            if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+            if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
+            showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
+        } else {
+            showToast('この注文の商品はすでにマイクローゼットに登録済みです');
+        }
+        return;
+    }
 
     // 配列要素やインデックスを順番に繰り返すループ処理（for (let i = 0; i < itemsList.length; i++) {）を開始します
     for (let i = 0; i < itemsList.length; i++) {
@@ -1752,46 +1955,73 @@ async function handlePlaceOrder() {
     // 先行する非同期通信の完了を待機します（万一失敗してもエラーで止まらず続行）
     try { await _cartSyncPromise; } catch (e) { }
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
-    try {
-        // Flask バックエンド API（/api/orders）へ非同期リクエストを送信し、応答を待ち受けます
-        const response = await fetch(`${apiBase}/api/orders`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-            method: 'POST',
-            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
-            headers: { 'Content-Type': 'application/json' },
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-            credentials: 'include',
-            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
-            body: JSON.stringify(orderPayload)
-        });
+    // スマホ版の場合は localStorage 上で注文データを生成・保存します
+    if (isMobileLocalStorageMode()) {
+        const now = new Date();
+        const rand4 = Math.floor(1000 + Math.random() * 9000);
+        confirmedOrder = {
+            order_no: `ORD-${now.getFullYear()}-${rand4}`,
+            user_id: targetUserId,
+            customer_name: orderPayload.customer_name,
+            customer_email: orderPayload.customer_email,
+            phone: orderPayload.phone,
+            postal_code: orderPayload.postal_code,
+            address: orderPayload.address,
+            payment_method: orderPayload.payment_method,
+            delivery_time: orderPayload.delivery_time,
+            date: now.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+            subtotal: orderPayload.subtotal,
+            shipping_fee: orderPayload.shipping_fee,
+            coupon_code: orderPayload.coupon_code,
+            coupon_discount: orderPayload.coupon_discount,
+            used_points: orderPayload.used_points,
+            total_amount: orderPayload.total_amount,
+            earned_points: orderPayload.earned_points,
+            status: '発送準備中',
+            items: JSON.parse(JSON.stringify(AppState.cart || []))
+        };
+    } else {
+        // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+        try {
+            // Flask バックエンド API（/api/orders）へ非同期リクエストを送信し、応答を待ち受けます
+            const response = await fetch(`${apiBase}/api/orders`, {
+                // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+                method: 'POST',
+                // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
+                headers: { 'Content-Type': 'application/json' },
+                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+                credentials: 'include',
+                // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
+                body: JSON.stringify(orderPayload)
+            });
 
-        // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
-        const data = await response.json().catch(() => ({}));
-        // サーバーから返ってきた JSON のステータス結果が成功かエラーかを検証します
-        if (!response.ok || !data.order) {
+            // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
+            const data = await response.json().catch(() => ({}));
+            // サーバーから返ってきた JSON のステータス結果が成功かエラーかを検証します
+            if (!response.ok || !data.order) {
+                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+                showToast(data.message || '⚠️ MySQLへの注文保存に失敗しました（データベース接続を確認してください）');
+                // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
+                restorePlaceBtn();
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+                return;
+            }
+            // 変数・配列項目 confirmedOrder の値を更新・計算します
+            confirmedOrder = data.order;
+            // 条件（data.updated_points !== undefined && data.updated_po…）が成り立つか判定し、該当する場合の処理を実行します
+            if (data.updated_points !== undefined && data.updated_points !== null) {
+                // 変数・配列項目 backendUpdatedPoints の値を更新・計算します
+                backendUpdatedPoints = data.updated_points;
+            }
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(data.message || '⚠️ MySQLへの注文保存に失敗しました（データベース接続を確認してください）');
+            showToast('⚠️ PythonサーバーまたはMySQLに接続できないため注文を確定できませんでした（app.pyとMySQLの起動を確認してください）');
             // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
             restorePlaceBtn();
             // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
             return;
         }
-        // 変数・配列項目 confirmedOrder の値を更新・計算します
-        confirmedOrder = data.order;
-        // 条件（data.updated_points !== undefined && data.updated_po…）が成り立つか判定し、該当する場合の処理を実行します
-        if (data.updated_points !== undefined && data.updated_points !== null) {
-            // 変数・配列項目 backendUpdatedPoints の値を更新・計算します
-            backendUpdatedPoints = data.updated_points;
-        }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-    } catch (err) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ PythonサーバーまたはMySQLに接続できないため注文を確定できませんでした（app.pyとMySQLの起動を確認してください）');
-        // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
-        restorePlaceBtn();
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
     }
 
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
@@ -1868,6 +2098,9 @@ async function handlePlaceOrder() {
                 usedC.is_used = 1;
             }
         }
+        if (isMobileLocalStorageMode()) {
+            lsSetJson(`manekin_ls_coupons_${targetUserId}`, AppState.userCoupons || []);
+        }
         currentAppliedCoupon = null;
         renderCheckoutCoupons();
     }
@@ -1881,6 +2114,13 @@ async function handlePlaceOrder() {
     updateCartBadge();
     // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
     checkoutUsedPoints = 0;
+
+    // スマホ版の場合は注文履歴・クローゼット・空になったカートを localStorage に保存します
+    if (isMobileLocalStorageMode()) {
+        lsSetJson(`manekin_ls_orders_${targetUserId}`, AppState.orderHistory);
+        lsSetJson(`manekin_ls_closet_${targetUserId}`, AppState.myCloset);
+        lsSetJson(`manekin_ls_cart_${targetUserId}`, []);
+    }
 
     // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
     restorePlaceBtn();
@@ -1927,7 +2167,7 @@ async function handlePlaceOrder() {
     // 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
     if (compDbStatus) {
         // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-        compDbStatus.textContent = '🟢 MySQL (manekin_db) 保存完了';
+        compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
         // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
         compDbStatus.style.background = '#dcfce7';
         // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
@@ -1953,7 +2193,7 @@ let _ordersMutationSeq = 0;
 // ==========================================================================
 //  5. 注文履歴同期・MySQL接続再読込・マイページ描画
 // ==========================================================================
-// バックエンド MySQL（GET /api/orders）から現在ログイン会員の注文履歴を取得して画面更新します
+// 現在ログイン会員の注文履歴を取得して画面更新します（スマホ版はlocalStorage、PC版はバックエンドMySQL）
 async function syncOrdersFromBackend() {
     // HTML 要素 #mysql-status-pill を取得して変数 statusPill に格納します
     const statusPill = document.getElementById('mysql-status-pill');
@@ -1970,6 +2210,13 @@ async function syncOrdersFromBackend() {
         // 変数・配列項目 statusPill.title の値を更新・計算します
         statusPill.title = 'Python APIサーバーとMySQL(manekin_db)に正常接続されています';
     };
+    const setMobileLocalStoragePill = () => {
+        if (!statusPill) return;
+        statusPill.textContent = '🟢 スマホ版 (localStorage 保存モード)';
+        statusPill.style.background = '#dcfce7';
+        statusPill.style.color = '#15803d';
+        statusPill.title = 'スマホ版ではPythonサーバー・MySQLを使わずlocalStorageに保存しています';
+    };
     // 定数 setDisconnectedPill を宣言し、値（() => {）をセットします
     const setDisconnectedPill = () => {
         // 条件（!statusPill）が成り立つか判定し、該当する場合の処理を実行します
@@ -1983,6 +2230,20 @@ async function syncOrdersFromBackend() {
         // 変数・配列項目 statusPill.title の値を更新・計算します
         statusPill.title = 'Pythonサーバー(app.py)とXAMPPのMySQLが起動しているか確認してください';
     };
+
+    // スマホ版の場合は localStorage から注文履歴を取得して画面を更新します
+    if (isMobileLocalStorageMode()) {
+        setMobileLocalStoragePill();
+        if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+            AppState.orderHistory = [];
+            renderMyPage();
+            return;
+        }
+        const savedOrders = lsGetJson(`manekin_ls_orders_${AppState.currentUser.id}`, []);
+        AppState.orderHistory = Array.isArray(savedOrders) ? savedOrders : [];
+        renderMyPage();
+        return;
+    }
 
     // 定数 apiBase を宣言し、値（getApiBaseUrl()）をセットします
     const apiBase = getApiBaseUrl();
@@ -2076,7 +2337,7 @@ async function syncOrdersFromBackend() {
 }
 
 
-// 現在のログイン会員の注文履歴をサーバー MySQL 上（DELETE /api/orders）から初期化削除します
+// 現在のログイン会員の注文履歴を初期化削除します（スマホ版はlocalStorage、PC版はサーバーMySQL）
 async function handleClearOrderHistory() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -2092,6 +2353,15 @@ async function handleClearOrderHistory() {
     const targetUserId = AppState.currentUser.id;
     // 変数・配列項目 _ordersMutationSeq の値を更新・計算します
     _ordersMutationSeq++;
+
+    // スマホ版の場合は localStorage の注文履歴を初期化します
+    if (isMobileLocalStorageMode()) {
+        lsSetJson(`manekin_ls_orders_${targetUserId}`, []);
+        AppState.orderHistory = [];
+        renderMyPage();
+        showToast('このアカウントのご注文履歴を初期化しました（0件）');
+        return;
+    }
 
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
@@ -2125,15 +2395,36 @@ async function handleClearOrderHistory() {
 }
 
 
-// マイページの「最新データに更新」ボタン押下時に注文・お気に入り・カート・クローゼットをMySQLから再取得します
+// マイページの「最新データに更新」ボタン押下時に注文・お気に入り・カート・クローゼットを再取得します
 async function handleRefreshFromMySQL() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ MySQLデータを読み込むにはログインしてください');
+        showToast('⚠️ データを読み込むにはログインしてください');
         // 変数・配列項目 window.location.hash の値を更新・計算します
         window.location.hash = '#login';
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+        return;
+    }
+
+    // スマホ版の場合は localStorage から全データを再読込します
+    if (isMobileLocalStorageMode()) {
+        const refreshedUser = await restoreAuthSessionFromBackend();
+        if (refreshedUser) {
+            AppState.currentUser = refreshedUser;
+            if (typeof updateAuthNavUI === 'function') updateAuthNavUI();
+        }
+        await Promise.all([
+            syncOrdersFromBackend(),
+            syncFavoritesFromBackend(),
+            syncCartFromBackend(),
+            fetchUserCoupons(),
+            (typeof syncClosetFromBackend === 'function') ? syncClosetFromBackend() : Promise.resolve(),
+            (typeof syncOutfitsFromBackend === 'function') ? syncOutfitsFromBackend() : Promise.resolve(),
+            (typeof syncStudioStateFromBackend === 'function') ? syncStudioStateFromBackend() : Promise.resolve()
+        ]);
+        renderMyPage();
+        showToast(`✨ スマホ版(localStorage)から最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
         return;
     }
 
@@ -2393,7 +2684,7 @@ let _favoritesMutationSeq = 0;
 // ==========================================================================
 //  6. お気に入り管理（ハートボタン状態同期 ＋ MySQL favorites テーブル連動）
 // ==========================================================================
-// ログイン会員のお気に入り商品ID一覧を MySQL（GET /api/favorites）から取得してハートUIを同期します
+// ログイン会員のお気に入り商品ID一覧を取得してハートUIを同期します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncFavoritesFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -2406,6 +2697,24 @@ async function syncFavoritesFromBackend() {
     }
     // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
+
+    // スマホ版の場合は localStorage からお気に入り一覧を取得します
+    if (isMobileLocalStorageMode()) {
+        const savedFavs = lsGetJson(`manekin_ls_favorites_${targetUserId}`, []);
+        AppState.favorites = Array.isArray(savedFavs) ? savedFavs : [];
+        updateFavoriteBadges();
+        if (AppState.currentDetailId && typeof syncAllFavoriteButtons === 'function') {
+            syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
+        }
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
+        if (typeof renderHomeProducts === 'function') renderHomeProducts();
+        if (typeof renderCatalogProducts === 'function') renderCatalogProducts();
+        if (typeof renderNewItems === 'function') renderNewItems();
+        if (typeof renderMyPage === 'function') renderMyPage();
+        return;
+    }
+
     // 定数 fetchStartSeq を宣言し、値（_favoritesMutationSeq）をセットします
     const fetchStartSeq = _favoritesMutationSeq;
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
@@ -2458,12 +2767,12 @@ async function syncFavoritesFromBackend() {
 }
 
 
-// ハートボタン押下時のお気に入り登録／解除トグル処理（メモリ更新→アイコン反映→MySQL保存）を行います
+// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（スマホ版はlocalStorage、PC版はMySQL保存）
 async function handleToggleFavorite(productId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ お気に入りをMySQLに保存するにはログインが必要です');
+        showToast('⚠️ お気に入りを保存するにはログインが必要です');
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
@@ -2471,6 +2780,27 @@ async function handleToggleFavorite(productId) {
     const targetUserId = AppState.currentUser.id;
     // 変数・配列項目 _favoritesMutationSeq の値を更新・計算します
     _favoritesMutationSeq++;
+
+    // スマホ版の場合は localStorage でお気に入りをトグル保存します
+    if (isMobileLocalStorageMode()) {
+        const index = AppState.favorites.indexOf(productId);
+        let isAdded = false;
+        if (index === -1) {
+            AppState.favorites.push(productId);
+            isAdded = true;
+        } else {
+            AppState.favorites.splice(index, 1);
+            isAdded = false;
+        }
+        lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        updateFavoriteBadges();
+        syncAllFavoriteButtons(productId, isAdded);
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (window.location.hash === '#favorites') renderFavoriteProducts();
+        if (typeof renderMyPage === 'function') renderMyPage();
+        showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
+        return;
+    }
 
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
@@ -2694,24 +3024,28 @@ function updateAuthNavUI() {
 }
 
 
-// ログアウト実行：POST /api/auth/logout でサーバーセッションCookieを破棄し、全メモリ・画面を未ログイン状態へ戻します
+// ログアウト実行：スマホ版はlocalStorageのログインセッションを解除、PC版はPOST /api/auth/logoutでサーバーセッションを破棄し、HOMEへ戻ります
 async function handleLogout(e) {
     // 条件（e && typeof e.preventDefault === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+
+    // スマホ版のlocalStorageログインセッションをクリアします
     try {
-        // Flask バックエンド API（/api/auth/logout）へ非同期リクエストを送信し、応答を待ち受けます
-        await fetch(`${getApiBaseUrl()}/api/auth/logout`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-            method: 'POST',
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-            credentials: 'include'
-        });
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-    } catch (err) {
-        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
-        console.warn('ログアウトAPI通信に失敗しました:', err);
+        window.localStorage.removeItem('manekin_ls_current_user');
+    } catch (e) {}
+
+    // PC版の場合はバックエンド API（/api/auth/logout）へリクエストを送信します
+    if (!isMobileLocalStorageMode()) {
+        try {
+            await fetch(`${getApiBaseUrl()}/api/auth/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (err) {
+            console.warn('ログアウトAPI通信に失敗しました:', err);
+        }
     }
+
     // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
     await applyAccountSession(null);
     // モバイルメニューが開いていれば閉じます
@@ -2784,7 +3118,7 @@ const navigateAfterAuth = redirectToHome;
 window.redirectToHome = redirectToHome;
 
 
-// デモログインボタン用：POST /api/auth/demo でデモ会員へログインし、全アカウントデータをMySQL復元してHOME画面へ戻ります
+// デモログインボタン用：スマホ版はlocalStorage、PC版はPOST /api/auth/demoでデモ会員へログインし、HOME画面へ戻ります
 async function handleDemoLogin(e) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
@@ -2795,32 +3129,56 @@ async function handleDemoLogin(e) {
     // 再代入可能な変数 demoUser を宣言し、値（null）をセットします
     let demoUser = null;
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
-    try {
-        // Flask バックエンド API（/api/auth/demo）へ非同期リクエストを送信し、応答を待ち受けます
-        const res = await fetch(`${apiBase}/api/auth/demo`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-            method: 'POST',
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-            credentials: 'include'
-        });
-        // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
-        const data = await res.json().catch(() => ({}));
-        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
-        if (!res.ok || !data.user || !isServerUserId(data.user.id)) {
+    // スマホ版の場合は localStorage でデモアカウントを発行・復元します
+    if (isMobileLocalStorageMode()) {
+        const users = lsGetJson('manekin_ls_users', []);
+        let existingDemo = users.find(u => u && u.email === 'demo@manekin.jp');
+        if (!existingDemo) {
+            existingDemo = {
+                id: 99999,
+                name: 'テスト 太郎 (DEMO)',
+                email: 'demo@manekin.jp',
+                password: 'password123',
+                rank: 'GOLD MEMBER',
+                points: 0,
+                isLocalStorage: true
+            };
+            users.push(existingDemo);
+            lsSetJson('manekin_ls_users', users);
+        } else {
+            existingDemo.isLocalStorage = true;
+        }
+        demoUser = existingDemo;
+        ensureMobileUserInitialized(demoUser);
+        lsSetJson('manekin_ls_current_user', demoUser);
+    } else {
+        // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+        try {
+            // Flask バックエンド API（/api/auth/demo）へ非同期リクエストを送信し、応答を待ち受けます
+            const res = await fetch(`${apiBase}/api/auth/demo`, {
+                // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+                method: 'POST',
+                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+                credentials: 'include'
+            });
+            // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
+            const data = await res.json().catch(() => ({}));
+            // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
+            if (!res.ok || !data.user || !isServerUserId(data.user.id)) {
+                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+                showToast(data.message || '⚠️ デモアカウントでログインできませんでした（MySQL接続を確認してください）');
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+                return;
+            }
+            // 変数・配列項目 demoUser の値を更新・計算します
+            demoUser = data.user;
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        } catch (e) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(data.message || '⚠️ デモアカウントでログインできませんでした（MySQL接続を確認してください）');
+            showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
             // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
             return;
         }
-        // 変数・配列項目 demoUser の値を更新・計算します
-        demoUser = data.user;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-    } catch (e) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
     }
 
     // ログインした瞬間に即座にHOME画面へ切り替える
@@ -2833,13 +3191,13 @@ async function handleDemoLogin(e) {
     // アラートOK直後にも確実にHOME画面表示を維持
     await redirectToHome(demoUser, { silentToast: true });
 
-    // 関連処理 applyAccountSession() を呼び出してMySQLデータを復元し、再度HOME画面を保証します
+    // 関連処理 applyAccountSession() を呼び出してデータを復元し、再度HOME画面を保証します
     await applyAccountSession(demoUser, { preserveGuestCart });
     await redirectToHome(demoUser, { silentToast: true });
 }
 
 
-// ログインフォーム送信処理：POST /api/auth/login でメール・パスワード照合後、Cookie認証開始＆MySQLデータ復元を行います
+// ログインフォーム送信処理：スマホ版はlocalStorage、PC版はPOST /api/auth/loginで認証し、HOME画面へ戻ります
 async function handleLogin(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -2876,39 +3234,72 @@ async function handleLogin(e) {
     // 再代入可能な変数 loggedInUser を宣言し、値（null）をセットします
     let loggedInUser = null;
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
-    try {
-        // Flask バックエンド API（/api/auth/login）へ非同期リクエストを送信し、応答を待ち受けます
-        const response = await fetch(`${apiBase}/api/auth/login`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-            method: 'POST',
-            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
-            headers: { 'Content-Type': 'application/json' },
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-            credentials: 'include',
-            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
-            body: JSON.stringify({ email, password })
-        });
-        // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
-        const data = await response.json().catch(() => ({}));
+    // スマホ版の場合は localStorage で認証・ログインします
+    if (isMobileLocalStorageMode()) {
+        const users = lsGetJson('manekin_ls_users', []);
+        const lowerEmail = email.toLowerCase();
+        let matched = users.find(u => u && String(u.email || '').toLowerCase() === lowerEmail);
 
-        // 条件（response.ok && data.user && isServerUserId(data.user…）が成り立つか判定し、該当する場合の処理を実行します
-        if (response.ok && data.user && isServerUserId(data.user.id)) {
-            // 変数・配列項目 loggedInUser の値を更新・計算します
-            loggedInUser = data.user;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        if (matched) {
+            if (matched.password && matched.password !== password) {
+                showToast('メールアドレスまたはパスワードが正しくありません');
+                return;
+            }
+            matched.isLocalStorage = true;
+            loggedInUser = matched;
         } else {
+            // スマホ版で未登録メールアドレスが入力された場合も、その場でlocalStorage会員として登録＆ログインできるようにします
+            const isDemo = (lowerEmail === 'demo@manekin.jp');
+            const newMobileUser = {
+                id: isDemo ? 99999 : Date.now(),
+                name: isDemo ? 'テスト 太郎 (DEMO)' : (email.split('@')[0] || '会員'),
+                email: email,
+                password: password,
+                rank: isDemo ? 'GOLD MEMBER' : 'REGULAR MEMBER',
+                points: 0,
+                isLocalStorage: true
+            };
+            users.push(newMobileUser);
+            lsSetJson('manekin_ls_users', users);
+            loggedInUser = newMobileUser;
+        }
+        ensureMobileUserInitialized(loggedInUser);
+        lsSetJson('manekin_ls_current_user', loggedInUser);
+    } else {
+        // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+        try {
+            // Flask バックエンド API（/api/auth/login）へ非同期リクエストを送信し、応答を待ち受けます
+            const response = await fetch(`${apiBase}/api/auth/login`, {
+                // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+                method: 'POST',
+                // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
+                headers: { 'Content-Type': 'application/json' },
+                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+                credentials: 'include',
+                // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
+                body: JSON.stringify({ email, password })
+            });
+            // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
+            const data = await response.json().catch(() => ({}));
+
+            // 条件（response.ok && data.user && isServerUserId(data.user…）が成り立つか判定し、該当する場合の処理を実行します
+            if (response.ok && data.user && isServerUserId(data.user.id)) {
+                // 変数・配列項目 loggedInUser の値を更新・計算します
+                loggedInUser = data.user;
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            } else {
+                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+                showToast(data.message || 'メールアドレスまたはパスワードが正しくありません');
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+                return;
+            }
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(data.message || 'メールアドレスまたはパスワードが正しくありません');
+            showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
             // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
             return;
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-    } catch (err) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
     }
 
     // 条件（loggedInUser）が成り立つか判定し、該当する場合の処理を実行します
@@ -2934,14 +3325,14 @@ async function handleLogin(e) {
         // アラートOK直後にも確実にHOME画面表示を維持
         await redirectToHome(loggedInUser, { silentToast: true });
 
-        // 関連処理 applyAccountSession() を呼び出してMySQLデータを復元し、再度HOME画面を保証します
+        // 関連処理 applyAccountSession() を呼び出してデータを復元し、再度HOME画面を保証します
         await applyAccountSession(loggedInUser, { preserveGuestCart });
         await redirectToHome(loggedInUser, { silentToast: true });
     }
 }
 
 
-// 会員登録フォーム送信処理：POST /api/auth/register で新規会員作成（1,000pt付与）＆ゲストカート維持ログインを行います
+// 会員登録フォーム送信処理：スマホ版はlocalStorage、PC版はPOST /api/auth/registerで新規会員作成＆ログインし、HOME画面へ戻ります
 async function handleRegister(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -3003,39 +3394,66 @@ async function handleRegister(e) {
     // 再代入可能な変数 newUser を宣言し、値（null）をセットします
     let newUser = null;
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
-    try {
-        // Flask バックエンド API（/api/auth/register）へ非同期リクエストを送信し、応答を待ち受けます
-        const response = await fetch(`${apiBase}/api/auth/register`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-            method: 'POST',
-            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
-            headers: { 'Content-Type': 'application/json' },
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-            credentials: 'include',
-            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
-            body: JSON.stringify({ name, email, password })
-        });
-        // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
-        const data = await response.json().catch(() => ({}));
-
-        // 条件（response.ok && data.user && isServerUserId(data.user…）が成り立つか判定し、該当する場合の処理を実行します
-        if (response.ok && data.user && isServerUserId(data.user.id)) {
-            // 変数・配列項目 newUser の値を更新・計算します
-            newUser = data.user;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+    // スマホ版の場合は localStorage に新規会員を登録・保存します
+    if (isMobileLocalStorageMode()) {
+        const users = lsGetJson('manekin_ls_users', []);
+        const lowerEmail = email.toLowerCase();
+        const existingIdx = users.findIndex(u => u && String(u.email || '').toLowerCase() === lowerEmail);
+        if (existingIdx > -1) {
+            users[existingIdx].name = name;
+            users[existingIdx].password = password;
+            users[existingIdx].isLocalStorage = true;
+            newUser = users[existingIdx];
         } else {
+            newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                rank: 'REGULAR MEMBER',
+                points: 0,
+                isLocalStorage: true
+            };
+            users.push(newUser);
+        }
+        lsSetJson('manekin_ls_users', users);
+        ensureMobileUserInitialized(newUser);
+        lsSetJson('manekin_ls_current_user', newUser);
+    } else {
+        // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+        try {
+            // Flask バックエンド API（/api/auth/register）へ非同期リクエストを送信し、応答を待ち受けます
+            const response = await fetch(`${apiBase}/api/auth/register`, {
+                // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
+                method: 'POST',
+                // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
+                headers: { 'Content-Type': 'application/json' },
+                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+                credentials: 'include',
+                // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
+                body: JSON.stringify({ name, email, password })
+            });
+            // 定数 data を宣言し、値（await response.json().catch(() => ({})…）をセットします
+            const data = await response.json().catch(() => ({}));
+
+            // 条件（response.ok && data.user && isServerUserId(data.user…）が成り立つか判定し、該当する場合の処理を実行します
+            if (response.ok && data.user && isServerUserId(data.user.id)) {
+                // 変数・配列項目 newUser の値を更新・計算します
+                newUser = data.user;
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            } else {
+                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+                showToast(data.message || '会員登録に失敗しました');
+                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+                return;
+            }
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(data.message || '会員登録に失敗しました');
+            showToast('⚠️ Pythonサーバー(ポート8080)に接続できないため会員登録できません（app.pyとMySQLの起動を確認してください）');
             // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
             return;
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-    } catch (err) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ Pythonサーバー(ポート8080)に接続できないため会員登録できません（app.pyとMySQLの起動を確認してください）');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
     }
 
     // 条件（newUser）が成り立つか判定し、該当する場合の処理を実行します
@@ -3063,7 +3481,7 @@ async function handleRegister(e) {
         // アラートOK直後にも確実にHOME画面表示を維持
         await redirectToHome(newUser, { silentToast: true });
 
-        // 関連処理 applyAccountSession() を呼び出してMySQLデータを復元し、再度HOME画面を保証します
+        // 関連処理 applyAccountSession() を呼び出してデータを復元し、再度HOME画面を保証します
         await applyAccountSession(newUser, { preserveGuestCart });
         await redirectToHome(newUser, { silentToast: true });
     }
@@ -3159,7 +3577,13 @@ function closeMobileDrawer() {
 }
 
 
-// ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
+// スマホ版 localStorage 判定・操作ヘルパーをグローバルに公開します
+window.isMobileLocalStorageMode = isMobileLocalStorageMode;
+window.lsGetJson = lsGetJson;
+window.lsSetJson = lsSetJson;
+window.getDefaultMobileClosetItems = getDefaultMobileClosetItems;
+window.ensureMobileUserInitialized = ensureMobileUserInitialized;
+// ブラウザ旧ストレージに残っていた不要な manekin* データを消去します
 window.purgeAllManekinLocalStorage = purgeAllManekinLocalStorage;
 // 変数・配列項目 window.getApiBaseUrl の値を更新・計算します
 window.getApiBaseUrl = getApiBaseUrl;
