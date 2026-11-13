@@ -940,6 +940,7 @@ async function handleBuyNow(productId) {
     if (!AppState.currentUser) {
         // アプリ全体状態 AppState.pendingAuthTarget を最新値（'checkout'）に更新します
         AppState.pendingAuthTarget = 'checkout';
+        sessionStorage.setItem('manekin_pending_auth_target', 'checkout');
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ ご購入には会員登録またはログインが必要です');
         // 変数・配列項目 window.location.hash の値を更新・計算します
@@ -1622,6 +1623,7 @@ async function handlePlaceOrder() {
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         // アプリ全体状態 AppState.pendingAuthTarget を最新値（'checkout'）に更新します
         AppState.pendingAuthTarget = 'checkout';
+        sessionStorage.setItem('manekin_pending_auth_target', 'checkout');
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ ご購入には会員登録またはログインが必要です');
         // 変数・配列項目 window.location.hash の値を更新・計算します
@@ -2238,8 +2240,17 @@ function renderMyPage() {
         if (pointsEl) pointsEl.innerHTML = `${getUserPoints().toLocaleString()} <span class="stat-unit">pt</span>`;
         // 条件（actionsWrapper）が成り立つか判定し、該当する場合の処理を実行します
         if (actionsWrapper) {
-            // 生成・変換した HTML 文字列を要素 actionsWrapper の中身として描画します
-            actionsWrapper.innerHTML = '<button class="btn btn-outline-sm" id="logout-btn" onclick="handleLogout()">ログアウト</button>';
+            // ログアウトボタンを分かりやすく赤枠アイコン付きで描画します
+            actionsWrapper.innerHTML = `
+                <button type="button" class="btn btn-outline-danger btn-sm" id="logout-btn" onclick="handleLogout()" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-weight: 600;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    ログアウト
+                </button>
+            `;
         }
     // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
@@ -2255,8 +2266,11 @@ function renderMyPage() {
         if (pointsEl) pointsEl.innerHTML = `0 <span class="stat-unit">pt</span>`;
         // 条件（actionsWrapper）が成り立つか判定し、該当する場合の処理を実行します
         if (actionsWrapper) {
-            // 生成・変換した HTML 文字列を要素 actionsWrapper の中身として描画します
-            actionsWrapper.innerHTML = '<a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>';
+            // 未ログイン時はログインおよび新規登録ボタンを表示します
+            actionsWrapper.innerHTML = `
+                <a href="#login" class="btn btn-primary btn-sm" id="mypage-action-btn" onclick="AppState.pendingAuthTarget='mypage';sessionStorage.setItem('manekin_pending_auth_target','mypage');" style="padding: 6px 14px; margin-right: 6px;">ログイン</a>
+                <a href="#register" class="btn btn-outline-dark btn-sm" onclick="AppState.pendingAuthTarget='mypage';sessionStorage.setItem('manekin_pending_auth_target','mypage');" style="padding: 6px 14px;">新規会員登録</a>
+            `;
         }
     }
 
@@ -2296,8 +2310,19 @@ function renderMyPage() {
 
     // 条件（ordersTbody）が成り立つか判定し、該当する場合の処理を実行します
     if (ordersTbody) {
+        // 未ログイン時の専用メッセージ（ログイン案内）
+        if (!AppState.currentUser) {
+            ordersTbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 36px 20px; color: #555;">
+                        <div style="font-weight: 700; margin-bottom: 6px; font-size: 1rem;">ログインしていません</div>
+                        <div style="font-size: 0.88rem; color: #777; margin-bottom: 14px;">ご購入履歴やクーポンの確認にはログインが必要です。</div>
+                        <a href="#login" class="btn btn-primary btn-sm" onclick="AppState.pendingAuthTarget='mypage';sessionStorage.setItem('manekin_pending_auth_target','mypage');" style="padding: 6px 16px;">ログインして購入履歴を表示</a>
+                    </td>
+                </tr>
+            `;
         // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
-        if (!AppState.orderHistory || AppState.orderHistory.length === 0) {
+        } else if (!AppState.orderHistory || AppState.orderHistory.length === 0) {
             // テンプレートリテラルで組み立てた HTML を要素 ordersTbody 内に書き込んで画面を更新します
             ordersTbody.innerHTML = `
                 <tr>
@@ -2615,58 +2640,47 @@ function renderFavoriteProducts() {
 // ==========================================================================
 //  7. 会員認証 UI（ログイン・新規登録・デモログイン・ログアウト）
 // ==========================================================================
-// ヘッダー・モバイルメニュー・マイページのお名前や「LOGIN／ログアウト済」表示をログイン状態に合わせて切り替えます
+// ヘッダーやマイページのログイン状態表示（ユーザーアイコンのオンライン表示など）を切り替えます
 function updateAuthNavUI() {
-    // HTML 要素 #nav-auth-link を取得して変数 authLink に格納します
+    // HTML 要素 #nav-auth-link を取得（ナビから削除された場合は null）
     const authLink = document.getElementById('nav-auth-link');
-    // HTML 要素 #mobile-login-link を取得して変数 mobileLoginLink に格納します
+    // HTML 要素 #mobile-login-link を取得（ナビから削除された場合は null）
     const mobileLoginLink = document.getElementById('mobile-login-link');
-    // HTML 要素 #mobile-register-link を取得して変数 mobileRegisterLink に格納します
+    // HTML 要素 #mobile-register-link を取得（ナビから削除された場合は null）
     const mobileRegisterLink = document.getElementById('mobile-register-link');
+    // ヘッダーのユーザーアイコン（マイページ遷移）横のステータスドット
+    const headerUserOnlineDot = document.getElementById('header-user-online-dot');
+    const headerUserBtn = document.getElementById('header-user-btn');
 
     // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
-        // 条件（authLink）が成り立つか判定し、該当する場合の処理を実行します
+        if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'block';
+        if (headerUserBtn) headerUserBtn.title = `${AppState.currentUser.name || '会員'} 様でログイン中（マイページへ）`;
         if (authLink) {
-            // 文字要素 authLink の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             authLink.textContent = 'LOGOUT';
-            // 変数・配列項目 authLink.href の値を更新・計算します
             authLink.href = 'javascript:void(0)';
-            // 変数・配列項目 authLink.onclick の値を更新・計算します
             authLink.onclick = handleLogout;
         }
-        // 条件（mobileLoginLink）が成り立つか判定し、該当する場合の処理を実行します
         if (mobileLoginLink) {
-            // 文字要素 mobileLoginLink の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             mobileLoginLink.textContent = 'LOGOUT (ログアウト)';
-            // 変数・配列項目 mobileLoginLink.href の値を更新・計算します
             mobileLoginLink.href = 'javascript:void(0)';
-            // 変数・配列項目 mobileLoginLink.onclick の値を更新・計算します
             mobileLoginLink.onclick = handleLogout;
         }
-        // 条件（mobileRegisterLink）が成り立つか判定し、該当する場合の処理を実行します
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
     } else {
-        // 条件（authLink）が成り立つか判定し、該当する場合の処理を実行します
+        if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'none';
+        if (headerUserBtn) headerUserBtn.title = 'マイページ / ログイン';
         if (authLink) {
-            // 文字要素 authLink の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             authLink.textContent = 'LOGIN';
-            // 変数・配列項目 authLink.href の値を更新・計算します
             authLink.href = '#login';
-            // 変数・配列項目 authLink.onclick の値を更新・計算します
             authLink.onclick = null;
         }
-        // 条件（mobileLoginLink）が成り立つか判定し、該当する場合の処理を実行します
         if (mobileLoginLink) {
-            // 文字要素 mobileLoginLink の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
             mobileLoginLink.textContent = 'LOGIN (ログイン)';
-            // 変数・配列項目 mobileLoginLink.href の値を更新・計算します
             mobileLoginLink.href = '#login';
-            // 変数・配列項目 mobileLoginLink.onclick の値を更新・計算します
             mobileLoginLink.onclick = null;
         }
-        // 条件（mobileRegisterLink）が成り立つか判定し、該当する場合の処理を実行します
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'block';
     }
 }
@@ -2692,6 +2706,10 @@ async function handleLogout(e) {
     }
     // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
     await applyAccountSession(null);
+    // モバイルメニューが開いていれば閉じます
+    if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+    // ログアウト完了アラートを表示します
+    alert('ログアウトしました');
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToast('ログアウトしました');
     // 変数・配列項目 window.location.hash の値を更新・計算します
@@ -2701,8 +2719,9 @@ async function handleLogout(e) {
 
 // デモログインボタン用：POST /api/auth/demo でデモ会員へログインし、全アカウントデータをMySQL復元して元の画面へ戻ります
 async function handleDemoLogin() {
-    // 定数 preserveGuestCart を宣言し、値（(AppState.pendingAuthTarget === 'check…）をセットします
-    const preserveGuestCart = (AppState.pendingAuthTarget === 'checkout');
+    const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
+    // 定数 preserveGuestCart を宣言し、値（(target === 'checkout')）をセットします
+    const preserveGuestCart = (target === 'checkout');
     // 定数 apiBase を宣言し、値（getApiBaseUrl()）をセットします
     const apiBase = getApiBaseUrl();
     // 再代入可能な変数 demoUser を宣言し、値（null）をセットします
@@ -2739,28 +2758,30 @@ async function handleDemoLogin() {
     // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
     await applyAccountSession(demoUser, { preserveGuestCart });
 
-    // 条件（AppState.pendingAuthTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
-    if (AppState.pendingAuthTarget === 'manekin') {
-        // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-        AppState.pendingAuthTarget = null;
+    // ログイン成功アラートを表示
+    alert('ログインされました');
+
+    // 遷移先を判定して元の画面へ自動復帰します
+    const returnTarget = target;
+    AppState.pendingAuthTarget = null;
+    sessionStorage.removeItem('manekin_pending_auth_target');
+
+    // 条件（returnTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
+    if (returnTarget === 'manekin') {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('🎉 デモログイン完了！MANEKINスタジオへ移動します');
         // 変数・配列項目 window.location.hash の値を更新・計算します
         window.location.hash = '#manekin-studio';
-    // 前の if が偽で、かつ（AppState.pendingAuthTarget === 'checkout' && AppStat…）を満たす場合の別条件分岐です
-    } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
-        // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-        AppState.pendingAuthTarget = null;
+    // 前の if が偽で、かつ（returnTarget === 'checkout'）を満たす場合の別条件分岐です
+    } else if (returnTarget === 'checkout') {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('🎉 デモログイン完了！ご注文手続きへ戻ります');
         // 変数・配列項目 window.location.hash の値を更新・計算します
         window.location.hash = '#checkout';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です（MyPageからログイン時等）
     } else {
-        // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-        AppState.pendingAuthTarget = null;
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast(`🎉 デモアカウントでログインしました！ようこそ、${demoUser.name}`);
+        showToast(`🎉 デモアカウントでログインしました！ようこそ、${demoUser.name} 様`);
         // 変数・配列項目 window.location.hash の値を更新・計算します
         window.location.hash = '#mypage';
     }
@@ -2843,8 +2864,9 @@ async function handleLogin(e) {
     if (loggedInUser) {
         // 変数・配列項目 loggedInUser.points の値を更新・計算します（初期値は0ポイント）
         loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 0;
-        // 定数 preserveGuestCart を宣言し、値（(AppState.pendingAuthTarget === 'check…）をセットします
-        const preserveGuestCart = (AppState.pendingAuthTarget === 'checkout');
+        const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
+        // 定数 preserveGuestCart を宣言し、値（(target === 'checkout')）をセットします
+        const preserveGuestCart = (target === 'checkout');
         // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
         await applyAccountSession(loggedInUser, { preserveGuestCart });
 
@@ -2852,28 +2874,30 @@ async function handleLogin(e) {
         if (emailEl) emailEl.value = '';
         // 条件（passEl）が成り立つか判定し、該当する場合の処理を実行します
         if (passEl) passEl.value = '';
-        // 条件（AppState.pendingAuthTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
-        if (AppState.pendingAuthTarget === 'manekin') {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
+
+        // ログイン成功アラートを表示
+        alert('ログインされました');
+
+        const returnTarget = target;
+        AppState.pendingAuthTarget = null;
+        sessionStorage.removeItem('manekin_pending_auth_target');
+
+        // 条件（returnTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
+        if (returnTarget === 'manekin') {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name}。MANEKINスタジオへ移動します`);
+            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name} 様。MANEKINスタジオへ移動します`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#manekin-studio';
-        // 前の if が偽で、かつ（AppState.pendingAuthTarget === 'checkout' && AppStat…）を満たす場合の別条件分岐です
-        } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
+        // 前の if が偽で、かつ（returnTarget === 'checkout'）を満たす場合の別条件分岐です
+        } else if (returnTarget === 'checkout') {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name}。ご注文手続きへ戻ります`);
+            showToast(`🎉 ログイン完了！ようこそ、${loggedInUser.name} 様。ご注文手続きへ戻ります`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#checkout';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（MyPageからログイン時等）
         } else {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 ログインに成功しました！ようこそ、${loggedInUser.name}`);
+            showToast(`🎉 ログインに成功しました！ようこそ、${loggedInUser.name} 様`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#mypage';
         }
@@ -2982,8 +3006,9 @@ async function handleRegister(e) {
     if (newUser) {
         // 変数・配列項目 newUser.points の値を更新・計算します（初期値は0ポイント）
         newUser.points = (newUser.points !== undefined && newUser.points !== null) ? newUser.points : 0;
-        // 定数 preserveGuestCart を宣言し、値（(AppState.pendingAuthTarget === 'check…）をセットします
-        const preserveGuestCart = (AppState.pendingAuthTarget === 'checkout');
+        const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
+        // 定数 preserveGuestCart を宣言し、値（(target === 'checkout')）をセットします
+        const preserveGuestCart = (target === 'checkout');
         // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
         await applyAccountSession(newUser, { preserveGuestCart });
 
@@ -2993,28 +3018,30 @@ async function handleRegister(e) {
         if (emailEl) emailEl.value = '';
         // 条件（passEl）が成り立つか判定し、該当する場合の処理を実行します
         if (passEl) passEl.value = '';
-        // 条件（AppState.pendingAuthTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
-        if (AppState.pendingAuthTarget === 'manekin') {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
+
+        // 会員登録・ログイン成功アラートを表示
+        alert('ログインされました');
+
+        const returnTarget = target;
+        AppState.pendingAuthTarget = null;
+        sessionStorage.removeItem('manekin_pending_auth_target');
+
+        // 条件（returnTarget === 'manekin'）が成り立つか判定し、該当する場合の処理を実行します
+        if (returnTarget === 'manekin') {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 会員登録完了！初回限定1割引（10% OFF）クーポンを進呈しました！ようこそ、${newUser.name}`);
+            showToast(`🎉 会員登録完了！初回限定1割引クーポンを進呈しました！ようこそ、${newUser.name} 様。MANEKINスタジオへ移動します`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#manekin-studio';
-        // 前の if が偽で、かつ（AppState.pendingAuthTarget === 'checkout' && AppStat…）を満たす場合の別条件分岐です
-        } else if (AppState.pendingAuthTarget === 'checkout' && AppState.cart && AppState.cart.length > 0) {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
+        // 前の if が偽で、かつ（returnTarget === 'checkout'）を満たす場合の別条件分岐です
+        } else if (returnTarget === 'checkout') {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 会員登録完了！初回限定1割引（10% OFF）クーポンを進呈しました！ご注文手続きへ戻ります`);
+            showToast(`🎉 会員登録完了！初回限定1割引クーポンを進呈しました！ご注文手続きへ戻ります`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#checkout';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（MyPageから登録時等）
         } else {
-            // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
-            AppState.pendingAuthTarget = null;
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 会員登録完了！特典として 1,000 ポイント（1,000円分）をプレゼントしました！ようこそ、${newUser.name}`);
+            showToast(`🎉 会員登録完了！初回限定1割引クーポンを進呈しました！ようこそ、${newUser.name} 様`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#mypage';
         }

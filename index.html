@@ -77,11 +77,6 @@
                         </a>
                     </li>
                     <!-- メニューやリストの 1 項目分の要素（<li>）です -->
-                    <li class="nav-item" id="nav-auth-container">
-                        <!-- クリックで画面ハッシュを「#login」へ切り替える SPA リンクです（LOGIN） -->
-                        <a href="#login" class="nav-link" id="nav-auth-link" data-nav="login">LOGIN</a>
-                    </li>
-                    <!-- メニューやリストの 1 項目分の要素（<li>）です -->
                     <li class="nav-item" id="nav-mypage-container">
                         <!-- クリックで画面ハッシュを「#mypage」へ切り替える SPA リンクです（MYPAGE） -->
                         <a href="#mypage" class="nav-link" data-nav="mypage">MYPAGE</a>
@@ -123,7 +118,7 @@
                 </a>
 
                 <!-- クリックで画面ハッシュを「#mypage」へ切り替える SPA リンクです（マイページを表示） -->
-                <a href="#mypage" class="tool-icon-btn" aria-label="マイページを表示">
+                <a href="#mypage" class="tool-icon-btn" id="header-user-btn" aria-label="マイページを表示" style="position: relative;">
                     <!-- 拡大してもぼやけないベクター形式の SVG アイコン（icon-svg）を描画します -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <!-- アイコンやイラストの輪郭線を座標データ(d属性)で描く SVG パス要素です -->
@@ -131,6 +126,8 @@
                         <!-- SVG で丸図形（アイコンの丸やカート車輪・頭など）を描く要素です -->
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
+                    <!-- ログイン中を示す緑のステータスインジケータードット -->
+                    <span class="header-user-online-dot" id="header-user-online-dot" style="display: none;" title="ログイン中"></span>
                 </a>
 
                 <!-- クリック操作用ボタン「メニューを開閉する」です -->
@@ -179,12 +176,6 @@
                         data-mobile-nav="manekin-studio" style="justify-content: flex-start; gap: 8px;"><span>MANEKIN</span><span class="nav-tag">AI</span></a></li>
                 <!-- メニューやリストの 1 項目分の要素（<li>）です -->
                 <li class="mobile-divider"></li>
-                <!-- メニューやリストの 1 項目分の要素（<li>）です -->
-                <li><a href="#login" class="mobile-nav-link" id="mobile-login-link" data-mobile-nav="login">LOGIN
-                        (ログイン)</a></li>
-                <!-- メニューやリストの 1 項目分の要素（<li>）です -->
-                <li><a href="#register" class="mobile-nav-link" id="mobile-register-link"
-                        data-mobile-nav="register">REGISTER (会員登録)</a></li>
                 <!-- メニューやリストの 1 項目分の要素（<li>）です -->
                 <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE
                         (マイページ)</a></li>
@@ -852,13 +843,13 @@
                             <div class="checkout-earned-points-card">
                                 <!-- デザイン・配置用のブロック要素（<div class="earned-points-header">）を開始します -->
                                 <div class="earned-points-header">
-                                    <!-- インライン装飾／グルーピング用の <span> 要素（.earned-points-label ✨ 今回獲得予定ポイント (1%還元)）です -->
-                                    <span class="earned-points-label">✨ 今回獲得予定ポイント (1%還元)</span>
-                                    <!-- 重要テキストを太字で強調表示（+0 pt）します -->
-                                    <strong class="earned-points-value" id="checkout-earned-points">+0 pt</strong>
+                                    <!-- インライン装飾／グルーピング用の <span> 要素（.earned-points-label 🎫 特典・クーポン利用）です -->
+                                    <span class="earned-points-label">🎫 特典・クーポン利用</span>
+                                    <!-- 重要テキストを太字で強調表示（0 pt (クーポン還元)）します -->
+                                    <strong class="earned-points-value" id="checkout-earned-points">0 pt (クーポン還元)</strong>
                                 </div>
-                                <!-- 段落テキスト（.earned-points-hint: ※ご注文確定時に付与され、次回以降1pt＝1円として利用できます）を表示します -->
-                                <p class="earned-points-hint">※ご注文確定時に付与され、次回以降1pt＝1円として利用できます</p>
+                                <!-- 段落テキストを表示します -->
+                                <p class="earned-points-hint">※ご購入によるポイント付与はありません。お得な割引は配布クーポンをご利用ください（配送料はポイント対象外です）。</p>
                             </div>
 
                             <!-- クリック操作用ボタン「<button type="button" class="btn…」です -->
@@ -936,12 +927,17 @@
                                 <!-- 重要テキストを太字で強調表示（¥0）します -->
                                 <strong class="comp-value highlight-price" id="comp-order-total">¥0</strong>
                             </div>
+                            <!-- クーポン利用情報表示行 -->
+                            <div class="comp-row" id="comp-coupon-row" style="display: none;">
+                                <span class="comp-label">ご利用クーポン:</span>
+                                <strong class="comp-value text-success" id="comp-coupon-info">--</strong>
+                            </div>
                             <!-- 特定機能・領域のブロック要素（<div id="comp-point-row" class="comp-row">）を開始します -->
-                            <div class="comp-row" id="comp-point-row">
+                            <div class="comp-row" id="comp-point-row" style="display: none;">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 今回獲得ポイント:）です -->
                                 <span class="comp-label">今回獲得ポイント:</span>
-                                <!-- 重要テキストを太字で強調表示（+0 pt）します -->
-                                <strong class="comp-value text-success" id="comp-earned-points">+0 pt</strong>
+                                <!-- 重要テキストを太字で強調表示（0 pt (クーポン進呈)）します -->
+                                <strong class="comp-value text-success" id="comp-earned-points">0 pt (クーポン進呈)</strong>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
@@ -1005,6 +1001,17 @@
                         <h1 class="auth-title">LOGIN</h1>
                         <!-- 段落テキスト（.auth-subtitle: 会員ログイン）を表示します -->
                         <p class="auth-subtitle">会員ログイン</p>
+                    </div>
+
+                    <!-- 既にログイン済みの場合の案内表示枠 -->
+                    <div id="login-already-box" class="login-already-box" style="display: none;">
+                        <div class="already-login-icon">🟢</div>
+                        <h2 class="already-login-title">現在 <span id="login-already-name">会員</span> 様 としてログイン中です</h2>
+                        <p class="already-login-desc">マイページへ移動して購入履歴やお気に入りを確認するか、別のアカウントに切り替える場合はログアウトしてください。</p>
+                        <div class="already-login-actions">
+                            <a href="#mypage" class="btn btn-primary btn-sm">マイページへ移動</a>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="handleLogout()">ログアウトする</button>
+                        </div>
                     </div>
 
                     <!-- 特定機能・領域のブロック要素（<div id="login-checkout-notice" class="auth-checkout-alert">）を開始します -->
@@ -1089,17 +1096,17 @@
                     <!-- デザイン・配置用のブロック要素（<div class="auth-point-banner">）を開始します -->
                     <div class="auth-point-banner">
                         <!-- デザイン・配置用のブロック要素（<div class="auth-point-badge">）を開始します -->
-                        <div class="auth-point-badge">WELCOME GIFT</div>
+                        <div class="auth-point-badge">WELCOME COUPON</div>
                         <!-- デザイン・配置用のブロック要素（<div class="auth-point-content">）を開始します -->
                         <div class="auth-point-content">
-                            <!-- インライン装飾／グルーピング用の <span> 要素（.auth-point-icon 🎁）です -->
-                            <span class="auth-point-icon">🎁</span>
+                            <!-- インライン装飾／グルーピング用の <span> 要素（.auth-point-icon 🎫）です -->
+                            <span class="auth-point-icon">🎫</span>
                             <!-- デザイン・配置用のブロック要素（<div class="auth-point-text">）を開始します -->
                             <div class="auth-point-text">
-                                <!-- 重要テキストを太字で強調表示（新規会員登録で今すぐ使える 1,000 ポイント（1,000円分…）します -->
-                                <strong>新規会員登録で今すぐ使える 1,000 ポイント（1,000円分）プレゼント！</strong>
-                                <!-- 段落テキスト（.p: 登録完了で即座に付与され、今回・次回のお買い物で1pt＝1円とし…）を表示します -->
-                                <p>登録完了で即座に付与され、今回・次回のお買い物で1pt＝1円としてご利用いただけます。</p>
+                                <!-- 重要テキストを太字で強調表示します -->
+                                <strong>新規会員登録で今すぐ使える【初回限定】1割引 (10% OFF) クーポン進呈！</strong>
+                                <!-- 段落テキストを表示します -->
+                                <p>登録完了で即座にクーポンが付与され、今回・次回のお買い物でご利用いただけます（使用したら消滅・配送料は別途発生）。</p>
                             </div>
                         </div>
                     </div>
@@ -1217,7 +1224,7 @@
                     <!-- 特定機能・領域のブロック要素（<div id="mypage-actions-wrapper" class="mypage-actions">）を開始します -->
                     <div class="mypage-actions" id="mypage-actions-wrapper">
                         <!-- クリックで画面ハッシュを「#login」へ切り替える SPA リンクです（ログイン） -->
-                        <a href="#login" class="btn btn-outline-sm" id="mypage-action-btn">ログイン</a>
+                        <a href="#login" class="btn btn-primary btn-sm" id="mypage-action-btn" onclick="AppState.pendingAuthTarget='mypage';sessionStorage.setItem('manekin_pending_auth_target','mypage');" style="padding: 6px 16px; font-weight: 700;">ログイン</a>
                     </div>
                 </div>
 
