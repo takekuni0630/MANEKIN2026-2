@@ -1300,7 +1300,28 @@ function renderCheckoutPage() {
 // ==========================================================================
 //  4. チェックアウト（購入手続き）・ポイント割引計算・注文確定トランザクション
 // ==========================================================================
-// 現在ログイン中の会員が持つ利用可能ポイント残高（数値）を返します（初期ポイントは0から）
+// 注文履歴（AppState.orderHistory）から「購入で加算されたポイント合計 − 利用したポイント合計」を算出します
+function calculateNetPointsFromOrders(ordersList) {
+    const list = Array.isArray(ordersList) ? ordersList : (AppState.orderHistory || []);
+    if (!list || list.length === 0) return 0;
+    let totalEarned = 0;
+    let totalUsed = 0;
+    list.forEach(o => {
+        if (!o) return;
+        const totalAmt = Number(o.total_amount || o.subtotal || 0);
+        let earned = Number(o.earned_points || 0);
+        if (earned <= 0 && totalAmt > 0) {
+            earned = Math.max(1, Math.floor(totalAmt * 0.01));
+            o.earned_points = earned;
+        }
+        const used = Math.max(0, Number(o.used_points || 0));
+        totalEarned += earned;
+        totalUsed += used;
+    });
+    return Math.max(0, totalEarned - totalUsed);
+}
+
+// 現在ログイン中の会員が持つ利用可能ポイント残高（数値）を返します（購入で加算されたポイントの合計）
 function getUserPoints() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return 0;
@@ -1309,17 +1330,25 @@ function getUserPoints() {
         // 初期配布はクーポンに変更されたため、ポイントは 0 からスタートします
         AppState.currentUser.points = 0;
     }
+    // 注文履歴がある場合は、購入で加算されたポイント合計（−利用分）を確実に反映します
+    if (Array.isArray(AppState.orderHistory) && AppState.orderHistory.length > 0) {
+        const netFromOrders = calculateNetPointsFromOrders(AppState.orderHistory);
+        if (netFromOrders > 0 && Number(AppState.currentUser.points) < netFromOrders) {
+            AppState.currentUser.points = netFromOrders;
+        }
+    }
     // 結果（AppState.currentUser.points）を呼び出し元へ返却します
-    return AppState.currentUser.points;
+    return Number(AppState.currentUser.points) || 0;
 }
 
 
-// 注文でのポイント増減後に AppState.currentUser.points と表示UIを最新値へ更新します（スマホ版はlocalStorageも更新）
-function setUserPoints(points) {
+// 注文でのポイント増減後に AppState.currentUser.points と表示UI（チェックアウト・マイページ両方）を最新値へ更新します
+function setUserPoints(points, options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return;
     // アプリ全体状態 AppState.currentUser.points を最新値（Math.max(0, points)）に更新します
-    AppState.currentUser.points = Math.max(0, points);
+    const normalizedPts = Math.max(0, Math.floor(Number(points) || 0));
+    AppState.currentUser.points = normalizedPts;
 
     // スマホ版の場合は localStorage のユーザー情報にもポイント残高を反映します
     if (isMobileLocalStorageMode()) {
@@ -1327,9 +1356,29 @@ function setUserPoints(points) {
         const users = lsGetJson('manekin_ls_users', []);
         const uIdx = users.findIndex(u => String(u.id) === String(AppState.currentUser.id));
         if (uIdx > -1) {
-            users[uIdx].points = AppState.currentUser.points;
+            users[uIdx].points = normalizedPts;
             lsSetJson('manekin_ls_users', users);
         }
+    } else if (options.syncToBackend && isServerUserId(AppState.currentUser.id)) {
+        // デスクトップ版では MySQL の users.points にも最新残高を同期保存します
+        fetch(`${getApiBaseUrl()}/api/users/${AppState.currentUser.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ points: normalizedPts })
+        }).catch(() => {});
+    }
+
+    // チェックアウト画面の「保有ポイント: XX pt」表示を即時更新します
+    const checkoutUserPoints = document.getElementById('checkout-user-points');
+    if (checkoutUserPoints) {
+        checkoutUserPoints.textContent = normalizedPts.toLocaleString();
+    }
+
+    // 注文完了画面の「現在の保有ポイント」表示も即時更新します
+    const compBalancePoints = document.getElementById('comp-balance-points');
+    if (compBalancePoints) {
+        compBalancePoints.textContent = `${normalizedPts.toLocaleString()} pt`;
     }
 
     // HTML 要素 #mypage-points を取得して変数 mypagePoints に格納します
@@ -1337,7 +1386,7 @@ function setUserPoints(points) {
     // 条件（mypagePoints）が成り立つか判定し、該当する場合の処理を実行します
     if (mypagePoints) {
         // テンプレートリテラルで組み立てた HTML を要素 mypagePoints 内に書き込んで画面を更新します
-        mypagePoints.innerHTML = `${AppState.currentUser.points.toLocaleString()} <span class="stat-unit">pt</span>`;
+        mypagePoints.innerHTML = `${normalizedPts.toLocaleString()} <span class="stat-unit">pt</span>`;
     }
 }
 
@@ -2290,11 +2339,15 @@ async function syncOrdersFromBackend() {
         if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
             AppState.orderHistory = [];
             renderMyPage();
+            updateCheckoutCalculations();
             return;
         }
         const savedOrders = lsGetJson(`manekin_ls_orders_${AppState.currentUser.id}`, []);
         AppState.orderHistory = Array.isArray(savedOrders) ? savedOrders : [];
+        const netPts = calculateNetPointsFromOrders(AppState.orderHistory);
+        setUserPoints(Math.max(Number(AppState.currentUser.points || 0), netPts));
         renderMyPage();
+        updateCheckoutCalculations();
         return;
     }
 
@@ -2372,8 +2425,18 @@ async function syncOrdersFromBackend() {
                 });
                 // アプリ全体状態 AppState.orderHistory を最新値（validOrders）に更新します
                 AppState.orderHistory = validOrders;
+                // 購入した注文履歴から加算されたポイント合計（−利用分）を算出し、保有ポイントとして反映します
+                const netPts = calculateNetPointsFromOrders(validOrders);
+                const prevPts = Number(AppState.currentUser.points || 0);
+                if (validOrders.length > 0 && netPts !== prevPts) {
+                    setUserPoints(netPts, { syncToBackend: true });
+                } else {
+                    setUserPoints(Math.max(prevPts, netPts));
+                }
                 // 関連処理 renderMyPage() を呼び出して処理・画面を更新します
                 renderMyPage();
+                // チェックアウト画面の保有ポイント表示も最新値へ更新します
+                updateCheckoutCalculations();
             }
         // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
@@ -2411,7 +2474,9 @@ async function handleClearOrderHistory() {
     if (isMobileLocalStorageMode()) {
         lsSetJson(`manekin_ls_orders_${targetUserId}`, []);
         AppState.orderHistory = [];
+        setUserPoints(0);
         renderMyPage();
+        updateCheckoutCalculations();
         showToast('このアカウントのご注文履歴を初期化しました（0件）');
         return;
     }
@@ -2434,8 +2499,10 @@ async function handleClearOrderHistory() {
 
         // アプリ全体状態 AppState.orderHistory を最新値（[]）に更新します
         AppState.orderHistory = [];
+        setUserPoints(0, { syncToBackend: true });
         // 関連処理 renderMyPage() を呼び出して処理・画面を更新します
         renderMyPage();
+        updateCheckoutCalculations();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('このアカウントのMySQLご注文履歴を初期化しました（0件）');
     // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです

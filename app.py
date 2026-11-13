@@ -733,10 +733,26 @@ def get_orders():
             orders = cursor.fetchall()
 
             # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for o in orders）
+            total_earned_pts = 0
+            total_used_pts = 0
             for o in orders:
                 # 注文者の名前を確実にセット（誰が購入したか保存・表示用）
                 if not o.get('customer_name'):
                     o['customer_name'] = current_user_name
+                # 過去注文で earned_points が 0 の場合はお支払い金額の 1% を補完して DB も更新します
+                t_amt = int(o.get('total_amount') or o.get('subtotal') or 0)
+                e_pts = int(o.get('earned_points') or 0)
+                if e_pts <= 0 and t_amt > 0:
+                    e_pts = max(1, int(t_amt * 0.01))
+                    o['earned_points'] = e_pts
+                    try:
+                        cursor.execute("UPDATE `orders` SET `earned_points` = %s WHERE `id` = %s;", (e_pts, o['id']))
+                    except Exception:
+                        pass
+                u_pts = max(0, int(o.get('used_points') or 0))
+                total_earned_pts += e_pts
+                total_used_pts += u_pts
+
                 # 条件式（if isinstance(o['created_at'], datetime)）が成り立つかチェックして処理を分岐します
                 if isinstance(o['created_at'], datetime):
                     # 辞書・配列要素 o['date'] に最新の値をセットします
@@ -779,8 +795,17 @@ def get_orders():
                 # 辞書・配列要素 o['items_summary'] に最新の値をセットします
                 o['items_summary'] = ", ".join(item_summary_list) if item_summary_list else "注文商品"
 
+            # 購入で加算されたポイント合計（−利用ポイント）を users.points にも同期します
+            net_user_points = max(0, total_earned_pts - total_used_pts)
+            if orders:
+                try:
+                    cursor.execute("UPDATE `users` SET `points` = %s WHERE `id` = %s;", (net_user_points, user_id))
+                    conn.commit()
+                except Exception:
+                    pass
+
         # 処理成功を示す HTTP ステータス 200 (OK) と共に JSON データをクライアントへ返却します
-        return jsonify({"status": "success", "orders": orders}), 200
+        return jsonify({"status": "success", "orders": orders, "user_points": net_user_points}), 200
 
     # try ブロック内で例外エラーが発生したときに安全にエラー応答へ切り替える受け皿です
     except Exception as e:
@@ -828,6 +853,8 @@ def clear_orders():
             cursor.execute("DELETE FROM `order_items` WHERE `order_id` IN (SELECT `id` FROM `orders` WHERE `user_id` = %s);", (user_id,))
             # 続いて親テーブル orders の該当ユーザー注文レコードを削除します
             cursor.execute("DELETE FROM `orders` WHERE `user_id` = %s;", (user_id,))
+            # 注文履歴リセット時は保有ポイントも 0 にリセットします
+            cursor.execute("UPDATE `users` SET `points` = 0 WHERE `id` = %s;", (user_id,))
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
         conn.commit()
         # サーバーを起動しているコンソール（黒い画面）へ実行ログや案内メッセージを出力します
