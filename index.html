@@ -30,8 +30,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <!-- メインのスタイルシート「css/style.css?v=20261109_fav」を読み込み、全CSSをサイトへ適用します -->
-    <link rel="stylesheet" href="css/style.css?v=20261109_fav">
+    <!-- メインのスタイルシート「css/style.css?v=20261113_pt_fix」を読み込み、全CSSをサイトへ適用します -->
+    <link rel="stylesheet" href="css/style.css?v=20261113_pt_fix">
     <!-- ここまで <head>（裏方設定・CSS読込エリア）の終了です -->
 </head>
 
@@ -714,21 +714,24 @@
                                     <!-- デザイン・配置用のブロック要素（<div class="checkout-point-body">）を開始します -->
                                     <div class="checkout-point-body">
                                         <!-- デザイン・配置用のブロック要素（<div class="point-input-row">）を開始します -->
-                                        <div class="point-input-row">
+                                        <div class="point-input-row" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                             <!-- デザイン・配置用のブロック要素（<div class="point-input-group">）を開始します -->
-                                            <div class="point-input-group">
+                                            <div class="point-input-group" style="position: relative; width: 145px; max-width: 145px; flex: 0 0 145px;">
                                                 <!-- ユーザー入力欄（type=number / #checkout-use-points / 0）です -->
                                                 <input type="number" id="checkout-use-points"
                                                     class="form-input point-num-input" placeholder="0" min="0" value="0"
+                                                    style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 52px 8px 10px; font-size: 0.9rem; font-weight: 700; text-align: right;"
                                                     oninput="handlePointsInputChange()">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.point-input-suffix pt 利用）です -->
-                                                <span class="point-input-suffix">pt 利用</span>
+                                                <span class="point-input-suffix" style="position: absolute; right: 10px; font-size: 0.75rem; font-weight: 600; color: #6b7280; pointer-events: none;">pt 利用</span>
                                             </div>
                                             <!-- 押すと関数 handleUseAllPoints() を実行する操作ボタン「<button type="button" class="btn…」です -->
                                             <button type="button" class="btn btn-outline-xs btn-use-all-points"
+                                                style="padding: 8px 12px; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0;"
                                                 onclick="handleUseAllPoints()">全額使う</button>
                                             <!-- 押すと関数 handleResetPoints() を実行する操作ボタン「<button type="button" class="btn…」です -->
                                             <button type="button" class="btn btn-outline-xs btn-reset-points"
+                                                style="padding: 8px 12px; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0;"
                                                 onclick="handleResetPoints()">取消</button>
                                         </div>
                                         <!-- 段落テキスト（.point-help-text: checkout-point-message）を表示します -->
