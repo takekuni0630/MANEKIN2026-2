@@ -7,19 +7,26 @@
 // ==========================================================================
 //  1. 認証・セッション管理 & API通信基盤（MySQL一本化・Cookieセッション復元）
 // ==========================================================================
-// スマホ版かどうかを判定します（スマホ版ではPythonサーバーとMySQLが使用できないためlocalStorageを使用します）
+// スマホ版かどうかを判定します（スマホ版のみ localStorage を使用し、デスクトップ版は必ず Python + MySQL を使用します）
 function isMobileLocalStorageMode() {
     try {
-        if (window.innerWidth > 0 && window.innerWidth <= 768) return true;
-        if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) return true;
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent || '')) return true;
-        if (typeof AppState !== 'undefined' && AppState.currentUser && AppState.currentUser.isLocalStorage) return true;
+        const ua = navigator.userAgent || '';
+        // 1. 実機スマートフォン（iPhone / Android / Mobile UA）または DevTools スマホ端末エミュレーション時のみ true
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua)) {
+            return true;
+        }
+        // 2. タッチ専用端末（hover不可・coarseポインタ）かつ画面幅768px以下の場合のみ true
+        // ※PCのデスクトップブラウザでウィンドウ幅を狭めただけや、F12開発者ツールを横に開いただけでは false（MySQL）を維持します
+        if (window.matchMedia && window.matchMedia('(max-width: 768px) and (pointer: coarse) and (hover: none)').matches) {
+            return true;
+        }
     } catch (e) {}
     return false;
 }
 
 // スマホ版 localStorage 安全読み書きヘルパー
 function lsGetJson(key, fallback) {
+    if (!isMobileLocalStorageMode()) return fallback;
     try {
         const raw = window.localStorage.getItem(key);
         if (raw === null || raw === undefined) return fallback;
@@ -30,6 +37,7 @@ function lsGetJson(key, fallback) {
 }
 
 function lsSetJson(key, val) {
+    if (!isMobileLocalStorageMode()) return false;
     try {
         window.localStorage.setItem(key, JSON.stringify(val));
         return true;
@@ -77,7 +85,7 @@ function getDefaultMobileClosetItems() {
 
 // スマホ版：ユーザーの初期データ（初回限定10%OFFクーポン・初期クローゼット等）をlocalStorageに準備します
 function ensureMobileUserInitialized(user) {
-    if (!user || !user.id) return;
+    if (!isMobileLocalStorageMode() || !user || !user.id) return;
     const uid = String(user.id);
     if (lsGetJson(`manekin_ls_coupons_${uid}`, null) === null) {
         lsSetJson(`manekin_ls_coupons_${uid}`, [
@@ -108,23 +116,39 @@ function ensureMobileUserInitialized(user) {
     }
 }
 
-// 過去バージョン等で使われていた不要なブラウザ保存キーを削除します（※スマホ版用の manekin_ls_* キーは保護します）
+// デスクトップ版ではすべての manekin* キー（manekin_ls_* を含む）を完全消去して MySQL 一本化を保証します。
+// スマホ版（isMobileLocalStorageMode() === true）のときだけ manekin_ls_* キーを保持します。
 function purgeAllManekinLocalStorage() {
+    const isMobile = isMobileLocalStorageMode();
     [window.localStorage, window.sessionStorage].forEach(storage => {
         if (!storage) return;
         try {
             const targetKeys = [];
             for (let i = 0; i < storage.length; i++) {
                 const k = storage.key(i);
-                // スマホ版で保存する manekin_ls_ プレフィックスのキーは削除せず保持します
-                if (k && k.startsWith('manekin') && !k.startsWith('manekin_ls_')) {
-                    targetKeys.push(k);
+                if (!k || !k.startsWith('manekin')) continue;
+                if (isMobile && storage === window.localStorage && k.startsWith('manekin_ls_')) {
+                    continue;
                 }
+                targetKeys.push(k);
             }
             targetKeys.forEach(k => storage.removeItem(k));
         } catch (e) { }
     });
 }
+
+// 開発者ツール等でスマホ表示 ⇔ デスクトップ表示を切り替えた際、デスクトップ版では即座にlocalStorageを破棄してMySQLへ切り替えます
+let _lastMobileStorageModeState = isMobileLocalStorageMode();
+window.addEventListener('resize', () => {
+    const currentMode = isMobileLocalStorageMode();
+    if (currentMode !== _lastMobileStorageModeState) {
+        _lastMobileStorageModeState = currentMode;
+        purgeAllManekinLocalStorage();
+        if (typeof restoreAuthSessionFromBackend === 'function' && typeof applyAccountSession === 'function') {
+            restoreAuthSessionFromBackend().then(u => applyAccountSession(u, { fromSessionRestore: true }));
+        }
+    }
+});
 
 
 // 通信先の Flask API サーバーURLを返します（8080番ポート配信時は相対パス ''、それ以外は http://ホスト:8080）
@@ -1927,7 +1951,7 @@ async function handlePlaceOrder() {
         // 送料金額をセットします（ポイントでは引かれません）
         shipping_fee: calc.shipping,
         // クーポンコードおよびクーポン割引額
-        coupon_code: currentAppliedCoupon ? currentAppliedCoupon.code : null,
+        coupon_code: currentAppliedCoupon ? String(currentAppliedCoupon.code || '') : '',
         coupon_discount: calc.couponDiscount || 0,
         // 今回支払いに使うポイント数をセットします（商品小計のみ対象）
         used_points: calc.usedPoints,

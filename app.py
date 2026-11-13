@@ -380,19 +380,19 @@ def create_order():
     req = request.get_json() or {}
 
     # 注文者のお名前を前後の空白を除いて取得します
-    customer_name = req.get('customer_name', '').strip()
+    customer_name = (req.get('customer_name') or '').strip()
     # 注文確認用メールアドレスを前後の空白を除いて取得します
-    customer_email = req.get('customer_email', '').strip()
+    customer_email = (req.get('customer_email') or '').strip()
     # 配送先の郵便番号を取得します
-    postal_code = req.get('postal_code', '').strip()
+    postal_code = (req.get('postal_code') or '').strip()
     # 配送先住所を前後の空白を除いて取得します
-    address = req.get('address', '').strip()
+    address = (req.get('address') or '').strip()
     # 連絡先電話番号を取得します
-    phone = req.get('phone', '').strip()
+    phone = (req.get('phone') or '').strip()
     # お支払い方法（未指定時は 'クレジットカード'）を取得します
-    payment_method = req.get('payment_method', 'クレジットカード')
+    payment_method = req.get('payment_method') or 'クレジットカード'
     # 希望配送時間帯（未指定時は '指定なし'）を取得します
-    delivery_time = req.get('delivery_time', '指定なし')
+    delivery_time = req.get('delivery_time') or '指定なし'
     # カートに入っていた注文商品の詳細配列を受け取ります
     cart_items = req.get('items', []) or req.get('items_detail', [])
     # 受信データから取り出したユーザーIDを「1以上の整数」に検証・変換します
@@ -425,7 +425,7 @@ def create_order():
     # 商品小計が 5,000 円以上なら送料無料（0円）、未満なら送料 550 円に設定します
     shipping_fee = 0 if subtotal >= 5000 else 550
     # クーポンコードとクーポンの割引額を初期化します
-    coupon_code = req.get('coupon_code', '').strip()
+    coupon_code = (req.get('coupon_code') or '').strip()
     coupon_discount = 0
     coupon_id = None
     applied_coupon_label = None
