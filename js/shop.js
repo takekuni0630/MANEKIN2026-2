@@ -196,6 +196,10 @@ async function applyAccountSession(user, options = {}) {
     AppState.studioGender = 'MEN';
     // アプリ全体状態 AppState.userBodyProfile を最新値（getDefaultBodyProfile()）に更新します
     AppState.userBodyProfile = getDefaultBodyProfile();
+    // アプリ全体状態 AppState.userCoupons を最新値（[]）に更新します
+    AppState.userCoupons = [];
+    // 現在適用中のクーポンを初期化します
+    currentAppliedCoupon = null;
 
     // 条件（!user）が成り立つか判定し、該当する場合の処理を実行します
     if (!user) {
@@ -264,7 +268,9 @@ async function applyAccountSession(user, options = {}) {
         // 関連モジュール側に関数が定義されている場合のみ、その同期・補助処理を呼び出します
         (typeof syncOutfitsFromBackend === 'function') ? syncOutfitsFromBackend() : Promise.resolve(),
         // 関連モジュール側に関数が定義されている場合のみ、その同期・補助処理を呼び出します
-        (typeof syncStudioStateFromBackend === 'function') ? syncStudioStateFromBackend() : Promise.resolve()
+        (typeof syncStudioStateFromBackend === 'function') ? syncStudioStateFromBackend() : Promise.resolve(),
+        // ユーザーが所持するクーポン一覧を取得して画面に反映します
+        fetchUserCoupons()
     ]);
 }
 
@@ -340,23 +346,23 @@ function renderCatalogProducts() {
     // HTML 要素 #catalog-page-subtitle を取得して変数 pageSubtitle に格納します
     const pageSubtitle = document.getElementById('catalog-page-subtitle');
 
-    // 条件（AppState.selectedGender === 'MAN'）が成り立つか判定し、該当する場合の処理を実行します
-    if (AppState.selectedGender === 'MAN') {
+    // 条件（AppState.selectedGender === 'MEN' || AppState.selectedGender === 'MAN'）が成り立つか判定し、該当する場合の処理を実行します
+    if (AppState.selectedGender === 'MEN' || AppState.selectedGender === 'MAN') {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
-        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'MAN';
+        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'MEN COLLECTION';
         // 条件（pageTitle）が成り立つか判定し、該当する場合の処理を実行します
-        if (pageTitle) pageTitle.textContent = "MEN'S COLLECTION";
+        if (pageTitle) pageTitle.textContent = "MEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "現代の男性に向けた、洗練されたモダンウェア（全12アイテム）";
-    // 前の if が偽で、かつ（AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
-    } else if (AppState.selectedGender === 'WOMAN') {
+    // 前の if が偽で、かつ（AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
+    } else if (AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN') {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
-        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'WOMAN';
+        if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'WOMEN COLLECTION';
         // 条件（pageTitle）が成り立つか判定し、該当する場合の処理を実行します
-        if (pageTitle) pageTitle.textContent = "WOMEN'S COLLECTION";
+        if (pageTitle) pageTitle.textContent = "WOMEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "凛とした美しさと現代的なリラックス感を纏うウィメンズウェア（全12アイテム）";
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+    // 上記の if 条件に当てはまらなかった場合の分岐処理です（デフォルト: HOMEからすべて見るを押した時など）
     } else {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'ALL COLLECTION';
@@ -1112,6 +1118,10 @@ function renderCheckoutPage() {
             orderEmail.value = AppState.currentUser.email;
         }
     }
+    // ユーザー所持クーポン一覧の取得と再描画（初期配布クーポンなど）
+    if (typeof fetchUserCoupons === 'function') {
+        fetchUserCoupons();
+    }
     // 関連処理 updateCheckoutCalculations() を呼び出して処理・画面を更新します
     updateCheckoutCalculations();
 }
@@ -1120,14 +1130,14 @@ function renderCheckoutPage() {
 // ==========================================================================
 //  4. チェックアウト（購入手続き）・ポイント割引計算・注文確定トランザクション
 // ==========================================================================
-// 現在ログイン中の会員が持つ利用可能ポイント残高（数値）を返します
+// 現在ログイン中の会員が持つ利用可能ポイント残高（数値）を返します（初期ポイントは0から）
 function getUserPoints() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return 0;
-    // 条件（AppState.currentUser.points === undefined || AppStat…）が成り立つか判定し、該当する場合の処理を実行します
+    // 条件（AppState.currentUser.points === undefined || AppState.currentUser.points === null）
     if (AppState.currentUser.points === undefined || AppState.currentUser.points === null) {
-        // アプリ全体状態 AppState.currentUser.points を最新値（1000）に更新します
-        AppState.currentUser.points = 1000;
+        // 初期配布はクーポンに変更されたため、ポイントは 0 からスタートします
+        AppState.currentUser.points = 0;
     }
     // 結果（AppState.currentUser.points）を呼び出し元へ返却します
     return AppState.currentUser.points;
@@ -1153,116 +1163,235 @@ function setUserPoints(points) {
 
 // 再代入可能な変数 checkoutUsedPoints を宣言し、値（0）をセットします
 let checkoutUsedPoints = 0;
+// 現在チェックアウトで適用されているクーポンオブジェクト（未適用時は null）
+let currentAppliedCoupon = null;
+
+// ユーザーの保有クーポン一覧を API から取得して同期します
+async function fetchUserCoupons() {
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        AppState.userCoupons = [];
+        renderCheckoutCoupons();
+        return [];
+    }
+    const apiBase = getApiBaseUrl();
+    try {
+        const resp = await fetch(`${apiBase}/api/coupons?user_id=${AppState.currentUser.id}`, {
+            credentials: 'include'
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (resp.ok && Array.isArray(data.coupons)) {
+            AppState.userCoupons = data.coupons;
+        } else {
+            AppState.userCoupons = [];
+        }
+    } catch (e) {
+        console.warn('クーポン取得エラー:', e);
+        AppState.userCoupons = [];
+    }
+    renderCheckoutCoupons();
+    // マイページのクーポン枚数バッジも更新
+    const mypageCouponCount = document.getElementById('mypage-coupon-count');
+    if (mypageCouponCount) {
+        const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
+        mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
+    }
+    return AppState.userCoupons;
+}
+
+// チェックアウト画面の所持クーポン一覧を描画します
+function renderCheckoutCoupons() {
+    const listEl = document.getElementById('checkout-coupons-list');
+    const badgeEl = document.getElementById('checkout-coupon-status-badge');
+    const cancelBtn = document.getElementById('btn-cancel-coupon');
+    const codeInput = document.getElementById('checkout-coupon-code-input');
+    if (!listEl) return;
+
+    const coupons = AppState.userCoupons || [];
+    const availableCoupons = coupons.filter(c => !c.is_used);
+
+    if (currentAppliedCoupon) {
+        if (badgeEl) badgeEl.textContent = `✓ ${currentAppliedCoupon.name} 適用中`;
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        if (codeInput) codeInput.value = currentAppliedCoupon.code;
+    } else {
+        if (badgeEl) badgeEl.textContent = availableCoupons.length > 0 ? `${availableCoupons.length}枚のクーポン利用可能` : '利用可能なクーポンはありません';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+    }
+
+    if (availableCoupons.length === 0) {
+        listEl.innerHTML = `<p style="font-size: 0.78rem; color: #888; margin: 0;">所持している未使用クーポンはありません（コード直接入力も可能です）</p>`;
+        return;
+    }
+
+    listEl.innerHTML = availableCoupons.map(c => {
+        const isApplied = currentAppliedCoupon && currentAppliedCoupon.code === c.code;
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${isApplied ? '#ffedd5' : '#ffffff'}; border: 1px solid ${isApplied ? '#ea580c' : '#fed7aa'}; border-radius: 6px;">
+                <div>
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #111;">${c.name}</div>
+                    <div style="font-size: 0.72rem; color: #666;">コード: <strong style="color: #c2410c;">${c.code}</strong> | ${c.discount_label}</div>
+                </div>
+                <div>
+                    ${isApplied
+                        ? `<button type="button" class="btn btn-outline-xs" onclick="handleCancelCoupon()" style="padding: 4px 10px; font-size: 0.75rem; color: #888; border-color: #ccc;">適用解除</button>`
+                        : `<button type="button" class="btn btn-outline-xs" onclick="handleApplyCouponCode('${c.code}')" style="padding: 4px 12px; font-size: 0.75rem; font-weight: 700; color: #ea580c; border-color: #ea580c;">適用する</button>`
+                    }
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// クーポンコードの適用処理（何割引きクーポン）
+function handleApplyCouponCode(code) {
+    const input = document.getElementById('checkout-coupon-code-input');
+    const targetCode = (code || (input ? input.value : '')).trim().toUpperCase();
+
+    if (!targetCode) {
+        showToast('クーポンコードを入力してください');
+        return;
+    }
+
+    // ユーザー所持クーポンまたはビルトイン（WELCOME10 等）を検索
+    let coupon = (AppState.userCoupons || []).find(c => c.code === targetCode && !c.is_used);
+
+    // 未所持でも WELCOME10（初回限定1割引クーポン）なら即時適用可能
+    if (!coupon && targetCode === 'WELCOME10') {
+        coupon = {
+            code: 'WELCOME10',
+            name: '【初回限定】1割引クーポン (10% OFF)',
+            discount_rate: 0.10,
+            discount_label: '1割引 (10% OFF)',
+            is_used: 0
+        };
+    }
+
+    if (!coupon) {
+        showToast(`⚠️ クーポン「${targetCode}」は見つからないか、既に使用済みです`);
+        return;
+    }
+
+    currentAppliedCoupon = coupon;
+    renderCheckoutCoupons();
+    updateCheckoutCalculations();
+    showToast(`🎉 クーポン「${coupon.name}」を適用しました！（商品代金から ${coupon.discount_label} 引き）`);
+}
+
+// クーポンの適用解除
+function handleCancelCoupon() {
+    currentAppliedCoupon = null;
+    const input = document.getElementById('checkout-coupon-code-input');
+    if (input) input.value = '';
+    renderCheckoutCoupons();
+    updateCheckoutCalculations();
+    showToast('クーポンの適用を解除しました');
+}
 
 
-// カート小計・送料(5,000円以上無料 / 未満550円)・利用ポイント割引・最終支払額・獲得予定ポイントをリアルタイム計算します
+// カート小計・送料(5,000円以上無料 / 未満550円)・クーポン割引・利用ポイント割引・最終支払額をリアルタイム計算します
+// ※重要: ポイントは配送料には影響せず、確実に配送料は払う必要があります（ポイント上限は割引後小計まで）
 function updateCheckoutCalculations() {
-    // HTML 要素 #checkout-subtotal を取得して変数 subtotalEl に格納します
+    // HTML 要素の取得
     const subtotalEl = document.getElementById('checkout-subtotal');
-    // HTML 要素 #checkout-shipping を取得して変数 shippingEl に格納します
     const shippingEl = document.getElementById('checkout-shipping');
-    // HTML 要素 #checkout-tax を取得して変数 taxEl に格納します
     const taxEl = document.getElementById('checkout-tax');
-    // HTML 要素 #checkout-total を取得して変数 totalEl に格納します
     const totalEl = document.getElementById('checkout-total');
-    // HTML 要素 #checkout-point-discount-row を取得して変数 pointDiscountRow に格納します
     const pointDiscountRow = document.getElementById('checkout-point-discount-row');
-    // HTML 要素 #checkout-point-discount を取得して変数 pointDiscountEl に格納します
     const pointDiscountEl = document.getElementById('checkout-point-discount');
-    // HTML 要素 #checkout-earned-points を取得して変数 earnedPointsEl に格納します
+    const couponDiscountRow = document.getElementById('checkout-coupon-discount-row');
+    const couponDiscountLabel = document.getElementById('checkout-coupon-discount-label');
+    const couponDiscountEl = document.getElementById('checkout-coupon-discount');
     const earnedPointsEl = document.getElementById('checkout-earned-points');
-    // HTML 要素 #checkout-user-points を取得して変数 userPointsEl に格納します
     const userPointsEl = document.getElementById('checkout-user-points');
-    // HTML 要素 #checkout-use-points を取得して変数 pointInput に格納します
     const pointInput = document.getElementById('checkout-use-points');
-    // HTML 要素 #checkout-point-message を取得して変数 pointMessage に格納します
     const pointMessage = document.getElementById('checkout-point-message');
 
-    // 定数 subtotal を宣言し、値（AppState.cart.reduce((sum, item) => su…）をセットします
+    // 商品小計
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // 定数 shipping を宣言し、値（subtotal >= 5000 ? 0 : 550）をセットします
+    // 配送料（5,000円以上無料 / 未満550円）
     const shipping = subtotal >= 5000 ? 0 : 550;
-    // 定数 grossTotal を宣言し、値（subtotal + shipping）をセットします
-    const grossTotal = subtotal + shipping;
 
-    // 定数 availablePoints を宣言し、値（getUserPoints()）をセットします
+    // クーポン割引（商品小計に対して何割引きかを適用）
+    let couponDiscount = 0;
+    if (currentAppliedCoupon && subtotal > 0) {
+        const rate = currentAppliedCoupon.discount_rate || 0.10;
+        couponDiscount = Math.round(subtotal * rate);
+    }
+    // クーポン適用後の商品小計
+    const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
+
+    // ポイント利用計算:
+    // 【仕様】ポイントは配送料には影響せず、確実に配送料は払う必要がある。
+    // そのため、ポイントが充当できる上限は「割引後商品小計（discountedSubtotal）」まで！配送料には一切使えません。
     const availablePoints = getUserPoints();
-    // 条件（userPointsEl）が成り立つか判定し、該当する場合の処理を実行します
     if (userPointsEl) userPointsEl.textContent = availablePoints.toLocaleString();
 
-    // 定数 maxUsable を宣言し、値（Math.min(availablePoints, grossTotal)）をセットします
-    const maxUsable = Math.min(availablePoints, grossTotal);
+    const maxUsablePoints = Math.min(availablePoints, discountedSubtotal);
 
-    // 条件（checkoutUsedPoints > maxUsable）が成り立つか判定し、該当する場合の処理を実行します
-    if (checkoutUsedPoints > maxUsable) {
-        // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
-        checkoutUsedPoints = maxUsable;
+    if (checkoutUsedPoints > maxUsablePoints) {
+        checkoutUsedPoints = maxUsablePoints;
     }
-    // 条件（checkoutUsedPoints < 0）が成り立つか判定し、該当する場合の処理を実行します
     if (checkoutUsedPoints < 0) {
-        // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
         checkoutUsedPoints = 0;
     }
 
-    // 条件（pointInput && document.activeElement !== pointInput）が成り立つか判定し、該当する場合の処理を実行します
     if (pointInput && document.activeElement !== pointInput) {
-        // 入力フォーム部品 pointInput の現在の入力値を更新・リセットします
         pointInput.value = checkoutUsedPoints > 0 ? checkoutUsedPoints : '';
     }
 
-    // 定数 netTotal を宣言し、値（Math.max(0, grossTotal - checkoutUsedP…）をセットします
-    const netTotal = Math.max(0, grossTotal - checkoutUsedPoints);
-    // 定数 tax を宣言し、値（Math.round(netTotal * 10 / 110)）をセットします
+    // 最終お支払い金額: (割引後小計 - ポイント) + 配送料（※確実に配送料は加算されます）
+    const netTotal = (discountedSubtotal - checkoutUsedPoints) + shipping;
     const tax = Math.round(netTotal * 10 / 110);
-
-    // 定数 earnedPoints を宣言し、値（netTotal > 0 ? Math.max(1, Math.floor(…）をセットします
     const earnedPoints = netTotal > 0 ? Math.max(1, Math.floor(netTotal * 0.01)) : 0;
 
-    // 条件（subtotalEl）が成り立つか判定し、該当する場合の処理を実行します
     if (subtotalEl) subtotalEl.textContent = `¥${subtotal.toLocaleString()}`;
-    // 条件（shippingEl）が成り立つか判定し、該当する場合の処理を実行します
     if (shippingEl) shippingEl.textContent = shipping === 0 ? "無料 (5,000円以上)" : `¥${shipping.toLocaleString()}`;
-    // 条件（taxEl）が成り立つか判定し、該当する場合の処理を実行します
     if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
-    // 条件（totalEl）が成り立つか判定し、該当する場合の処理を実行します
     if (totalEl) totalEl.textContent = `¥${netTotal.toLocaleString()}`;
 
-    // 条件（pointDiscountRow && pointDiscountEl）が成り立つか判定し、該当する場合の処理を実行します
-    if (pointDiscountRow && pointDiscountEl) {
-        // 条件（checkoutUsedPoints > 0）が成り立つか判定し、該当する場合の処理を実行します
-        if (checkoutUsedPoints > 0) {
-            // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（pointDiscountRow.style.display = 'flex';）
-            pointDiscountRow.style.display = 'flex';
-            // 文字要素 pointDiscountEl の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-            pointDiscountEl.textContent = `-¥${checkoutUsedPoints.toLocaleString()}`;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+    // クーポン割引行の更新
+    if (couponDiscountRow && couponDiscountEl) {
+        if (couponDiscount > 0 && currentAppliedCoupon) {
+            couponDiscountRow.style.display = 'flex';
+            if (couponDiscountLabel) couponDiscountLabel.textContent = `クーポン割引 (${currentAppliedCoupon.discount_label || '10% OFF'})`;
+            couponDiscountEl.textContent = `-¥${couponDiscount.toLocaleString()}`;
         } else {
-            // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（pointDiscountRow.style.display = 'none';）
+            couponDiscountRow.style.display = 'none';
+        }
+    }
+
+    // ポイント割引行の更新
+    if (pointDiscountRow && pointDiscountEl) {
+        if (checkoutUsedPoints > 0) {
+            pointDiscountRow.style.display = 'flex';
+            pointDiscountEl.textContent = `-¥${checkoutUsedPoints.toLocaleString()}`;
+        } else {
             pointDiscountRow.style.display = 'none';
         }
     }
 
-    // 条件（earnedPointsEl）が成り立つか判定し、該当する場合の処理を実行します
     if (earnedPointsEl) {
-        // 文字要素 earnedPointsEl の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
         earnedPointsEl.textContent = `+${earnedPoints.toLocaleString()} pt`;
     }
 
-    // 条件（pointMessage）が成り立つか判定し、該当する場合の処理を実行します
     if (pointMessage) {
-        // 条件（checkoutUsedPoints > 0）が成り立つか判定し、該当する場合の処理を実行します
         if (checkoutUsedPoints > 0) {
-            // テンプレートリテラルで組み立てた HTML を要素 pointMessage 内に書き込んで画面を更新します
-            pointMessage.innerHTML = `<span style="color: #059669; font-weight: 700;">✓ ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円引き）を適用中</span>（残り: ${(availablePoints - checkoutUsedPoints).toLocaleString()} pt）`;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            pointMessage.innerHTML = `<span style="color: #059669; font-weight: 700;">✓ ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円引き）を商品代金に適用中</span>（残り: ${(availablePoints - checkoutUsedPoints).toLocaleString()} pt）<br><small style="color: #666;">※配送料（${shipping === 0 ? '無料' : `¥${shipping.toLocaleString()}`}）はポイント適用外のため確実に発生します</small>`;
         } else {
-            // 文字要素 pointMessage の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-            pointMessage.textContent = '1ポイント＝1円として、今回のお買い物代金にそのままご利用いただけます。';
+            pointMessage.innerHTML = '1ポイント＝1円として、商品代金（割引後小計）にのみご利用いただけます。<strong>※配送料には影響せず、確実に配送料は別途発生します。</strong>';
         }
     }
 
-    // 結果（{ subtotal, shipping, grossTotal, usedPoints: ch…）を呼び出し元へ返却します
-    return { subtotal, shipping, grossTotal, usedPoints: checkoutUsedPoints, netTotal, earnedPoints };
+    return {
+        subtotal,
+        shipping,
+        grossTotal: subtotal + shipping,
+        couponDiscount,
+        discountedSubtotal,
+        usedPoints: checkoutUsedPoints,
+        netTotal,
+        earnedPoints
+    };
 }
 
 
@@ -1279,35 +1408,28 @@ function handlePointsInputChange() {
 }
 
 
-// 「すべて使う」ボタン押下時に保有ポイントとお支払い金額の小さい方（使える最大値）を自動入力します
+// 「すべて使う」ボタン押下時に保有ポイントとお支払い金額（商品代金上限）の小さい方を自動入力します
+// ※配送料にはポイントを使えないため、商品代金が上限となります
 function handleUseAllPoints() {
-    // 定数 subtotal を宣言し、値（AppState.cart.reduce((sum, item) => su…）をセットします
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // 定数 shipping を宣言し、値（subtotal >= 5000 ? 0 : 550）をセットします
-    const shipping = subtotal >= 5000 ? 0 : 550;
-    // 定数 grossTotal を宣言し、値（subtotal + shipping）をセットします
-    const grossTotal = subtotal + shipping;
-    // 定数 available を宣言し、値（getUserPoints()）をセットします
+    let couponDiscount = 0;
+    if (currentAppliedCoupon && subtotal > 0) {
+        couponDiscount = Math.round(subtotal * (currentAppliedCoupon.discount_rate || 0.10));
+    }
+    const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
     const available = getUserPoints();
 
-    // 条件（available <= 0）が成り立つか判定し、該当する場合の処理を実行します
     if (available <= 0) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('現在ご利用可能な保有ポイントはありません');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
+        showToast('現在ご利用可能な保有ポイントはありません（保有ポイント: 0 pt）');
         return;
     }
 
-    // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
-    checkoutUsedPoints = Math.min(available, grossTotal);
-    // HTML 要素 #checkout-use-points を取得して変数 pointInput に格納します
+    // 配送料にはポイントを使えないため、割引後小計を上限とする
+    checkoutUsedPoints = Math.min(available, discountedSubtotal);
     const pointInput = document.getElementById('checkout-use-points');
-    // 条件（pointInput）が成り立つか判定し、該当する場合の処理を実行します
     if (pointInput) pointInput.value = checkoutUsedPoints;
-    // 関連処理 updateCheckoutCalculations() を呼び出して処理・画面を更新します
     updateCheckoutCalculations();
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`✨ 保有ポイントから ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円分）を適用しました`);
+    showToast(`✨ 保有ポイントから ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円分）を商品代金に適用しました（※配送料はポイント対象外です）`);
 }
 
 
@@ -1573,8 +1695,8 @@ async function handlePlaceOrder() {
     const targetUserId = AppState.currentUser.id;
     // 定数 orderPayload を宣言し、値（{）をセットします
     const orderPayload = {
-        // 注文者氏名データをセットします
-        customer_name: customerName,
+        // 注文者氏名データをセットします（誰が購入したか保存）
+        customer_name: customerName || AppState.currentUser.name || '会員様',
         // 注文確認メールアドレスをセットします
         customer_email: email,
         // 連絡先電話番号をセットします
@@ -1589,11 +1711,14 @@ async function handlePlaceOrder() {
         delivery_time: deliveryTime,
         // 税込み商品小計金額をセットします
         subtotal: calc.subtotal,
-        // 送料金額をセットします
+        // 送料金額をセットします（ポイントでは引かれません）
         shipping_fee: calc.shipping,
-        // 今回支払いに使うポイント数をセットします
+        // クーポンコードおよびクーポン割引額
+        coupon_code: currentAppliedCoupon ? currentAppliedCoupon.code : null,
+        coupon_discount: calc.couponDiscount || 0,
+        // 今回支払いに使うポイント数をセットします（商品小計のみ対象）
         used_points: calc.usedPoints,
-        // 最終お支払い合計金額をセットします
+        // 最終お支払い合計金額をセットします（確実に送料を含みます）
         total_amount: calc.netTotal,
         // 今回獲得するポイント数をセットします
         earned_points: calc.earnedPoints,
@@ -1721,6 +1846,22 @@ async function handlePlaceOrder() {
         }
     });
 
+    // 購入者のお名前を注文データに確実に紐付けます（誰が購入したか保存）
+    if (!confirmedOrder.customer_name && AppState.currentUser) {
+        confirmedOrder.customer_name = AppState.currentUser.name;
+    }
+    // 使用したクーポンを消滅（1回限り有効）させます
+    if (currentAppliedCoupon) {
+        if (Array.isArray(AppState.userCoupons)) {
+            const usedC = AppState.userCoupons.find(c => c.code === currentAppliedCoupon.code);
+            if (usedC) {
+                usedC.is_used = 1;
+            }
+        }
+        currentAppliedCoupon = null;
+        renderCheckoutCoupons();
+    }
+
     // 新規追加された最新データを配列 AppState.orderHistory の先頭へ挿入して即画面反映します
     AppState.orderHistory.unshift(confirmedOrder);
 
@@ -1790,7 +1931,8 @@ async function handlePlaceOrder() {
     }
 
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`🎉 ご注文確定！${calc.earnedPoints}ポイントを獲得し、MySQLとマイクローゼットに保存しました`);
+    const buyerName = confirmedOrder.customer_name || AppState.currentUser?.name || 'お客様';
+    showToast(`🎉【${buyerName} 様】ご注文完了！注文番号「${confirmedOrder.order_no}」をご注文履歴に保存しました`);
 }
 
 
@@ -2126,6 +2268,24 @@ function renderMyPage() {
         orderCountEl.innerHTML = `${orderCount} <span class="stat-unit">回</span>`;
     }
 
+    // 保有クーポン枚数の更新（初期配布クーポンなど）
+    const mypageCouponCount = document.getElementById('mypage-coupon-count');
+    if (mypageCouponCount) {
+        const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
+        mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
+    }
+
+    // 注文履歴見出し横のアカウント表示バッジ（誰の注文履歴か明示）
+    const ordersAccountBadge = document.getElementById('orders-account-badge');
+    if (ordersAccountBadge) {
+        if (AppState.currentUser) {
+            ordersAccountBadge.textContent = `${AppState.currentUser.name} 様 (${orderCount}件)`;
+            ordersAccountBadge.style.display = 'inline-block';
+        } else {
+            ordersAccountBadge.style.display = 'none';
+        }
+    }
+
     // 条件（mypageFavCount）が成り立つか判定し、該当する場合の処理を実行します
     if (mypageFavCount) {
         // 定数 favCount を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
@@ -2141,25 +2301,33 @@ function renderMyPage() {
             // テンプレートリテラルで組み立てた HTML を要素 ordersTbody 内に書き込んで画面を更新します
             ordersTbody.innerHTML = `
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 32px; color: #777;">
+                    <td colspan="6" style="text-align: center; padding: 32px; color: #777;">
                         購入履歴はまだありません。商品をお選びいただき購入手続きをお試しください。
                     </td>
                 </tr>
             `;
         // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 生成・変換した HTML 文字列を要素 ordersTbody の中身として描画します
+            // 生成・変換した HTML 文字列を要素 ordersTbody の中身として描画します（購入者列・クーポン割引を追加）
             ordersTbody.innerHTML = AppState.orderHistory.map((order, idx) => `
                 <tr>
                     <td><strong>${order.order_no}</strong></td>
+                    <td>
+                        <div style="font-weight: 700; color: #111;">${order.customer_name || AppState.currentUser?.name || "会員様"}</div>
+                        <div style="font-size: 0.72rem; color: #888;">${order.customer_email || ""}</div>
+                    </td>
                     <td>${order.date}</td>
                     <td>
                         <div>${order.items_summary || "ご注文商品"}</div>
+                        ${order.coupon_discount ? `<div style="font-size: 0.72rem; color: #ea580c; font-weight: 600; margin-top: 2px;">🎫 クーポン割引: -¥${Number(order.coupon_discount).toLocaleString()}</div>` : ''}
                         <button class="btn btn-outline-xs mt-1" onclick="importOrderToCloset(${idx})" style="font-size: 0.72rem; padding: 2px 8px; margin-top: 4px;" title="購入した服をマイクローゼットへ登録">
                             + クローゼットへ登録
                         </button>
                     </td>
-                    <td><strong>¥${(order.total_amount || 0).toLocaleString()}</strong></td>
+                    <td>
+                        <strong>¥${(order.total_amount || 0).toLocaleString()}</strong>
+                        <div style="font-size: 0.7rem; color: #888;">(うち送料 ¥${(order.shipping_fee !== undefined ? order.shipping_fee : (order.subtotal >= 5000 ? 0 : 550)).toLocaleString()})</div>
+                    </td>
                     <td><span class="status-badge">${order.status || "発送準備中"}</span></td>
                 </tr>
             `).join('');
@@ -2673,8 +2841,8 @@ async function handleLogin(e) {
 
     // 条件（loggedInUser）が成り立つか判定し、該当する場合の処理を実行します
     if (loggedInUser) {
-        // 変数・配列項目 loggedInUser.points の値を更新・計算します
-        loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 1000;
+        // 変数・配列項目 loggedInUser.points の値を更新・計算します（初期値は0ポイント）
+        loggedInUser.points = (loggedInUser.points !== undefined && loggedInUser.points !== null) ? loggedInUser.points : 0;
         // 定数 preserveGuestCart を宣言し、値（(AppState.pendingAuthTarget === 'check…）をセットします
         const preserveGuestCart = (AppState.pendingAuthTarget === 'checkout');
         // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
@@ -2812,8 +2980,8 @@ async function handleRegister(e) {
 
     // 条件（newUser）が成り立つか判定し、該当する場合の処理を実行します
     if (newUser) {
-        // 変数・配列項目 newUser.points の値を更新・計算します
-        newUser.points = (newUser.points !== undefined && newUser.points !== null) ? newUser.points : 1000;
+        // 変数・配列項目 newUser.points の値を更新・計算します（初期値は0ポイント）
+        newUser.points = (newUser.points !== undefined && newUser.points !== null) ? newUser.points : 0;
         // 定数 preserveGuestCart を宣言し、値（(AppState.pendingAuthTarget === 'check…）をセットします
         const preserveGuestCart = (AppState.pendingAuthTarget === 'checkout');
         // 関連処理 applyAccountSession() を呼び出して処理・画面を更新します
@@ -2830,7 +2998,7 @@ async function handleRegister(e) {
             // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
             AppState.pendingAuthTarget = null;
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 会員登録完了！1,000ポイント（1,000円分）を進呈しました！ようこそ、${newUser.name}`);
+            showToast(`🎉 会員登録完了！初回限定1割引（10% OFF）クーポンを進呈しました！ようこそ、${newUser.name}`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#manekin-studio';
         // 前の if が偽で、かつ（AppState.pendingAuthTarget === 'checkout' && AppStat…）を満たす場合の別条件分岐です
@@ -2838,7 +3006,7 @@ async function handleRegister(e) {
             // アプリ全体状態 AppState.pendingAuthTarget を最新値（null）に更新します
             AppState.pendingAuthTarget = null;
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast(`🎉 会員登録完了！1,000ポイント（1,000円分）を進呈しました！ご注文手続きへ戻ります`);
+            showToast(`🎉 会員登録完了！初回限定1割引（10% OFF）クーポンを進呈しました！ご注文手続きへ戻ります`);
             // 変数・配列項目 window.location.hash の値を更新・計算します
             window.location.hash = '#checkout';
         // 上記の if 条件に当てはまらなかった場合の分岐処理です
@@ -3003,3 +3171,7 @@ window.updateCartItemQty = updateCartItemQty;
 window.removeCartItem = removeCartItem;
 // 変数・配列項目 window.handlePlaceOrder の値を更新・計算します
 window.handlePlaceOrder = handlePlaceOrder;
+// クーポン関連の関数をグローバルに公開します
+window.handleApplyCouponCode = handleApplyCouponCode;
+window.handleCancelCoupon = handleCancelCoupon;
+window.fetchUserCoupons = fetchUserCoupons;

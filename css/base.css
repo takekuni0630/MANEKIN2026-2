@@ -695,6 +695,12 @@ button {
     color: var(--color-black);
 }
 
+/* ハンバーガーメニュー内の MANEKIN AI リンクの表示位置調整（MANEKINとAIタグを隣同士にする） */
+.mobile-manekin-btn {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
 /* セレクタ「.mobile-divider」に対するスタイル定義を開始します（対象: .mobile-divider） */
 .mobile-divider {
     /* 要素の外側余白（margin）を「上下 8px・左右 0（余白なし）」に設定します */

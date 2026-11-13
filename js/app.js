@@ -21,6 +21,10 @@ const AppState = {
     selectedSize: "M",
     // ログインユーザーの注文履歴配列（MySQL orders テーブルから取得します）
     orderHistory: [],
+    // ログインユーザーの所持クーポン一覧配列（MySQL user_coupons テーブルから取得）
+    userCoupons: [],
+    // 商品一覧ページの対象性別（'ALL' / 'MEN' / 'WOMEN'）
+    selectedGender: "ALL",
     // 商品一覧ページのカテゴリ絞り込み状態（'ALL' は全カテゴリ表示）
     selectedCategory: "ALL",
     // 商品一覧ページの並び順（'default' はおすすめ順）
