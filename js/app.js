@@ -133,14 +133,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 3. SPAルーティング（URL末尾の #〇〇 を読み取り、リロードなしで画面を表示切替）
 // URL末尾の #〇〇 に合わせて画面セクションを切り替えるメインルーター関数です
-async function handleRouting() {
+async function handleRouting(forcedRoute) {
     // まだ起動時のセッション復元が終わっていなければ、未ログイン誤判定を防ぐため完了を待ちます
     if (!_authBootstrapDone && _authBootstrapPromise) {
         // 復元処理の Promise が完了するまで await で待機します
         await _authBootstrapPromise;
     }
-    // 現在のURLハッシュを取得します（空の場合はトップ画面 '#home' を既定値にします）
-    const hash = window.location.hash || '#home';
+    // 現在のURLハッシュを取得します（引数指定があればそれを最優先、空の場合はトップ画面 '#home' を既定値にします）
+    const hash = (typeof forcedRoute === 'string' && forcedRoute) ? forcedRoute : (window.location.hash || '#home');
     // パラメータ分離前の純粋な画面名を入れる変数 routeName を用意します
     let routeName = hash;
     // 商品詳細ページの '?id=3' 等から取り出す数値ID用変数を null で初期化します
@@ -313,9 +313,6 @@ async function handleRouting() {
         case '#manekin-studio':
             // まだログインしていない（AppState.currentUser が null）かチェックするアクセス制御です
             if (!AppState.currentUser) {
-                // ログイン完了後に自動でスタジオへ戻すための目的地 'manekin' を記憶します
-                AppState.pendingAuthTarget = 'manekin';
-                sessionStorage.setItem('manekin_pending_auth_target', 'manekin');
                 // ログインが必要なことを右下のトースト通知で案内します
                 showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
                 // 強制的にログイン画面（#login）へ誘導します
@@ -386,7 +383,7 @@ function updateAuthNoticeBanner() {
         if (loginAlert) loginAlert.style.display = 'block';
         if (regAlert) regAlert.style.display = 'block';
         const titleText = '⚠️ マイページのご利用には会員登録またはログインが必要です';
-        const descText = 'ご購入履歴の確認やクーポン利用、マイクローゼットの管理にはアカウントが必要です。<br>ログインまたは新規会員登録が完了すると、自動的にマイページへ移動します。';
+        const descText = 'ご購入履歴の確認やクーポン利用、マイクローゼットの管理にはアカウントが必要です。<br>ログインまたは新規会員登録が完了すると、ホーム画面へ戻ります。';
         if (loginTitle) loginTitle.textContent = titleText;
         if (loginDesc) loginDesc.innerHTML = descText;
         if (regTitle) regTitle.textContent = titleText;
@@ -399,8 +396,8 @@ function updateAuthNoticeBanner() {
         if (regAlert) regAlert.style.display = 'block';
         // AI試着スタジオ利用にはアカウントが必要である見出し文言を用意します
         const titleText = '⚠️ MANEKIN AIスタジオのご利用には会員登録またはログインが必要です';
-        // ログイン後に自動でAIスタジオへ戻る旨の案内HTML文言を用意します
-        const descText = 'バーチャル試着やAIコーデ診断機能をご利用いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にMANEKINスタジオへ移動します。';
+        // ログイン後にホームへ戻る旨の案内HTML文言を用意します
+        const descText = 'バーチャル試着やAIコーデ診断機能をご利用いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、ホーム画面へ戻ります。';
         // ログイン画面側アラートの見出しを書き換えます
         if (loginTitle) loginTitle.textContent = titleText;
         // ログイン画面側アラートの本文をHTMLとして反映します
@@ -417,8 +414,8 @@ function updateAuthNoticeBanner() {
         if (regAlert) regAlert.style.display = 'block';
         // 購入手続きにはログインが必要である見出し文言を用意します
         const titleText = '⚠️ ご購入手続きには会員登録またはログインが必要です';
-        // ログイン後に自動で注文画面へ戻る旨の案内HTML文言を用意します
-        const descText = '商品をご購入いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、自動的にご注文手続き画面へ戻ります。';
+        // ログイン後にホームへ戻る旨の案内HTML文言を用意します
+        const descText = '商品をご購入いただくにはアカウントが必要となります。<br>ログインまたは新規会員登録が完了すると、ホーム画面へ戻ります。';
         // ログイン画面側アラートの見出しを書き換えます
         if (loginTitle) loginTitle.textContent = titleText;
         // ログイン画面側アラートの本文を反映します
@@ -463,14 +460,22 @@ function setupEventListeners() {
     // URLの #〇〇（ハッシュ）が切り替わるたびに自動で handleRouting() を走らせます
     window.addEventListener('hashchange', handleRouting);
 
-    // ヘッダーやスマホメニュー内にあるすべての MANEKIN AI ボタンを取得して繰り返します
-    document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn').forEach(btn => {
+    // ヘッダーやスマホメニュー、トップバナー内にあるすべての MANEKIN AI ボタンを取得して繰り返します
+    document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn, #banner-manekin-btn').forEach(btn => {
         // ボタンクリック時にカスタムハンドラを実行します
         btn.addEventListener('click', (e) => {
             // リンクの通常ジャンプ前にイベント既定動作を明示的に制御します
             e.preventDefault();
-            // ハッシュを '#manekin-studio' に変更し、上記の hashchange で画面遷移を発火させます
+            // 未ログイン時はログイン画面へ誘導します
+            if (!AppState.currentUser) {
+                showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
+                window.location.hash = '#login';
+                handleRouting('#login');
+                return;
+            }
+            // ログイン済みの場合はAI試着スタジオへ移動します
             window.location.hash = '#manekin-studio';
+            handleRouting('#manekin-studio');
         });
     });
 

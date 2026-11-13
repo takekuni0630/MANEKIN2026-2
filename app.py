@@ -33,6 +33,8 @@ from pymysql.cursors import DictCursor
 
 # 現在のディレクトリ('.')を静的配信先に含めた Flask アプリケーション本体を作成します
 app = Flask(__name__, static_folder='.', static_url_path='')
+# 静的ファイル（HTML/JS/CSS）のブラウザキャッシュ有効期限を 0 秒に設定し、常に最新ファイルを配信します
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 # フロント側 fetch(..., credentials: 'include') での Cookie 送受信を許可する CORS 設定を有効化します
 CORS(app, supports_credentials=True)
 
@@ -43,14 +45,13 @@ SESSION_TTL_DAYS = 7
 
 # すべての Flask レスポンスがクライアントへ返却される直前に自動実行されるフックを登録します
 @app.after_request
-# すべての HTTP レスポンス返却直前に割り込み、/api/ 通信にキャッシュ禁止ヘッダを付ける関数です
+# すべての HTTP レスポンス返却直前に割り込み、キャッシュ禁止ヘッダを付ける関数です
 def disable_api_cache(response):
-    # リクエスト先が API エンドポイント('/api/...')の場合のみキャッシュ無効化処理を行います
-    if request.path.startswith('/api/'):
-        # ブラウザが /api/ 応答を古いキャッシュで返さないよう Cache-Control: no-store 等を指定します
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-        # 古い HTTP/1.0 互換キャッシュ機構にもキャッシュ禁止を伝える Pragma: no-cache を付与します
-        response.headers['Pragma'] = 'no-cache'
+    # ブラウザがHTML/JS/CSSや/api/応答を古いキャッシュで保持しないよう Cache-Control: no-store 等を指定します
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    # 古い HTTP/1.0 互換キャッシュ機構にもキャッシュ禁止を伝える Pragma: no-cache を付与します
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
     # 結果（response）を呼び出し元へ返却します
     return response
 
