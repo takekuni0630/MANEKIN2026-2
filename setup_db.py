@@ -1,6 +1,7 @@
 # ==============================================================================
 #  MySQL データベース初期化・初期商品画像マッピング更新スクリプト (setup_db.py)
-#  manekin_db の作成確認と、products / product_variants テーブルの商品画像パスを登録します
+#  manekin_db の作成確認と、products テーブルの商品画像パスを登録します
+#  ※商品ごとのカラーバリエーションは廃止されたため、PRODUCT_IMAGE_MAPPING は不要となりました
 # ==============================================================================
 
 # Python のシステム機能を提供する標準ライブラリ sys を読み込みます
@@ -29,61 +30,13 @@ DB_CONFIG = {
 # 作成および操作対象にするデータベース名 'manekin_db' を定数に入れます
 DB_NAME = 'manekin_db'
 
-# (商品ID, カラー名, 色見本コード, 画像パス) の組み合わせ一覧を配列で定義します
-PRODUCT_IMAGE_MAPPING = [
-    # 商品ID 1 の WHITE カラー用色コードと画像パスを定義します
-    (1, 'WHITE',        '#ffffff', 'assets/images/tshirt_white.jpg'),
-    # 商品ID 1 の BLACK カラー用色コードと画像パスを定義します
-    (1, 'BLACK',        '#111111', 'assets/images/tshirt_black.jpg'),
-    # 商品ID 1 の HEATHER GREY カラー用色コードと画像パスを定義します
-    (1, 'HEATHER GREY', '#999999', 'assets/images/tshirt_grey.jpg'),
 
-    # 商品ID 2 の BLACK カラー用色コードと画像パスを定義します
-    (2, 'BLACK',        '#111111', 'assets/images/jacket_black.jpg'),
-    # 商品ID 2 の CHARCOAL カラー用色コードと画像パスを定義します
-    (2, 'CHARCOAL',     '#333333', 'assets/images/jacket_charcoal.jpg'),
-    # 商品ID 2 の NAVY カラー用色コードと画像パスを定義します
-    (2, 'NAVY',         '#1a237e', 'assets/images/jacket_navy.jpg'),
-
-    # 商品ID 3 の CHARCOAL カラー用色コードと画像パスを定義します
-    (3, 'CHARCOAL',     '#444444', 'assets/images/pants_charcoal.jpg'),
-    # 商品ID 3 の BLACK カラー用色コードと画像パスを定義します
-    (3, 'BLACK',        '#111111', 'assets/images/pants_black.jpg'),
-    # 商品ID 3 の DARK BROWN カラー用色コードと画像パスを定義します
-    (3, 'DARK BROWN',   '#4e342e', 'assets/images/pants_brown.jpg'),
-
-    # 商品ID 4 の LIGHT GREY カラー用色コードと画像パスを定義します
-    (4, 'LIGHT GREY',   '#d6d6d6', 'assets/images/knit_grey.jpg'),
-    # 商品ID 4 の BLACK カラー用色コードと画像パスを定義します
-    (4, 'BLACK',        '#111111', 'assets/images/knit_black.jpg'),
-    # 商品ID 4 の OFF WHITE カラー用色コードと画像パスを定義します
-    (4, 'OFF WHITE',    '#fafafa', 'assets/images/knit_white.jpg'),
-
-    # 商品ID 5 の BLACK カラー用色コードと画像パスを定義します
-    (5, 'BLACK',        '#111111', 'assets/images/coat_black.jpg'),
-    # 商品ID 5 の CHARCOAL カラー用色コードと画像パスを定義します
-    (5, 'CHARCOAL',     '#333333', 'assets/images/coat_charcoal.jpg'),
-
-    # 商品ID 6 の OFF WHITE カラー用色コードと画像パスを定義します
-    (6, 'OFF WHITE',    '#fafafa', 'assets/images/sweat_white.jpg'),
-    # 商品ID 6 の BLACK カラー用色コードと画像パスを定義します
-    (6, 'BLACK',        '#111111', 'assets/images/sweat_black.jpg'),
-    # 商品ID 6 の ASH GREY カラー用色コードと画像パスを定義します
-    (6, 'ASH GREY',     '#9e9e9e', 'assets/images/sweat_grey.jpg'),
-
-    # 商品ID 7 の BLACK カラー用色コードと画像パスを定義します
-    (7, 'BLACK',        '#111111', 'assets/images/tapered_black.jpg'),
-    # 商品ID 7 の CHARCOAL カラー用色コードと画像パスを定義します
-    (7, 'CHARCOAL',     '#424242', 'assets/images/tapered_charcoal.jpg')
-]
-
-
-# データベース作成と商品画像マッピングの一括更新を実行する関数 setup_database() を定義します
+# データベース作成と商品代表画像の更新を実行する関数 setup_database() を定義します
 def setup_database():
     # 開始メッセージ上部の区切り線を表示します
     print("=" * 60)
     # データベース更新処理の開始メッセージを画面に表示します
-    print("MANEKIN FASHION - データベース画像マッピング更新を開始します...")
+    print("MANEKIN FASHION - データベース初期化・画像パス更新を開始します...")
     # 開始メッセージ下部の区切り線を表示します
     print("=" * 60)
 
@@ -101,20 +54,13 @@ def setup_database():
 
         # 各商品カードに最初に表示される代表画像パス (商品ID, 画像パス) の一覧を用意します
         main_images = [
-            # 商品ID 1 の代表画像パスをセットします
-            (1, 'assets/images/tshirt_white.jpg'),
-            # 商品ID 2 の代表画像パスをセットします
-            (2, 'assets/images/jacket_black.jpg'),
-            # 商品ID 3 の代表画像パスをセットします
-            (3, 'assets/images/pants_charcoal.jpg'),
-            # 商品ID 4 の代表画像パスをセットします
-            (4, 'assets/images/knit_grey.jpg'),
-            # 商品ID 5 の代表画像パスをセットします
-            (5, 'assets/images/coat_black.jpg'),
-            # 商品ID 6 の代表画像パスをセットします
-            (6, 'assets/images/sweat_white.jpg'),
-            # 商品ID 7 の代表画像パスをセットします
-            (7, 'assets/images/tapered_black.jpg'),
+            (1, 'assets/images/men/オーバードレープダブルトレンチコート.png'),
+            (2, 'assets/images/men/リラックスダブルブレストテーラードジャケット.png'),
+            (3, 'assets/images/men/シングルブレストフェイクレザージャケット.png'),
+            (4, 'assets/images/men/バッファローチェックボアジップジャケット.png'),
+            (5, 'assets/images/men/アーバングレイジップフーディ.png'),
+            (6, 'assets/images/men/チャコールブークニット.png'),
+            (7, 'assets/images/men/スカイオックスフォードシャツ.png'),
         ]
         # 代表画像リストを 1 件ずつ順番に取り出しながらループ処理します
         for pid, img in main_images:
@@ -124,17 +70,52 @@ def setup_database():
         # 旧データ仕様で残っていた不要な商品（ID=8）があれば削除します
         cursor.execute("DELETE FROM `products` WHERE `id` = 8;")
 
-        # 古い色バリエーション設定を一度リセットするため product_variants を全削除します
-        cursor.execute("DELETE FROM `product_variants`;")
-        # product_variants テーブルへ 4 列（商品ID・色名・色コード・画像URL）を挿入する複数行SQL文を定義します
-        insert_variant_sql = """
-        INSERT INTO `product_variants` (`product_id`, `color`, `color_code`, `image_url`)
-        VALUES (%s, %s, %s, %s);
-        """
-        # PRODUCT_IMAGE_MAPPING の全データを executemany() で一気に一括登録します
-        cursor.executemany(insert_variant_sql, PRODUCT_IMAGE_MAPPING)
+        # カラーバリエーションは廃止されたため、古い product_variants レコードをクリアします
+        cursor.execute("SHOW TABLES LIKE 'product_variants';")
+        if cursor.fetchone():
+            cursor.execute("DELETE FROM `product_variants`;")
 
-        # UPDATE / DELETE / INSERT の変更をすべてデータベースへ保存確定（commit）します
+        # 会員別所持クーポン管理テーブル `user_coupons` を作成します（使用したら消滅）
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `user_coupons` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `user_id` int(11) NOT NULL,
+              `code` varchar(50) NOT NULL,
+              `name` varchar(255) NOT NULL,
+              `discount_rate` decimal(4,2) NOT NULL DEFAULT 0.10,
+              `discount_label` varchar(50) NOT NULL DEFAULT '1割引 (10% OFF)',
+              `is_used` tinyint(1) NOT NULL DEFAULT 0,
+              `used_at` datetime DEFAULT NULL,
+              `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+              PRIMARY KEY (`id`),
+              KEY `idx_coupon_user` (`user_id`),
+              CONSTRAINT `fk_coupon_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        """)
+
+        # orders テーブルに customer_name / coupon_code / coupon_discount カラムを追加します
+        cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'customer_name';")
+        if not cursor.fetchone():
+            try:
+                cursor.execute("ALTER TABLE `orders` ADD COLUMN `customer_name` varchar(255) DEFAULT NULL AFTER `user_id`;")
+            except Exception:
+                pass
+
+        cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_code';")
+        if not cursor.fetchone():
+            try:
+                cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_code` varchar(50) DEFAULT NULL AFTER `earned_points`;")
+            except Exception:
+                pass
+
+        cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_discount';")
+        if not cursor.fetchone():
+            try:
+                cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_discount` int(11) NOT NULL DEFAULT 0 AFTER `coupon_code`;")
+            except Exception:
+                pass
+
+        # UPDATE / DELETE の変更をすべてデータベースへ保存確定（commit）します
         conn.commit()
         # 使い終わったカーソルを閉じます
         cursor.close()
@@ -142,7 +123,7 @@ def setup_database():
         conn.close()
 
         # 画像マッピングの更新が正常完了したことを画面に表示します
-        print("[+] MySQLの画像ファイルパスをわかりやすい名称に更新完了！")
+        print("[+] MySQLの代表画像ファイルパス更新完了！（カラーバリエーションは廃止・整理済）")
         # 処理成功を表す True を呼び出し元へ返します
         return True
 

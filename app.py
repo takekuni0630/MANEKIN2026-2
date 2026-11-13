@@ -107,8 +107,12 @@ def parse_user_id(raw_uid):
         # 有効な値が取得できなかった合図として None（空）を返します
         return None
 
-# 起動時にアカウント別保存に必要な3テーブル（cart_items / user_studio_states / user_sessions）を自動作成します
+# テーブル自動初期化が完了したかを記憶するキャッシュフラグ
+_tables_ensured = False
+
+# 起動時にアカウント別保存に必要なテーブル群を自動作成します
 def ensure_account_tables():
+    global _tables_ensured
     # get_db_connection() を呼んで MySQL データベースへの新しい接続を開きます
     conn = get_db_connection()
     # MySQL へ接続できなかった（conn が None）場合に 500 エラーを返すためのチェックです
@@ -153,6 +157,44 @@ def ensure_account_tables():
                   CONSTRAINT `fk_studio_state_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             """)
+            # 会員別所持クーポン管理テーブル `user_coupons` が無ければ自動作成します（使用したら消滅）
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS `user_coupons` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `user_id` int(11) NOT NULL,
+                  `code` varchar(50) NOT NULL,
+                  `name` varchar(255) NOT NULL,
+                  `discount_rate` decimal(4,2) NOT NULL DEFAULT 0.10,
+                  `discount_label` varchar(50) NOT NULL DEFAULT '1割引 (10% OFF)',
+                  `is_used` tinyint(1) NOT NULL DEFAULT 0,
+                  `used_at` datetime DEFAULT NULL,
+                  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+                  PRIMARY KEY (`id`),
+                  KEY `idx_coupon_user` (`user_id`),
+                  CONSTRAINT `fk_coupon_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            """)
+            # orders テーブルに customer_name カラムが無ければ自動追加します
+            cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'customer_name';")
+            if not cursor.fetchone():
+                try:
+                    cursor.execute("ALTER TABLE `orders` ADD COLUMN `customer_name` varchar(255) DEFAULT NULL AFTER `user_id`;")
+                except Exception:
+                    pass
+
+            # orders テーブルに coupon_code / coupon_discount カラムが無ければ自動追加します
+            cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_code';")
+            if not cursor.fetchone():
+                try:
+                    cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_code` varchar(50) DEFAULT NULL AFTER `earned_points`;")
+                except Exception:
+                    pass
+            cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_discount';")
+            if not cursor.fetchone():
+                try:
+                    cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_discount` int(11) NOT NULL DEFAULT 0 AFTER `coupon_code`;")
+                except Exception:
+                    pass
             # HttpOnly Cookie 認証用セッション管理テーブル `user_sessions` が無ければ自動作成します
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS `user_sessions` (
@@ -169,6 +211,8 @@ def ensure_account_tables():
             """)
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
         conn.commit()
+        # テーブル初期化成功フラグを立てます
+        _tables_ensured = True
         # 処理結果の成否フラグとして True を呼び出し元へ返します
         return True
     # try ブロック内で例外エラーが発生したときに安全にエラー応答へ切り替える受け皿です
@@ -181,6 +225,14 @@ def ensure_account_tables():
     finally:
         # 使い終わった MySQL データベース接続を閉じ、サーバーの接続リソースを解放します
         conn.close()
+
+
+# すべてのリクエスト受信前にテーブル作成が確実に完了しているか自動チェックするフック
+@app.before_request
+def auto_ensure_tables():
+    global _tables_ensured
+    if not _tables_ensured:
+        ensure_account_tables()
 
 # ==============================================================================
 #  3. 商品カタログ取得 & ヘルスチェック API (/api/products, /api/health)
@@ -349,12 +401,11 @@ def create_order():
 
     # 商品小計が 5,000 円以上なら送料無料（0円）、未満なら送料 550 円に設定します
     shipping_fee = 0 if subtotal >= 5000 else 550
-    # 利用ポイント数を 0 以上の整数として安全に取り出します
-    used_points = max(0, int(req.get('used_points', 0) or 0))
-    # 小計＋送料から利用ポイントを引いた最終お支払い金額を計算します（0円未満にならないよう保護）
-    total_amount = max(0, subtotal + shipping_fee - used_points)
-    # お支払い金額の 1%（またはリクエスト値）を今回の獲得予定ポイントとして計算します
-    earned_points = int(req.get('earned_points', int(total_amount * 0.01)))
+    # クーポンコードとクーポンの割引額を初期化します
+    coupon_code = req.get('coupon_code', '').strip()
+    coupon_discount = 0
+    coupon_id = None
+    applied_coupon_label = None
 
     # 今日の日付を 'YYYYMMDD' 形式の 8 桁文字列（例: 20261112）で作ります
     today_str = datetime.now().strftime('%Y%m%d')
@@ -406,14 +457,50 @@ def create_order():
                     # 重複しない一意の注文番号（'ORD-日付-ランダム4文字'、事前指定があればそれ）を決めます
                     order_no = f"ORD-{today_str}-{''.join(random.choices(string.ascii_uppercase + string.digits, k=4))}"
 
-            # orders テーブルへ 1 件分の注文ヘッダ（注文番号・配送先・合計金額・使用/獲得ポイント・注文日時）を追加します
+            # クーポンが指定されている場合、未使用の所持クーポンか検証して割引を計算します
+            if coupon_code and user_id:
+                try:
+                    cursor.execute(
+                        "SELECT `id`, `name`, `discount_rate`, `discount_label` FROM `user_coupons` WHERE `user_id` = %s AND `code` = %s AND `is_used` = 0;",
+                        (user_id, coupon_code)
+                    )
+                    c_row = cursor.fetchone()
+                    if c_row:
+                        coupon_id = c_row['id']
+                        applied_coupon_label = c_row['name']
+                        d_rate = float(c_row.get('discount_rate') or 0.10)
+                        coupon_discount = int(subtotal * d_rate)
+                except Exception as e_c:
+                    print(f"[!] 注文時クーポン検証スキップ: {e_c}")
+
+            # クーポン割引適用後の商品小計（0円未満にはならない）
+            discounted_subtotal = max(0, subtotal - coupon_discount)
+
+            # ポイントは配送料には影響せず、確実に配送料は払う必要がある
+            # （ポイントは商品小計 discounted_subtotal までしか充当できません）
+            raw_used_points = max(0, int(req.get('used_points', 0) or 0))
+            used_points = min(raw_used_points, discounted_subtotal)
+
+            # 最終支払金額: (割引後商品小計 - 利用ポイント) + 配送料（確実に配送料を支払う）
+            total_amount = (discounted_subtotal - used_points) + shipping_fee
+            # 獲得予定ポイント（支払総額の1%）
+            earned_points = int(req.get('earned_points', int(total_amount * 0.01)))
+
+            # クーポンを使用済みに更新（使用したら消滅）
+            if coupon_id:
+                try:
+                    cursor.execute("UPDATE `user_coupons` SET `is_used` = 1, `used_at` = NOW() WHERE `id` = %s;", (coupon_id,))
+                except Exception as e_c:
+                    print(f"[!] クーポン消滅更新エラー: {e_c}")
+
+            # orders テーブルへ 1 件分の注文ヘッダ（注文番号・配送先・合計金額・使用/獲得ポイント・クーポン・注文日時）を追加します
             insert_order_sql = """
             INSERT INTO `orders` (
                 `order_no`, `user_id`, `customer_name`, `customer_email`,
                 `postal_code`, `address`, `phone`, `payment_method`,
                 `delivery_time`, `subtotal`, `shipping_fee`, `total_amount`,
-                `used_points`, `earned_points`, `status`, `created_at`
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW());
+                `used_points`, `earned_points`, `coupon_code`, `coupon_discount`, `status`, `created_at`
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW());
             """
             # カーソル経由で SQL クエリ（必要に応じて %s パラメータを安全に埋め込み）を MySQL へ実行します
             cursor.execute(insert_order_sql, (
@@ -423,8 +510,9 @@ def create_order():
                 postal_code, address, phone, payment_method,
                 # 配列要素または直前の SQL プレースホルダへ渡す値（delivery_time, subtotal, shipping_fee, total_）です
                 delivery_time, subtotal, shipping_fee, total_amount,
-                # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値（used_points, earned_points, "注文受付済み"）です
-                used_points, earned_points, "注文受付済み"
+                # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値です
+                used_points, earned_points,
+                coupon_code if coupon_id else None, coupon_discount, "注文受付済み"
             ))
             # 今 INSERT した orders テーブルの自動採番 ID（PRIMARY KEY）を取得します
             order_id = cursor.lastrowid
@@ -514,8 +602,8 @@ def create_order():
                 u_row = cursor.fetchone()
                 # 条件式（if u_row is not None）が成り立つかチェックして処理を分岐します
                 if u_row is not None:
-                    # 右辺の結果（int(u_row.get('points', 1000))）を変数 curr_pts に代入して以降の処理で使います
-                    curr_pts = int(u_row.get('points', 1000))
+                    # 初期保有ポイント（ポイントは0から）を取り出します
+                    curr_pts = int(u_row.get('points', 0) if u_row.get('points') is not None else 0)
                     # 注文後の残高ポイント数（フロントへ返す最新値）の変数を初期化します
                     updated_points = max(0, curr_pts - used_points) + earned_points
                     # 計算した最新の保有ポイント残高を users テーブルに上書き更新します
@@ -548,11 +636,14 @@ def create_order():
             "subtotal": subtotal,
             # 配送送料（5,000円以上なら 0 円、未満なら 550 円）
             "shipping_fee": shipping_fee,
-            # 今回の注文支払いに充当したポイント数
+            # 適用されたクーポンコードおよび割引額
+            "coupon_code": coupon_code if coupon_id else None,
+            "coupon_discount": coupon_discount,
+            # 今回の注文支払いに充当したポイント数（商品小計のみ対象・送料には影響なし）
             "used_points": used_points,
             # 今回の注文で新たに獲得したポイント数
             "earned_points": earned_points,
-            # 送料加算・ポイント割引後の最終請求金額（円）
+            # 送料加算・クーポン・ポイント割引後の最終請求金額（円・確実に送料は含まれる）
             "total_amount": total_amount,
             # API 処理の結果ステータス（'success' / 'error' / 'ok' / 'warning'）
             "status": "注文受付・発送準備中",
@@ -608,6 +699,11 @@ def get_orders():
     try:
         # MySQL に SQL 命令を送るためのカーソルを取得します（with ブロック終了時に自動解放されます）
         with conn.cursor() as cursor:
+            # 注文者ユーザーの名前を users テーブルから取得します
+            cursor.execute("SELECT `name` FROM `users` WHERE `id` = %s;", (user_id,))
+            u_row = cursor.fetchone()
+            current_user_name = u_row['name'] if u_row and u_row.get('name') else '会員様'
+
             # orders テーブルから該当ユーザー・注文番号の注文レコードを検索します
             cursor.execute("SELECT * FROM `orders` WHERE `user_id` = %s ORDER BY `created_at` DESC;", (user_id,))
             # ユーザーIDに一致する注文レコード一覧を新しい順で取得します
@@ -615,6 +711,9 @@ def get_orders():
 
             # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for o in orders）
             for o in orders:
+                # 注文者の名前を確実にセット（誰が購入したか保存・表示用）
+                if not o.get('customer_name'):
+                    o['customer_name'] = current_user_name
                 # 条件式（if isinstance(o['created_at'], datetime)）が成り立つかチェックして処理を分岐します
                 if isinstance(o['created_at'], datetime):
                     # 辞書・配列要素 o['date'] に最新の値をセットします
@@ -809,15 +908,25 @@ def register_user():
                 # メールアドレス重複などを示す HTTP 409 (Conflict) エラーを JSON で返します
                 return jsonify({"status": "error", "message": "このメールアドレスは既に登録されています。"}), 409
 
-            # 新しい会員レコード（初回特典 1,000 ポイント付き）を MySQL users テーブルへ登録します
+            # 新しい会員レコード（ポイントは0から！）を MySQL users テーブルへ登録します
             cursor.execute(
                 # 上のカーソルで実行する INSERT 新規登録 SQL 文です（%s に下の値が埋め込まれます）
-                "INSERT INTO `users` (`name`, `email`, `password_hash`, `rank`, `points`, `created_at`) VALUES (%s, %s, %s, 'REGULAR MEMBER', 1000, NOW());",
+                "INSERT INTO `users` (`name`, `email`, `password_hash`, `rank`, `points`, `created_at`) VALUES (%s, %s, %s, 'REGULAR MEMBER', 0, NOW());",
                 # 直前の SQL クエリの %s に安全に埋め込むパラメータタプル (name, email, password) です
                 (name, email, password)
             )
             # 受信データから取り出したユーザーIDを「1以上の整数」に検証・変換します
             user_id = cursor.lastrowid
+
+            # 初期配布クーポン（初回限定 1割引クーポン）を付与（使用したら消滅）
+            try:
+                cursor.execute("""
+                    INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                    VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
+                """, (user_id,))
+            except Exception as e_coupon:
+                print(f"[!] 新規登録時クーポン付与スキップ（修復実行）: {e_coupon}")
+                ensure_account_tables()
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user_id)
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
@@ -828,7 +937,7 @@ def register_user():
             # API 処理の結果ステータス（'success' / 'error' / 'ok' / 'warning'）
             "status": "success",
             # ユーザー画面またはログに表示する処理結果・エラー案内メッセージ
-            "message": "会員登録が完了しました。1,000ポイントを進呈しました！",
+            "message": "会員登録が完了しました。【初回限定】1割引クーポンを進呈しました！",
             # フロントエンド AppState.currentUser に格納する会員情報オブジェクト
             "user": {
                 # レコード・商品・アイテムを識別する ID
@@ -839,8 +948,8 @@ def register_user():
                 "email": email,
                 # 会員ランク名称（REGULAR MEMBER / VIP MEMBER）
                 "rank": "REGULAR MEMBER",
-                # 現在保有している利用可能ポイント残高
-                "points": 1000
+                # 現在保有している利用可能ポイント残高（0からスタート）
+                "points": 0
             }
         # ここまで組み立てた辞書を JSON 化し、HTTP ステータス 201 番を添えて返却します
         }), 201)
@@ -891,8 +1000,21 @@ def login_user():
 
             # 条件式（if user.get('points') is None）が成り立つかチェックして処理を分岐します
             if user.get('points') is None:
-                # 辞書・配列要素 user['points'] に最新の値をセットします
-                user['points'] = 1000
+                # 初期ポイントは 0 からスタートします
+                user['points'] = 0
+
+            # クーポンを未所持（初回ログイン）の場合は初回限定1割引クーポンを自動配布します
+            try:
+                cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user['id'],))
+                c_cnt = cursor.fetchone()
+                if not c_cnt or c_cnt['cnt'] == 0:
+                    cursor.execute("""
+                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
+                    """, (user['id'],))
+            except Exception as e_coupon:
+                print(f"[!] ログイン時クーポン確認スキップ（修復実行）: {e_coupon}")
+                ensure_account_tables()
 
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
@@ -949,15 +1071,25 @@ def demo_login_user():
             user = cursor.fetchone()
             # データベース上に該当レコードが見つからなかった場合のチェックです
             if not user:
-                # 新しい会員レコード（初回特典 1,000 ポイント付き）を MySQL users テーブルへ登録します
+                # 新しい会員レコード（ポイントは0から！）を MySQL users テーブルへ登録します
                 cursor.execute(
                     # 上のカーソルで実行する INSERT 新規登録 SQL 文です（%s に下の値が埋め込まれます）
-                    "INSERT INTO `users` (`name`, `email`, `password_hash`, `rank`, `points`, `created_at`) VALUES (%s, %s, %s, %s, 1000, NOW());",
+                    "INSERT INTO `users` (`name`, `email`, `password_hash`, `rank`, `points`, `created_at`) VALUES (%s, %s, %s, %s, 0, NOW());",
                     # 直前の SQL クエリの %s に安全に埋め込むパラメータタプル ('テストユーザー（デモ）', 'demo@manekin.com', 'demo1234 です
                     ('テストユーザー（デモ）', 'demo@manekin.com', 'demo1234', 'VIP MEMBER')
                 )
-                # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
-                conn.commit()
+                # 受信データから取り出したユーザーIDを取得します
+                demo_uid = cursor.lastrowid
+                # 初期配布クーポン（初回限定 1割引クーポン）を付与（使用したら消滅）
+                try:
+                    cursor.execute("""
+                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
+                    """, (demo_uid,))
+                    conn.commit()
+                except Exception as e_coupon:
+                    print(f"[!] デモ新規登録時クーポン付与スキップ: {e_coupon}")
+                    ensure_account_tables()
                 # デモログイン用アカウント（demo@manekin.com）が既に users テーブルに登録済みか調べます
                 cursor.execute(
                     # 上のカーソルで実行する SELECT 検索 SQL 文です（%s に下のパラメータが安全に埋め込まれます）
@@ -969,8 +1101,22 @@ def demo_login_user():
                 user = cursor.fetchone()
             # 条件式（if user and user.get('points') is None）が成り立つかチェックして処理を分岐します
             if user and user.get('points') is None:
-                # 辞書・配列要素 user['points'] に最新の値をセットします
-                user['points'] = 1000
+                # 初期ポイントは 0 からスタートします
+                user['points'] = 0
+
+            # 既存デモアカウントでクーポンを一度も付与されていない場合は初期クーポンを付与します
+            try:
+                cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user['id'],))
+                c_cnt = cursor.fetchone()
+                if not c_cnt or c_cnt['cnt'] == 0:
+                    cursor.execute("""
+                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
+                    """, (user['id'],))
+                    conn.commit()
+            except Exception as e_coupon:
+                print(f"[!] 既存デモアカウントクーポン付与スキップ: {e_coupon}")
+                ensure_account_tables()
 
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
@@ -1042,8 +1188,8 @@ def get_current_auth_user():
             if user:
                 # 条件式（if user.get('points') is None）が成り立つかチェックして処理を分岐します
                 if user.get('points') is None:
-                    # 辞書・配列要素 user['points'] に最新の値をセットします
-                    user['points'] = 1000
+                    # 初期保有ポイントは 0 からです
+                    user['points'] = 0
                 # 処理成功を示す HTTP ステータス 200 (OK) と共に JSON データをクライアントへ返却します
                 return jsonify({"status": "success", "authenticated": True, "user": user}), 200
 
@@ -1101,6 +1247,49 @@ def logout_user():
     resp = make_response(jsonify({"status": "success", "message": "ログアウトしました。"}), 200)
     # ブラウザ側の古いセッションCookieを消去する指示を付けてレスポンスを返します
     return clear_session_cookie(resp)
+
+# URL パス「/api/coupons」（HTTP メソッド: GET）へのリクエストを下の関数へ割り当てます
+@app.route('/api/coupons', methods=['GET'])
+# ログイン中のユーザーの保有クーポン一覧（未使用・使用済み）を取得して返す API です
+def get_user_coupons():
+    user_id = parse_user_id(request.args.get('user_id', None))
+    if not user_id:
+        return jsonify({"status": "success", "coupons": []}), 200
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            # 既存会員でクーポンをまだ1つも受け取っていない場合は初期配布クーポンを付与します
+            cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user_id,))
+            c_cnt = cursor.fetchone()
+            if not c_cnt or c_cnt['cnt'] == 0:
+                cursor.execute("""
+                    INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                    VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
+                """, (user_id,))
+                conn.commit()
+
+            # ユーザーの所持クーポン一覧を取得します（未使用を優先表示）
+            cursor.execute("SELECT * FROM `user_coupons` WHERE `user_id` = %s ORDER BY `is_used` ASC, `created_at` DESC;", (user_id,))
+            coupons = cursor.fetchall()
+            for c in coupons:
+                if isinstance(c.get('created_at'), datetime):
+                    c['created_at'] = c['created_at'].strftime('%Y/%m/%d %H:%M')
+                if isinstance(c.get('used_at'), datetime):
+                    c['used_at'] = c['used_at'].strftime('%Y/%m/%d %H:%M')
+                if c.get('discount_rate') is not None:
+                    c['discount_rate'] = float(c['discount_rate'])
+
+        return jsonify({"status": "success", "coupons": coupons}), 200
+    except Exception as e:
+        print(f"[!] クーポン取得エラー: {e}")
+        ensure_account_tables()
+        return jsonify({"status": "success", "coupons": []}), 200
+    finally:
+        conn.close()
 
 # URL パス「/api/user/sync」（HTTP メソッド: POST）へのリクエストを下の関数へ割り当てます
 @app.route('/api/user/sync', methods=['POST'])

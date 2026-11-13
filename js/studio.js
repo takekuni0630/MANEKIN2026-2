@@ -1789,6 +1789,112 @@ function switchMobileStudioView(viewKey) {
 // ==========================================================================
 //  5. AIスタイリング自動診断・保存済みコーデ（Lookbook）＆一括カート追加
 // ==========================================================================
+
+// コーディネート内の各部位の面積比重からカラー構成比率（ベース/アソート/アクセント）および配色理論をAI解析します
+function analyzeOutfitColorComposition(outfit) {
+    if (!outfit) return { breakdown: [], schemeType: '--', schemeComment: '', tags: [] };
+
+    // 部位ごとの視覚的面積重み（アウター有無で配分を自動調整）
+    const hasOuter = !!outfit.outer;
+    const weights = hasOuter
+        ? { outer: 40, tops: 25, bottoms: 25, shoes: 7, hat: 3 }
+        : { tops: 45, bottoms: 35, shoes: 12, hat: 8 };
+
+    const colorWeights = {};
+    let totalWeight = 0;
+
+    for (const [slot, item] of Object.entries(outfit)) {
+        if (!item) continue;
+        const color = (item.color || 'BLACK').toUpperCase();
+        const w = weights[slot] || 10;
+        colorWeights[color] = (colorWeights[color] || 0) + w;
+        totalWeight += w;
+    }
+
+    if (totalWeight === 0) return { breakdown: [], schemeType: '--', schemeComment: '', tags: [] };
+
+    // 各色の比率（%）を算出
+    const entries = Object.entries(colorWeights).map(([color, weight]) => ({
+        color,
+        hex: typeof getColorHex === 'function' ? getColorHex(color) : '#666666',
+        ratio: Math.round((weight / totalWeight) * 100),
+        weight
+    })).sort((a, b) => b.weight - a.weight);
+
+    // 比率の合計を100%に補正（端数処理）
+    const ratioSum = entries.reduce((acc, cur) => acc + cur.ratio, 0);
+    if (ratioSum !== 100 && entries.length > 0) {
+        entries[0].ratio += (100 - ratioSum);
+    }
+
+    // 役割を付与
+    entries.forEach((item, idx) => {
+        if (idx === 0) {
+            item.role = item.ratio >= 50 ? 'ベースカラー (基調色)' : 'メインカラー';
+        } else if (idx === 1) {
+            item.role = 'アソートカラー (配合色)';
+        } else {
+            item.role = 'アクセントカラー (差し色)';
+        }
+    });
+
+    // 配色パターンの判定
+    const achromatics = ['BLACK', 'WHITE', 'CHARCOAL', 'GREY', 'ASH GREY', 'HEATHER GREY'];
+    const earthTones = ['BEIGE', 'BROWN', 'DARK BROWN', 'KHAKI', 'GREEN', 'OLIVE', 'ECRU'];
+    const blueTones = ['NAVY', 'BLUE', 'VINTAGE BLUE'];
+
+    const allColors = entries.map(e => e.color);
+    const areAllAchromatic = allColors.every(c => achromatics.includes(c));
+    const achromaticRatio = entries.filter(e => achromatics.includes(e.color)).reduce((sum, e) => sum + e.ratio, 0);
+    const earthRatio = entries.filter(e => earthTones.includes(e.color)).reduce((sum, e) => sum + e.ratio, 0);
+
+    let schemeType = 'バランス配色';
+    let schemeComment = '各アイテムの明暗と色味が美しく整った調和のあるスタイリングです。';
+    let tags = ['#カラーバランス'];
+
+    if (entries.length === 1) {
+        if (entries[0].color === 'BLACK') {
+            schemeType = 'オールブラック';
+            schemeComment = '黒の統一感で極めて洗練されたモードな重厚感とスタイル引き締め効果を発揮しています。';
+            tags = ['#オールブラック', '#モード'];
+        } else {
+            schemeType = 'ワンカラーワントーン';
+            schemeComment = `${entries[0].color}で統一されたミニマルで洗練されたシルエットです。`;
+            tags = ['#ワントーンコーデ'];
+        }
+    } else if (areAllAchromatic) {
+        schemeType = 'モノトーンシック';
+        schemeComment = '白・黒・グレーの無彩色のみで構成された、無駄のない都会的で上品なミニマリズムです。';
+        tags = ['#モノトーンシック', '#モードミニマル'];
+    } else if (achromaticRatio >= 70 && entries.length >= 2) {
+        const accentItem = entries.find(e => !achromatics.includes(e.color));
+        if (accentItem) {
+            schemeType = 'モノトーン＋1差し色';
+            schemeComment = `ベースのモノトーンに「${accentItem.color}」が絶妙なアクセント（差し色）として際立つ黄金比の配色です。`;
+            tags = ['#モノトーン+1', '#差し色アクセント'];
+        }
+    } else if (earthRatio >= 65) {
+        schemeType = 'アースカラー / ナチュラル';
+        schemeComment = 'ベージュやブラウンなどの温もりある自然色でまとまり、落ち着いたこなれ感とリラックスした大人の余裕を演出しています。';
+        tags = ['#アースカラー', '#ナチュラルシック'];
+    } else if (allColors.every(c => blueTones.includes(c) || achromatics.includes(c))) {
+        schemeType = 'ノーブルネイビー / クール';
+        schemeComment = 'ネイビーとブルーを基調とした、清潔感と知的さを兼ね備えた好印象なトーンです。';
+        tags = ['#ノーブルネイビー', '#清潔感'];
+    } else if (allColors.includes('WHITE') && (allColors.includes('BLACK') || allColors.includes('NAVY'))) {
+        schemeType = 'コントラスト配色';
+        schemeComment = '明暗のコントラストが効いており、遠目から見ても輪郭が引き締まるメリハリのあるコーディネートです。';
+        tags = ['#コントラスト配色', '#メリハリ'];
+    }
+
+    return {
+        breakdown: entries,
+        schemeType,
+        schemeComment,
+        tags
+    };
+}
+
 // 現在着せている服の組み合わせ（アウター・色構成・部位充実度）を解析し、AIスコア・アドバイス文・カラー構成ドットを更新します
 function updateAIStylingComment() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
@@ -1803,6 +1909,8 @@ function updateAIStylingComment() {
     const scoreValElem = document.getElementById('ai-score-val');
     // HTML 要素 #ai-score-stars を取得して変数 scoreStarsElem に格納します
     const scoreStarsElem = document.getElementById('ai-score-stars');
+    // カラー構成診断ボックス要素を取得します
+    const colorBox = document.getElementById('ai-color-diagnosis-box');
 
     // 定数 wornItems を宣言し、値（Object.values(outfit).filter(Boolean)）をセットします
     const wornItems = Object.values(outfit).filter(Boolean);
@@ -1822,6 +1930,8 @@ function updateAIStylingComment() {
         if (scoreValElem) scoreValElem.textContent = '--点';
         // 条件（scoreStarsElem）が成り立つか判定し、該当する場合の処理を実行します
         if (scoreStarsElem) scoreStarsElem.textContent = '';
+        // カラー構成診断ボックスを非表示にします
+        if (colorBox) colorBox.style.display = 'none';
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
@@ -1848,6 +1958,31 @@ function updateAIStylingComment() {
         dotsElem.innerHTML = uniqueColors.map(c => `
             <span class="palette-dot" style="background-color: ${getColorHex(c)};" title="${c}" ></span>
                 `).join('');
+    }
+
+    // AIカラー構成診断を実行し、比率バーと内訳を描画します
+    const colorDiag = analyzeOutfitColorComposition(outfit);
+    if (colorBox && colorDiag.breakdown.length > 0) {
+        colorBox.style.display = 'block';
+        const typeElem = document.getElementById('ai-color-scheme-type');
+        if (typeElem) typeElem.textContent = colorDiag.schemeType;
+
+        const ratioBar = document.getElementById('ai-color-ratio-bar');
+        if (ratioBar) {
+            ratioBar.innerHTML = colorDiag.breakdown.map(item => `
+                <div style="width: ${item.ratio}%; background-color: ${item.hex}; height: 100%; transition: width 0.3s;" title="${item.color}: ${item.ratio}%"></div>
+            `).join('');
+        }
+
+        const listElem = document.getElementById('ai-color-breakdown-list');
+        if (listElem) {
+            listElem.innerHTML = colorDiag.breakdown.map(item => `
+                <div style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 4px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${item.hex}; border: 1px solid rgba(255,255,255,0.3); display: inline-block;"></span>
+                    <span>${item.color} <b>${item.ratio}%</b> <span style="opacity: 0.68; font-size: 0.68rem;">(${item.role})</span></span>
+                </div>
+            `).join('');
+        }
     }
 
     // 再代入可能な変数 comment を宣言し、値（''）をセットします
@@ -1913,6 +2048,16 @@ function updateAIStylingComment() {
         comment += ` 頭元の「${outfit.hat.name}」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
         // 条件（!tags.includes('#アクセント小物')）が成り立つか判定し、該当する場合の処理を実行します
         if (!tags.includes('#アクセント小物')) tags.push('#アクセント小物');
+    }
+
+    // AIカラー診断のコメントとタグを統合
+    if (colorDiag && colorDiag.schemeComment) {
+        comment += ` 【🎨 AIカラー構成: ${colorDiag.schemeType}】${colorDiag.schemeComment}`;
+        if (colorDiag.tags) {
+            for (const t of colorDiag.tags) {
+                if (!tags.includes(t)) tags.push(t);
+            }
+        }
     }
 
     // 条件（commentElem）が成り立つか判定し、該当する場合の処理を実行します
@@ -2735,11 +2880,17 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
         // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-valid';
         // 条件（badgeText）が成り立つか判定し、該当する場合の処理を実行します
-        if (badgeText) badgeText.textContent = 'AI形状判定: OK';
+        if (badgeText) badgeText.textContent = 'AI形状・カラー判定: OK';
         // 条件（confidence）が成り立つか判定し、該当する場合の処理を実行します
         if (confidence) confidence.textContent = `${result.confidence}% 適合`;
         // 条件（title）が成り立つか判定し、該当する場合の処理を実行します
-        if (title) title.textContent = result.title;
+        if (title) {
+            if (result.colorLabel) {
+                title.innerHTML = `${result.title}<div style="margin-top: 5px; font-size: 0.8rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px;"><span>🎨 AIカラー診断:</span> <span style="background: rgba(251,191,36,0.2); padding: 1px 8px; border-radius: 6px; border: 1px solid rgba(251,191,36,0.4);">${result.colorLabel}</span></div>`;
+            } else {
+                title.textContent = result.title;
+            }
+        }
         // 条件（desc）が成り立つか判定し、該当する場合の処理を実行します
         if (desc) desc.textContent = result.desc;
 
@@ -2751,6 +2902,14 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
             if (radio) {
                 // 変数・配列項目 radio.checked の値を更新・計算します
                 radio.checked = true;
+            }
+        }
+
+        // AI診断されたカラーをマイクローゼット登録フォームの選択欄へ自動反映します
+        if (result.color) {
+            const colorSelect = document.getElementById('closet-item-color');
+            if (colorSelect) {
+                colorSelect.value = result.color;
             }
         }
     // 上記の if 条件に当てはまらなかった場合の分岐処理です
@@ -2847,6 +3006,8 @@ async function analyzeClothingItemShape(source) {
                 let fgCount = 0;
                 // 再代入可能な変数 minX を宣言し、値（cw, maxX = 0, minY = ch, maxY = 0）をセットします
                 let minX = cw, maxX = 0, minY = ch, maxY = 0;
+                // 前景ピクセルのカラー集計用変数
+                let sumR = 0, sumG = 0, sumB = 0;
 
                 // 配列要素やインデックスを順番に繰り返すループ処理（for (let y = 0; y < ch; y++) {）を開始します
                 for (let y = 0; y < ch; y++) {
@@ -2883,6 +3044,10 @@ async function analyzeClothingItemShape(source) {
                             mask[y * cw + x] = 1;
                             // 変数・配列項目 fgCount の値を更新・計算します
                             fgCount++;
+                            // 前景ピクセルの RGB 値を集計します
+                            sumR += r;
+                            sumG += g;
+                            sumB += b;
                             // 条件（x < minX）が成り立つか判定し、該当する場合の処理を実行します
                             if (x < minX) minX = x;
                             // 条件（x > maxX）が成り立つか判定し、該当する場合の処理を実行します
@@ -3203,6 +3368,66 @@ async function analyzeClothingItemShape(source) {
                 // 定数 confidence を宣言し、値（Math.min(99, Math.max(82, Math.round(h…）をセットします
                 const confidence = Math.min(99, Math.max(82, Math.round(highestScore * 0.95)));
 
+                // 前景ピクセルから代表カラーをAI検出（RGB -> HSL判定）
+                const avgR = fgCount > 0 ? Math.round(sumR / fgCount) : 0;
+                const avgG = fgCount > 0 ? Math.round(sumG / fgCount) : 0;
+                const avgB = fgCount > 0 ? Math.round(sumB / fgCount) : 0;
+
+                const rf = avgR / 255, gf = avgG / 255, bf = avgB / 255;
+                const cMax = Math.max(rf, gf, bf), cMin = Math.min(rf, gf, bf);
+                let h = 0, s = 0, l = (cMax + cMin) / 2;
+                if (cMax !== cMin) {
+                    const d = cMax - cMin;
+                    s = l > 0.5 ? d / (2 - cMax - cMin) : d / (cMax + cMin);
+                    if (cMax === rf) h = ((gf - bf) / d + (gf < bf ? 6 : 0)) / 6;
+                    else if (cMax === gf) h = ((bf - rf) / d + 2) / 6;
+                    else h = ((rf - gf) / d + 4) / 6;
+                }
+                const hue = Math.round(h * 360);
+                const sat = Math.round(s * 100);
+                const light = Math.round(l * 100);
+
+                let detectedColor = 'BLACK';
+                let detectedColorLabel = 'BLACK (ブラック・黒)';
+
+                if (light < 18) {
+                    detectedColor = 'BLACK';
+                    detectedColorLabel = 'BLACK (ブラック・黒)';
+                } else if (light > 80 && sat < 18) {
+                    detectedColor = 'WHITE';
+                    detectedColorLabel = 'WHITE (ホワイト・白)';
+                } else if (sat < 14) {
+                    if (light < 45) {
+                        detectedColor = 'CHARCOAL';
+                        detectedColorLabel = 'CHARCOAL (チャコール・濃灰)';
+                    } else {
+                        detectedColor = 'GREY';
+                        detectedColorLabel = 'GREY (グレー・灰)';
+                    }
+                } else if (hue >= 170 && hue <= 260) {
+                    if (light < 35) {
+                        detectedColor = 'NAVY';
+                        detectedColorLabel = 'NAVY (ネイビー・紺)';
+                    } else {
+                        detectedColor = 'BLUE';
+                        detectedColorLabel = 'BLUE (ブルー・青・デニム)';
+                    }
+                } else if (hue >= 15 && hue <= 50) {
+                    if (light > 62 && sat < 50) {
+                        detectedColor = 'BEIGE';
+                        detectedColorLabel = 'BEIGE (ベージュ・生成)';
+                    } else if (light <= 48) {
+                        detectedColor = 'BROWN';
+                        detectedColorLabel = 'BROWN (ブラウン・茶)';
+                    } else {
+                        detectedColor = 'BEIGE';
+                        detectedColorLabel = 'BEIGE (ベージュ・生成)';
+                    }
+                } else {
+                    detectedColor = 'OTHER';
+                    detectedColorLabel = 'OTHER (その他)';
+                }
+
                 // 最終結果を resolve() に渡して非同期 Promise を完了させます
                 resolve({
                     // 有効なファッションアイテム画像として許可するかどうかの真偽値
@@ -3211,10 +3436,14 @@ async function analyzeClothingItemShape(source) {
                     category: bestCategory,
                     // AI 形状判定の信頼度スコア（%）
                     confidence: confidence,
+                    // AI 検出カラー
+                    color: detectedColor,
+                    // AI 検出カラー表示ラベル
+                    colorLabel: detectedColorLabel,
                     // モーダル見出しまたはコーデ保存タイトル
                     title: `✨ AI形状認識: ${catNames[bestCategory]}`,
                     // 画面に表示する補足説明文
-                    desc: 'マイクローゼットに登録可能です。カテゴリを自動選択しました。'
+                    desc: `マイクローゼットに登録可能です。カテゴリとカラー（${detectedColorLabel}）を自動判定しました。`
                 });
 
             // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
@@ -3229,6 +3458,9 @@ async function analyzeClothingItemShape(source) {
                     category: 'TOPS',
                     // AI 形状判定の信頼度スコア（%）
                     confidence: 80,
+                    // AI 検出カラー
+                    color: 'BLACK',
+                    colorLabel: 'BLACK (ブラック・黒)',
                     // モーダル見出しまたはコーデ保存タイトル
                     title: '✨ 形状解析完了',
                     // 画面に表示する補足説明文
