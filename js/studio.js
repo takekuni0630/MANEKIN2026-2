@@ -2140,6 +2140,18 @@ async function handleSaveOutfit(e) {
         items: JSON.parse(JSON.stringify(AppState.currentOutfit))
     };
 
+    // スマホ版の場合は localStorage にコーディネートを保存します
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        AppState.savedOutfits.unshift(newOutfit);
+        if (typeof lsSetJson === 'function') {
+            lsSetJson(`manekin_ls_outfits_${userId}`, AppState.savedOutfits);
+        }
+        showToastNotification(`「${title}」を保存しました！`);
+        if (input) input.value = '';
+        renderManekinStudio(AppState.studioActiveTab);
+        return;
+    }
+
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
         // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
@@ -2281,7 +2293,7 @@ function restoreOutfit(outfitId) {
 }
 
 
-// 指定した保存済みコーデを MySQL（DELETE /api/outfits/delete/...）から削除します
+// 指定した保存済みコーデを削除します（スマホ版はlocalStorage、PC版はMySQL）
 async function deleteSavedOutfit(outfitId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -2297,6 +2309,19 @@ async function deleteSavedOutfit(outfitId) {
 
     // 変数・配列項目 _outfitsMutationSeq の値を更新・計算します
     _outfitsMutationSeq++;
+
+    // スマホ版の場合は localStorage から保存コーデを削除します
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        AppState.savedOutfits = AppState.savedOutfits.filter(o => o.id !== outfitId);
+        if (typeof lsSetJson === 'function') {
+            lsSetJson(`manekin_ls_outfits_${userId}`, AppState.savedOutfits);
+        }
+        showToastNotification('コーディネートを削除しました');
+        renderSavedOutfitsGrid();
+        renderManekinStudio(AppState.studioActiveTab);
+        return;
+    }
+
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
         // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
@@ -2336,7 +2361,7 @@ async function deleteSavedOutfit(outfitId) {
 }
 
 
-// ログイン会員の保存済みコーディネート一覧を MySQL（GET /api/outfits/...）から取得します
+// ログイン会員の保存済みコーディネート一覧を取得します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncOutfitsFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
@@ -2354,6 +2379,23 @@ async function syncOutfitsFromBackend() {
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+
+    // スマホ版の場合は localStorage から保存済みコーデ一覧を取得します
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        const savedOutfits = (typeof lsGetJson === 'function')
+            ? lsGetJson(`manekin_ls_outfits_${targetUserId}`, [])
+            : [];
+        AppState.savedOutfits = Array.isArray(savedOutfits) ? savedOutfits : [];
+        const savedBadge = document.getElementById('studio-saved-badge');
+        if (savedBadge) savedBadge.textContent = AppState.savedOutfits.length;
+        const homeSaved = document.getElementById('home-stat-saved');
+        if (homeSaved) homeSaved.innerHTML = `${AppState.savedOutfits.length} <small>組</small>`;
+        if (AppState.studioActiveTab === 'saved') {
+            renderSavedOutfitsGrid();
+        }
+        return;
+    }
+
     // 定数 fetchStartSeq を宣言し、値（_outfitsMutationSeq）をセットします
     const fetchStartSeq = _outfitsMutationSeq;
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
@@ -3821,6 +3863,21 @@ async function handleAddClosetItem(e) {
         isOwned: true
     };
 
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        AppState.myCloset.unshift(newItem);
+        if (typeof lsSetJson === 'function') {
+            lsSetJson('manekin_ls_closet_' + userId, AppState.myCloset);
+        }
+        showToastNotification(`「${name}」をマイクローゼットに登録しました！`);
+        closeAddClosetModal();
+        renderManekinStudio(AppState.studioActiveTab);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText || 'クローゼットに登録する';
+        }
+        return;
+    }
+
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
         // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
@@ -3913,6 +3970,27 @@ async function deleteClosetItem(itemId) {
     // 条件（!confirm('この手持ちの服をクローゼットから削除しますか？')）が成り立つか判定し、該当する場合の処理を実行します
     if (!confirm('この手持ちの服をクローゼットから削除しますか？')) return;
 
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        let wasWearingDeleted = false;
+        for (const slotKey in AppState.currentOutfit) {
+            if (AppState.currentOutfit[slotKey] && String(AppState.currentOutfit[slotKey].id) === String(itemId)) {
+                AppState.currentOutfit[slotKey] = null;
+                wasWearingDeleted = true;
+            }
+        }
+        if (wasWearingDeleted) {
+            await syncStudioStateToBackend({ immediate: true });
+        }
+        AppState.myCloset = AppState.myCloset.filter(c => String(c.id) !== String(itemId));
+        _closetMutationSeq++;
+        if (typeof lsSetJson === 'function') {
+            lsSetJson('manekin_ls_closet_' + userId, AppState.myCloset);
+        }
+        showToastNotification('手持ちの服を削除しました');
+        renderManekinStudio(AppState.studioActiveTab);
+        return;
+    }
+
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
         // 三項演算子・真(True)の場合の選択値（getApiBaseUrl()）
@@ -3989,6 +4067,29 @@ async function syncClosetFromBackend() {
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
+
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        let saved = (typeof lsGetJson === 'function') ? lsGetJson('manekin_ls_closet_' + targetUserId, null) : null;
+        if (!Array.isArray(saved)) {
+            saved = (typeof getDefaultMobileClosetItems === 'function') ? getDefaultMobileClosetItems() : [];
+            if (typeof lsSetJson === 'function') {
+                lsSetJson('manekin_ls_closet_' + targetUserId, saved);
+            }
+        }
+        AppState.myCloset = saved;
+        const closetBadge = document.getElementById('studio-closet-badge');
+        if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
+        const mobClosetCnt = document.getElementById('mob-closet-cnt');
+        if (mobClosetCnt) mobClosetCnt.textContent = AppState.myCloset.length;
+        const homeCloset = document.getElementById('home-stat-closet');
+        if (homeCloset) homeCloset.innerHTML = `${AppState.myCloset.length} <small>点</small>`;
+        if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+        if (AppState.studioActiveTab === 'closet' && typeof renderPaneClosetGrid === 'function') {
+            renderPaneClosetGrid();
+        }
+        return;
+    }
+
     // 定数 fetchStartSeq を宣言し、値（_closetMutationSeq）をセットします
     const fetchStartSeq = _closetMutationSeq;
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
@@ -4129,6 +4230,16 @@ async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnaps
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
         // 処理結果の基準値として false を呼び出し元へ返して関数を終了します
         return false;
+    }
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        if (typeof lsSetJson === 'function') {
+            lsSetJson('manekin_ls_studio_' + targetUserId, {
+                current_outfit: outfitSnapshot,
+                fitting_offsets: offsetsSnapshot,
+                studio_gender: genderSnapshot
+            });
+        }
+        return true;
     }
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
     const apiBase = (typeof getApiBaseUrl === 'function')
@@ -4275,6 +4386,26 @@ async function syncStudioStateFromBackend() {
     }
     // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
+
+    if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
+        const saved = (typeof lsGetJson === 'function') ? lsGetJson('manekin_ls_studio_' + targetUserId, null) : null;
+        if (saved && typeof saved === 'object') {
+            AppState.currentOutfit = saved.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+            AppState.fittingOffsets = saved.fitting_offsets || getDefaultFittingOffsets();
+            AppState.studioGender = (saved.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
+        } else {
+            AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
+            AppState.fittingOffsets = getDefaultFittingOffsets();
+            AppState.studioGender = 'MEN';
+        }
+        syncGenderToggleUI();
+        if (typeof renderMannequinStage === 'function') renderMannequinStage();
+        if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
+        return;
+    }
+
     // 定数 fetchStartSeq を宣言し、値（_studioStateSyncSeq）をセットします
     const fetchStartSeq = _studioStateSyncSeq;
     // 定数 apiBase を宣言し、値（(typeof getApiBaseUrl === 'function')）をセットします
