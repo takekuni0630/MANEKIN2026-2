@@ -143,7 +143,8 @@
                 </a>
 
                 <!-- クリックで画面ハッシュを「#mypage」へ切り替える SPA リンクです（マイページを表示） -->
-                <a href="#mypage" class="tool-icon-btn" id="header-user-btn" aria-label="マイページを表示" style="position: relative;">
+                <a href="#mypage" class="tool-icon-btn" id="header-user-btn" aria-label="マイページを表示"
+                    style="position: relative;">
                     <!-- 拡大してもぼやけないベクター形式の SVG アイコン（icon-svg）を描画します -->
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <!-- アイコンやイラストの輪郭線を座標データ(d属性)で描く SVG パス要素です -->
@@ -152,7 +153,8 @@
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <!-- ログイン中を示す緑のステータスインジケータードット -->
-                    <span class="header-user-online-dot" id="header-user-online-dot" style="display: none;" title="ログイン中"></span>
+                    <span class="header-user-online-dot" id="header-user-online-dot" style="display: none;"
+                        title="ログイン中"></span>
                 </a>
 
                 <!-- クリック操作用ボタン「メニューを開閉する」です -->
@@ -199,7 +201,9 @@
                 <li><a href="#favorites" class="mobile-nav-link" data-mobile-nav="favorites">FAVORITE (お気に入り)</a></li>
                 <!-- メニューやリストの 1 項目分の要素（<li>）です -->
                 <li><a href="#manekin-studio" class="mobile-nav-link mobile-manekin-btn" id="mobile-manekin-btn"
-                        data-mobile-nav="manekin-studio" style="justify-content: flex-start; gap: 8px;"><span>MANEKIN</span><span class="nav-tag">AI</span></a></li>
+                        data-mobile-nav="manekin-studio"
+                        style="justify-content: flex-start; gap: 8px;"><span>MANEKIN</span><span
+                            class="nav-tag">AI</span></a></li>
                 <!-- メニューやリストの 1 項目分の要素（<li>）です -->
                 <li class="mobile-divider"></li>
                 <!-- メニューやリストの 1 項目分の要素（<li>）です -->
@@ -667,31 +671,49 @@
                                     </select>
                                 </div>
 
-                                <!-- クーポン利用セクション（初回登録時は1割引クーポンを自動初期配布・使用すると消滅） -->
+                                <!-- クーポン利用セクション（コード入力ではなく、適用する／利用しないを選択） -->
                                 <div class="checkout-coupon-box" id="checkout-coupon-box"
                                     style="margin-bottom: 20px; padding: 16px 20px; background: #fffcf7; border: 1px solid #fed7aa; border-radius: 8px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
-                                        <div style="font-weight: 700; color: #c2410c; display: flex; align-items: center; gap: 6px;">
-                                            <span style="font-size: 1.1rem;">🎫</span> クーポンの利用
-                                            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: #ffedd5; color: #ea580c; font-weight: 600;">1回限り有効（使用後消滅）</span>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
+                                        <div
+                                            style="font-weight: 700; color: #c2410c; display: flex; align-items: center; gap: 6px;">
+                                            <span style="font-size: 1.1rem;">🎫</span> クーポンの利用選択
+                                            <span
+                                                style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: #ffedd5; color: #ea580c; font-weight: 600;">1回限り有効（使用後消滅）</span>
                                         </div>
-                                        <div id="checkout-coupon-status-badge" style="font-size: 0.75rem; color: #059669; font-weight: 700;"></div>
+                                        <div id="checkout-coupon-status-badge"
+                                            style="font-size: 0.78rem; color: #6b7280; font-weight: 700;">現在：利用しない</div>
                                     </div>
-                                    <!-- 保有クーポン一覧コンテナ -->
-                                    <div id="checkout-coupons-list" style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;">
-                                        <!-- JSで動的に保有クーポンを挿入 -->
+                                    <!-- 保有クーポン情報＆「適用する／利用しない」選択ボタン -->
+                                    <div id="checkout-coupons-list"
+                                        style="margin-bottom: 8px; display: flex; flex-direction: column; gap: 10px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 14px; background: #ffffff; border: 1px solid #fed7aa; border-radius: 8px;">
+                                            <div>
+                                                <div style="font-size: 0.9rem; font-weight: 700; color: #111827;">
+                                                    【初回限定】1割引クーポン (10% OFF)</div>
+                                                <div style="font-size: 0.76rem; color: #c2410c; font-weight: 600;">
+                                                    商品代金（小計）から 10% OFF 割引</div>
+                                            </div>
+                                            <div style="display: flex; gap: 8px; align-items: center;">
+                                                <button type="button" id="btn-apply-coupon-select"
+                                                    class="btn btn-outline-xs"
+                                                    onclick="handleApplyCouponCode('WELCOME10')"
+                                                    style="padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border: 2px solid #ea580c; background: #ea580c; color: #ffffff; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                                                    適用する
+                                                </button>
+                                                <button type="button" id="btn-cancel-coupon-select"
+                                                    class="btn btn-outline-xs" onclick="handleCancelCoupon()"
+                                                    style="padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border: 2px solid #374151; background: #374151; color: #ffffff; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                                                    ✓ 利用しない
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <!-- 手動クーポンコード入力行 -->
-                                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                        <input type="text" id="checkout-coupon-code-input" class="form-input" placeholder="クーポンコードを入力 (例: WELCOME10)"
-                                            style="flex: 1; min-width: 180px; font-size: 0.85rem; padding: 6px 10px; text-transform: uppercase;">
-                                        <button type="button" class="btn btn-outline-xs" onclick="handleApplyCouponCode()"
-                                            style="padding: 7px 14px; font-weight: 600; white-space: nowrap; border-color: #ea580c; color: #ea580c;">適用する</button>
-                                        <button type="button" class="btn btn-outline-xs" id="btn-cancel-coupon" onclick="handleCancelCoupon()"
-                                            style="padding: 7px 10px; color: #888; display: none; white-space: nowrap;">解除</button>
-                                    </div>
-                                    <p class="point-help-text" id="checkout-coupon-message" style="margin: 8px 0 0 0; font-size: 0.75rem; color: #7c2d12; line-height: 1.4;">
-                                        ※初期配布された「【初回限定】1割引クーポン (10% OFF)」などのクーポンがご利用いただけます。クーポンは商品小計から割引され、注文確定時に消滅します（配送料には影響しません）。
+                                    <p class="point-help-text" id="checkout-coupon-message"
+                                        style="margin: 8px 0 0 0; font-size: 0.75rem; color: #7c2d12; line-height: 1.4;">
+                                        ※上の「<strong>適用する</strong>」または「<strong>利用しない</strong>」ボタンから選択してください。クーポンは商品小計から割引され、注文確定時に消滅します（配送料には影響しません）。
                                     </p>
                                 </div>
 
@@ -714,16 +736,20 @@
                                     <!-- デザイン・配置用のブロック要素（<div class="checkout-point-body">）を開始します -->
                                     <div class="checkout-point-body">
                                         <!-- デザイン・配置用のブロック要素（<div class="point-input-row">）を開始します -->
-                                        <div class="point-input-row" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <div class="point-input-row"
+                                            style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                             <!-- デザイン・配置用のブロック要素（<div class="point-input-group">）を開始します -->
-                                            <div class="point-input-group" style="position: relative; width: 145px; max-width: 145px; flex: 0 0 145px;">
+                                            <div class="point-input-group"
+                                                style="position: relative; width: 145px; max-width: 145px; flex: 0 0 145px;">
                                                 <!-- ユーザー入力欄（type=number / #checkout-use-points / 0）です -->
                                                 <input type="number" id="checkout-use-points"
                                                     class="form-input point-num-input" placeholder="0" min="0" value="0"
                                                     style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 52px 8px 10px; font-size: 0.9rem; font-weight: 700; text-align: right;"
                                                     oninput="handlePointsInputChange()">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.point-input-suffix pt 利用）です -->
-                                                <span class="point-input-suffix" style="position: absolute; right: 10px; font-size: 0.75rem; font-weight: 600; color: #6b7280; pointer-events: none;">pt 利用</span>
+                                                <span class="point-input-suffix"
+                                                    style="position: absolute; right: 10px; font-size: 0.75rem; font-weight: 600; color: #6b7280; pointer-events: none;">pt
+                                                    利用</span>
                                             </div>
                                             <!-- 押すと関数 handleUseAllPoints() を実行する操作ボタン「<button type="button" class="btn…」です -->
                                             <button type="button" class="btn btn-outline-xs btn-use-all-points"
@@ -735,7 +761,8 @@
                                                 onclick="handleResetPoints()">取消</button>
                                         </div>
                                         <!-- 段落テキスト（.point-help-text: checkout-point-message）を表示します -->
-                                        <p class="point-help-text" id="checkout-point-message" style="line-height: 1.4;">
+                                        <p class="point-help-text" id="checkout-point-message"
+                                            style="line-height: 1.4;">
                                             1ポイント＝1円として商品代金（割引後小計）にのみご利用いただけます。<strong>※配送料には影響せず、確実に配送料は別途発生します。</strong>
                                         </p>
                                     </div>
@@ -877,13 +904,14 @@
                             <div class="checkout-earned-points-card">
                                 <!-- デザイン・配置用のブロック要素（<div class="earned-points-header">）を開始します -->
                                 <div class="earned-points-header">
-                                    <!-- インライン装飾／グルーピング用の <span> 要素（.earned-points-label 🎫 特典・クーポン利用）です -->
-                                    <span class="earned-points-label">🎫 特典・クーポン利用</span>
-                                    <!-- 重要テキストを太字で強調表示（0 pt (クーポン還元)）します -->
-                                    <strong class="earned-points-value" id="checkout-earned-points">0 pt (クーポン還元)</strong>
+                                    <!-- インライン装飾／グルーピング用の <span> 要素（.earned-points-label ✨ 獲得予定ポイント）です -->
+                                    <span class="earned-points-label">✨ 今回獲得予定のポイント</span>
+                                    <!-- 重要テキストを太字で強調表示（+0 pt）します -->
+                                    <strong class="earned-points-value" id="checkout-earned-points">+0 pt</strong>
                                 </div>
                                 <!-- 段落テキストを表示します -->
-                                <p class="earned-points-hint">※ご購入によるポイント付与はありません。お得な割引は配布クーポンをご利用ください（配送料はポイント対象外です）。</p>
+                                <p class="earned-points-hint">※お支払い金額の1%がポイントとして加算され、次回以降のお買い物で1pt＝1円としてご利用いただけます。
+                                </p>
                             </div>
 
                             <!-- クリック操作用ボタン「<button type="button" class="btn…」です -->
@@ -967,11 +995,11 @@
                                 <strong class="comp-value text-success" id="comp-coupon-info">--</strong>
                             </div>
                             <!-- 特定機能・領域のブロック要素（<div id="comp-point-row" class="comp-row">）を開始します -->
-                            <div class="comp-row" id="comp-point-row" style="display: none;">
+                            <div class="comp-row" id="comp-point-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 今回獲得ポイント:）です -->
                                 <span class="comp-label">今回獲得ポイント:</span>
-                                <!-- 重要テキストを太字で強調表示（0 pt (クーポン進呈)）します -->
-                                <strong class="comp-value text-success" id="comp-earned-points">0 pt (クーポン進呈)</strong>
+                                <!-- 重要テキストを太字で強調表示（+0 pt）します -->
+                                <strong class="comp-value text-success" id="comp-earned-points">+0 pt</strong>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
@@ -1044,7 +1072,8 @@
                         <p class="already-login-desc">マイページへ移動して購入履歴やお気に入りを確認するか、別のアカウントに切り替える場合はログアウトしてください。</p>
                         <div class="already-login-actions">
                             <a href="#mypage" class="btn btn-primary btn-sm">マイページへ移動</a>
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="handleLogout()">ログアウトする</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                onclick="handleLogout()">ログアウトする</button>
                         </div>
                     </div>
 
@@ -1258,7 +1287,8 @@
                     <!-- 特定機能・領域のブロック要素（<div id="mypage-actions-wrapper" class="mypage-actions">）を開始します -->
                     <div class="mypage-actions" id="mypage-actions-wrapper">
                         <!-- クリックで画面ハッシュを「#login」へ切り替える SPA リンクです（ログイン） -->
-                        <a href="#login" class="btn btn-primary btn-sm" id="mypage-action-btn" style="padding: 6px 16px; font-weight: 700;">ログイン</a>
+                        <a href="#login" class="btn btn-primary btn-sm" id="mypage-action-btn"
+                            style="padding: 6px 16px; font-weight: 700;">ログイン</a>
                     </div>
                 </div>
 
@@ -2202,8 +2232,10 @@
                                 <!-- AIカラー構成診断ボックス（ベース/アソート/アクセント比率・配色調和タイプ判定） -->
                                 <div class="ai-color-diagnosis-box" id="ai-color-diagnosis-box"
                                     style="margin-top: 12px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 8px; border-left: 3px solid #f59e0b; display: none;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
-                                        <span style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
+                                        <span
+                                            style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
                                             <span>🎨</span> AIカラー構成診断
                                         </span>
                                         <span id="ai-color-scheme-type"
@@ -2211,10 +2243,12 @@
                                     </div>
                                     <!-- カラー比率バー -->
                                     <div id="ai-color-ratio-bar"
-                                        style="height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 8px; background: rgba(255,255,255,0.1);"></div>
+                                        style="height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 8px; background: rgba(255,255,255,0.1);">
+                                    </div>
                                     <!-- カラー内訳リスト -->
                                     <div id="ai-color-breakdown-list"
-                                        style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.73rem; color: #e2e8f0;"></div>
+                                        style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.73rem; color: #e2e8f0;">
+                                    </div>
                                 </div>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="ai-meta-bar">）を開始します -->
@@ -2712,13 +2746,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
-    <script src="js/products-data.js?v=20261113_desktop_mysql_v11"></script>
+    <script src="js/products-data.js?v=20261113_coupon_btn_v13"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261113_desktop_mysql_v11"></script>
+    <script src="js/shop.js?v=20261113_coupon_btn_v13"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261113_desktop_mysql_v11"></script>
+    <script src="js/studio.js?v=20261113_coupon_btn_v13"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261113_desktop_mysql_v11"></script>
+    <script src="js/app.js?v=20261113_coupon_btn_v13"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
