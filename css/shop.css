@@ -3308,3 +3308,254 @@
     /* 1行あたりの高さ（行間・1.5）を設定して文章の読みやすさを調整します */
     line-height: 1.5;
 }
+
+/* ========================================================================== */
+/*  ログイン・ログアウト明確化 & 認証状態UIスタイル                           */
+/* ========================================================================== */
+.nav-user-greeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #15803d;
+    padding: 4px 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+.user-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #16a34a;
+    display: inline-block;
+}
+.header-user-online-dot {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #16a34a;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #bbf7d0;
+    z-index: 2;
+}
+.nav-logout-btn {
+    color: #dc2626 !important;
+    font-weight: 600 !important;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    padding: 4px 10px !important;
+    background: #fff5f5;
+    transition: all 0.2s ease;
+}
+.nav-logout-btn:hover {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border-color: #fca5a5;
+}
+.nav-login-btn {
+    color: #111827 !important;
+    font-weight: 600 !important;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px !important;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+.nav-login-btn:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827;
+}
+
+/* モバイルドロワー内ユーザーカード */
+.drawer-user-card {
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+.drawer-user-box {
+    border-radius: 8px;
+    padding: 12px;
+}
+.drawer-user-box.logged-in {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+.drawer-user-box.guest {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+.drawer-user-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.drawer-user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.drawer-user-avatar.guest-avatar {
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 1.2rem;
+}
+.drawer-user-details {
+    flex: 1;
+    min-width: 0;
+}
+.drawer-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 2px;
+}
+.drawer-status-badge.guest-badge {
+    color: #64748b;
+}
+.badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.badge-dot.online {
+    background: #16a34a;
+}
+.badge-dot.offline {
+    background: #94a3b8;
+}
+.drawer-user-name {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.drawer-user-rank {
+    font-size: 0.72rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.drawer-user-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+.drawer-user-actions {
+    display: flex;
+    gap: 8px;
+}
+.drawer-user-actions .btn {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    border-radius: 4px;
+    text-decoration: none;
+}
+.btn-outline-danger {
+    background: #ffffff;
+    border: 1px solid #ef4444;
+    color: #dc2626;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.btn-outline-danger:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* 購入手続き画面の未ログイン通知バナー */
+.checkout-guest-notice {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.checkout-guest-notice-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 260px;
+}
+.guest-notice-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+.guest-notice-text strong {
+    display: block;
+    color: #d46b08;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+.guest-notice-text p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #595959;
+    line-height: 1.4;
+}
+.checkout-guest-notice-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ログイン画面の既存ログイン表示ボックス */
+.login-already-box {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.already-login-icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+.already-login-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 6px;
+}
+.already-login-desc {
+    font-size: 0.88rem;
+    color: #4b5563;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+.already-login-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

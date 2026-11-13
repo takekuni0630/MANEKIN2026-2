@@ -234,6 +234,28 @@ def auto_ensure_tables():
     if not _tables_ensured:
         ensure_account_tables()
 
+
+# 会員に初回限定1割引クーポンを安全に付与する共通ヘルパー（SQL内の%プレースホルダ衝突を防止）
+def grant_welcome_coupon(cursor, user_id):
+    if not user_id:
+        return False
+    try:
+        cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user_id,))
+        c_cnt = cursor.fetchone()
+        if not c_cnt or c_cnt['cnt'] == 0:
+            cursor.execute("""
+                INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
+                VALUES (%s, %s, %s, %s, %s, 0, NOW());
+            """, (user_id, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)'))
+            return True
+    except Exception as e:
+        print(f"[!] クーポン付与スキップ: {e}")
+        try:
+            ensure_account_tables()
+        except Exception:
+            pass
+    return False
+
 # ==============================================================================
 #  3. 商品カタログ取得 & ヘルスチェック API (/api/products, /api/health)
 # ==============================================================================
@@ -919,14 +941,7 @@ def register_user():
             user_id = cursor.lastrowid
 
             # 初期配布クーポン（初回限定 1割引クーポン）を付与（使用したら消滅）
-            try:
-                cursor.execute("""
-                    INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
-                    VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
-                """, (user_id,))
-            except Exception as e_coupon:
-                print(f"[!] 新規登録時クーポン付与スキップ（修復実行）: {e_coupon}")
-                ensure_account_tables()
+            grant_welcome_coupon(cursor, user_id)
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user_id)
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
@@ -1004,17 +1019,7 @@ def login_user():
                 user['points'] = 0
 
             # クーポンを未所持（初回ログイン）の場合は初回限定1割引クーポンを自動配布します
-            try:
-                cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user['id'],))
-                c_cnt = cursor.fetchone()
-                if not c_cnt or c_cnt['cnt'] == 0:
-                    cursor.execute("""
-                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
-                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
-                    """, (user['id'],))
-            except Exception as e_coupon:
-                print(f"[!] ログイン時クーポン確認スキップ（修復実行）: {e_coupon}")
-                ensure_account_tables()
+            grant_welcome_coupon(cursor, user['id'])
 
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
@@ -1081,15 +1086,8 @@ def demo_login_user():
                 # 受信データから取り出したユーザーIDを取得します
                 demo_uid = cursor.lastrowid
                 # 初期配布クーポン（初回限定 1割引クーポン）を付与（使用したら消滅）
-                try:
-                    cursor.execute("""
-                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
-                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
-                    """, (demo_uid,))
+                if grant_welcome_coupon(cursor, demo_uid):
                     conn.commit()
-                except Exception as e_coupon:
-                    print(f"[!] デモ新規登録時クーポン付与スキップ: {e_coupon}")
-                    ensure_account_tables()
                 # デモログイン用アカウント（demo@manekin.com）が既に users テーブルに登録済みか調べます
                 cursor.execute(
                     # 上のカーソルで実行する SELECT 検索 SQL 文です（%s に下のパラメータが安全に埋め込まれます）
@@ -1105,18 +1103,8 @@ def demo_login_user():
                 user['points'] = 0
 
             # 既存デモアカウントでクーポンを一度も付与されていない場合は初期クーポンを付与します
-            try:
-                cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user['id'],))
-                c_cnt = cursor.fetchone()
-                if not c_cnt or c_cnt['cnt'] == 0:
-                    cursor.execute("""
-                        INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
-                        VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
-                    """, (user['id'],))
-                    conn.commit()
-            except Exception as e_coupon:
-                print(f"[!] 既存デモアカウントクーポン付与スキップ: {e_coupon}")
-                ensure_account_tables()
+            if grant_welcome_coupon(cursor, user['id']):
+                conn.commit()
 
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
@@ -1263,13 +1251,7 @@ def get_user_coupons():
     try:
         with conn.cursor() as cursor:
             # 既存会員でクーポンをまだ1つも受け取っていない場合は初期配布クーポンを付与します
-            cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user_id,))
-            c_cnt = cursor.fetchone()
-            if not c_cnt or c_cnt['cnt'] == 0:
-                cursor.execute("""
-                    INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
-                    VALUES (%s, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)', 0, NOW());
-                """, (user_id,))
+            if grant_welcome_coupon(cursor, user_id):
                 conn.commit()
 
             # ユーザーの所持クーポン一覧を取得します（未使用を優先表示）

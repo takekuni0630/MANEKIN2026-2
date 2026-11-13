@@ -293,16 +293,17 @@ async function handleRouting() {
 
         // '#mypage'（マイページ）の場合の処理
         case '#mypage':
-            // マイページ画面（#view-mypage）を表示します
+            // マイページ画面（#view-mypage）を表示します（未ログイン時もゲスト状態で開け、中のログインボタンからログイン可能）
             showView('view-mypage');
             // ナビの MYPAGE ボタンを選択状態にします
             highlightNavLink('mypage');
             // 会員プロフィール・保有ポイント・注文履歴・お気に入りタブの現在内容を描画します
             renderMyPage();
-            // バックエンド（MySQL）から最新の注文履歴を取り直して画面に反映します
-            syncOrdersFromBackend();
-            // バックエンド（MySQL）からお気に入りリストも最新同期します
-            if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
+            // ログイン中の場合のみバックエンド（MySQL）から最新データを同期します
+            if (AppState.currentUser) {
+                syncOrdersFromBackend();
+                if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
+            }
             // switch 分岐を抜けます
             break;
 
@@ -314,6 +315,7 @@ async function handleRouting() {
             if (!AppState.currentUser) {
                 // ログイン完了後に自動でスタジオへ戻すための目的地 'manekin' を記憶します
                 AppState.pendingAuthTarget = 'manekin';
+                sessionStorage.setItem('manekin_pending_auth_target', 'manekin');
                 // ログインが必要なことを右下のトースト通知で案内します
                 showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
                 // 強制的にログイン画面（#login）へ誘導します
@@ -365,9 +367,32 @@ function updateAuthNoticeBanner() {
     const regTitle = document.getElementById('reg-notice-title');
     // 会員登録画面側アラートの説明文要素を取得します
     const regDesc = document.getElementById('reg-notice-desc');
+    // 既にログイン済みの場合のバナー要素を取得します
+    const alreadyBox = document.getElementById('login-already-box');
+    const alreadyName = document.getElementById('login-already-name');
 
+    // 既にログイン中の場合のログイン画面上部表示制御
+    if (AppState.currentUser) {
+        if (alreadyBox) alreadyBox.style.display = 'block';
+        if (alreadyName) alreadyName.textContent = AppState.currentUser.name || '会員';
+    } else {
+        if (alreadyBox) alreadyBox.style.display = 'none';
+    }
+
+    const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
+
+    // マイページへ入ろうとして誘導された場合
+    if (target === 'mypage') {
+        if (loginAlert) loginAlert.style.display = 'block';
+        if (regAlert) regAlert.style.display = 'block';
+        const titleText = '⚠️ マイページのご利用には会員登録またはログインが必要です';
+        const descText = 'ご購入履歴の確認やクーポン利用、マイクローゼットの管理にはアカウントが必要です。<br>ログインまたは新規会員登録が完了すると、自動的にマイページへ移動します。';
+        if (loginTitle) loginTitle.textContent = titleText;
+        if (loginDesc) loginDesc.innerHTML = descText;
+        if (regTitle) regTitle.textContent = titleText;
+        if (regDesc) regDesc.innerHTML = descText;
     // 直前に MANEKIN AIスタジオへ入ろうとして弾かれた場合の専用文言を設定します
-    if (AppState.pendingAuthTarget === 'manekin') {
+    } else if (target === 'manekin') {
         // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
         // 会員登録画面側の警告バナーを表示状態にします
@@ -385,7 +410,7 @@ function updateAuthNoticeBanner() {
         // 会員登録画面側アラートの本文をHTMLとして反映します
         if (regDesc) regDesc.innerHTML = descText;
     // 直前に注文手続きページ（checkout）から認証誘導された場合の分岐です
-    } else if (AppState.pendingAuthTarget === 'checkout') {
+    } else if (target === 'checkout') {
         // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
         // 会員登録画面側の警告バナーを表示状態にします
