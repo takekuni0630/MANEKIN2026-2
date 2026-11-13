@@ -222,6 +222,9 @@ function resetAccountScopedDomInputs(user) {
         // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
         checkoutUsedPoints = 0;
     }
+    if (typeof currentAppliedCoupon !== 'undefined') {
+        currentAppliedCoupon = null;
+    }
     // HTML 要素 #order-name を取得して変数 orderName に格納します
     const orderName = document.getElementById('order-name');
     // HTML 要素 #order-phone を取得して変数 orderPhone に格納します
@@ -1344,12 +1347,21 @@ let checkoutUsedPoints = 0;
 // 現在チェックアウトで適用されているクーポンオブジェクト（未適用時は null）
 let currentAppliedCoupon = null;
 
-// ユーザーの保有クーポン一覧を取得して同期します（スマホ版はlocalStorage、PC版はAPI）
+// ユーザーの保有クーポン一覧を取得して同期します（スマホ版はlocalStorage、PC版はAPI＋フォールバック対応）
 async function fetchUserCoupons() {
+    const defaultWelcomeCoupon = {
+        id: 1,
+        code: 'WELCOME10',
+        name: '【初回限定】1割引クーポン (10% OFF)',
+        discount_rate: 0.10,
+        discount_label: '1割引 (10% OFF)',
+        is_used: 0
+    };
+
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        AppState.userCoupons = [];
+        AppState.userCoupons = [defaultWelcomeCoupon];
         renderCheckoutCoupons();
-        return [];
+        return AppState.userCoupons;
     }
     const uid = AppState.currentUser.id;
 
@@ -1357,7 +1369,7 @@ async function fetchUserCoupons() {
     if (isMobileLocalStorageMode()) {
         ensureMobileUserInitialized(AppState.currentUser);
         const savedCoupons = lsGetJson(`manekin_ls_coupons_${uid}`, []);
-        AppState.userCoupons = Array.isArray(savedCoupons) ? savedCoupons : [];
+        AppState.userCoupons = (Array.isArray(savedCoupons) && savedCoupons.length > 0) ? savedCoupons : [defaultWelcomeCoupon];
         renderCheckoutCoupons();
         const mypageCouponCount = document.getElementById('mypage-coupon-count');
         if (mypageCouponCount) {
@@ -1373,14 +1385,17 @@ async function fetchUserCoupons() {
             credentials: 'include'
         });
         const data = await resp.json().catch(() => ({}));
-        if (resp.ok && Array.isArray(data.coupons)) {
+        if (resp.ok && Array.isArray(data.coupons) && data.coupons.length > 0) {
             AppState.userCoupons = data.coupons;
-        } else {
-            AppState.userCoupons = [];
+        } else if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
+            // Pythonサーバー再起動前などで /api/coupons が未応答の場合でも、初回1割引クーポンを選択可能にします
+            AppState.userCoupons = [defaultWelcomeCoupon];
         }
     } catch (e) {
         console.warn('クーポン取得エラー:', e);
-        AppState.userCoupons = [];
+        if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
+            AppState.userCoupons = [defaultWelcomeCoupon];
+        }
     }
     renderCheckoutCoupons();
     // マイページのクーポン枚数バッジも更新
@@ -1392,76 +1407,89 @@ async function fetchUserCoupons() {
     return AppState.userCoupons;
 }
 
-// チェックアウト画面の所持クーポン一覧を描画します
+// チェックアウト画面の所持クーポン選択UI（「適用する」「利用しない」ボタン選択式）を描画します
 function renderCheckoutCoupons() {
     const listEl = document.getElementById('checkout-coupons-list');
     const badgeEl = document.getElementById('checkout-coupon-status-badge');
-    const cancelBtn = document.getElementById('btn-cancel-coupon');
-    const codeInput = document.getElementById('checkout-coupon-code-input');
     if (!listEl) return;
 
-    const coupons = AppState.userCoupons || [];
+    const coupons = (Array.isArray(AppState.userCoupons) && AppState.userCoupons.length > 0)
+        ? AppState.userCoupons
+        : [{
+            id: 1,
+            code: 'WELCOME10',
+            name: '【初回限定】1割引クーポン (10% OFF)',
+            discount_rate: 0.10,
+            discount_label: '1割引 (10% OFF)',
+            is_used: 0
+        }];
     const availableCoupons = coupons.filter(c => !c.is_used);
 
+    // もし適用中のクーポンが使用済みになっていたら解除
+    if (currentAppliedCoupon && !availableCoupons.some(c => c.code === currentAppliedCoupon.code)) {
+        currentAppliedCoupon = null;
+    }
+
     if (currentAppliedCoupon) {
-        if (badgeEl) badgeEl.textContent = `✓ ${currentAppliedCoupon.name} 適用中`;
-        if (cancelBtn) cancelBtn.style.display = 'inline-block';
-        if (codeInput) codeInput.value = currentAppliedCoupon.code;
+        if (badgeEl) {
+            badgeEl.textContent = `現在：✓ ${currentAppliedCoupon.name} を適用中`;
+            badgeEl.style.color = '#059669';
+        }
     } else {
-        if (badgeEl) badgeEl.textContent = availableCoupons.length > 0 ? `${availableCoupons.length}枚のクーポン利用可能` : '利用可能なクーポンはありません';
-        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (badgeEl) {
+            badgeEl.textContent = availableCoupons.length > 0 ? '現在：利用しない（未適用）' : '利用可能なクーポンなし（使用済み）';
+            badgeEl.style.color = '#6b7280';
+        }
     }
 
     if (availableCoupons.length === 0) {
-        listEl.innerHTML = `<p style="font-size: 0.78rem; color: #888; margin: 0;">所持している未使用クーポンはありません（コード直接入力も可能です）</p>`;
+        listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">現在ご利用可能な未使用クーポンはありません（使用済み）</div>`;
         return;
     }
 
     listEl.innerHTML = availableCoupons.map(c => {
-        const isApplied = currentAppliedCoupon && currentAppliedCoupon.code === c.code;
+        const isApplied = Boolean(currentAppliedCoupon && currentAppliedCoupon.code === c.code);
         return `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${isApplied ? '#ffedd5' : '#ffffff'}; border: 1px solid ${isApplied ? '#ea580c' : '#fed7aa'}; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 14px; background: ${isApplied ? '#ffedd5' : '#ffffff'}; border: ${isApplied ? '2px solid #ea580c' : '1px solid #fed7aa'}; border-radius: 8px;">
                 <div>
-                    <div style="font-size: 0.85rem; font-weight: 700; color: #111;">${c.name}</div>
-                    <div style="font-size: 0.72rem; color: #666;">コード: <strong style="color: #c2410c;">${c.code}</strong> | ${c.discount_label}</div>
+                    <div style="font-size: 0.9rem; font-weight: 700; color: #111827;">${c.name}</div>
+                    <div style="font-size: 0.76rem; color: #c2410c; font-weight: 600;">商品代金（小計）から ${c.discount_label} 割引</div>
                 </div>
-                <div>
-                    ${isApplied
-                        ? `<button type="button" class="btn btn-outline-xs" onclick="handleCancelCoupon()" style="padding: 4px 10px; font-size: 0.75rem; color: #888; border-color: #ccc;">適用解除</button>`
-                        : `<button type="button" class="btn btn-outline-xs" onclick="handleApplyCouponCode('${c.code}')" style="padding: 4px 12px; font-size: 0.75rem; font-weight: 700; color: #ea580c; border-color: #ea580c;">適用する</button>`
-                    }
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" class="btn btn-outline-xs" onclick="handleApplyCouponCode('${c.code}')"
+                        style="padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border: 2px solid #ea580c; background: ${isApplied ? '#ea580c' : '#ffffff'}; color: ${isApplied ? '#ffffff' : '#ea580c'}; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                        ${isApplied ? '✓ 適用する（選択中）' : '適用する'}
+                    </button>
+                    <button type="button" class="btn btn-outline-xs" onclick="handleCancelCoupon()"
+                        style="padding: 8px 16px; font-size: 0.82rem; font-weight: 700; border: 2px solid #374151; background: ${!isApplied ? '#374151' : '#ffffff'}; color: ${!isApplied ? '#ffffff' : '#374151'}; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                        ${!isApplied ? '✓ 利用しない（選択中）' : '利用しない'}
+                    </button>
                 </div>
             </div>
         `;
     }).join('');
 }
 
-// クーポンコードの適用処理（何割引きクーポン）
+// クーポンの選択適用処理（何割引きクーポン）
 function handleApplyCouponCode(code) {
-    const input = document.getElementById('checkout-coupon-code-input');
-    const targetCode = (code || (input ? input.value : '')).trim().toUpperCase();
-
-    if (!targetCode) {
-        showToast('クーポンコードを入力してください');
-        return;
-    }
-
-    // ユーザー所持クーポンまたはビルトイン（WELCOME10 等）を検索
-    let coupon = (AppState.userCoupons || []).find(c => c.code === targetCode && !c.is_used);
-
-    // 未所持でも WELCOME10（初回限定1割引クーポン）なら即時適用可能
-    if (!coupon && targetCode === 'WELCOME10') {
-        coupon = {
+    const targetCode = String(code || 'WELCOME10').trim().toUpperCase();
+    if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
+        AppState.userCoupons = [{
+            id: 1,
             code: 'WELCOME10',
             name: '【初回限定】1割引クーポン (10% OFF)',
             discount_rate: 0.10,
             discount_label: '1割引 (10% OFF)',
             is_used: 0
-        };
+        }];
+    }
+    let coupon = (AppState.userCoupons || []).find(c => c.code === targetCode && !c.is_used);
+    if (!coupon) {
+        coupon = (AppState.userCoupons || []).find(c => !c.is_used) || null;
     }
 
     if (!coupon) {
-        showToast(`⚠️ クーポン「${targetCode}」は見つからないか、既に使用済みです`);
+        showToast('⚠️ ご利用可能なクーポンがありません（使用済み）');
         return;
     }
 
@@ -1471,14 +1499,15 @@ function handleApplyCouponCode(code) {
     showToast(`🎉 クーポン「${coupon.name}」を適用しました！（商品代金から ${coupon.discount_label} 引き）`);
 }
 
-// クーポンの適用解除
+// クーポンを利用しない（適用解除）処理
 function handleCancelCoupon() {
+    const hadCoupon = Boolean(currentAppliedCoupon);
     currentAppliedCoupon = null;
-    const input = document.getElementById('checkout-coupon-code-input');
-    if (input) input.value = '';
     renderCheckoutCoupons();
     updateCheckoutCalculations();
-    showToast('クーポンの適用を解除しました');
+    if (hadCoupon) {
+        showToast('クーポンを「利用しない」に変更しました');
+    }
 }
 
 
