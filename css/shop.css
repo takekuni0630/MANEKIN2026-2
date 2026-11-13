@@ -3137,32 +3137,47 @@
     display: flex;
     /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
     align-items: center;
-    /* 横幅の最大上限を 180px に制限し、はみ出しを防ぎます */
-    max-width: 180px;
-    /* Flexアイテムの伸び縮み・基準幅比率を一括で 1 に設定します */
-    flex: 1;
+    /* コンパクトな横幅（145px）に固定し、右側のボタンに重ならないようにします */
+    width: 145px;
+    max-width: 145px;
+    flex: 0 0 145px;
 }
 
 /* セレクタ「.point-num-input」に対するスタイル定義を開始します（対象: .point-num-input） */
 .point-num-input {
-    /* 右側の内側余白を 58px に設定します */
-    padding-right: 58px;
+    /* 親枠（.point-input-group）の幅 100% にぴったり収め、はみ出しを防止します */
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    /* 上下 8px・右 52px（単位表示用）・左 10px の内側余白を設定します */
+    padding: 8px 52px 8px 10px !important;
     /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 700 に設定します */
     font-weight: 700;
-    /* 文字の大きさ（フォントサイズ）を 0.95rem に設定します */
-    font-size: 0.95rem;
+    /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
+    font-size: 0.9rem;
     /* 文字やインライン要素の水平揃え（left / center / right）を right に設定します */
     text-align: right;
+}
+
+/* 数値入力欄のスピンボタン（上下矢印）が単位「pt 利用」と重ならないよう非表示にします */
+.point-num-input::-webkit-outer-spin-button,
+.point-num-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.point-num-input[type=number] {
+    -moz-appearance: textfield;
 }
 
 /* セレクタ「.point-input-suffix」に対するスタイル定義を開始します（対象: .point-input-suffix） */
 .point-input-suffix {
     /* 親の基準枠（relative 等）に対して top/left などで自由な絶対座標へ重ね配置します */
     position: absolute;
-    /* 基準位置の右端からの横位置を 12px に指定します */
-    right: 12px;
-    /* 文字の大きさ（フォントサイズ）を 0.78rem に設定します */
-    font-size: 0.78rem;
+    /* 基準位置の右端からの横位置を 10px に指定します */
+    right: 10px;
+    /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
+    font-size: 0.75rem;
     /* 文字の太さ（700＝太字、500〜600＝中太、400＝標準）を 600 に設定します */
     font-weight: 600;
     /* 文字色（テキストカラー）を #6b7280 に設定します */
@@ -3179,6 +3194,8 @@
     padding: 8px 12px;
     /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
     white-space: nowrap;
+    /* ボタンが縮んで隠れないよう flex-shrink: 0 を指定します */
+    flex-shrink: 0;
 }
 
 /* セレクタ「.point-help-text」に対するスタイル定義を開始します（対象: .point-help-text） */

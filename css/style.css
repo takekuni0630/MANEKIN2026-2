@@ -7,13 +7,13 @@
 
 
 /* 1. サイト全体の基本ルール（共通カラー変数、文字サイズ、固定ヘッダー、画面切替）を読み込みます */
-@import url('base.css');
+@import url('base.css?v=20261113_pt_fix');
 
 /* 2. ECショップ画面用スタイル（トップHERO、商品カード、詳細、カート、認証、マイページ）を読み込みます */
-@import url('shop.css');
+@import url('shop.css?v=20261113_pt_fix');
 
 /* 3. MANEKIN AI試着スタジオ用スタイル（3列レイアウト、クローゼット、位置調整パネル）を読み込みます */
-@import url('studio.css');
+@import url('studio.css?v=20261113_pt_fix');
 
 /* 4. レスポンシブ対応スタイル（最後に読み込むことでPC・タブレット・スマホ幅用のデザインで上書きできます） */
-@import url('responsive.css');
+@import url('responsive.css?v=20261113_pt_fix');
