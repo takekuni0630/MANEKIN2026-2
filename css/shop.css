@@ -2310,6 +2310,20 @@
     gap: 8px;
 }
 
+/* クリック可能な統計カード（保有クーポンなど） */
+.stat-card-clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.stat-card-clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: #22c55e;
+}
+.stat-card-clickable:active {
+    transform: translateY(0);
+}
+
 /* セレクタ「.stat-label」に対するスタイル定義を開始します（対象: .stat-label） */
 .stat-label {
     /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */

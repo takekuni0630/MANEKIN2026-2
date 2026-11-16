@@ -303,6 +303,7 @@ async function handleRouting(forcedRoute) {
             if (AppState.currentUser) {
                 syncOrdersFromBackend();
                 if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
+                if (typeof fetchUserCoupons === 'function') fetchUserCoupons();
             }
             // switch 分岐を抜けます
             break;
@@ -330,8 +331,19 @@ async function handleRouting(forcedRoute) {
             if (typeof syncOutfitsFromBackend === 'function') syncOutfitsFromBackend();
             // MySQL からマネキン着用中スロット＆位置調整値（user_studio_states）を最新取得します
             if (typeof syncStudioStateFromBackend === 'function') syncStudioStateFromBackend();
+            // お気に入り商品一覧（favorites）を最新取得・同期します
+            if (typeof syncFavoritesFromBackend === 'function') syncFavoritesFromBackend();
             // スタジオ全体（マネキン・棚リスト・調整パネル）を描画します
-            renderManekinStudio(AppState.studioActiveTab || 'create');
+            // デフォルトで確実に試着室（コーデ作成: 'create'）タブを表示させます
+            if (typeof switchStudioTab === 'function') {
+                switchStudioTab('create');
+            } else {
+                renderManekinStudio('create');
+            }
+            // スマホ表示時も確実に試着室（マネキンステージ）を表示させます
+            if (typeof switchMobileStudioView === 'function') {
+                switchMobileStudioView('mannequin');
+            }
             // switch 分岐を抜けます
             break;
 
@@ -507,6 +519,16 @@ function setupEventListeners() {
         closetModal.addEventListener('click', (e) => {
             // 外側の暗い背景部分がクリックされた場合のみ登録モーダルを閉じます
             if (e.target === closetModal) closeAddClosetModal();
+        });
+    }
+
+    // 保有クーポンモーダル（#modal-user-coupons）の外側ラッパー要素を取得します
+    const userCouponsModal = document.getElementById('modal-user-coupons');
+    if (userCouponsModal) {
+        userCouponsModal.addEventListener('click', (e) => {
+            if (e.target === userCouponsModal && typeof closeMyPageCouponsModal === 'function') {
+                closeMyPageCouponsModal();
+            }
         });
     }
 

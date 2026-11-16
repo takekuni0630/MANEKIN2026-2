@@ -100,6 +100,16 @@ let isCurrentUploadTransparent = false;
 
 // MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
 function switchStudioTab(tabKey) {
+    // メディアクエリの画面設計（992px以下）の時だけ、独立したお気に入り画面を開かず、コーデ作成画面内の「お気に入り商品」列へ誘導します
+    if (tabKey === 'favorites' && window.innerWidth <= 992) {
+        tabKey = 'create';
+        setTimeout(() => {
+            if (typeof switchMobileStudioView === 'function') {
+                switchMobileStudioView('brand');
+            }
+        }, 50);
+    }
+
     // アプリ全体状態 AppState.studioActiveTab を最新値（tabKey）に更新します
     AppState.studioActiveTab = tabKey;
 
@@ -464,8 +474,8 @@ function renderStudioBrandList() {
         mobBrandFavCnt.textContent = allFavProducts.length;
     }
 
-    // 再代入可能な変数 products を宣言し、値（allFavProducts.filter(p => !p.gender |…）をセットします
-    let products = allFavProducts.filter(p => !p.gender || p.gender === gender);
+    // お気に入りに設定された商品を性別問わずすべて全件表示します
+    let products = [...allFavProducts];
     // 条件（filter !== 'ALL'）が成り立つか判定し、該当する場合の処理を実行します
     if (filter !== 'ALL') {
         // 変数・配列項目 products の値を更新・計算します
@@ -493,7 +503,7 @@ function renderStudioBrandList() {
         list.innerHTML = `
             <div style="text-align: center; padding: 36px 12px; color: var(--color-gray-medium);">
                 <p style="font-size: 0.85rem; font-weight: 600; color: var(--color-dark); margin-bottom: 6px;">該当するお気に入りアイテムがありません</p>
-                <p style="font-size: 0.75rem; color: var(--color-gray-medium); line-height: 1.4;">他のカテゴリまたはマネキンの性別（${gender === 'MEN' ? 'WOMEN' : 'MEN'}）をお試しください。</p>
+                <p style="font-size: 0.75rem; color: var(--color-gray-medium); line-height: 1.4;">上のカテゴリ切り替えで「ALL」を選択するか、商品一覧でお気に入り（♥）を追加してください。</p>
             </div>
         `;
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
@@ -1920,7 +1930,7 @@ function updateAIStylingComment() {
         // 条件（commentElem）が成り立つか判定し、該当する場合の処理を実行します
         if (commentElem) {
             // 文字要素 commentElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-            commentElem.textContent = '左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。';
+            commentElem.textContent = '左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。';
         }
         // 条件（tagsElem）が成り立つか判定し、該当する場合の処理を実行します
         if (tagsElem) tagsElem.innerHTML = '<span class="ai-tag">#試着待ち</span>';
@@ -2463,7 +2473,7 @@ async function addCurrentBrandItemsToCart() {
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (brandItems.length === 0) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToastNotification('現在マネキンが着用しているブランド商品はありません');
+        showToastNotification('現在マネキンが着用しているお気に入り商品はありません');
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
