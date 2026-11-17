@@ -1171,6 +1171,14 @@
     color: var(--color-black);
 }
 
+/* PC画面・メディアクエリ画面でのタイトル表示切り替え */
+.desktop-brand-title {
+    display: inline;
+}
+.mobile-fav-title {
+    display: none;
+}
+
 /* セレクタ「.col-badge」に対するスタイル定義を開始します（対象: .col-badge） */
 .col-badge {
     /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */

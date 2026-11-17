@@ -30,8 +30,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <!-- メインのスタイルシート「css/style.css?v=20261113_pt_fix」を読み込み、全CSSをサイトへ適用します -->
-    <link rel="stylesheet" href="css/style.css?v=20261113_pt_fix">
+    <!-- メインのスタイルシート「css/style.css?v=20261116_all_favs_v5」を読み込み、全CSSをサイトへ適用します -->
+    <link rel="stylesheet" href="css/style.css?v=20261116_all_favs_v5">
     <!-- ここまで <head>（裏方設定・CSS読込エリア）の終了です -->
 </head>
 
@@ -1302,8 +1302,8 @@
                         <span class="stat-value" id="mypage-points">0 <span class="stat-unit">pt</span></span>
                     </div>
                     <!-- クーポン保有数カード（初期配布クーポンなど） -->
-                    <div class="stat-card">
-                        <span class="stat-label">保有クーポン</span>
+                    <div class="stat-card stat-card-clickable" id="mypage-coupon-card" onclick="openMyPageCouponsModal()" title="タップして保有クーポンを確認">
+                        <span class="stat-label">保有クーポン <span style="font-size: 0.72rem; color: #15803d; font-weight: normal; margin-left: 2px;">(タップで確認 👆)</span></span>
                         <span class="stat-value" id="mypage-coupon-count">0 <span class="stat-unit">枚</span></span>
                     </div>
                     <!-- デザイン・配置用のブロック要素（<div class="stat-card">）を開始します -->
@@ -1763,7 +1763,7 @@
                                 id="mob-closet-cnt">0</span>)</button>
                         <!-- 押すと関数 switchMobileStudioView('brand') を実行する操作ボタン「<button class="mobile-tab-btn" d…」です -->
                         <button class="mobile-tab-btn" data-mobile-view="brand"
-                            onclick="switchMobileStudioView('brand')">ブランド商品 (<span
+                            onclick="switchMobileStudioView('brand')">お気に入り商品 (<span
                                 id="mob-brand-fav-cnt">0</span>)</button>
                     </div>
 
@@ -1811,8 +1811,8 @@
                             </div>
                         </div>
 
-                        <!-- 特定機能・領域のブロック要素（<div id="col-studio-mannequin" class="studio-col studio-col-center">）を開始します -->
-                        <div class="studio-col studio-col-center" id="col-studio-mannequin">
+                        <!-- 特定機能・領域のブロック要素（<div id="col-studio-mannequin" class="studio-col studio-col-center mobile-active">）を開始します -->
+                        <div class="studio-col studio-col-center mobile-active" id="col-studio-mannequin">
                             <!-- デザイン・配置用のブロック要素（<div class="mannequin-toolbar">）を開始します -->
                             <div class="mannequin-toolbar"
                                 style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
@@ -2168,8 +2168,8 @@
                             <div class="col-header">
                                 <!-- デザイン・配置用のブロック要素（<div class="col-title-wrap">）を開始します -->
                                 <div class="col-title-wrap">
-                                    <!-- セクションの見出し（<h3>: 3. ブランド商品）を表示します -->
-                                    <h3 class="col-title">3. ブランド商品</h3>
+                                    <!-- セクションの見出し（<h3>: 3. ブランド商品 / お気に入り商品）を表示します -->
+                                    <h3 class="col-title"><span class="desktop-brand-title">3. ブランド商品</span><span class="mobile-fav-title">3. お気に入り商品</span></h3>
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.col-badge col-badge-fav お気に入り）です -->
                                     <span class="col-badge col-badge-fav">お気に入り</span>
                                 </div>
@@ -2227,7 +2227,7 @@
                             <div class="ai-comment-body">
                                 <!-- 段落テキスト（.ai-comment-text: ai-comment-text）を表示します -->
                                 <p class="ai-comment-text" id="ai-comment-text">
-                                    左側の「手持ちの服」または右側の「ブランド商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
+                                    左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
                                 </p>
                                 <!-- AIカラー構成診断ボックス（ベース/アソート/アクセント比率・配色調和タイプ判定） -->
                                 <div class="ai-color-diagnosis-box" id="ai-color-diagnosis-box"
@@ -2344,8 +2344,42 @@
 
 
     <!-- ================================================================== -->
-    <!--  4. ポップアップモーダル群（手持ち服登録 / 完了・AI案内モーダル） -->
+    <!--  4. ポップアップモーダル群（手持ち服登録 / 保有クーポン / 完了・AI案内モーダル） -->
     <!-- ================================================================== -->
+    <!-- 保有クーポン詳細一覧モーダル (#modal-user-coupons) -->
+    <!-- 特定機能・領域のブロック要素（<div id="modal-user-coupons" class="modal-backdrop">）を開始します -->
+    <div class="modal-backdrop" id="modal-user-coupons" role="dialog" aria-modal="true"
+        aria-labelledby="modal-coupons-title">
+        <!-- デザイン・配置用のブロック要素（<div class="modal-dialog modal-dialog-coupon">）を開始します -->
+        <div class="modal-dialog modal-dialog-coupon" style="max-width: 520px; width: 92%; padding: 24px; border-radius: 12px;">
+            <!-- デザイン・配置用のブロック要素（<div class="modal-header">）を開始します -->
+            <div class="modal-header" style="border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px;">
+                <!-- インライン装飾／グルーピング用の <span> 要素（.modal-badge MY COUPONS）です -->
+                <span class="modal-badge" style="background: #111; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">MY COUPONS</span>
+                <!-- 押すと関数 closeMyPageCouponsModal() を実行する操作ボタン「×」です -->
+                <button class="modal-close-btn" onclick="closeMyPageCouponsModal()" aria-label="閉じる" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <!-- デザイン・配置用のブロック要素（<div class="modal-body">）を開始します -->
+            <div class="modal-body">
+                <!-- セクションの見出し領域を表示します -->
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 6px;">🎟️</div>
+                    <h2 class="modal-title" id="modal-coupons-title" style="font-size: 1.35rem; margin-bottom: 6px; font-weight: 700;">保有クーポン一覧</h2>
+                    <p class="modal-subtext" style="color: #666; font-size: 0.85rem; margin: 0;">お買い物でご利用いただけるクーポン特典です</p>
+                </div>
+                <!-- クーポンカード一覧が動的挿入されるコンテナ（#mypage-coupons-list）です -->
+                <div id="mypage-coupons-list" class="coupons-modal-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
+                    <!-- JavaScript（openMyPageCouponsModal）により動的にカードが挿入されます -->
+                </div>
+                <!-- デザイン・配置用のブロック要素（<div class="modal-actions">）を開始します -->
+                <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: center;">
+                    <!-- 押すと関数 closeMyPageCouponsModal() を実行する操作ボタン「閉じる」です -->
+                    <button type="button" class="btn btn-secondary" onclick="closeMyPageCouponsModal()" style="min-width: 140px;">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 特定機能・領域のブロック要素（<div id="modal-add-closet" class="modal-backdrop">）を開始します -->
     <div class="modal-backdrop" id="modal-add-closet" role="dialog" aria-modal="true"
         aria-labelledby="modal-add-closet-title">
@@ -2746,13 +2780,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
-    <script src="js/products-data.js?v=20261113_points_sync_v14"></script>
+    <script src="js/products-data.js?v=20261116_all_favs_v5"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261113_points_sync_v14"></script>
+    <script src="js/shop.js?v=20261116_all_favs_v5"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261113_points_sync_v14"></script>
+    <script src="js/studio.js?v=20261116_all_favs_v5"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261113_points_sync_v14"></script>
+    <script src="js/app.js?v=20261116_all_favs_v5"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 

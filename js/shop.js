@@ -3020,7 +3020,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
             // テンプレートリテラルで組み立てた HTML を要素 detailFavBtn 内に書き込んで画面を更新します
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 0z"></path>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 お気に入り解除
             `;
@@ -3631,6 +3631,94 @@ function closeManekinModal() {
     const modal = document.getElementById('manekin-modal');
     // 条件（modal）が成り立つか判定し、該当する場合の処理を実行します
     if (modal) modal.classList.remove('open');
+}
+
+
+// マイページの「保有クーポン」を押した時に何のクーポンを所持しているか一覧モーダルを表示します
+async function openMyPageCouponsModal() {
+    // 最新の保有クーポン配列を同期します
+    await fetchUserCoupons();
+
+    const modal = document.getElementById('modal-user-coupons');
+    const listElem = document.getElementById('mypage-coupons-list');
+    if (!modal || !listElem) return;
+
+    const coupons = Array.isArray(AppState.userCoupons) ? AppState.userCoupons : [];
+
+    if (coupons.length === 0) {
+        listElem.innerHTML = `
+            <div style="text-align: center; padding: 36px 16px; color: #888; background: #fafafa; border-radius: 8px;">
+                <div style="font-size: 2rem; margin-bottom: 8px;">🎫</div>
+                <p style="font-size: 1rem; font-weight: bold; margin-bottom: 4px; color: #555;">現在ご利用可能なクーポンはありません</p>
+                <p style="font-size: 0.8rem; margin: 0;">新規会員登録特典やキャンペーン開催時にクーポンが付与されます。</p>
+            </div>
+        `;
+    } else {
+        listElem.innerHTML = coupons.map(c => {
+            const isUsed = !!c.is_used;
+            const discountLabel = c.discount_label || (c.discount_rate ? `${Math.round(c.discount_rate * 100)}% OFF` : '割引特典');
+            const code = c.code || 'COUPON';
+            const name = c.name || `${discountLabel} クーポン`;
+
+            if (isUsed) {
+                return `
+                    <div class="coupon-item-card is-used" style="border: 1px dashed #d1d5db; border-radius: 10px; padding: 14px 16px; background: #f9fafb; opacity: 0.65; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
+                            <div style="font-weight: 600; color: #4b5563; font-size: 0.95rem; line-height: 1.4;">
+                                ${escapeHtml(name)}
+                            </div>
+                            <span style="font-size: 0.72rem; background: #6b7280; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 600; white-space: nowrap;">使用済み</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #e5e7eb;">
+                            <div style="font-size: 0.8rem; color: #9ca3af; font-family: monospace;">
+                                コード: <span style="letter-spacing: 0.05em;">${escapeHtml(code)}</span>
+                            </div>
+                            <div style="font-size: 0.9rem; color: #9ca3af; font-weight: 700;">
+                                ${escapeHtml(discountLabel)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="coupon-item-card" style="border: 2px solid #22c55e; border-radius: 10px; padding: 14px 16px; background: #f0fdf4; box-shadow: 0 3px 10px rgba(34,197,94,0.08); position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                            <div style="font-weight: 700; color: #166534; font-size: 1rem; line-height: 1.4;">
+                                🎁 ${escapeHtml(name)}
+                            </div>
+                            <span style="font-size: 0.75rem; background: #22c55e; color: #fff; padding: 3px 10px; border-radius: 20px; font-weight: bold; white-space: nowrap; box-shadow: 0 1px 3px rgba(34,197,94,0.3);">利用可能</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #bbf7d0;">
+                            <div>
+                                <span style="font-size: 0.75rem; color: #166534; font-weight: 600;">クーポンコード:</span>
+                                <span style="font-family: monospace; font-size: 0.95rem; font-weight: bold; background: #fff; padding: 2px 8px; border: 1px solid #86efac; border-radius: 4px; margin-left: 4px; color: #111;">${escapeHtml(code)}</span>
+                            </div>
+                            <div style="font-size: 1.15rem; color: #dc2626; font-weight: 800;">
+                                ${escapeHtml(discountLabel)}
+                            </div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #15803d; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(34,197,94,0.15); display: flex; align-items: center; gap: 4px;">
+                            <span>ℹ️ ご注文手続き画面で「適用する」を選択すると割引されます</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }).join('');
+    }
+
+    modal.classList.add('open');
+    modal.classList.add('active');
+    if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+}
+
+
+// 保有クーポンモーダルを非表示に閉じます
+function closeMyPageCouponsModal() {
+    const modal = document.getElementById('modal-user-coupons');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.classList.remove('active');
+    }
 }
 
 

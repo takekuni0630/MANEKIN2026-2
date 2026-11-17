@@ -66,6 +66,20 @@
 /* 画面横幅が 992px 以下のときに上書き適用されるメディアクエリ（タブレット横以下（ハンバーガーメニューへ切替）向けの調整ルールです） */
 @media screen and (max-width: 992px) {
 
+    /* メディアクエリ画面設計のみ: スタジオ上部のお気に入り商品タブを非表示にし、コーデ作成内の「お気に入り商品」列で一元化します */
+    .studio-tab-btn[data-studio-tab="favorites"],
+    #studio-pane-favorites {
+        display: none !important;
+    }
+
+    /* メディアクエリ画面設計のみ: ブランド商品列のタイトルをお気に入り商品表示に切り替えます */
+    .desktop-brand-title {
+        display: none !important;
+    }
+    .mobile-fav-title {
+        display: inline !important;
+    }
+
     /* PCナビゲーションに対するスタイル定義を開始します（対象: .desktop-nav） */
     .desktop-nav {
         /* 横いっぱいに広がるブロック要素として表示します（非表示からの表示復帰にも使用） */
@@ -649,18 +663,46 @@
         display: none;
     }
 
+    /* スマホ版カート・注文手続き画面（#view-checkout）のみ画面幅にぴったり収まるよう縮小・幅制限します */
+    #view-checkout {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    #view-checkout .container.page-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
     /* カート・注文手続き画面に対するスタイル定義を開始します（対象: .checkout-layout） */
     .checkout-layout {
-        /* Grid の横方向の列数と幅の割り振り（1fr）を定義します */
-        grid-template-columns: 1fr;
-        /* Flexbox や Grid で並べた要素どうしの間隔を 20px に設定します */
-        gap: 20px;
+        /* Grid の1列幅を minmax(0, 1fr) にし、内部要素による右側のはみ出し・見切れを完全に防ぎます */
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        /* Flexbox や Grid で並べた要素どうしの間隔を 16px に設定します */
+        gap: 16px;
+    }
+
+    .checkout-form-column,
+    .checkout-summary-column {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* お支払い方法選択に対するスタイル定義を開始します（対象: .payment-options-grid） */
     .payment-options-grid {
-        /* Grid の横方向の列数と幅の割り振り（1fr）を定義します */
-        grid-template-columns: 1fr;
+        /* Grid の横方向の列数と幅の割り振り（minmax(0, 1fr)）を定義します */
+        grid-template-columns: minmax(0, 1fr);
     }
 
     /* セレクタ「.form-row」に対するスタイル定義を開始します（対象: .form-row） */
@@ -673,60 +715,92 @@
 
     /* カート・注文手続き画面に対するスタイル定義を開始します（対象: .checkout-stepper） */
     .checkout-stepper {
-        /* 要素の下側の外側余白を 20px に設定します */
-        margin-bottom: 20px;
-        /* 枠の内側余白（padding）を「上下 0（余白なし）・左右 4px」に設定します */
-        padding: 0 4px;
+        /* 要素の下側の外側余白を 16px に設定します */
+        margin-bottom: 16px;
+        /* 枠の内側余白（padding）を「上下 0（余白なし）・左右 2px」に設定します */
+        padding: 0 2px;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     /* セレクタ「.step-num」に対するスタイル定義を開始します（対象: .step-num） */
     .step-num {
-        /* 横幅を 28px に設定します */
-        width: 28px;
-        /* 高さを 28px に設定します */
-        height: 28px;
-        /* 文字の大きさ（フォントサイズ）を 0.75rem に設定します */
-        font-size: 0.75rem;
+        /* 横幅を 26px に設定します */
+        width: 26px;
+        /* 高さを 26px に設定します */
+        height: 26px;
+        /* 文字の大きさ（フォントサイズ）を 0.72rem に設定します */
+        font-size: 0.72rem;
     }
 
     /* セレクタ「.step-text」に対するスタイル定義を開始します（対象: .step-text） */
     .step-text {
-        /* 文字の大きさ（フォントサイズ）を 0.68rem に設定します */
-        font-size: 0.68rem;
+        /* 文字の大きさ（フォントサイズ）を 0.65rem に設定します */
+        font-size: 0.65rem;
     }
 
     /* セレクタ「.step-line」に対するスタイル定義を開始します（対象: .step-line） */
     .step-line {
-        /* 要素の外側余白（margin）を「上 0・左右 6px・下 14px」に設定します */
-        margin: 0 6px 14px;
+        /* 要素の外側余白（margin）を「上 0・左右 4px・下 14px」に設定します */
+        margin: 0 4px 14px;
     }
 
     /* カート・注文手続き画面に対するスタイル定義を開始します（対象: .checkout-section-card） */
-    .checkout-section-card {
-        /* 枠の内側余白（padding）を「上下 18px・左右 14px」に設定します */
-        padding: 18px 14px;
+    .checkout-section-card,
+    .checkout-summary-card {
+        /* 枠の内側余白（padding）をスマホ向けにコンパクトな「上下 14px・左右 10px」に設定します */
+        padding: 14px 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    #view-checkout .checkout-coupon-box,
+    #view-checkout .checkout-point-card,
+    #view-checkout .payment-method-box {
+        padding: 12px 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    #view-checkout .form-input,
+    #view-checkout select.form-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        font-size: 0.85rem !important;
+        padding: 9px 10px !important;
     }
 
     /* カート・注文手続き画面に対するスタイル定義を開始します（対象: .checkout-section-title） */
     .checkout-section-title {
-        /* 文字の大きさ（フォントサイズ）を 1.05rem に設定します */
-        font-size: 1.05rem;
+        /* 文字の大きさ（フォントサイズ）を 0.98rem に設定します */
+        font-size: 0.98rem;
+        margin-bottom: 12px;
     }
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-item-row） */
     .cart-item-row {
-        /* CSS Grid を有効にし、格子状（行と列のグリッド）に子要素を並べます */
-        display: grid;
-        /* Grid の横方向の列数と幅の割り振り（58px 1fr）を定義します */
-        grid-template-columns: 58px 1fr;
+        /* CSS Grid を有効にし、右側が見切れないよう 2列目を minmax(0, 1fr) に設定します */
+        display: grid !important;
+        grid-template-columns: 50px minmax(0, 1fr) !important;
         /* 名前付きエリア配置（grid-area）を使ったGridレイアウトの設計図を定義します */
         grid-template-areas:
             "thumb details"
-            "thumb controls";
-        /* Flexbox や Grid で並べた要素どうしの間隔を 8px 12px に設定します */
-        gap: 8px 12px;
-        /* 枠の内側余白（padding）を「上下 12px・左右 10px」に設定します */
-        padding: 12px 10px;
+            "thumb controls" !important;
+        /* Flexbox や Grid で並べた要素どうしの間隔を 6px 10px に設定します */
+        gap: 6px 10px !important;
+        /* 枠の内側余白（padding）をコンパクトな「上下 10px・左右 8px」に設定します */
+        padding: 10px 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
         /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
         align-items: center;
     }
@@ -735,10 +809,10 @@
     .cart-item-thumb {
         /* 親要素の grid-template-areas で定義した領域名「thumb」にこの要素をはめ込みます */
         grid-area: thumb;
-        /* 横幅を 58px に設定します */
-        width: 58px;
-        /* 高さを 74px に設定します */
-        height: 74px;
+        /* 横幅を 50px に縮小設定します */
+        width: 50px !important;
+        /* 高さを 64px に縮小設定します */
+        height: 64px !important;
         /* この要素単体だけ交差軸の揃え位置を start で個別調整します */
         align-self: start;
     }
@@ -747,12 +821,16 @@
     .cart-item-details {
         /* 親要素の grid-template-areas で定義した領域名「details」にこの要素をはめ込みます */
         grid-area: details;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-item-name） */
     .cart-item-name {
-        /* 文字の大きさ（フォントサイズ）を 0.88rem に設定します */
-        font-size: 0.88rem;
+        /* 文字の大きさ（フォントサイズ）を 0.82rem に縮小設定します */
+        font-size: 0.82rem !important;
         /* 1行あたりの高さ（行間・1.3）を設定して文章の読みやすさを調整します */
         line-height: 1.3;
         /* 要素の下側の外側余白を 2px に設定します */
@@ -761,16 +839,16 @@
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-item-meta） */
     .cart-item-meta {
-        /* 文字の大きさ（フォントサイズ）を 0.76rem に設定します */
-        font-size: 0.76rem;
+        /* 文字の大きさ（フォントサイズ）を 0.72rem に縮小設定します */
+        font-size: 0.72rem !important;
         /* 要素の下側の外側余白を 2px に設定します */
         margin-bottom: 2px;
     }
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-item-price） */
     .cart-item-price {
-        /* 文字の大きさ（フォントサイズ）を 0.9rem に設定します */
-        font-size: 0.9rem;
+        /* 文字の大きさ（フォントサイズ）を 0.84rem に縮小設定します */
+        font-size: 0.84rem !important;
     }
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-item-controls） */
@@ -778,33 +856,44 @@
         /* 親要素の grid-template-areas で定義した領域名「controls」にこの要素をはめ込みます */
         grid-area: controls;
         /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
-        display: flex;
+        display: flex !important;
         /* 交差軸（通常は上下方向）の揃え位置を center に設定します */
         align-items: center;
-        /* 主軸（通常は横方向）の配置・間隔揃えを space-between に設定します */
-        justify-content: space-between;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
         /* 上側の内側余白を 6px に設定します */
         padding-top: 6px;
         /* 上辺だけの境界線を 1px dashed var(--color-gray-light) に設定します */
         border-top: 1px dashed var(--color-gray-light);
     }
 
+    .cart-remove-btn {
+        margin-left: auto !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap;
+    }
+
     /* ボタンパーツ・ショッピングカートに対するスタイル定義を開始します（対象: .cart-qty-btn） */
     .cart-qty-btn {
-        /* 横幅を 26px に設定します */
-        width: 26px;
-        /* 高さを 26px に設定します */
-        height: 26px;
-        /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
-        font-size: 0.85rem;
+        /* 横幅を 24px に設定します */
+        width: 24px !important;
+        /* 高さを 24px に設定します */
+        height: 24px !important;
+        /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
+        font-size: 0.8rem !important;
+        flex-shrink: 0;
     }
 
     /* ショッピングカートに対するスタイル定義を開始します（対象: .cart-qty-text） */
     .cart-qty-text {
-        /* 文字の大きさ（フォントサイズ）を 0.85rem に設定します */
-        font-size: 0.85rem;
-        /* どんなに画面が狭くても最低 18px の横幅を保つ（0 の場合はフレックス縮みバグ防止）ようにします */
-        min-width: 18px;
+        /* 文字の大きさ（フォントサイズ）を 0.8rem に設定します */
+        font-size: 0.8rem !important;
+        /* どんなに画面が狭くても最低 16px の横幅を保つ（0 の場合はフレックス縮みバグ防止）ようにします */
+        min-width: 16px;
     }
 
     /* ログイン・新規会員登録画面に対するスタイル定義を開始します（対象: .auth-card） */
@@ -1060,6 +1149,12 @@
         flex-shrink: 0;
         /* テキストの自動折り返しを禁止（nowrap）して1行のままにします */
         white-space: nowrap;
+    }
+
+    /* スマホ画面のみスタジオ上部のお気に入り商品タブを非表示にし、コーデ作成内の「お気に入り商品」列で一元化します */
+    .studio-tab-btn[data-studio-tab="favorites"],
+    #studio-pane-favorites {
+        display: none !important;
     }
 
     /* MANEKIN AI試着スタジオに対するスタイル定義を開始します（対象: .studio-stats-grid） */
