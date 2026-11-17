@@ -370,6 +370,23 @@ function renderStudioClosetList() {
     // 条件（!list）が成り立つか判定し、該当する場合の処理を実行します
     if (!list) return;
 
+    // 手持ち服のカラー誤認自動修復（茶色の服が初期値BLACKで登録されていた場合の補正）
+    if (Array.isArray(AppState.myCloset)) {
+        AppState.myCloset.forEach(it => {
+            if (!it) return;
+            const imgStr = (it.image || '').toLowerCase();
+            const nameStr = (it.name || '').toLowerCase();
+            if (it.color === 'BLACK' || !it.color || it.color === 'OTHER') {
+                if (imgStr.includes('brown') || imgStr.includes('mocha') || imgStr.includes('camel') || 
+                    imgStr.includes('ヴィンテージウォッシュ') || imgStr.includes('茶') ||
+                    nameStr.includes('茶') || nameStr.includes('ブラウン') || nameStr.includes('モカ') || nameStr.includes('キャメル')) {
+                    it.color = 'BROWN';
+                    it._detectedColor = 'BROWN';
+                }
+            }
+        });
+    }
+
     // 定数 filter を宣言し、値（AppState.studioClosetFilter || 'ALL'）をセットします
     const filter = AppState.studioClosetFilter || 'ALL';
     // 定数 items を宣言し、値（(filter === 'ALL')）をセットします
@@ -1827,7 +1844,7 @@ function analyzeOutfitColorComposition(outfit) {
 
     for (const [slot, item] of Object.entries(outfit)) {
         if (!item) continue;
-        const color = typeof getItemColor === 'function' ? getItemColor(item) : (item.color || 'BLACK').toUpperCase();
+        const color = typeof getItemColor === 'function' ? getItemColor(item, slot) : (item.color || 'BLACK').toUpperCase();
         const w = weights[slot] || 10;
         colorWeights[color] = (colorWeights[color] || 0) + w;
         totalWeight += w;
@@ -1985,6 +2002,22 @@ function analyzeOutfitColorComposition(outfit) {
 // 現在着せている服の組み合わせ（アウター・色構成・部位充実度）を解析し、AIスコア・アドバイス文・カラー構成ドットを更新します
 function updateAIStylingComment() {
     const outfit = AppState.currentOutfit || {};
+
+    // 着用中アイテムのカラー自動修復（茶色の服が初期値BLACKになっていた場合の補正）
+    for (const [slot, it] of Object.entries(outfit)) {
+        if (!it) continue;
+        const imgStr = (it.image || '').toLowerCase();
+        const nameStr = (it.name || '').toLowerCase();
+        if (it.color === 'BLACK' || !it.color || it.color === 'OTHER') {
+            if (imgStr.includes('brown') || imgStr.includes('mocha') || imgStr.includes('camel') || 
+                imgStr.includes('ヴィンテージウォッシュ') || imgStr.includes('茶') ||
+                nameStr.includes('茶') || nameStr.includes('ブラウン') || nameStr.includes('モカ') || nameStr.includes('キャメル')) {
+                it.color = 'BROWN';
+                it._detectedColor = 'BROWN';
+            }
+        }
+    }
+
     const commentElem = document.getElementById('ai-comment-text');
     const tagsElem = document.getElementById('ai-tags-wrap');
     const dotsElem = document.getElementById('palette-dots');
@@ -3459,7 +3492,7 @@ async function analyzeClothingItemShape(source) {
                 // 定数 confidence を宣言し、値（Math.min(99, Math.max(82, Math.round(h…）をセットします
                 const confidence = Math.min(99, Math.max(82, Math.round(highestScore * 0.95)));
 
-                // 前景ピクセルから代表カラーをAI検出（RGB -> HSL判定）
+                // 前景ピクセルから代表カラーをAI検出（RGB差分 & HSLによる高精度判定）
                 const avgR = fgCount > 0 ? Math.round(sumR / fgCount) : 0;
                 const avgG = fgCount > 0 ? Math.round(sumG / fgCount) : 0;
                 const avgB = fgCount > 0 ? Math.round(sumB / fgCount) : 0;
@@ -3477,46 +3510,64 @@ async function analyzeClothingItemShape(source) {
                 const hue = Math.round(h * 360);
                 const sat = Math.round(s * 100);
                 const light = Math.round(l * 100);
+                const brightness = (avgR * 299 + avgG * 587 + avgB * 114) / 1000;
 
                 let detectedColor = 'BLACK';
                 let detectedColorLabel = 'BLACK (ブラック・黒)';
 
-                if (light < 18) {
+                // ★ 茶色（ブラウン / モカ / キャメル / チョコ）の最優先判定:
+                // ファッション服の茶色は赤(R)が緑(G)や青(B)より確実に高く(暖色系)、R - B が出ている
+                const isWarmBrown = (avgR > avgG) && ((avgR - avgB) >= 12) && ((avgR - avgG) >= 4);
+                const isBrownHue = (hue >= 5 && hue <= 58) || (hue >= 345);
+
+                if (isWarmBrown && (isBrownHue || sat >= 7) && brightness >= 25 && brightness <= 185) {
+                    if (brightness > 140 && avgR > 165 && avgG > 130) {
+                        detectedColor = 'BEIGE';
+                        detectedColorLabel = 'BEIGE (ベージュ・生成)';
+                    } else {
+                        detectedColor = 'BROWN';
+                        detectedColorLabel = 'BROWN (ブラウン・茶)';
+                    }
+                } else if (brightness < 30 && Math.abs(avgR - avgB) < 12) {
                     detectedColor = 'BLACK';
                     detectedColorLabel = 'BLACK (ブラック・黒)';
-                } else if (light > 80 && sat < 18) {
+                } else if (brightness > 220 && sat < 18) {
                     detectedColor = 'WHITE';
                     detectedColorLabel = 'WHITE (ホワイト・白)';
-                } else if (sat < 14) {
-                    if (light < 45) {
+                } else if (sat < 12 && Math.abs(avgR - avgB) < 12) {
+                    if (brightness < 75) {
                         detectedColor = 'CHARCOAL';
                         detectedColorLabel = 'CHARCOAL (チャコール・濃灰)';
                     } else {
                         detectedColor = 'GREY';
                         detectedColorLabel = 'GREY (グレー・灰)';
                     }
-                } else if (hue >= 170 && hue <= 260) {
-                    if (light < 35) {
+                } else if ((hue >= 170 && hue <= 265) || (avgB > avgR && avgB > avgG && (avgB - avgR) >= 12)) {
+                    if (brightness < 65) {
                         detectedColor = 'NAVY';
                         detectedColorLabel = 'NAVY (ネイビー・紺)';
                     } else {
                         detectedColor = 'BLUE';
                         detectedColorLabel = 'BLUE (ブルー・青・デニム)';
                     }
-                } else if (hue >= 15 && hue <= 50) {
-                    if (light > 62 && sat < 50) {
-                        detectedColor = 'BEIGE';
-                        detectedColorLabel = 'BEIGE (ベージュ・生成)';
-                    } else if (light <= 48) {
+                } else if (hue >= 60 && hue <= 165 && avgG >= avgB) {
+                    detectedColor = 'OLIVE';
+                    detectedColorLabel = 'OLIVE (オリーブ・カーキ)';
+                } else if ((hue <= 15 || hue >= 340) && avgR > 130 && (avgR - avgG) > 40) {
+                    detectedColor = 'RED';
+                    detectedColorLabel = 'RED (レッド・赤)';
+                } else {
+                    // 暖色系で茶色傾向があれば確実に BROWN
+                    if (avgR > avgG && avgG >= avgB && (avgR - avgB) >= 10 && brightness >= 25 && brightness <= 170) {
                         detectedColor = 'BROWN';
                         detectedColorLabel = 'BROWN (ブラウン・茶)';
+                    } else if (brightness < 60) {
+                        detectedColor = 'CHARCOAL';
+                        detectedColorLabel = 'CHARCOAL (チャコール・濃灰)';
                     } else {
-                        detectedColor = 'BEIGE';
-                        detectedColorLabel = 'BEIGE (ベージュ・生成)';
+                        detectedColor = 'BROWN';
+                        detectedColorLabel = 'BROWN (ブラウン・茶)';
                     }
-                } else {
-                    detectedColor = 'OTHER';
-                    detectedColorLabel = 'OTHER (その他)';
                 }
 
                 // 最終結果を resolve() に渡して非同期 Promise を完了させます
@@ -4560,36 +4611,161 @@ function getCategoryNameJP(cat) {
 }
 
 
-// アイテム（手持ち服またはブランド商品）から正確なカラーコード文字列（'BLACK', 'CHARCOAL', 'NAVY' 等）を取得します
-function getItemColor(item) {
+// 画像（URLまたはDataURL）から支配的な色を分析してカラーカテゴリ（'BROWN', 'BLACK', 'WHITE' 等）を判定するキャッシュ辞書
+const _imageColorAnalysisCache = {};
+
+// すでに画面に表示されている <img> 要素、または生成した Image からピクセルを直接サンプリングして色判定（茶色等を誤認せず確実に検出）
+function analyzeImgElementColor(imgElem) {
+    if (!imgElem) return null;
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const w = 32;
+        const h = 32;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(imgElem, 0, 0, w, h);
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        const counts = {};
+
+        // 中央部分（服の本体）を中心にサンプリング
+        for (let y = 4; y < h - 4; y++) {
+            for (let x = 4; x < w - 4; x++) {
+                const idx = (y * w + x) * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const a = data[idx + 3];
+
+                if (a < 40) continue; // 透明ピクセル除外
+                if (r > 240 && g > 240 && b > 240) continue; // 白背景除外
+
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                const diff = max - min;
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+                let cat = 'BLACK';
+
+                // ★ 茶色（ブラウン / モカ / キャメル / チョコ）の最優先判定:
+                // 赤(R)が緑(G)や青(B)より確実に高く(暖色系)、R - B がしっかりと出ていること
+                if (r > g && (r - b) >= 12 && (r - g) >= 4) {
+                    if (r > 150 && g < 75 && b < 75 && (r - g) > 65) {
+                        cat = 'RED';
+                    } else if (r > 75 && b > 35 && g < b && (r - g) > 30) {
+                        cat = 'WINE';
+                    } else if (brightness >= 24 && brightness <= 185) {
+                        if (brightness > 140 && r > 165 && g > 130) {
+                            cat = 'BEIGE';
+                        } else {
+                            cat = 'BROWN'; // ★ 茶色
+                        }
+                    } else {
+                        cat = 'BROWN';
+                    }
+                } else if (brightness < 30 && diff < 12) {
+                    cat = 'BLACK';
+                } else if (brightness > 220 && diff < 20) {
+                    cat = 'WHITE';
+                } else if (diff < 16) {
+                    if (brightness < 75) cat = 'CHARCOAL';
+                    else if (brightness < 165) cat = 'GREY';
+                    else cat = 'LIGHT GREY';
+                } else if ((b > r && b > g) || (b - r) >= 12) {
+                    if (brightness < 70) cat = 'NAVY';
+                    else cat = 'BLUE';
+                } else if (g > b && g >= r) {
+                    cat = 'OLIVE';
+                } else {
+                    if (r > g && (r - b) >= 10 && brightness >= 24) {
+                        cat = 'BROWN';
+                    } else if (brightness < 60) {
+                        cat = 'CHARCOAL';
+                    } else {
+                        cat = 'BROWN';
+                    }
+                }
+
+                counts[cat] = (counts[cat] || 0) + 1;
+            }
+        }
+
+        let bestCol = null;
+        let maxC = 0;
+        for (const [col, cnt] of Object.entries(counts)) {
+            if (cnt > maxC) {
+                maxC = cnt;
+                bestCol = col;
+            }
+        }
+        return bestCol;
+    } catch (e) {
+        return null;
+    }
+}
+
+// アイテム（手持ち服またはブランド商品）から正確なカラーコード文字列（'BROWN', 'BLACK', 'CHARCOAL' 等）を取得します
+function getItemColor(item, slotKey) {
     if (!item) return 'BLACK';
 
-    // 1. item.color が明示されている場合
-    if (item.color && typeof item.color === 'string') {
-        const c = item.color.toUpperCase().trim();
-        if (c && c !== 'OTHER' && c !== '不明') return c;
-    }
-
-    // 2. item.colors 配列（ブランド商品 SAMPLE_PRODUCTS）
-    if (Array.isArray(item.colors) && item.colors.length > 0 && typeof item.colors[0] === 'string') {
-        return item.colors[0].toUpperCase().trim();
-    }
-
-    // 3. SAMPLE_PRODUCTS からID照合して colors を取得
-    if (item.id && typeof SAMPLE_PRODUCTS !== 'undefined') {
-        const prod = SAMPLE_PRODUCTS.find(p => p.id === parseInt(item.id, 10));
-        if (prod && Array.isArray(prod.colors) && prod.colors.length > 0) {
-            return prod.colors[0].toUpperCase().trim();
+    // 1. マネキン上に現在描画されている <img> 要素から直接ピクセルサンプリング（完全同期・最高精度！）
+    if (slotKey) {
+        const layerContent = document.getElementById(`layer-content-${slotKey}`);
+        if (layerContent) {
+            const liveImg = layerContent.querySelector('img');
+            if (liveImg && liveImg.complete && liveImg.naturalWidth > 0) {
+                const detected = analyzeImgElementColor(liveImg);
+                if (detected) {
+                    if (item.image) _imageColorAnalysisCache[item.image] = detected;
+                    item._detectedColor = detected;
+                    // 元が初期値BLACKで、画像が茶色の場合は即時修復
+                    if (item.color === 'BLACK' && detected === 'BROWN') {
+                        item.color = 'BROWN';
+                    }
+                    return detected;
+                }
+            }
         }
     }
 
-    // 4. アイテム名（name）のキーワードから推定（日本語・英語対応）
+    // 2. 画像キャッシュまたは検出済みカラーがあれば即時利用
+    if (item._detectedColor) return item._detectedColor;
+    if (item.image && _imageColorAnalysisCache[item.image]) {
+        return _imageColorAnalysisCache[item.image];
+    }
+
+    // 3. 画像URL・パスから茶色や各色を判定（ファイル名やURLに含まれるキーワード）
+    const imgUrl = (item.image || '').toLowerCase();
+    if (imgUrl.includes('ヴィンテージウォッシュフルジップパーカー') ||
+        imgUrl.includes('mocha') ||
+        imgUrl.includes('brown') ||
+        imgUrl.includes('camel') ||
+        imgUrl.includes('hoodie_zip_brown') ||
+        imgUrl.includes('hoodie_pullover_brown') ||
+        imgUrl.includes('hoodie_zip_camel') ||
+        imgUrl.includes('hoodie_pullover_camel') ||
+        imgUrl.includes('茶')) {
+        return 'BROWN';
+    }
+    if (imgUrl.includes('charcoal') || imgUrl.includes('チャコール')) return 'CHARCOAL';
+    if (imgUrl.includes('スカイオックスフォード') || imgUrl.includes('blue')) return 'BLUE';
+    if (imgUrl.includes('アーバングレイ') || imgUrl.includes('grey') || imgUrl.includes('gray')) return 'GREY';
+    if (imgUrl.includes('アーバンワイン') || imgUrl.includes('wine')) return 'WINE';
+    if (imgUrl.includes('バッファローチェック') || imgUrl.includes('red')) return 'RED CHECK';
+    if (imgUrl.includes('オリーブ') || imgUrl.includes('olive') || imgUrl.includes('カーゴ')) return 'OLIVE';
+
+    // 4. アイテム名（name）のキーワードから茶色や各色を判定
     const name = (item.name || '').toLowerCase();
+    if (name.includes('茶') || name.includes('ブラウン') || name.includes('brown') || name.includes('モカ') || name.includes('mocha') || name.includes('キャメル') || name.includes('camel')) {
+        return 'BROWN';
+    }
     if (name.includes('チャコール') || name.includes('charcoal')) return 'CHARCOAL';
-    if (name.includes('黒') || name.includes('ブラック') || name.includes('black')) return 'BLACK';
     if (name.includes('オフホワイト') || name.includes('off white')) return 'OFF WHITE';
     if (name.includes('アイボリー') || name.includes('ivory')) return 'IVORY';
     if (name.includes('白') || name.includes('ホワイト') || name.includes('white')) return 'WHITE';
+    if (name.includes('黒') || name.includes('ブラック') || name.includes('black')) return 'BLACK';
     if (name.includes('杢グレー') || name.includes('ヘザーグレー') || name.includes('heather grey')) return 'HEATHER GREY';
     if (name.includes('ライトグレー') || name.includes('light grey')) return 'LIGHT GREY';
     if (name.includes('グレー') || name.includes('グレイ') || name.includes('grey') || name.includes('gray')) return 'GREY';
@@ -4605,10 +4781,51 @@ function getItemColor(item) {
     if (name.includes('ブルー') || name.includes('青') || name.includes('blue')) return 'BLUE';
     if (name.includes('オートミール') || name.includes('oatmeal')) return 'OATMEAL';
     if (name.includes('ベージュ') || name.includes('beige') || name.includes('エクリュ') || name.includes('ecru')) return 'BEIGE';
-    if (name.includes('モカ') || name.includes('mocha')) return 'MOCHA BROWN';
-    if (name.includes('ブラウン') || name.includes('茶') || name.includes('brown')) return 'BROWN';
     if (name.includes('チェック') || name.includes('赤') || name.includes('レッド') || name.includes('red')) return 'RED CHECK';
 
+    // 5. ブランド商品の colors 配列
+    if (Array.isArray(item.colors) && item.colors.length > 0 && typeof item.colors[0] === 'string') {
+        return item.colors[0].toUpperCase().trim();
+    }
+    if (item.id && typeof SAMPLE_PRODUCTS !== 'undefined') {
+        const prod = SAMPLE_PRODUCTS.find(p => p.id === parseInt(item.id, 10));
+        if (prod && Array.isArray(prod.colors) && prod.colors.length > 0) {
+            return prod.colors[0].toUpperCase().trim();
+        }
+    }
+
+    // 6. 手持ち服等で直接指定された color（BLACK以外なら信頼）
+    if (item.color && typeof item.color === 'string') {
+        const c = item.color.toUpperCase().trim();
+        if (c && c !== 'BLACK' && c !== 'OTHER' && c !== '不明') {
+            return c;
+        }
+    }
+
+    // 7. 画像がある場合は非同期でロードして解析（完了時に再診断）
+    if (item.image && typeof window !== 'undefined') {
+        const tempImg = new Image();
+        tempImg.crossOrigin = 'Anonymous';
+        tempImg.onload = function () {
+            const detected = analyzeImgElementColor(tempImg);
+            if (detected) {
+                _imageColorAnalysisCache[item.image] = detected;
+                item._detectedColor = detected;
+                if (item.color === 'BLACK' && detected !== 'BLACK') {
+                    item.color = detected;
+                }
+                if (typeof updateAIStylingComment === 'function') {
+                    updateAIStylingComment();
+                }
+            }
+        };
+        tempImg.src = item.image;
+    }
+
+    // フォールバック
+    if (item.color && typeof item.color === 'string') {
+        return item.color.toUpperCase().trim();
+    }
     return 'BLACK';
 }
 
