@@ -2025,6 +2025,13 @@ function updateAIStylingComment() {
     const scoreStarsElem = document.getElementById('ai-score-stars');
     const colorBox = document.getElementById('ai-color-diagnosis-box');
     const baseToneTag = document.getElementById('palette-basetone-tag');
+    const paletteWrap = document.getElementById('ai-palette-wrap');
+
+    // カラー構成・色識別エリアは完全非表示
+    if (paletteWrap) paletteWrap.style.display = 'none';
+    if (colorBox) colorBox.style.display = 'none';
+    if (baseToneTag) baseToneTag.textContent = '';
+    if (dotsElem) dotsElem.innerHTML = '';
 
     const wornItems = Object.values(outfit).filter(Boolean);
 
@@ -2034,11 +2041,8 @@ function updateAIStylingComment() {
             commentElem.textContent = '左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。';
         }
         if (tagsElem) tagsElem.innerHTML = '<span class="ai-tag">#試着待ち</span>';
-        if (dotsElem) dotsElem.innerHTML = '';
-        if (baseToneTag) baseToneTag.textContent = '';
         if (scoreValElem) scoreValElem.textContent = '--点';
         if (scoreStarsElem) scoreStarsElem.textContent = '';
-        if (colorBox) colorBox.style.display = 'none';
         return;
     }
 
@@ -2048,84 +2052,32 @@ function updateAIStylingComment() {
     const hasShoes = !!outfit.shoes;
     const hasHat = !!outfit.hat;
 
-    // AIカラー構成診断を実行
-    const colorDiag = analyzeOutfitColorComposition(outfit);
-
-    // カラー構成ドットと基調色バッジを描画
-    if (dotsElem) {
-        dotsElem.innerHTML = colorDiag.breakdown.map(item => `
-            <span class="palette-dot" style="background-color: ${item.hex};" title="${item.colorJa}: ${item.ratio}% (${item.role})" ></span>
-        `).join('');
-    }
-    if (baseToneTag) {
-        baseToneTag.textContent = colorDiag.baseToneBadge ? `【${colorDiag.baseToneBadge}】` : '';
-        baseToneTag.title = colorDiag.baseToneDescription || '';
-    }
-
-    // AIカラー構成診断ボックスの表示更新
-    if (colorBox && colorDiag.breakdown.length > 0) {
-        colorBox.style.display = 'block';
-        const typeElem = document.getElementById('ai-color-scheme-type');
-        if (typeElem) typeElem.textContent = colorDiag.schemeType;
-
-        const baseToneNameElem = document.getElementById('ai-color-basetone-name');
-        if (baseToneNameElem) baseToneNameElem.textContent = colorDiag.baseToneTitle;
-
-        const baseToneRatioElem = document.getElementById('ai-color-basetone-ratio');
-        if (baseToneRatioElem) {
-            baseToneRatioElem.textContent = `(${colorDiag.topColor}が全体の約${colorDiag.topRatio}%を占めるベースカラー)`;
-        }
-
-        const ratioBar = document.getElementById('ai-color-ratio-bar');
-        if (ratioBar) {
-            ratioBar.innerHTML = colorDiag.breakdown.map(item => `
-                <div style="width: ${item.ratio}%; background-color: ${item.hex}; height: 100%; transition: width 0.3s;" title="${item.colorJa}: ${item.ratio}% (${item.role})"></div>
-            `).join('');
-        }
-
-        const listElem = document.getElementById('ai-color-breakdown-list');
-        if (listElem) {
-            listElem.innerHTML = colorDiag.breakdown.map(item => `
-                <div style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 4px;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: ${item.hex}; border: 1px solid rgba(255,255,255,0.3); display: inline-block;"></span>
-                    <span>${item.colorJa} <b>${item.ratio}%</b> <span style="opacity: 0.72; font-size: 0.68rem;">(${item.role})</span></span>
-                </div>
-            `).join('');
-        }
-    }
-
-    // AIコメントの生成
+    // AIコメントの生成（カラー識別テキストは除外し、自然なスタイリング提案を行う）
     let comment = '';
     let tags = [];
     let score = 95;
-
-    // 基調色リード文を生成
-    let colorLead = '';
-    if (colorDiag && colorDiag.baseToneTitle && colorDiag.baseToneTitle !== '--') {
-        colorLead = `【🎨 ${colorDiag.baseToneTitle}】${colorDiag.baseToneDescription} `;
-    }
 
     if (hasBottoms && hasShoes && hasTops) {
         comment = `「${outfit.bottoms.name}」と「${outfit.tops.name}」の調和が取れており、足元の「${outfit.shoes.name}」が視線の抜け感を作っています。`;
         if (hasOuter) {
             comment += ` さらに「${outfit.outer.name}」を羽織ることで、大人の落ち着きと洗練されたレイヤードが完成します。`;
-            tags = ['#大人の品格', `#${colorDiag.baseToneTitle}`, '#洗練レイヤード'];
+            tags = ['#大人の品格', '#洗練レイヤード', '#トータルコーデ'];
             score = 98;
         } else {
-            tags = ['#キレイめカジュアル', `#${colorDiag.baseToneTitle}`, '#デイリーバランス'];
+            tags = ['#キレイめカジュアル', '#デイリーバランス', '#王道スタイル'];
             score = 95;
         }
     } else if (hasOuter && hasBottoms) {
         comment = `「${outfit.outer.name}」の落ち感が全体のシルエットを引き締め、ボトムス「${outfit.bottoms.name}」との組み合わせでモダンな装いに仕上がっています。`;
-        tags = ['#スマートシルエット', `#${colorDiag.baseToneTitle}`, '#都会派モード'];
+        tags = ['#スマートシルエット', '#都会派モード', '#シンプルシック'];
         score = 96;
     } else if (hasTops && hasBottoms) {
         comment = `「${outfit.tops.name}」と「${outfit.bottoms.name}」の明度と彩度のバランスが美しく、日常使いにもぴったりな洗練されたスタイルです。`;
-        tags = ['#黄金バランス', `#${colorDiag.baseToneTitle}`, '#着回し自在'];
+        tags = ['#黄金バランス', '#着回し自在', '#ベーシック'];
         score = 94;
     } else {
         const singleItem = wornItems[0];
-        comment = `「${singleItem.name}」を着用中。美しいシルエットが際立っています。さらに相性の良い${hasTops ? 'ボトムスや靴' : 'トップスやアウター'} を組み合わせると、全体のトータルカラーバランスを診断できます。`;
+        comment = `「${singleItem.name}」を着用中。美しいシルエットが際立っています。さらに相性の良い${hasTops ? 'ボトムスや靴' : 'トップスやアウター'} を組み合わせると、全身のバランスを診断できます。`;
         tags = ['#シルエット重視', '#スタイリング途中'];
         score = 90;
     }
@@ -2133,18 +2085,6 @@ function updateAIStylingComment() {
     if (hasHat && outfit.hat) {
         comment += ` 頭元の「${outfit.hat.name}」が全体のアイキャッチとなり、こなれたストリート感を演出しています。`;
         if (!tags.includes('#アクセント小物')) tags.push('#アクセント小物');
-    }
-
-    // 配色理論コメントとタグを統合
-    if (colorDiag && colorDiag.schemeComment) {
-        comment = colorLead + comment + ` （配色タイプ: ${colorDiag.schemeType}）`;
-        if (colorDiag.tags) {
-            for (const t of colorDiag.tags) {
-                if (!tags.includes(t)) tags.push(t);
-            }
-        }
-    } else {
-        comment = colorLead + comment;
     }
 
     if (commentElem) commentElem.textContent = comment;
