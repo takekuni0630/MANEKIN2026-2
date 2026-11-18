@@ -129,6 +129,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     migrateOldBrokenAssets();
     // 現在のブラウザURLのハッシュ（例: #home, #mypage）に応じた最初の画面を表示します
     await handleRouting();
+    // 起動時に現在の気温・季節に応じた AIコーデ提案（TODAY'S AI STYLING）を初期反映します
+    if (typeof updateTodaySeasonalStyling === 'function') {
+        updateTodaySeasonalStyling();
+    }
 });
 
 // 3. SPAルーティング（URL末尾の #〇〇 を読み取り、リロードなしで画面を表示切替）
@@ -343,6 +347,10 @@ async function handleRouting(forcedRoute) {
             // スマホ表示時も確実に試着室（マネキンステージ）を表示させます
             if (typeof switchMobileStudioView === 'function') {
                 switchMobileStudioView('mannequin');
+            }
+            // 本日の気温・季節に応じた AIコーデ提案（TODAY'S AI STYLING）を更新します
+            if (typeof updateTodaySeasonalStyling === 'function') {
+                updateTodaySeasonalStyling();
             }
             // switch 分岐を抜けます
             break;
@@ -696,6 +704,8 @@ window.handleSaveOutfit = handleSaveOutfit;
 window.applyPresetName = applyPresetName;
 // おすすめルックの一括試着適用関数を公開します
 window.applyPresetLook = applyPresetLook;
+window.applyTodaySeasonalPresetLook = applyTodaySeasonalPresetLook;
+window.updateTodaySeasonalStyling = updateTodaySeasonalStyling;
 // 保存済みコーデをマネキンへワンクリック復元する関数を公開します
 window.restoreOutfit = restoreOutfit;
 // 保存済みコーデ削除関数を公開します

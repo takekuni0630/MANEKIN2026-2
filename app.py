@@ -207,6 +207,7 @@ def ensure_account_tables():
                   PRIMARY KEY (`id`),
                   UNIQUE KEY `uk_session_token` (`session_token`),
                   KEY `idx_session_user_id` (`user_id`),
+                  KEY `idx_session_expires` (`expires_at`),
                   CONSTRAINT `fk_session_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             """)
@@ -883,8 +884,8 @@ def create_user_session(conn, user_id):
     token = secrets.token_urlsafe(32)
     # MySQL に SQL 命令を送るためのカーソルを取得します（with ブロック終了時に自動解放されます）
     with conn.cursor() as cursor:
-        # 有効期限切れ、またはログアウト済みのセッションレコードを user_sessions テーブルから削除します
-        cursor.execute("DELETE FROM `user_sessions` WHERE `expires_at` <= NOW();")
+        # このユーザーの古いセッションレコードをピンポイントに削除します（全行ロック競合を防止）
+        cursor.execute("DELETE FROM `user_sessions` WHERE `user_id` = %s;", (user_id,))
         # 新しく発行したランダムセッショントークンと 7 日後の有効期限を user_sessions テーブルへ登録します
         cursor.execute(
             # 上のカーソルで実行する INSERT 新規登録 SQL 文です（%s に下の値が埋め込まれます）
