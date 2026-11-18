@@ -234,6 +234,10 @@ function renderManekinStudio(activeTab = 'create') {
     switch (activeTab) {
         // 値が 'home' だった場合の専用処理ルートです
         case 'home':
+            // 本日の気温・季節に連動した TODAY'S AI STYLING を動的更新します
+            if (typeof updateTodaySeasonalStyling === 'function') {
+                updateTodaySeasonalStyling();
+            }
             // 現在の case / ループ処理をここで抜けます
             break;
         // 値が 'closet' だった場合の専用処理ルートです
@@ -1763,6 +1767,11 @@ function setMannequinGender(gender) {
 
     // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
+
+    // マネキン性別変更に合わせて TODAY'S AI STYLING の提案内容も更新します
+    if (typeof updateTodaySeasonalStyling === 'function') {
+        updateTodaySeasonalStyling();
+    }
 
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
@@ -4188,41 +4197,458 @@ async function syncClosetFromBackend() {
 }
 
 
-// AIおすすめコーデバナーからトレンチコート中心のデモコーデを一括着用させます
-function applyPresetLook(lookKey) {
-    // 定数 blackPants を宣言し、値（AppState.myCloset.find(c => c.category…）をセットします
-    const blackPants = AppState.myCloset.find(c => c.category === 'BOTTOMS') || {
-        // レコード・商品・コーデを識別する ID プロパティをセットします
-        id: 'c1', name: '黒ワイドスラックス', category: 'BOTTOMS', color: 'BLACK', isOwned: true, image: 'assets/images/men/ストレートレープセミフレアスラックス.png'
-    };
-    // 定数 whiteSneakers を宣言し、値（AppState.myCloset.find(c => c.category…）をセットします
-    const whiteSneakers = AppState.myCloset.find(c => c.category === 'SHOES') || {
-        // レコード・商品・コーデを識別する ID プロパティをセットします
-        id: 'c2', name: 'クラシック 白レザースニーカー', category: 'SHOES', color: 'WHITE', isOwned: true, image: getCategoryFallbackImage('SHOES')
-    };
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して trenchCoat に入れます
-    const trenchCoat = SAMPLE_PRODUCTS.find(p => p.id === 1) || SAMPLE_PRODUCTS[0];
+// ==========================================================================
+//  TODAY'S AI STYLING: 現在の気温・日時・季節に応じた動的コーデ提案エンジン
+// ==========================================================================
 
-    // アプリ全体状態 AppState.currentOutfit を最新値（{）に更新します
-    AppState.currentOutfit = {
-        // オブジェクトの 'hat' プロパティ値を設定します
+// 気温キャッシュ（過度なAPI通信を防ぐため5分間有効）
+let _todayStylingWeatherCache = {
+    temp: null,
+    tempMin: null,
+    tempMax: null,
+    weatherText: '',
+    locationName: '愛知・名古屋',
+    provider: 'JMA',
+    fetchedAt: 0
+};
+
+// 現在日時（月・時間帯）から愛知（名古屋）のリアルな推定気温を算出するフォールバック関数
+function calculateEstimatedTemperature(date = new Date()) {
+    const month = date.getMonth() + 1; // 1〜12月
+    const hour = date.getHours();       // 0〜23時
+    const monthBaseTemps = {
+        1: { day: 9, night: 2 },
+        2: { day: 10, night: 2 },
+        3: { day: 14, night: 5 },
+        4: { day: 20, night: 10 },
+        5: { day: 24, night: 15 },
+        6: { day: 27, night: 20 },
+        7: { day: 32, night: 24 },
+        8: { day: 34, night: 25 },
+        9: { day: 28, night: 20 },
+        10: { day: 23, night: 14 },
+        11: { day: 16, night: 9 },
+        12: { day: 12, night: 4 }
+    };
+    const base = monthBaseTemps[month] || { day: 18, night: 12 };
+    if (hour >= 10 && hour <= 16) {
+        return base.day;
+    } else if ((hour >= 7 && hour < 10) || (hour > 16 && hour <= 20)) {
+        return Math.round((base.day + base.night) / 2);
+    }
+    return base.night;
+}
+
+// 気象庁（JMA）公式予報・アメダスから愛知県（名古屋）の最低気温・最高気温・現在気温・天候を取得する非同期関数
+async function fetchCurrentTemperature() {
+    const now = Date.now();
+    // 5分以内のキャッシュがあれば再利用
+    if (_todayStylingWeatherCache.temp !== null && (now - _todayStylingWeatherCache.fetchedAt < 300000)) {
+        return _todayStylingWeatherCache;
+    }
+    // デフォルトの愛知推定気温を即座に計算
+    const estimatedTemp = calculateEstimatedTemperature(new Date());
+    let result = {
+        temp: estimatedTemp,
+        tempMin: Math.max(estimatedTemp - 5, 0),
+        tempMax: estimatedTemp + 4,
+        weatherText: '心地よい秋晴れ',
+        locationName: '愛知・名古屋',
+        provider: '気象庁(JMA)',
+        fetchedAt: now
+    };
+
+    // 1. 気象庁（JMA）公式APIから愛知県（名古屋）の予報（最低・最高気温・天候）を取得
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+        const jmaRes = await fetch('https://www.jma.go.jp/bosai/forecast/data/forecast/230000.json', {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (jmaRes.ok) {
+            const jmaData = await jmaRes.json();
+            let parsedMin = null;
+            let parsedMax = null;
+            let parsedWeather = '晴れ';
+
+            // 天気テキストの抽出（西部: 名古屋）
+            try {
+                if (jmaData[0] && jmaData[0].timeSeries && jmaData[0].timeSeries[0] && jmaData[0].timeSeries[0].areas) {
+                    const area0 = jmaData[0].timeSeries[0].areas[0];
+                    if (area0 && area0.weathers && area0.weathers[0]) {
+                        parsedWeather = area0.weathers[0].replace(/[\s\u3000]+/g, ' ').trim();
+                    }
+                }
+            } catch (we) {}
+
+            // 気温（最低・最高）の抽出（名古屋: 51106）
+            try {
+                if (jmaData[0] && jmaData[0].timeSeries && jmaData[0].timeSeries[2] && jmaData[0].timeSeries[2].areas) {
+                    for (const a of jmaData[0].timeSeries[2].areas) {
+                        if (a.area && (a.area.code === '51106' || a.area.name === '名古屋')) {
+                            const nums = (a.temps || []).map(t => parseInt(t, 10)).filter(n => !isNaN(n));
+                            if (nums.length > 0) {
+                                parsedMin = Math.min(...nums);
+                                parsedMax = Math.max(...nums);
+                            }
+                            break;
+                        }
+                    }
+                }
+                // 週間予報から補完
+                if (parsedMin === null && jmaData[1] && jmaData[1].timeSeries && jmaData[1].timeSeries[1] && jmaData[1].timeSeries[1].areas) {
+                    for (const a of jmaData[1].timeSeries[1].areas) {
+                        if (a.area && (a.area.code === '51106' || a.area.name === '名古屋')) {
+                            const minNums = (a.tempsMin || []).map(t => parseInt(t, 10)).filter(n => !isNaN(n));
+                            const maxNums = (a.tempsMax || []).map(t => parseInt(t, 10)).filter(n => !isNaN(n));
+                            if (minNums.length > 0) parsedMin = minNums[0];
+                            if (maxNums.length > 0) parsedMax = maxNums[0];
+                            break;
+                        }
+                    }
+                }
+            } catch (te) {}
+
+            if (parsedMin !== null) {
+                result.tempMin = parsedMin;
+                result.tempMax = (parsedMax !== null) ? parsedMax : (parsedMin + 7);
+                result.weatherText = parsedWeather;
+                result.provider = '気象庁(JMA)';
+                result.locationName = '愛知・名古屋';
+            }
+        }
+    } catch (jmaErr) {
+        // JMA失敗時はフォールバック
+    }
+
+    // 2. 気象庁アメダス最新実況から「現在の観測気温」を取得（タイムアウト2秒）
+    try {
+        const amedasCtrl = new AbortController();
+        const amedasTimer = setTimeout(() => amedasCtrl.abort(), 2000);
+        const timeRes = await fetch('https://www.jma.go.jp/bosai/amedas/data/latest_time.txt', { signal: amedasCtrl.signal });
+        if (timeRes.ok) {
+            const timeTxt = (await timeRes.text()).trim();
+            const formattedTime = timeTxt.replace(/[-T:]/g, '').split('+')[0];
+            const dataRes = await fetch(`https://www.jma.go.jp/bosai/amedas/data/map/${formattedTime}.json`, { signal: amedasCtrl.signal });
+            clearTimeout(amedasTimer);
+            if (dataRes.ok) {
+                const mapData = await dataRes.json();
+                const nagoyaAmedas = mapData['51106'];
+                if (nagoyaAmedas && nagoyaAmedas.temp && typeof nagoyaAmedas.temp[0] === 'number') {
+                    result.temp = Math.round(nagoyaAmedas.temp[0]);
+                }
+            }
+        }
+    } catch (amedasErr) {
+        // アメダス取得に失敗した場合はOpen-Meteoで現在気温を補完
+        if (result.temp === estimatedTemp) {
+            try {
+                const omCtrl = new AbortController();
+                const omTimer = setTimeout(() => omCtrl.abort(), 1500);
+                const omRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.1815&longitude=136.9066&current=temperature_2m&timezone=Asia%2FTokyo', { signal: omCtrl.signal });
+                clearTimeout(omTimer);
+                if (omRes.ok) {
+                    const omData = await omRes.json();
+                    if (omData && omData.current && typeof omData.current.temperature_2m === 'number') {
+                        result.temp = Math.round(omData.current.temperature_2m);
+                    }
+                }
+            } catch (oe) {}
+        }
+    }
+
+    _todayStylingWeatherCache = result;
+    return result;
+}
+
+// 現在の日時から季節情報（春・夏・秋・冬）と季節ラベルを判定
+function getCurrentSeasonInfo(date = new Date()) {
+    const month = date.getMonth() + 1; // 1〜12月
+    if (month >= 3 && month <= 5) {
+        return { key: 'spring', name: '春', sub: '春の陽気' };
+    } else if (month >= 6 && month <= 8) {
+        return { key: 'summer', name: '夏', sub: '初夏・真夏' };
+    } else if (month >= 9 && month <= 11) {
+        return { key: 'autumn', name: '秋', sub: '深まる秋' };
+    } else {
+        return { key: 'winter', name: '冬', sub: '冬の寒さ' };
+    }
+}
+
+// 季節ごとのAI提案コーデデータ（MEN / WOMEN それぞれのアイテム・タイトル・説明文）
+const SEASONAL_STYLING_PLANS = {
+    spring: {
+        MEN: {
+            title: (temp, w) => `気温${temp}℃・爽やかな春風に映える「スカイオックスフォードシャツ」スタイル`,
+            desc: (temp) => `過ごしやすい気温${temp}℃の春風に合わせて、清潔感溢れる「スカイ オックス フォードシャツ」を主役に。手持ちの軽快なスラックスと白スニーカーを合わせることで、好印象な大人のスマートカジュアルが完成します。`,
+            outfit: {
+                outerId: null,
+                topsId: 7, // スカイ オックス フォードシャツ
+                bottomsId: 9, // ストレートレープセミフレアスラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
+        },
+        WOMEN: {
+            title: (temp, w) => `気温${temp}℃・春風に揺れる「シアーヘンリーネック × ライトデニム」`,
+            desc: (temp) => `軽やかな気温${temp}℃の春にぴったりな「ドット柄シアーヘンリーネッククロップドTシャツ」に、手持ちのライトデニムを合わせて、爽やかで抜け感のある春の旬コーデに。`,
+            outfit: {
+                outerId: null,
+                topsId: 108, // ドット柄シアーヘンリーネッククロップドTシャツ
+                bottomsId: 110, // ライトインディゴデニム
+                shoesName: 'キャンバススニーカー'
+            }
+        }
+    },
+    summer: {
+        MEN: {
+            title: (temp, w) => `気温${temp}℃・夏の暑さを涼しく乗り切る「軽快アンクルスラックス」コーデ`,
+            desc: (temp) => `気温${temp}℃の夏日でも涼しく快適に。「スマートアンクルテーパードイージースラックス」ですっきりとした足元を演出し、シンプルながら洗練された都会的サマーカジュアルに。`,
+            outfit: {
+                outerId: null,
+                topsId: 7, // スカイオックスフォードシャツ
+                bottomsId: 11, // スマートアンクルテーパードイージースラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
+        },
+        WOMEN: {
+            title: (temp, w) => `気温${temp}℃・真夏のストリートカジュアル「クロップドT × バギーデニム」`,
+            desc: (temp) => `気温${temp}℃の暑い日も涼しげにキマる「クロップドTシャツ」にワイドなデニムを合わせて、開放感とトレンド感を両立したアクティブな夏コーデ。`,
+            outfit: {
+                outerId: null,
+                topsId: 108,
+                bottomsId: 111, // バギーデニム
+                shoesName: 'サンダル/スニーカー'
+            }
+        }
+    },
+    autumn: {
+        MEN: {
+            title: (temp, w) => `気温${temp}℃・深まる秋の寒暖差に映える「手持ち黒ボトムス × ダブルトレンチコート」`,
+            desc: (temp) => `肌寒さを感じる気温${temp}℃に最適。ブランド人気No.1の「オーバードレープ ダブルトレンチコート」にチャコールニットを重ね着。手持ちの黒ボトムスと合わせるだけで、こなれ感のある都会的な秋冬スマートカジュアルが完成します。`,
+            outfit: {
+                outerId: 1, // オーバードレープ ダブルトレンチコート
+                topsId: 6,  // チャコール ブーク ニット
+                bottomsId: 9, // ストレートレープセミフレアスラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
+        },
+        WOMEN: {
+            title: (temp, w) => `気温${temp}℃・秋めく街に映える「フリースジャケット × ワイドデニム」`,
+            desc: (temp) => `気温${temp}℃の秋の風に寄り添う、ふんわり暖かい「フリースジャケット」にインディゴデニムを合わせた王道カジュアル。手持ちのスニーカーと合わせて親しみやすいスタイルに。`,
+            outfit: {
+                outerId: 101, // フリースジャケット
+                topsId: 106,  // ヘビーウェイトルーズクルーネックスウェット
+                bottomsId: 109, // ハイウエストワイドドレープタックトラウザー(インディゴデニム)
+                shoesName: '白レザースニーカー'
+            }
+        }
+    },
+    winter: {
+        MEN: {
+            title: (temp, w) => `気温${temp}℃・真冬の冷え込みもおしゃれに包む「暖かボアジャケット × ニット」`,
+            desc: (temp) => `冷え込む気温${temp}℃の冬を乗り切る、保温性抜群の「バッファローチェックボアジップジャケット」とニットのレイヤード。手持ちのパンツと合わせるだけで季節感あふれるトレンド防寒スタイルに。`,
+            outfit: {
+                outerId: 4, // バッファローチェックボアジップジャケット
+                topsId: 6, // チャコール ブーク ニット
+                bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ
+                shoesName: 'ボリュームソールスニーカー'
+            }
+        },
+        WOMEN: {
+            title: (temp, w) => `気温${temp}℃・真冬の寒さを防ぐ「グリッドパフジャケット × シャギーニット」`,
+            desc: (temp) => `凍えるような気温${temp}℃でも抜群の暖かさを誇る「グリッドパフジャケット」とふわふわのシャギーニット。手持ちのスウェットパンツと合わせた旬の冬コーデ。`,
+            outfit: {
+                outerId: 102, // グリッドパフジャケット
+                topsId: 105, // シャギーニットオーバーサイズクルーネックセーター
+                bottomsId: 112, // タックイージーワイドスウェットパンツ
+                shoesName: 'スニーカー'
+            }
+        }
+    }
+};
+
+// バナー描画用内部ヘルパー
+function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, locationName = '愛知・名古屋', tempMin = null, tempMax = null, provider = '気象庁(JMA)') {
+    const badgeElem = document.getElementById('today-styling-badge');
+    const titleElem = document.getElementById('today-styling-title');
+    const descElem = document.getElementById('today-styling-desc');
+    const btnElem = document.getElementById('btn-apply-today-styling');
+    if (!titleElem || !descElem) return;
+
+    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
+    const plan = planGroup[gender] || planGroup.MEN;
+
+    const hasMinMax = (tempMin !== null && tempMax !== null);
+    const minMaxLabel = hasMinMax ? `最低${tempMin}℃ / 最高${tempMax}℃ (現在${temp}℃)` : `気温${temp}℃`;
+
+    if (badgeElem) {
+        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${seasonInfo.name}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
+    }
+    const rawTitle = plan.title(tempMin !== null ? tempMin : temp, weatherText);
+    const cleanTitle = rawTitle.replace(/^気温\d+℃・/, '');
+    const titlePrefix = hasMinMax ? `【${locationName} 最低${tempMin}℃ / 最高${tempMax}℃】` : `【${locationName} 気温${temp}℃】`;
+    titleElem.textContent = `${titlePrefix}${cleanTitle}`;
+
+    // 最低気温と朝晩の寒暖差に合わせたアドバイス文
+    let adviceText = '';
+    if (hasMinMax) {
+        const diff = tempMax - tempMin;
+        if (diff >= 7) {
+            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】寒暖差が${diff}℃と大きいため、朝晩の冷え込みに備えて羽織れるアウターが快適です。`;
+        } else {
+            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】肌寒さを防ぎ快適に過ごせるコーデです。`;
+        }
+    }
+    descElem.textContent = adviceText ? `${adviceText} ${plan.desc(tempMin !== null ? tempMin : temp)}` : plan.desc(temp);
+
+    if (btnElem) {
+        btnElem.textContent = `最低${tempMin !== null ? tempMin : temp}℃対応の${seasonInfo.name}おすすめを試着する`;
+    }
+}
+
+// TODAY'S AI STYLING バナーの気温と提案テキストを更新（気象庁JMAの愛知・名古屋最低気温と連動）
+async function updateTodaySeasonalStyling() {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const date = now.getDate();
+    const seasonInfo = getCurrentSeasonInfo(now);
+    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+
+    // 1. まず即座に愛知の推定気温で仮描画（待たずに即時表示）
+    const initialTemp = calculateEstimatedTemperature(now);
+    renderTodayStylingBanner(initialTemp, '穏やか', seasonInfo, gender, month, date, '愛知・名古屋', Math.max(initialTemp - 5, 0), initialTemp + 4, '気象庁(JMA)推定');
+
+    // 2. 非同期で気象庁（JMA）公式から名古屋の最低気温・最高気温・現在気温を取得してスムーズに更新
+    try {
+        const weather = await fetchCurrentTemperature();
+        if (weather && weather.temp !== null) {
+            renderTodayStylingBanner(
+                weather.temp,
+                weather.weatherText,
+                seasonInfo,
+                gender,
+                month,
+                date,
+                weather.locationName || '愛知・名古屋',
+                weather.tempMin,
+                weather.tempMax,
+                weather.provider || '気象庁(JMA)'
+            );
+        }
+    } catch (e) {
+        // エラー時は初期描画を維持
+    }
+}
+
+// 季節・現在日時に合わせたおすすめコーデを一括でマネキンに着せ替えます
+function applyTodaySeasonalPresetLook() {
+    const now = new Date();
+    const seasonInfo = getCurrentSeasonInfo(now);
+    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
+    const plan = planGroup[gender] || planGroup.MEN;
+
+    const newOutfit = {
         hat: null,
-        // オブジェクトの 'outer' プロパティ値を設定します
-        outer: { id: trenchCoat.id, name: trenchCoat.name, category: trenchCoat.category, color: 'CHARCOAL', price: trenchCoat.price, image: trenchCoat.image, isOwned: false },
-        // オブジェクトの 'tops' プロパティ値を設定します
-        tops: { id: 6, name: 'ヘビーウェイト ボクシー スウェット', category: 'TOPS', color: 'OFF WHITE', price: 3490, image: 'assets/images/men/アーバングレイジップフーディ.png', isOwned: false },
-        // オブジェクトの 'bottoms' プロパティ値を設定します
-        bottoms: { id: blackPants.id, name: blackPants.name, category: blackPants.category, color: blackPants.color, isOwned: true, image: blackPants.image },
-        // オブジェクトの 'shoes' プロパティ値を設定します
-        shoes: { id: whiteSneakers.id, name: whiteSneakers.name, category: whiteSneakers.category, color: whiteSneakers.color, isOwned: true, image: whiteSneakers.image }
+        outer: null,
+        tops: null,
+        bottoms: null,
+        shoes: null
     };
-    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
-    syncStudioStateToBackend({ immediate: true });
 
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToastNotification('AIおすすめコーデをマネキンにセットしました');
-    // 専用ヘルパー関数 switchStudioTab() を実行して状態や表示ラベルを更新します
+    // アウター
+    if (plan.outfit.outerId) {
+        const outerProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.outerId);
+        if (outerProd) {
+            newOutfit.outer = {
+                id: outerProd.id,
+                name: outerProd.name,
+                category: outerProd.category,
+                color: outerProd.color || 'STANDARD',
+                price: outerProd.price,
+                image: outerProd.image,
+                isOwned: false
+            };
+        }
+    }
+
+    // トップス
+    if (plan.outfit.topsId) {
+        const topsProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.topsId);
+        if (topsProd) {
+            newOutfit.tops = {
+                id: topsProd.id,
+                name: topsProd.name,
+                category: topsProd.category,
+                color: topsProd.color || 'STANDARD',
+                price: topsProd.price,
+                image: topsProd.image,
+                isOwned: false
+            };
+        }
+    }
+
+    // ボトムス（手持ち服があればそれを優先、なければ商品）
+    const ownedBottom = AppState.myCloset.find(c => c.category === 'BOTTOMS');
+    if (ownedBottom) {
+        newOutfit.bottoms = {
+            id: ownedBottom.id,
+            name: ownedBottom.name,
+            category: ownedBottom.category,
+            color: ownedBottom.color,
+            isOwned: true,
+            image: ownedBottom.image
+        };
+    } else if (plan.outfit.bottomsId) {
+        const botProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.bottomsId);
+        if (botProd) {
+            newOutfit.bottoms = {
+                id: botProd.id,
+                name: botProd.name,
+                category: botProd.category,
+                color: botProd.color || 'STANDARD',
+                price: botProd.price,
+                image: botProd.image,
+                isOwned: false
+            };
+        }
+    }
+
+    // シューズ
+    const ownedShoes = AppState.myCloset.find(c => c.category === 'SHOES');
+    if (ownedShoes) {
+        newOutfit.shoes = {
+            id: ownedShoes.id,
+            name: ownedShoes.name,
+            category: ownedShoes.category,
+            color: ownedShoes.color,
+            isOwned: true,
+            image: ownedShoes.image
+        };
+    } else {
+        newOutfit.shoes = {
+            id: 'c_shoes_fallback',
+            name: plan.outfit.shoesName || 'クラシック 白レザースニーカー',
+            category: 'SHOES',
+            color: 'WHITE',
+            isOwned: true,
+            image: getCategoryFallbackImage('SHOES')
+        };
+    }
+
+    AppState.currentOutfit = newOutfit;
+    syncStudioStateToBackend({ immediate: true });
+    const minText = (_todayStylingWeatherCache.tempMin !== null) ? ` 最低${_todayStylingWeatherCache.tempMin}℃対応` : '';
+    showToastNotification(`【気象庁 名古屋${minText}】${seasonInfo.name}のおすすめコーデをマネキンにセットしました`);
     switchStudioTab('create');
+}
+
+// 既存互換用ラッパー
+function applyPresetLook(lookKey) {
+    applyTodaySeasonalPresetLook();
 }
 
 
@@ -4571,3 +4997,5 @@ window.flushPendingStudioStateSync = flushPendingStudioStateSync;
 window.syncGenderToggleUI = syncGenderToggleUI;
 // 変数・配列項目 window.bumpClosetMutationSeq の値を更新・計算します
 window.bumpClosetMutationSeq = bumpClosetMutationSeq;
+window.updateTodaySeasonalStyling = updateTodaySeasonalStyling;
+window.applyTodaySeasonalPresetLook = applyTodaySeasonalPresetLook;
