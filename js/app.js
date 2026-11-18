@@ -384,16 +384,10 @@ function updateAuthNoticeBanner() {
     const regTitle = document.getElementById('reg-notice-title');
     // 会員登録画面側アラートの説明文要素を取得します
     const regDesc = document.getElementById('reg-notice-desc');
-    // 既にログイン済みの場合のバナー要素を取得します
-    const alreadyBox = document.getElementById('login-already-box');
-    const alreadyName = document.getElementById('login-already-name');
-
-    // 既にログイン中の場合のログイン画面上部表示制御
+    // 既にログイン中の場合はマイページへスムーズに自動転送
     if (AppState.currentUser) {
-        if (alreadyBox) alreadyBox.style.display = 'block';
-        if (alreadyName) alreadyName.textContent = AppState.currentUser.name || '会員';
-    } else {
-        if (alreadyBox) alreadyBox.style.display = 'none';
+        window.location.hash = '#mypage';
+        return;
     }
 
     const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');

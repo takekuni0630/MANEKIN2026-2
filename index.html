@@ -587,6 +587,7 @@
                                 <span class="sec-badge">2</span> お届け先情報
                             </h2>
                             <!-- 入力内容をまとめて送信するフォーム（#checkout-form / submit=JSリスナー）です -->
+                            <!-- novalidateは入力の形式を無視した状態や未入力などの状態で送信できる状態 -->
                             <form id="checkout-form" class="checkout-form" novalidate>
                                 <!-- デザイン・配置用のブロック要素（<div class="form-row">）を開始します -->
                                 <div class="form-row">
@@ -604,8 +605,8 @@
                                     <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
                                     <div class="form-group flex-1">
                                         <!-- 対応する入力欄（for=order-phone）の見出しラベル「電話番号 <span」です -->
-                                        <label for="order-phone" class="form-label">電話番号 <span
-                                                class="required">*</span></label>
+                                        <label for="order-phone" class="form-label">電話番号 <span>
+                                            </span></label>
                                         <!-- ユーザー入力欄（type=tel / #order-phone / 例: 090-1234-5678）です -->
                                         <input type="tel" id="order-phone" class="form-input"
                                             placeholder="例: 090-1234-5678" required>
@@ -631,8 +632,8 @@
                                     <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
                                     <div class="form-group flex-1">
                                         <!-- 対応する入力欄（for=order-postal）の見出しラベル「郵便番号 <span」です -->
-                                        <label for="order-postal" class="form-label">郵便番号 <span
-                                                class="required">*</span></label>
+                                        <label for="order-postal" class="form-label">郵便番号 <span>
+                                            </span></label>
                                         <!-- ユーザー入力欄（type=text / #order-postal / 例: 150-0001）です -->
                                         <input type="text" id="order-postal" class="form-input"
                                             placeholder="例: 150-0001" required>
@@ -670,6 +671,7 @@
                                         <option value="19:00〜21:00">19:00〜21:00</option>
                                     </select>
                                 </div>
+                                <br>
 
                                 <!-- クーポン利用セクション（コード入力ではなく、適用する／利用しないを選択） -->
                                 <div class="checkout-coupon-box" id="checkout-coupon-box"
@@ -713,6 +715,7 @@
                                     </div>
                                     <p class="point-help-text" id="checkout-coupon-message"
                                         style="margin: 8px 0 0 0; font-size: 0.75rem; color: #7c2d12; line-height: 1.4;">
+                                        <!-- (strongは文字を強調する(太くする)) -->
                                         ※上の「<strong>適用する</strong>」または「<strong>利用しない</strong>」ボタンから選択してください。クーポンは商品小計から割引され、注文確定時に消滅します（配送料には影響しません）。
                                     </p>
                                 </div>
@@ -747,6 +750,10 @@
                                                     style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 52px 8px 10px; font-size: 0.9rem; font-weight: 700; text-align: right;"
                                                     oninput="handlePointsInputChange()">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.point-input-suffix pt 利用）です -->
+                                                <!-- インライン装飾／グルーピング用の <span> 要素（.nav-tag AI）です -->
+                                                <!-- インライン装飾　→　文字を一部分だけ変更すること -->
+                                                <!-- グルーピング　→　タグの中で別々のもの同士をくっつける的な
+                             　　                       今回だったら、<a>の中のMANEKINと<span>の中の装飾を加えたAIをひとまとめにしている -->
                                                 <span class="point-input-suffix"
                                                     style="position: absolute; right: 10px; font-size: 0.75rem; font-weight: 600; color: #6b7280; pointer-events: none;">pt
                                                     利用</span>
@@ -894,6 +901,7 @@
                                 <!-- デザイン・配置用のブロック要素（<div class="summary-row total-row">）を開始します -->
                                 <div class="summary-row total-row">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.total-label お支払い合計 (税込)）です -->
+                                    <!-- 税抜き金額が知りたきゃ、商品合計から消費税を引け -->
                                     <span class="total-label">お支払い合計 (税込)</span>
                                     <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#checkout-total: 初期値 '¥0'）です -->
                                     <span class="total-amount" id="checkout-total">¥0</span>
@@ -919,8 +927,6 @@
                                 id="btn-place-order">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.order-btn-text 注文を確定する）です -->
                                 <span class="order-btn-text">注文を確定する</span>
-                                <!-- インライン装飾／グルーピング用の <span> 要素（.order-btn-sub （Python & MySQLへ保存されます））です -->
-                                <span class="order-btn-sub">（Python & MySQLへ保存されます）</span>
                             </button>
 
                             <!-- 段落テキスト（.summary-security-note: ）を表示します -->
@@ -994,6 +1000,11 @@
                                 <span class="comp-label">ご利用クーポン:</span>
                                 <strong class="comp-value text-success" id="comp-coupon-info">--</strong>
                             </div>
+                            <!-- ポイント利用情報表示行 -->
+                            <div class="comp-row" id="comp-used-points-row" style="display: none;">
+                                <span class="comp-label">ご利用ポイント:</span>
+                                <strong class="comp-value text-success" id="comp-used-points">-0 pt</strong>
+                            </div>
                             <!-- 特定機能・領域のブロック要素（<div id="comp-point-row" class="comp-row">）を開始します -->
                             <div class="comp-row" id="comp-point-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 今回獲得ポイント:）です -->
@@ -1065,24 +1076,11 @@
                         <p class="auth-subtitle">会員ログイン</p>
                     </div>
 
-                    <!-- 既にログイン済みの場合の案内表示枠 -->
-                    <div id="login-already-box" class="login-already-box" style="display: none;">
-                        <div class="already-login-icon">🟢</div>
-                        <h2 class="already-login-title">現在 <span id="login-already-name">会員</span> 様 としてログイン中です</h2>
-                        <p class="already-login-desc">マイページへ移動して購入履歴やお気に入りを確認するか、別のアカウントに切り替える場合はログアウトしてください。</p>
-                        <div class="already-login-actions">
-                            <a href="#mypage" class="btn btn-primary btn-sm">マイページへ移動</a>
-                            <button type="button" class="btn btn-outline-danger btn-sm"
-                                onclick="handleLogout()">ログアウトする</button>
-                        </div>
-                    </div>
-
                     <!-- 特定機能・領域のブロック要素（<div id="login-checkout-notice" class="auth-checkout-alert">）を開始します -->
                     <div id="login-checkout-notice" class="auth-checkout-alert"
-                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: left;">
                         <!-- レイアウト用のブロックグループ <div> を開始します -->
-                        <div
-                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08;">
                             <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#login-notice-title: 初期値 '⚠️ ご購入手続きには会員登録またはログインが必要です'）です -->
                             <span id="login-notice-title">⚠️ ご購入手続きには会員登録またはログインが必要です</span>
                         </div>
@@ -1099,6 +1097,7 @@
                         <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=login-email）の見出しラベル「メールアドレス *」です -->
+                            <!-- label for とはフォームのラベル（説明文）と入力欄を関連付けるためのHTML属性 -->
                             <label for="login-email" class="form-label">メールアドレス <span class="required">*</span></label>
                             <!-- ユーザー入力欄（type=email / #login-email / example@manekin.com）です -->
                             <input type="email" id="login-email" class="form-input" placeholder="example@manekin.com"
@@ -1176,10 +1175,9 @@
 
                     <!-- 特定機能・領域のブロック要素（<div id="reg-checkout-notice" class="auth-checkout-alert">）を開始します -->
                     <div id="reg-checkout-notice" class="auth-checkout-alert"
-                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; text-align: left;">
+                        style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: left;">
                         <!-- レイアウト用のブロックグループ <div> を開始します -->
-                        <div
-                            style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #d46b08;">
                             <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#reg-notice-title: 初期値 '⚠️ ご購入手続きには会員登録が必要です'）です -->
                             <span id="reg-notice-title">⚠️ ご購入手続きには会員登録が必要です</span>
                         </div>
@@ -1302,8 +1300,11 @@
                         <span class="stat-value" id="mypage-points">0 <span class="stat-unit">pt</span></span>
                     </div>
                     <!-- クーポン保有数カード（初期配布クーポンなど） -->
-                    <div class="stat-card stat-card-clickable" id="mypage-coupon-card" onclick="openMyPageCouponsModal()" title="タップして保有クーポンを確認">
-                        <span class="stat-label">保有クーポン <span style="font-size: 0.72rem; color: #15803d; font-weight: normal; margin-left: 2px;">(タップで確認 👆)</span></span>
+                    <div class="stat-card stat-card-clickable" id="mypage-coupon-card"
+                        onclick="openMyPageCouponsModal()" title="タップして保有クーポンを確認">
+                        <span class="stat-label">保有クーポン <span
+                                style="font-size: 0.72rem; color: #15803d; font-weight: normal; margin-left: 2px;">(タップで確認
+                                👆)</span></span>
                         <span class="stat-value" id="mypage-coupon-count">0 <span class="stat-unit">枚</span></span>
                     </div>
                     <!-- デザイン・配置用のブロック要素（<div class="stat-card">）を開始します -->
@@ -1364,7 +1365,7 @@
                             </button>
                             <!-- 押すと関数 handleClearOrderHistory() を実行する操作ボタン「<button type="button" class="btn…」です -->
                             <button type="button" class="btn btn-outline-xs" onclick="handleClearOrderHistory()"
-                                style="font-size: 0.75rem; padding: 5px 12px; color: #888; border-color: #ddd;"
+                                style="font-size: 0.75rem; padding: 5px 12px; color: #111; border-color: #111;"
                                 title="テスト注文履歴をリセットして0件にします">
                                 履歴をすべて初期化 (0件にする)
                             </button>
@@ -1440,7 +1441,7 @@
                                 <!-- セクションの見出し（<h4>: MANEKIN機能 (バーチャルマネキン試着)）を表示します -->
                                 <h4>MANEKIN機能 (バーチャルマネキン試着)</h4>
                                 <!-- 段落テキスト（.p: ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用…）を表示します -->
-                                <p>ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用シルエットを事前に確認できる機能です。</p>
+                                <p>ご自身の体型比率を反映した全アイテムの着用シルエットを事前に確認できる機能です。</p>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="roadmap-item">）を開始します -->
                             <div class="roadmap-item">
@@ -1638,7 +1639,8 @@
                         <!-- セクションの見出し（<h3>: 気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチ…）を表示します -->
                         <h3 class="banner-title" id="today-styling-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
                         <!-- 段落テキスト（.banner-desc: あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に…）を表示します -->
-                        <p class="banner-desc" id="today-styling-desc">あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
+                        <p class="banner-desc" id="today-styling-desc">
+                            あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
                             ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
                         <!-- デザイン・配置用のブロック要素（<div class="banner-actions">）を開始します -->
                         <div class="banner-actions">
@@ -2169,7 +2171,8 @@
                                 <!-- デザイン・配置用のブロック要素（<div class="col-title-wrap">）を開始します -->
                                 <div class="col-title-wrap">
                                     <!-- セクションの見出し（<h3>: 3. ブランド商品 / お気に入り商品）を表示します -->
-                                    <h3 class="col-title"><span class="desktop-brand-title">3. ブランド商品</span><span class="mobile-fav-title">3. お気に入り商品</span></h3>
+                                    <h3 class="col-title"><span class="desktop-brand-title">3. ブランド商品</span><span
+                                            class="mobile-fav-title">3. お気に入り商品</span></h3>
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.col-badge col-badge-fav お気に入り）です -->
                                     <span class="col-badge col-badge-fav">お気に入り</span>
                                 </div>
@@ -2351,30 +2354,39 @@
     <div class="modal-backdrop" id="modal-user-coupons" role="dialog" aria-modal="true"
         aria-labelledby="modal-coupons-title">
         <!-- デザイン・配置用のブロック要素（<div class="modal-dialog modal-dialog-coupon">）を開始します -->
-        <div class="modal-dialog modal-dialog-coupon" style="max-width: 520px; width: 92%; padding: 24px; border-radius: 12px;">
+        <div class="modal-dialog modal-dialog-coupon"
+            style="max-width: 520px; width: 92%; padding: 24px; border-radius: 12px;">
             <!-- デザイン・配置用のブロック要素（<div class="modal-header">）を開始します -->
-            <div class="modal-header" style="border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px;">
+            <div class="modal-header"
+                style="border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px;">
                 <!-- インライン装飾／グルーピング用の <span> 要素（.modal-badge MY COUPONS）です -->
-                <span class="modal-badge" style="background: #111; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">MY COUPONS</span>
+                <span class="modal-badge"
+                    style="background: #111; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">MY
+                    COUPONS</span>
                 <!-- 押すと関数 closeMyPageCouponsModal() を実行する操作ボタン「×」です -->
-                <button class="modal-close-btn" onclick="closeMyPageCouponsModal()" aria-label="閉じる" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</button>
+                <button class="modal-close-btn" onclick="closeMyPageCouponsModal()" aria-label="閉じる"
+                    style="background: none; border: none; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</button>
             </div>
             <!-- デザイン・配置用のブロック要素（<div class="modal-body">）を開始します -->
             <div class="modal-body">
                 <!-- セクションの見出し領域を表示します -->
                 <div style="text-align: center; margin-bottom: 16px;">
                     <div style="font-size: 2.2rem; margin-bottom: 6px;">🎟️</div>
-                    <h2 class="modal-title" id="modal-coupons-title" style="font-size: 1.35rem; margin-bottom: 6px; font-weight: 700;">保有クーポン一覧</h2>
-                    <p class="modal-subtext" style="color: #666; font-size: 0.85rem; margin: 0;">お買い物でご利用いただけるクーポン特典です</p>
+                    <h2 class="modal-title" id="modal-coupons-title"
+                        style="font-size: 1.35rem; margin-bottom: 6px; font-weight: 700;">保有クーポン一覧</h2>
+                    <p class="modal-subtext" style="color: #666; font-size: 0.85rem; margin: 0;">お買い物でご利用いただけるクーポン特典です
+                    </p>
                 </div>
                 <!-- クーポンカード一覧が動的挿入されるコンテナ（#mypage-coupons-list）です -->
-                <div id="mypage-coupons-list" class="coupons-modal-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
+                <div id="mypage-coupons-list" class="coupons-modal-list"
+                    style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
                     <!-- JavaScript（openMyPageCouponsModal）により動的にカードが挿入されます -->
                 </div>
                 <!-- デザイン・配置用のブロック要素（<div class="modal-actions">）を開始します -->
                 <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: center;">
                     <!-- 押すと関数 closeMyPageCouponsModal() を実行する操作ボタン「閉じる」です -->
-                    <button type="button" class="btn btn-secondary" onclick="closeMyPageCouponsModal()" style="min-width: 140px;">閉じる</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeMyPageCouponsModal()"
+                        style="min-width: 140px;">閉じる</button>
                 </div>
             </div>
         </div>
@@ -2782,11 +2794,11 @@
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
     <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261117_weather_aichi_v2"></script>
+    <script src="js/shop.js?v=20261118_modal_coupons_fix"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
     <script src="js/studio.js?v=20261118_jma_temp_min"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261118_jma_temp_min"></script>
+    <script src="js/app.js?v=20261118_clean_notice"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
