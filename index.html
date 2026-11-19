@@ -2281,6 +2281,7 @@
                             </div>
                         </div>
 
+                        <!-- コーディネート保存の領域 -->
                         <!-- デザイン・配置用のブロック要素（<div class="outfit-save-card">）を開始します -->
                         <div class="outfit-save-card">
                             <!-- セクションの見出し（<h4>: コーディネートを保存）を表示します -->
@@ -2307,6 +2308,7 @@
                                 <!-- デザイン・配置用のブロック要素（<div class="save-input-group">）を開始します -->
                                 <div class="save-input-group">
                                     <!-- ユーザー入力欄（type=text / #outfit-name-input / 例: 秋の通学カジュアルコーデ）です -->
+                                    <!-- requiredが付いたら必須項目 -->
                                     <input type="text" id="outfit-name-input" class="form-input outfit-name-input"
                                         placeholder="例: 秋の通学カジュアルコーデ" required>
                                     <!-- クリック操作用ボタン「」です -->
@@ -2326,7 +2328,7 @@
                     </div>
                 </div>
 
-
+                <!-- 保存したコーデの領域 -->
                 <!-- 特定機能・領域のブロック要素（<div id="studio-pane-saved" class="studio-pane">）を開始します -->
                 <div class="studio-pane" id="studio-pane-saved">
                     <!-- デザイン・配置用のブロック要素（<div class="pane-action-bar">）を開始します -->
@@ -2356,6 +2358,10 @@
     <!-- ================================================================== -->
     <!-- 保有クーポン詳細一覧モーダル (#modal-user-coupons) -->
     <!-- 特定機能・領域のブロック要素（<div id="modal-user-coupons" class="modal-backdrop">）を開始します -->
+    <!-- aria-labelledbyはタイトルを紐づける -->
+    <!-- role = dialogがポップアップ小窓(ダイアログだよ)
+         aria-modal="true"が開いている間は、後ろの画面は操作できないモード
+         aria-labelledby=""は、モーダルクーポンについてのタイトルだよって教えてるだけ -->
     <div class="modal-backdrop" id="modal-user-coupons" role="dialog" aria-modal="true"
         aria-labelledby="modal-coupons-title">
         <!-- デザイン・配置用のブロック要素（<div class="modal-dialog modal-dialog-coupon">）を開始します -->
