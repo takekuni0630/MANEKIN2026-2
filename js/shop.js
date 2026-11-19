@@ -20,7 +20,7 @@ function isMobileLocalStorageMode() {
         if (window.matchMedia && window.matchMedia('(max-width: 768px) and (pointer: coarse) and (hover: none)').matches) {
             return true;
         }
-    } catch (e) {}
+    } catch (e) { }
     return false;
 }
 
@@ -207,7 +207,7 @@ async function restoreAuthSessionFromBackend() {
         }
         // 処理結果の基準値として null を呼び出し元へ返して関数を終了します
         return null;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 処理結果の基準値として null を呼び出し元へ返して関数を終了します
         return null;
@@ -419,7 +419,7 @@ async function applyAccountSession(user, options = {}) {
 // 1商品オブジェクトを受け取り、お気に入りハートボタン・NEWバッジ・画像・価格付きのカードHTML文字列を作ります
 function createProductCardHTML(product) {
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
-    const isFav = AppState.favorites.includes(product.id);
+    const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
     const formattedPrice = "¥" + product.price.toLocaleString();
 
@@ -432,7 +432,7 @@ function createProductCardHTML(product) {
                 <button class="fav-btn ${isFav ? 'is-favorite' : ''}" 
                         onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
                         aria-label="${isFav ? 'お気に入りを解除' : 'お気に入りに追加'}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="${isFav ? '#e53935' : 'none'}" stroke="${isFav ? '#e53935' : 'currentColor'}" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                 </button>
@@ -492,7 +492,7 @@ function renderCatalogProducts() {
         if (pageTitle) pageTitle.textContent = "MEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "現代の男性に向けた、洗練されたモダンウェア（全12アイテム）";
-    // 前の if が偽で、かつ（AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
     } else if (AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN') {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'WOMEN COLLECTION';
@@ -500,7 +500,7 @@ function renderCatalogProducts() {
         if (pageTitle) pageTitle.textContent = "WOMEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "凛とした美しさと現代的なリラックス感を纏うウィメンズウェア（全12アイテム）";
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です（デフォルト: HOMEからすべて見るを押した時など）
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（デフォルト: HOMEからすべて見るを押した時など）
     } else {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'ALL COLLECTION';
@@ -606,7 +606,7 @@ function renderItemDetail(productId) {
     AppState.selectedSize = product.sizes[1] || "M";
 
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
-    const isFav = AppState.favorites.includes(product.id);
+    const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
     const formattedPrice = "¥" + product.price.toLocaleString();
     // 定数 initialImgUrl を宣言し、値（(product.colorImages && product.colorI…）をセットします
@@ -628,7 +628,7 @@ function renderItemDetail(productId) {
                 ${color}
             </button>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 
     // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
@@ -644,7 +644,7 @@ function renderItemDetail(productId) {
                 ${size}
             </button>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 
     // テンプレートリテラルで組み立てた HTML を要素 detailLayout 内に書き込んで画面を更新します
@@ -740,7 +740,7 @@ function handleColorSelect(chipEl, colorName, imageUrl) {
             mainImg.src = imageUrl;
             // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（mainImg.style.opacity = '1';）
             mainImg.style.opacity = '1';
-        // 上の処理を指定ミリ秒後（120ms 後）に実行するタイマー呼び出しを閉じます
+            // 上の処理を指定ミリ秒後（120ms 後）に実行するタイマー呼び出しを閉じます
         }, 120);
     }
 
@@ -846,7 +846,7 @@ async function syncCartToBackend() {
             if (!res.ok) throw new Error('Cart sync failed');
             // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
             return true;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.warn('[MySQL] カート同期エラー:', e);
@@ -934,7 +934,7 @@ async function syncCartFromBackend(options = {}) {
                 if (idx > -1) {
                     // 変数・配列項目 mergedCurrent[idx].quantity の値を更新・計算します
                     mergedCurrent[idx].quantity = Math.max(mergedCurrent[idx].quantity || 1, item.quantity || 1);
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 配列の末尾に新しい要素を追加します（mergedCurrent.push({ ...item });）
                     mergedCurrent.push({ ...item });
@@ -970,7 +970,7 @@ async function syncCartFromBackend(options = {}) {
                 if (idx > -1) {
                     // 変数・配列項目 finalCart[idx].quantity の値を更新・計算します
                     finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 配列の末尾に新しい要素を追加します（finalCart.push({ ...item });）
                     finalCart.push({ ...item });
@@ -995,7 +995,7 @@ async function syncCartFromBackend(options = {}) {
             // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
             await syncCartToBackend();
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLからのカート取得に失敗しました:', e);
@@ -1045,7 +1045,7 @@ async function handleAddToCartFromDetail(productId) {
     if (existingIndex > -1) {
         // 変数・配列項目 AppState.cart[existingIndex].qua… の値を更新・計算します
         AppState.cart[existingIndex].quantity += 1;
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
         AppState.cart.push({
@@ -1193,7 +1193,7 @@ async function removeCartItem(index) {
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToast('バッグから商品を削除しました');
 }
- 
+
 // 注文手続きステップバー（1:注文商品, 2:お届け先・決済, 3:注文確定）のアクティブ表示を更新します
 function updateCheckoutStepper(step = 2) {
     const stepper = document.querySelector('.checkout-stepper');
@@ -1392,7 +1392,7 @@ function setUserPoints(points, options = {}) {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ points: normalizedPts })
-        }).catch(() => {});
+        }).catch(() => { });
     }
 
     // チェックアウト画面の「保有ポイント: XX pt」表示を即時更新します
@@ -1802,12 +1802,24 @@ async function importOrderToCloset(idx) {
                 };
                 AppState.myCloset.unshift(newItem);
                 added++;
+
+                // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
+                const fIdx = AppState.favorites.indexOf(Number(itId));
+                if (fIdx > -1) {
+                    AppState.favorites.splice(fIdx, 1);
+                    syncAllFavoriteButtons(itId, false);
+                }
             }
         }
         if (added > 0) {
             lsSetJson(`manekin_ls_closet_${userId}`, AppState.myCloset);
+            lsSetJson(`manekin_ls_favorites_${userId}`, AppState.favorites);
+            updateFavoriteBadges();
+            if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+            if (typeof renderStudioItems === 'function') renderStudioItems();
             if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
             if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
+            if (window.location.hash === '#favorites') renderFavoriteProducts();
             showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
         } else {
             showToast('この注文の商品はすでにマイクローゼットに登録済みです');
@@ -1914,13 +1926,28 @@ async function importOrderToCloset(idx) {
                         AppState.myCloset.unshift(newItem);
                         // 変数・配列項目 added の値を更新・計算します
                         added++;
+
+                        // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
+                        const fIdx = AppState.favorites.indexOf(Number(itId));
+                        if (fIdx > -1) {
+                            AppState.favorites.splice(fIdx, 1);
+                            syncAllFavoriteButtons(itId, false);
+                            try {
+                                fetch(`${apiBase}/api/favorites/toggle`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'include',
+                                    body: JSON.stringify({ product_id: itId, user_id: userId })
+                                }).catch(() => { });
+                            } catch (_) { }
+                        }
                     }
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 変数・配列項目 failed の値を更新・計算します
                     failed++;
                 }
-            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (e) {
                 // 変数・配列項目 failed の値を更新・計算します
                 failed++;
@@ -1930,17 +1957,21 @@ async function importOrderToCloset(idx) {
 
     // 条件（added > 0）が成り立つか判定し、該当する場合の処理を実行します
     if (added > 0) {
+        updateFavoriteBadges();
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioItems === 'function') renderStudioItems();
+        if (window.location.hash === '#favorites') renderFavoriteProducts();
         // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
         // 条件（typeof renderPaneClosetGrid === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(`👗 注文商品をMySQLのマイクローゼットに登録しました（${added}点）`);
-    // 前の if が偽で、かつ（failed > 0）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（failed > 0）を満たす場合の別条件分岐です
     } else if (failed > 0) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ MySQLへのマイクローゼット登録に失敗しました（サーバー接続を確認してください）');
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('この注文の商品はすでにマイクローゼットに登録済みです');
@@ -2142,7 +2173,7 @@ async function handlePlaceOrder() {
                 // 変数・配列項目 backendUpdatedPoints の値を更新・計算します
                 backendUpdatedPoints = data.updated_points;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ PythonサーバーまたはMySQLに接続できないため注文を確定できませんでした（app.pyとMySQLの起動を確認してください）');
@@ -2214,6 +2245,42 @@ async function handlePlaceOrder() {
             });
         }
     });
+
+    // 購入した商品がお気に入りに登録されていた場合、お気に入り一覧から即座に削除・解除します
+    const purchasedIds = purchasedItems.map(it => Number(it.id || it.product_id)).filter(id => !isNaN(id) && id > 0);
+    if (purchasedIds.length > 0 && Array.isArray(AppState.favorites)) {
+        purchasedIds.forEach(pId => {
+            // 型に依存せず数値一致で配列から完全に削除
+            AppState.favorites = AppState.favorites.filter(favId => Number(favId) !== pId);
+            // ハートボタンの表示を解除状態に更新
+            if (typeof syncAllFavoriteButtons === 'function') {
+                syncAllFavoriteButtons(pId, false);
+            }
+            // MySQL データベースのお気に入りテーブルからも即座に削除
+            if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+                try {
+                    fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
+                    }).catch(() => { });
+                } catch (_) { }
+            }
+        });
+
+        // ナビバッジ・スタジオ表示・お気に入り画面をすべて即時同期
+        updateFavoriteBadges();
+        if (typeof updateStudioBadges === 'function') updateStudioBadges();
+        if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioItems === 'function') renderStudioItems();
+        if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
+        if (typeof renderMyPage === 'function') renderMyPage();
+        if (isMobileLocalStorageMode()) {
+            lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        }
+    }
 
     // 購入者のお名前を注文データに確実に紐付けます（誰が購入したか保存）
     if (!confirmedOrder.customer_name && AppState.currentUser) {
@@ -2434,7 +2501,7 @@ async function syncOrdersFromBackend() {
             if (hRes.ok && hData && hData.mysql === 'connected') {
                 // 専用ヘルパー関数 setConnectedPill() を実行して状態や表示ラベルを更新します
                 setConnectedPill();
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 専用ヘルパー関数 setDisconnectedPill() を実行して状態や表示ラベルを更新します
                 setDisconnectedPill();
@@ -2507,12 +2574,12 @@ async function syncOrdersFromBackend() {
                 // チェックアウト画面の保有ポイント表示も最新値へ更新します
                 updateCheckoutCalculations();
             }
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 処理を中断して呼び出し元の catch へエラー内容（throw new Error('API response not ok');）を渡します
             throw new Error('API response not ok');
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn("MySQL注文履歴の取得に失敗しました:", e);
@@ -2574,7 +2641,7 @@ async function handleClearOrderHistory() {
         updateCheckoutCalculations();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('このアカウントのMySQLご注文履歴を初期化しました（0件）');
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('Backend orders delete failed', e);
@@ -2681,7 +2748,7 @@ async function handleRefreshFromMySQL() {
         renderMyPage();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(`✨ MySQLから最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 関連処理 syncOrdersFromBackend() を呼び出して処理・画面を更新します
         await syncOrdersFromBackend();
@@ -2740,7 +2807,7 @@ function renderMyPage() {
                 </button>
             `;
         }
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（userNameEl）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameEl) userNameEl.textContent = 'ゲスト 様';
@@ -2809,7 +2876,7 @@ function renderMyPage() {
                     </td>
                 </tr>
             `;
-        // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
+            // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
         } else if (!AppState.orderHistory || AppState.orderHistory.length === 0) {
             // テンプレートリテラルで組み立てた HTML を要素 ordersTbody 内に書き込んで画面を更新します
             ordersTbody.innerHTML = `
@@ -2819,7 +2886,7 @@ function renderMyPage() {
                     </td>
                 </tr>
             `;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 生成・変換した HTML 文字列を要素 ordersTbody の中身として描画します（購入者列・クーポン割引を追加）
             ordersTbody.innerHTML = AppState.orderHistory.map((order, idx) => `
@@ -2857,7 +2924,7 @@ function renderMyPage() {
         if (favoriteItems.length === 0) {
             // 生成・変換した HTML 文字列を要素 mypageFavGrid の中身として描画します
             mypageFavGrid.innerHTML = '<p style="grid-column: 1/-1; padding: 24px; color: #777;">お気に入り登録された商品はありません。</p>';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 生成・変換した HTML 文字列を要素 mypageFavGrid の中身として描画します
             mypageFavGrid.innerHTML = favoriteItems.slice(0, 4).map(p => createProductCardHTML(p)).join('');
@@ -2873,15 +2940,83 @@ let _favoritesMutationSeq = 0;
 // ==========================================================================
 //  6. お気に入り管理（ハートボタン状態同期 ＋ MySQL favorites テーブル連動）
 // ==========================================================================
+
+// マイクローゼットに現在登録されているブランド商品の ID 一覧を取得するヘルパー関数
+function getOwnedProductIds() {
+    const ownedIds = new Set();
+    if (Array.isArray(AppState.myCloset)) {
+        AppState.myCloset.forEach(c => {
+            if (c.productId) {
+                ownedIds.add(Number(c.productId));
+            }
+            if (typeof SAMPLE_PRODUCTS !== 'undefined' && c.name) {
+                const matched = SAMPLE_PRODUCTS.find(p => p.name === c.name);
+                if (matched) {
+                    ownedIds.add(matched.id);
+                }
+            }
+        });
+    }
+    return ownedIds;
+}
+window.getOwnedProductIds = getOwnedProductIds;
+
+// 購入手続き確定時にお気に入りリストから購入済み商品を自動解除する関数
+function cleanPurchasedFavorites(purchasedIds) {
+    if (!Array.isArray(AppState.favorites)) return false;
+    let targetIds = [];
+    if (Array.isArray(purchasedIds) && purchasedIds.length > 0) {
+        targetIds = purchasedIds.map(id => Number(id)).filter(id => !isNaN(id) && id > 0);
+    }
+    if (targetIds.length === 0) return false;
+
+    const targetSet = new Set(targetIds);
+    let removedAny = false;
+    const removedIds = [];
+    AppState.favorites = AppState.favorites.filter(id => {
+        const numId = Number(id);
+        if (targetSet.has(numId)) {
+            removedAny = true;
+            removedIds.push(numId);
+            syncAllFavoriteButtons(numId, false);
+            return false;
+        }
+        return true;
+    });
+
+    if (removedAny) {
+        if (AppState.currentUser && isMobileLocalStorageMode()) {
+            lsSetJson(`manekin_ls_favorites_${AppState.currentUser.id}`, AppState.favorites);
+        } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+            removedIds.forEach(pId => {
+                try {
+                    fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
+                    }).catch(() => { });
+                } catch (_) { }
+            });
+        }
+        updateFavoriteBadges();
+        if (typeof updateStudioBadges === 'function') updateStudioBadges();
+    }
+    return removedAny;
+}
+window.cleanPurchasedFavorites = cleanPurchasedFavorites;
+
 // ログイン会員のお気に入り商品ID一覧を取得してハートUIを同期します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncFavoritesFromBackend() {
-    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    // 未ログイン時はゲスト用ストレージから復元します
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // アプリ全体状態 AppState.favorites を最新値（[]）に更新します
-        AppState.favorites = [];
-        // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
+        try {
+            const guestFavs = JSON.parse(localStorage.getItem('manekin_guest_favorites') || '[]');
+            if (Array.isArray(guestFavs)) {
+                AppState.favorites = guestFavs.map(id => Number(id));
+            }
+        } catch (_) { }
         updateFavoriteBadges();
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
     // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
@@ -2890,12 +3025,13 @@ async function syncFavoritesFromBackend() {
     // スマホ版の場合は localStorage からお気に入り一覧を取得します
     if (isMobileLocalStorageMode()) {
         const savedFavs = lsGetJson(`manekin_ls_favorites_${targetUserId}`, []);
-        AppState.favorites = Array.isArray(savedFavs) ? savedFavs : [];
+        AppState.favorites = Array.isArray(savedFavs) ? savedFavs.map(id => Number(id)) : [];
         updateFavoriteBadges();
         if (AppState.currentDetailId && typeof syncAllFavoriteButtons === 'function') {
             syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
         }
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
         if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
         if (typeof renderHomeProducts === 'function') renderHomeProducts();
         if (typeof renderCatalogProducts === 'function') renderCatalogProducts();
@@ -2926,7 +3062,7 @@ async function syncFavoritesFromBackend() {
             // 条件（Array.isArray(data.favorites)）が成り立つか判定し、該当する場合の処理を実行します
             if (Array.isArray(data.favorites)) {
                 // アプリ全体状態 AppState.favorites を最新値（data.favorites）に更新します
-                AppState.favorites = data.favorites;
+                AppState.favorites = data.favorites.map(id => Number(id));
                 // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
                 updateFavoriteBadges();
                 // 条件（AppState.currentDetailId && typeof syncAllFavoriteBu…）が成り立つか判定し、該当する場合の処理を実行します
@@ -2936,6 +3072,7 @@ async function syncFavoritesFromBackend() {
                 }
                 // 条件（typeof renderStudioBrandList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
                 if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+                if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
                 // 条件（typeof renderFavoriteProducts === 'function'）が成り立つか判定し、該当する場合の処理を実行します
                 if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
                 // 条件（typeof renderHomeProducts === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -2948,7 +3085,7 @@ async function syncFavoritesFromBackend() {
                 if (typeof renderMyPage === 'function') renderMyPage();
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLお気に入り取得エラー:', e);
@@ -2956,148 +3093,125 @@ async function syncFavoritesFromBackend() {
 }
 
 
-// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（スマホ版はlocalStorage、PC版はMySQL保存）
+// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（未ログイン時はローカル保存、ログイン時はMySQL/localStorage保存）
 async function handleToggleFavorite(productId) {
-    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
-    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ お気に入りを保存するにはログインが必要です');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
+    const numId = Number(productId);
+    if (!numId || isNaN(numId)) return;
+
+    if (!Array.isArray(AppState.favorites)) {
+        AppState.favorites = [];
     }
-    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
-    const targetUserId = AppState.currentUser.id;
+
     // 変数・配列項目 _favoritesMutationSeq の値を更新・計算します
     _favoritesMutationSeq++;
 
-    // スマホ版の場合は localStorage でお気に入りをトグル保存します
+    // 1. 即座にUIを楽観的更新（色を即座に反転、バッジ更新）
+    const existingIndex = AppState.favorites.findIndex(f => Number(f) === numId);
+    let isAdded = false;
+    if (existingIndex === -1) {
+        AppState.favorites.push(numId);
+        isAdded = true;
+    } else {
+        AppState.favorites.splice(existingIndex, 1);
+        isAdded = false;
+    }
+    console.log(`❤️ [Favorite] トグル実行: productId=${numId}, isAdded=${isAdded}, 現在のお気に入り一覧=`, AppState.favorites);
+
+    // ボタンの見た目（赤ハート・解除）とバッジを即座に同期
+    syncAllFavoriteButtons(numId, isAdded);
+    updateFavoriteBadges();
+    if (typeof updateStudioBadges === 'function') updateStudioBadges();
+    if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+    if (window.location.hash === '#favorites') renderFavoriteProducts();
+    if (typeof renderMyPage === 'function') renderMyPage();
+
+    // 2. ログイン状態に応じた永続化処理
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        // 未ログイン時：ゲスト用ストレージに保存
+        try {
+            localStorage.setItem('manekin_guest_favorites', JSON.stringify(AppState.favorites));
+        } catch (_) { }
+        showToast(isAdded ? 'お気に入りに追加しました（ログインすると会員データに保存されます）' : 'お気に入りから解除しました');
+        return;
+    }
+
+    const targetUserId = AppState.currentUser.id;
+
+    // スマホ版 localStorage モード
     if (isMobileLocalStorageMode()) {
-        const index = AppState.favorites.indexOf(productId);
-        let isAdded = false;
-        if (index === -1) {
-            AppState.favorites.push(productId);
-            isAdded = true;
-        } else {
-            AppState.favorites.splice(index, 1);
-            isAdded = false;
-        }
         lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
-        updateFavoriteBadges();
-        syncAllFavoriteButtons(productId, isAdded);
-        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
-        if (window.location.hash === '#favorites') renderFavoriteProducts();
-        if (typeof renderMyPage === 'function') renderMyPage();
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
         return;
     }
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    // PC版 MySQL モード
     try {
-        // Flask バックエンド API（/api/favorites/toggle）へ非同期リクエストを送信し、応答を待ち受けます
         const res = await fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
             method: 'POST',
-            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
             headers: { 'Content-Type': 'application/json' },
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
             credentials: 'include',
-            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
             body: JSON.stringify({
-                // 対象商品のマスタ ID をセットします
-                product_id: productId,
-                // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
-                user_id: targetUserId
+                product_id: numId,
+                user_id: targetUserId,
+                action: isAdded ? 'add' : 'remove'
             })
         });
-        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
-        if (!res.ok) throw new Error('Favorite toggle API failed');
-        // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
-        const data = await res.json();
-        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
-        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
-
-        // 定数 isAdded を宣言し、値（(data.action === 'added')）をセットします
-        const isAdded = (data.action === 'added');
-        // 定数 index を宣言し、値（AppState.favorites.indexOf(productId)）をセットします
-        const index = AppState.favorites.indexOf(productId);
-        // 条件（isAdded && index === -1）が成り立つか判定し、該当する場合の処理を実行します
-        if (isAdded && index === -1) {
-            // 配列の末尾に新しい要素を追加します（AppState.favorites.push(productId);）
-            AppState.favorites.push(productId);
-        // 前の if が偽で、かつ（!isAdded && index > -1）を満たす場合の別条件分岐です
-        } else if (!isAdded && index > -1) {
-            // 配列の指定位置から要素を取り除いて削除します（AppState.favorites.splice(index, 1);）
-            AppState.favorites.splice(index, 1);
-        }
-
-        // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
-        updateFavoriteBadges();
-        // 関連処理 syncAllFavoriteButtons() を呼び出して処理・画面を更新します
-        syncAllFavoriteButtons(productId, isAdded);
-        // 条件（typeof renderStudioBrandList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
-        // 条件（window.location.hash === '#favorites'）が成り立つか判定し、該当する場合の処理を実行します
-        if (window.location.hash === '#favorites') {
-            // 関連処理 renderFavoriteProducts() を呼び出して処理・画面を更新します
-            renderFavoriteProducts();
-        }
-        // 条件（typeof renderMyPage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof renderMyPage === 'function') renderMyPage();
-
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast(isAdded ? 'お気に入りに追加しました（MySQL保存）' : 'お気に入りから解除しました（MySQL保存）');
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        if (!res.ok) throw new Error('Favorite toggle API response not ok');
+        const data = await res.json().catch(() => ({}));
+        showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
     } catch (e) {
-        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
-        console.warn('MySQLお気に入り更新エラー:', e);
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ MySQLへお気に入りを保存できませんでした（サーバー接続を確認してください）');
+        console.warn('MySQLお気に入り更新エラー (フォールバック保存):', e);
+        try {
+            lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        } catch (_) { }
+        showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
     }
 }
 
 
 // 画面上のすべてのハートボタンと「お気に入り登録済み」ボタン見た目を AppState.favorites に合わせて一括同期します
 function syncAllFavoriteButtons(productId, isFavorite) {
-    // CSS セレクタに一致する複数要素リストを取得し変数 cards に入れます
-    const cards = document.querySelectorAll(`.product-card[data-id="${productId}"]`);
-    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
+    const numId = Number(productId);
+    // CSS セレクタに一致するすべての商品カード要素を安全に取得
+    const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
-        // 定数 btn を宣言し、値（card.querySelector('.fav-btn')）をセットします
-        const btn = card.querySelector('.fav-btn');
-        // 条件（btn）が成り立つか判定し、該当する場合の処理を実行します
-        if (btn) {
-            // 条件（isFavorite）が成り立つか判定し、該当する場合の処理を実行します
-            if (isFavorite) {
-                // 要素に CSS クラスを付与して見た目・表示状態を変更します（btn.classList.add('is-favorite');）
-                btn.classList.add('is-favorite');
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
-            } else {
-                // 要素から CSS クラスを外して強調や表示を戻します（btn.classList.remove('is-favorite');）
-                btn.classList.remove('is-favorite');
+        const rawId = card.getAttribute('data-id') || card.getAttribute('data - id');
+        if (rawId && Number(rawId) === numId) {
+            const btn = card.querySelector('.fav-btn');
+            if (btn) {
+                const svg = btn.querySelector('svg');
+                if (isFavorite) {
+                    btn.classList.add('is-favorite');
+                    btn.setAttribute('aria-label', 'お気に入りを解除');
+                    if (svg) {
+                        svg.setAttribute('fill', '#e53935');
+                        svg.setAttribute('stroke', '#e53935');
+                    }
+                } else {
+                    btn.classList.remove('is-favorite');
+                    btn.setAttribute('aria-label', 'お気に入りに追加');
+                    if (svg) {
+                        svg.setAttribute('fill', 'none');
+                        svg.setAttribute('stroke', 'currentColor');
+                    }
+                }
             }
         }
     });
 
-    // HTML 要素 #detail-fav-btn を取得して変数 detailFavBtn に格納します
+    // 商品詳細画面のお気に入りボタンも即座に同期
     const detailFavBtn = document.getElementById('detail-fav-btn');
-    // 条件（detailFavBtn && AppState.currentDetailId === product…）が成り立つか判定し、該当する場合の処理を実行します
-    if (detailFavBtn && AppState.currentDetailId === productId) {
-        // 条件（isFavorite）が成り立つか判定し、該当する場合の処理を実行します
+    if (detailFavBtn && Number(AppState.currentDetailId) === numId) {
         if (isFavorite) {
-            // 要素に CSS クラスを付与して見た目・表示状態を変更します（detailFavBtn.classList.add('is-favorite');）
             detailFavBtn.classList.add('is-favorite');
-            // テンプレートリテラルで組み立てた HTML を要素 detailFavBtn 内に書き込んで画面を更新します
             detailFavBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 お気に入り解除
             `;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 要素から CSS クラスを外して強調や表示を戻します（detailFavBtn.classList.remove('is-favorite…）
             detailFavBtn.classList.remove('is-favorite');
-            // テンプレートリテラルで組み立てた HTML を要素 detailFavBtn 内に書き込んで画面を更新します
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -3112,7 +3226,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
 // ヘッダーやタブ等のお気に入り件数バッジ（.icon-badge 等）を一括更新します
 function updateFavoriteBadges() {
     // 定数 count を宣言し、値（AppState.favorites.length）をセットします
-    const count = AppState.favorites.length;
+    const count = Array.isArray(AppState.favorites) ? AppState.favorites.length : 0;
     // HTML 要素 #nav-fav-badge を取得して変数 navBadge に格納します
     const navBadge = document.getElementById('nav-fav-badge');
     // HTML 要素 #icon-fav-badge を取得して変数 iconBadge に格納します
@@ -3144,8 +3258,10 @@ function renderFavoriteProducts() {
     // 条件（!favGrid）が成り立つか判定し、該当する場合の処理を実行します
     if (!favGrid) return;
 
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favoriteItems に入れます
-    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+    // お気に入りリストに登録されている商品（型を吸収して数値一致で抽出）
+    const favList = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    const favoriteItems = SAMPLE_PRODUCTS.filter(p => favList.some(f => Number(f) === Number(p.id)));
+
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favoriteItems.length === 0) {
         // テンプレートリテラルで組み立てた HTML を要素 favGrid 内に書き込んで画面を更新します
@@ -3156,7 +3272,7 @@ function renderFavoriteProducts() {
                 <a href="#items" class="btn btn-primary">商品一覧を見る</a>
             </div>
         `;
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 生成・変換した HTML 文字列を要素 favGrid の中身として描画します
         favGrid.innerHTML = favoriteItems.map(p => createProductCardHTML(p)).join('');
@@ -3194,7 +3310,7 @@ function updateAuthNavUI() {
             mobileLoginLink.onclick = handleLogout;
         }
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
     } else {
         if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'none';
         if (headerUserBtn) headerUserBtn.title = 'マイページ / ログイン';
@@ -3221,7 +3337,7 @@ async function handleLogout(e) {
     // スマホ版のlocalStorageログインセッションをクリアします
     try {
         window.localStorage.removeItem('manekin_ls_current_user');
-    } catch (e) {}
+    } catch (e) { }
 
     // PC版の場合はバックエンド API（/api/auth/logout）へリクエストを送信します
     if (!isMobileLocalStorageMode()) {
@@ -3255,7 +3371,7 @@ async function redirectToHome(user, options = {}) {
     try {
         sessionStorage.removeItem('manekin_pending_auth_target');
         localStorage.removeItem('manekin_pending_auth_target');
-    } catch (e) {}
+    } catch (e) { }
 
     // 1. DOM上の全.page-viewからactiveを外し、確実に#view-homeを表示
     const allViews = document.querySelectorAll('.page-view');
@@ -3274,7 +3390,7 @@ async function redirectToHome(user, options = {}) {
         if (window.location.hash !== '#home') {
             window.location.hash = '#home';
         }
-    } catch (e) {}
+    } catch (e) { }
 
     // 4. HOMEのおすすめ商品カードを再描画
     if (typeof renderHomeProducts === 'function') {
@@ -3282,7 +3398,7 @@ async function redirectToHome(user, options = {}) {
     }
 
     // 5. 画面最上部へ即時スクロール
-    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 
     // 6. トースト通知を表示
     if (user && !options.silentToast && typeof showToast === 'function') {
@@ -3291,7 +3407,7 @@ async function redirectToHome(user, options = {}) {
 
     // 7. handleRoutingも#homeを明示指定して呼んで状態を完全同期
     if (typeof handleRouting === 'function') {
-        try { await handleRouting('#home'); } catch (e) {}
+        try { await handleRouting('#home'); } catch (e) { }
     }
 
     // 8. 念押しで最上部スクロール＆#view-homeアクティブ保証
@@ -3299,7 +3415,7 @@ async function redirectToHome(user, options = {}) {
         allViews.forEach(v => v.classList.remove('active'));
         homeView.classList.add('active');
     }
-    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 }
 
 // 互換用エイリアス
@@ -3361,7 +3477,7 @@ async function handleDemoLogin(e) {
             }
             // 変数・配列項目 demoUser の値を更新・計算します
             demoUser = data.user;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
@@ -3475,14 +3591,14 @@ async function handleLogin(e) {
             if (response.ok && data.user && isServerUserId(data.user.id)) {
                 // 変数・配列項目 loggedInUser の値を更新・計算します
                 loggedInUser = data.user;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
                 showToast(data.message || 'メールアドレスまたはパスワードが正しくありません');
                 // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
@@ -3629,14 +3745,14 @@ async function handleRegister(e) {
             if (response.ok && data.user && isServerUserId(data.user.id)) {
                 // 変数・配列項目 newUser の値を更新・計算します
                 newUser = data.user;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
                 showToast(data.message || '会員登録に失敗しました');
                 // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないため会員登録できません（app.pyとMySQLの起動を確認してください）');
@@ -3822,7 +3938,7 @@ function showToast(message) {
         toast.classList.add('toast-fadeout');
         // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
         setTimeout(() => toast.remove(), 300);
-    // 上の処理を指定ミリ秒後（2500ms 後）に実行するタイマー呼び出しを閉じます
+        // 上の処理を指定ミリ秒後（2500ms 後）に実行するタイマー呼び出しを閉じます
     }, 2500);
 }
 

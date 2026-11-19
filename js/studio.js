@@ -153,7 +153,7 @@ function renderManekinStudio(activeTab = 'create') {
         if (avatarCharElem) avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
         // 条件（userRankElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userRankElem) userRankElem.textContent = AppState.currentUser.rank || 'MEMBER';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（userNameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameElem) userNameElem.textContent = 'ゲスト 様';
@@ -217,7 +217,7 @@ function renderManekinStudio(activeTab = 'create') {
         if (profEmail) profEmail.textContent = AppState.currentUser.email || '';
         // 条件（profRank）が成り立つか判定し、該当する場合の処理を実行します
         if (profRank) profRank.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（profName）が成り立つか判定し、該当する場合の処理を実行します
         if (profName) profName.textContent = 'ゲスト 様';
@@ -362,7 +362,7 @@ function renderPaneClosetGrid() {
                 </div>
             </div>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -420,7 +420,7 @@ function renderStudioClosetList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
             `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -467,8 +467,8 @@ function renderStudioBrandList() {
 
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して allFavProducts に入れます
-    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.includes(p.id));
+    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
+    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
 
     // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
@@ -536,7 +536,7 @@ function renderStudioBrandList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -571,8 +571,10 @@ function renderStudioFavoritesGrid() {
     // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favProducts に入れます
-    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+    // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? AppState.favorites : []）をセットします
+    const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
+    const favProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favProducts.length === 0) {
@@ -595,10 +597,17 @@ function renderStudioFavoritesGrid() {
         const isWearing = isItemWearing(product);
         // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
-            <article class="product-card" data - id="${product.id}" >
+            <article class="product-card" data-id="${product.id}">
                 <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
                     <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="badge-new" style="background: var(--color-black);">試着する</span>
+                    <button class="fav-btn is-favorite" 
+                            onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
+                            aria-label="お気に入りを解除">
+                        <svg viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="product-info">
                     <span class="product-category">${product.category}</span>
@@ -609,8 +618,8 @@ function renderStudioFavoritesGrid() {
                     </button>
                 </div>
             </article>
-            `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        `;
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -647,7 +656,7 @@ function toggleWearItem(itemId, isOwned) {
     if (isOwned) {
         // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = AppState.myCloset.find(c => String(c.id) === String(itemId));
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = SAMPLE_PRODUCTS.find(p => p.id === parseInt(itemId, 10));
@@ -669,7 +678,7 @@ function toggleWearItem(itemId, isOwned) {
         AppState.currentOutfit[slotKey] = null;
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`「${targetItem.name}」を外しました`);
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
         AppState.currentOutfit[slotKey] = {
@@ -850,15 +859,15 @@ function migrateOldBrokenAssets() {
             if (!item.image || item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-            // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
             } else if (item.image.includes('shoes_white.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = defaultSneaker;
-            // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
             } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/アーバングレイジップフーディ.png';
-            // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
             } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
@@ -892,19 +901,19 @@ function migrateOldBrokenAssets() {
                     item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
                 } else if (item.image.includes('shoes_white.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = defaultSneaker;
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/アーバングレイジップフーディ.png';
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
@@ -952,7 +961,7 @@ function renderMannequinStage() {
                 const fallback = getCategoryFallbackImage(item.category);
                 // テンプレートリテラルで組み立てた HTML を要素 layerContent 内に書き込んで画面を更新します
                 layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.onerror=null;this.src='${fallback}';">`;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 生成・変換した HTML 文字列を要素 layerContent の中身として描画します
                 layerContent.innerHTML = '';
@@ -1050,7 +1059,7 @@ function handleStageSlotClick(slotKey) {
     if (item) {
         // 専用ヘルパー関数 unwearSlot() を実行して状態や表示ラベルを更新します
         unwearSlot(slotKey);
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 関連処理 openStageQuickPicker() を呼び出して処理・画面を更新します
         openStageQuickPicker(slotKey);
@@ -1098,7 +1107,7 @@ function openStageQuickPicker(slotKey) {
     if (myItems.length === 0 && brandItems.length === 0) {
         // 変数・配列項目 html の値を更新・計算します
         html = '<p style="grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 0.75rem; padding: 12px;">選択できるアイテムがありません</p>';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         myItems.forEach(item => {
@@ -1198,7 +1207,7 @@ function handleStageDrop(event) {
             // 関連処理 toggleWearItem() を呼び出して処理・画面を更新します
             toggleWearItem(data.itemId, !!data.isOwned);
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.error('Drop error:', e);
@@ -1239,11 +1248,11 @@ function applyFittingOffsets() {
             const bSize = off.brandSize || item.size || 'M';
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = BRAND_SIZE_SCALES[bSize] || 100;
-        // 前の if が偽で、かつ（item && (item.isOwned || isFreeScaleSlot)）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（item && (item.isOwned || isFreeScaleSlot)）を満たす場合の別条件分岐です
         } else if (item && (item.isOwned || isFreeScaleSlot)) {
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
@@ -1374,6 +1383,10 @@ function syncAdjustPanelUI() {
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
         // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
+        // if(descElem)はもしステージ上に服が存在していたら
+        // descElem.textContent = .... その表示エリアを書き換える
+        // isFreeScaleSlot ? A : B 条件？が正しいとき(A):違うとき(B)に書き換える
+
         if (descElem) descElem.textContent = isFreeScaleSlot ? '自由サイズ調整（70%〜140%）' : '試着すると調整可能';
 
         // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します
@@ -1398,7 +1411,7 @@ function syncAdjustPanelUI() {
             if (valScale) valScale.textContent = `${(off.customScale !== undefined) ? off.customScale : (off.scale || 100)}%`;
             // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
             if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}をクローゼットから着用すると、マネキンに合わせてサイズ（70%〜140%）や位置を自由に微調整できます`;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
             if (rowBrand) rowBrand.style.display = 'flex';
@@ -1431,9 +1444,9 @@ function syncAdjustPanelUI() {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
             // 変数・配列項目 badgeElem.className の値を更新・計算します
-            badgeElem.className = 'adjust-item-tag closet';
-            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-            badgeElem.textContent = slotKey === 'hat' ? '🧢 帽子' : '👟 靴';
+            badgeElem.className = (item.isOwned !== false) ? 'adjust-item-tag closet' : 'adjust-item-tag brand';
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（すべてのジャンルでマイクローゼットに統一）
+            badgeElem.textContent = (item.isOwned !== false) ? '👕 マイクローゼット' : '🏷️ 販売商品';
         }
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
@@ -1455,7 +1468,7 @@ function syncAdjustPanelUI() {
         // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}はスライダーで大きさを70%〜140%まで自由に拡大・縮小できます（自動保存）`;
 
-    // 前の if が偽で、かつ（!item.isOwned）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（!item.isOwned）を満たす場合の別条件分岐です
     } else if (!item.isOwned) {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
@@ -1502,7 +1515,7 @@ function syncAdjustPanelUI() {
         // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = '💡 販売商品はXS〜XLのサイズ規格でマネキン上の表示サイズが変わります（自動保存）';
 
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
@@ -1653,13 +1666,13 @@ function handleAdjustInput(prop, val) {
         const valElem = document.getElementById('val-adjust-y');
         // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
-    // 前の if が偽で、かつ（prop === 'x'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（prop === 'x'）を満たす場合の別条件分岐です
     } else if (prop === 'x') {
         // HTML 要素 #val-adjust-x を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-x');
         // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
-    // 前の if が偽で、かつ（prop === 'scale'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（prop === 'scale'）を満たす場合の別条件分岐です
     } else if (prop === 'scale') {
         // HTML 要素 #val-adjust-scale を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-scale');
@@ -2023,7 +2036,7 @@ function updateAIStylingComment() {
             tags = ['#大人の品格', '#モノトーン+1', '#Aラインシルエット'];
             // 変数・配列項目 score の値を更新・計算します
             score = 98;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 変数・配列項目 tags の値を更新・計算します
             tags = ['#キレイめカジュアル', '#通学デイリー', '#モノトーンアクセント'];
@@ -2216,7 +2229,7 @@ async function handleSaveOutfit(e) {
         if (input) input.value = '';
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLコーデ保存失敗:', err);
@@ -2288,7 +2301,7 @@ function renderSavedOutfitsGrid() {
                 </div>
             </div>
             `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -2370,7 +2383,7 @@ async function deleteSavedOutfit(outfitId) {
         renderSavedOutfitsGrid();
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLコーデ削除失敗:', err);
@@ -2459,7 +2472,7 @@ async function syncOutfitsFromBackend() {
                 }
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLからの保存コーデ取得に失敗しました:', e);
@@ -2509,7 +2522,7 @@ async function addCurrentBrandItemsToCart() {
         if (existing) {
             // 変数・配列項目 existing.quantity の値を更新・計算します
             existing.quantity = (existing.quantity || 1) + 1;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
             AppState.cart.push({
@@ -2667,7 +2680,7 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
                 height = Math.round((height * maxDim) / width);
                 // 変数・配列項目 width の値を更新・計算します
                 width = maxDim;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 変数・配列項目 width の値を更新・計算します
                 width = Math.round((width * maxDim) / height);
@@ -2688,7 +2701,7 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
             canvas.toBlob((blob) => {
                 // 非同期 Promise を完了し、結果値（blob || imageSource）を呼び出し元へ返します
                 resolve(blob || imageSource);
-            // Canvas 画像を PNG 形式（透過対応）で書き出す処理を閉じます
+                // Canvas 画像を PNG 形式（透過対応）で書き出す処理を閉じます
             }, 'image/png');
         };
         // 変数・配列項目 img.onerror の値を更新・計算します
@@ -2698,11 +2711,11 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
         if (typeof imageSource === 'string') {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = imageSource;
-        // 前の if が偽で、かつ（imageSource instanceof Blob）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（imageSource instanceof Blob）を満たす場合の別条件分岐です
         } else if (imageSource instanceof Blob) {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(imageSource);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 非同期 Promise を完了し、結果値（imageSource）を呼び出し元へ返します
             resolve(imageSource);
@@ -2727,7 +2740,7 @@ async function runAiBackgroundRemoval(imageSource) {
             window.imglyRemoveBackground = removeBgFunc;
             // 変数・配列項目 window.imglyAiReady の値を更新・計算します
             window.imglyAiReady = true;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.error('AIモジュール読み込みエラー:', e);
@@ -2777,7 +2790,7 @@ async function runAiBackgroundRemoval(imageSource) {
                     if (key.includes('model') || key.includes('onnx')) {
                         // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `AIモデル読込中... (${pct}%)`;
-                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
                     } else {
                         // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `服の輪郭をAI解析・透過処理中... (${pct}%)`;
@@ -2795,7 +2808,7 @@ async function runAiBackgroundRemoval(imageSource) {
         if (overlay) overlay.style.display = 'none';
         // 結果（outputBlob）を呼び出し元へ返却します
         return outputBlob;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
         if (overlay) overlay.style.display = 'none';
@@ -2833,7 +2846,7 @@ function updateClosetPreviewUI(imgUrl, isTransparent = false) {
             preview.classList.add('is-transparent');
             // 条件（badgeTrans）が成り立つか判定し、該当する場合の処理を実行します
             if (badgeTrans) badgeTrans.style.display = 'block';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 要素から CSS クラスを外して強調や表示を戻します（preview.classList.remove('is-transparent')…）
             preview.classList.remove('is-transparent');
@@ -2973,7 +2986,7 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
                 colorSelect.value = result.color;
             }
         }
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-invalid';
@@ -3091,7 +3104,7 @@ async function analyzeClothingItemShape(source) {
                         if (isAlreadyTransparent) {
                             // 変数・配列項目 isFg の値を更新・計算します
                             isFg = a > 35;
-                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                            // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
                             // 定数 diff を宣言し、値（Math.hypot(r - bgR, g - bgG, b - bgB)）をセットします
                             const diff = Math.hypot(r - bgR, g - bgG, b - bgB);
@@ -3213,7 +3226,7 @@ async function analyzeClothingItemShape(source) {
                             if (!prevWasFg) transitions++;
                             // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = true;
-                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                            // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
                             // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = false;
@@ -3338,26 +3351,26 @@ async function analyzeClothingItemShape(source) {
                             if (label.match(/shoe|sneaker|boot|loafer|sandal|clog/)) {
                                 // 変数・配列項目 scores.SHOES の値を更新・計算します
                                 scores.SHOES += 60;
-                            // 前の if が偽で、かつ（label.match(/hat|cap|bonnet|beret|helmet/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/hat|cap|bonnet|beret|helmet/)）を満たす場合の別条件分岐です
                             } else if (label.match(/hat|cap|bonnet|beret|helmet/)) {
                                 // 変数・配列項目 scores.HAT の値を更新・計算します
                                 scores.HAT += 60;
-                            // 前の if が偽で、かつ（label.match(/jean|pant|trouser|skirt/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/jean|pant|trouser|skirt/)）を満たす場合の別条件分岐です
                             } else if (label.match(/jean|pant|trouser|skirt/)) {
                                 // 変数・配列項目 scores.BOTTOMS の値を更新・計算します
                                 scores.BOTTOMS += 60;
-                            // 前の if が偽で、かつ（label.match(/coat|jacket|trench|overcoat/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/coat|jacket|trench|overcoat/)）を満たす場合の別条件分岐です
                             } else if (label.match(/coat|jacket|trench|overcoat/)) {
                                 // 変数・配列項目 scores.OUTER の値を更新・計算します
                                 scores.OUTER += 60;
-                            // 前の if が偽で、かつ（label.match(/jersey|shirt|t-shirt|sweater|sweatshirt…）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/jersey|shirt|t-shirt|sweater|sweatshirt…）を満たす場合の別条件分岐です
                             } else if (label.match(/jersey|shirt|t-shirt|sweater|sweatshirt|cardigan|vest|top/)) {
                                 // 変数・配列項目 scores.TOPS の値を更新・計算します
                                 scores.TOPS += 60;
                             }
                         }
                     }
-                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
                 } catch (e) {
                     // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                     console.warn('AIモデル判定スキップ:', e);
@@ -3507,7 +3520,7 @@ async function analyzeClothingItemShape(source) {
                     desc: `マイクローゼットに登録可能です。カテゴリとカラー（${detectedColorLabel}）を自動判定しました。`
                 });
 
-            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (err) {
                 // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.error('形状解析エラー:', err);
@@ -3551,11 +3564,11 @@ async function analyzeClothingItemShape(source) {
         if (typeof source === 'string') {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = source;
-        // 前の if が偽で、かつ（source instanceof Blob）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（source instanceof Blob）を満たす場合の別条件分岐です
         } else if (source instanceof Blob) {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(source);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 最終結果を resolve() に渡して非同期 Promise を完了させます
             resolve({
@@ -3603,7 +3616,7 @@ async function processClosetImageWithAi(source) {
         };
         // 選択ファイルをブラウザ内でそのまま画像表示できる DataURL 文字列へ非同期変換開始します
         reader.readAsDataURL(blob);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('AI背景削除に失敗、元画像を使用:', err);
@@ -3711,7 +3724,7 @@ function handleClosetImageSelect(e) {
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
             // 選んだ画像またはリサイズ済み画像に対して AI 背景透過と形状分析パイプラインを実行します
             await processClosetImageWithAi(file);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
@@ -3956,13 +3969,13 @@ async function handleAddClosetItem(e) {
         closeAddClosetModal();
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット保存エラー:', err);
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`⚠️ MySQLへの手持ち服保存に失敗しました（${err.message || 'サーバー接続を確認してください'}）`);
-    // 成功・失敗に関わらず最後に必ず実行される後始末(finally)ブロックです
+        // 成功・失敗に関わらず最後に必ず実行される後始末(finally)ブロックです
     } finally {
         // 条件（submitBtn）が成り立つか判定し、該当する場合の処理を実行します
         if (submitBtn) {
@@ -4058,7 +4071,7 @@ async function deleteClosetItem(itemId) {
         showToastNotification('手持ちの服をMySQLから削除しました');
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット削除エラー:', err);
@@ -4189,7 +4202,7 @@ async function syncClosetFromBackend() {
                 }
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット取得エラー:', e);
@@ -4282,7 +4295,7 @@ async function fetchCurrentTemperature() {
                         parsedWeather = area0.weathers[0].replace(/[\s\u3000]+/g, ' ').trim();
                     }
                 }
-            } catch (we) {}
+            } catch (we) { }
 
             // 気温（最低・最高）の抽出（名古屋: 51106）
             try {
@@ -4310,7 +4323,7 @@ async function fetchCurrentTemperature() {
                         }
                     }
                 }
-            } catch (te) {}
+            } catch (te) { }
 
             if (parsedMin !== null) {
                 result.tempMin = parsedMin;
@@ -4356,7 +4369,7 @@ async function fetchCurrentTemperature() {
                         result.temp = Math.round(omData.current.temperature_2m);
                     }
                 }
-            } catch (oe) {}
+            } catch (oe) { }
         }
     }
 
@@ -4378,134 +4391,299 @@ function getCurrentSeasonInfo(date = new Date()) {
     }
 }
 
-// 季節ごとのAI提案コーデデータ（MEN / WOMEN それぞれのアイテム・タイトル・説明文）
-const SEASONAL_STYLING_PLANS = {
-    spring: {
+// ==========================================================================
+//  月別（1月〜12月）・ブランド商品おすすめコーデデータ（すべて SAMPLE_PRODUCTS から選定）
+// ==========================================================================
+const MONTHLY_STYLING_PLANS = {
+    1: {
+        monthName: '1月',
+        seasonName: '厳冬期',
+        themeTitle: '真冬の寒さを乗り切るウォームレイヤード',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・爽やかな春風に映える「スカイオックスフォードシャツ」スタイル`,
-            desc: (temp) => `過ごしやすい気温${temp}℃の春風に合わせて、清潔感溢れる「スカイ オックス フォードシャツ」を主役に。手持ちの軽快なスラックスと白スニーカーを合わせることで、好印象な大人のスマートカジュアルが完成します。`,
-            outfit: {
-                outerId: null,
-                topsId: 7, // スカイ オックス フォードシャツ
-                bottomsId: 9, // ストレートレープセミフレアスラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
+            topsId: 6,   // チャコール ブーク ニット (¥5,500)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '真冬の厳しい寒さに備え、防寒性とストリート感を兼ね備えた「バッファローチェックボアジップジャケット」に保温性の高いブークニットと機能的な2WAYナイロンカーゴパンツを合わせました。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・春風に揺れる「シアーヘンリーネック × ライトデニム」`,
-            desc: (temp) => `軽やかな気温${temp}℃の春にぴったりな「ドット柄シアーヘンリーネッククロップドTシャツ」に、手持ちのライトデニムを合わせて、爽やかで抜け感のある春の旬コーデに。`,
-            outfit: {
-                outerId: null,
-                topsId: 108, // ドット柄シアーヘンリーネッククロップドTシャツ
-                bottomsId: 110, // ライトインディゴデニム
-                shoesName: 'キャンバススニーカー'
-            }
+            outerId: 14, // グリッドパフジャケット (¥12,800)
+            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '凍える真冬の気候を暖かく包み込むボリューム感のある「グリッドパフジャケット」に、ふわふわなシャギーニットセーターとリラックスしたスウェットパンツを組み合わせた快適な防寒スタイルです。'
         }
     },
-    summer: {
+    2: {
+        monthName: '2月',
+        seasonName: '晩冬・早春',
+        themeTitle: '春の気配を感じるシックなウィンタースタイル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・夏の暑さを涼しく乗り切る「軽快アンクルスラックス」コーデ`,
-            desc: (temp) => `気温${temp}℃の夏日でも涼しく快適に。「スマートアンクルテーパードイージースラックス」ですっきりとした足元を演出し、シンプルながら洗練された都会的サマーカジュアルに。`,
-            outfit: {
-                outerId: null,
-                topsId: 7, // スカイオックスフォードシャツ
-                bottomsId: 11, // スマートアンクルテーパードイージースラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 3,  // シングルブレストフェイクレザージャケット (¥12,000)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: 'まだ冷え込む2月もスタイリッシュに。上質な光沢感の「シングルブレストフェイクレザージャケット」に深みのあるワインニットと美しいセミフレアスラックスを効かせた洗練コーデです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・真夏のストリートカジュアル「クロップドT × バギーデニム」`,
-            desc: (temp) => `気温${temp}℃の暑い日も涼しげにキマる「クロップドTシャツ」にワイドなデニムを合わせて、開放感とトレンド感を両立したアクティブな夏コーデ。`,
-            outfit: {
-                outerId: null,
-                topsId: 108,
-                bottomsId: 111, // バギーデニム
-                shoesName: 'サンダル/スニーカー'
-            }
+            outerId: 13, // フリースジャケット (¥7,500)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '軽くて暖かい「フリースジャケット」に肉厚なルーズクルーネックスウェットとシルエットの美しいインディゴデニムを合わせた抜け感のある旬カジュアルです。'
         }
     },
-    autumn: {
+    3: {
+        monthName: '3月',
+        seasonName: '早春',
+        themeTitle: '季節の変わり目を快適に繋ぐ春アウタースタイル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・深まる秋の寒暖差に映える「手持ち黒ボトムス × ダブルトレンチコート」`,
-            desc: (temp) => `肌寒さを感じる気温${temp}℃に最適。ブランド人気No.1の「オーバードレープ ダブルトレンチコート」にチャコールニットを重ね着。手持ちの黒ボトムスと合わせるだけで、こなれ感のある都会的な秋冬スマートカジュアルが完成します。`,
-            outfit: {
-                outerId: 1, // オーバードレープ ダブルトレンチコート
-                topsId: 6,  // チャコール ブーク ニット
-                bottomsId: 9, // ストレートレープセミフレアスラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '朝晩と日中の気温差が大きい3月に重宝する「オーバードレープ ダブルトレンチコート」に、着脱しやすいジップフーディとスラックスをレイヤードした大人の春スタイルです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・秋めく街に映える「フリースジャケット × ワイドデニム」`,
-            desc: (temp) => `気温${temp}℃の秋の風に寄り添う、ふんわり暖かい「フリースジャケット」にインディゴデニムを合わせた王道カジュアル。手持ちのスニーカーと合わせて親しみやすいスタイルに。`,
-            outfit: {
-                outerId: 101, // フリースジャケット
-                topsId: 106,  // ヘビーウェイトルーズクルーネックスウェット
-                bottomsId: 109, // ハイウエストワイドドレープタックトラウザー(インディゴデニム)
-                shoesName: '白レザースニーカー'
-            }
+            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '春の訪れを感じさせる軽快な「ボックスシルエットショートトレンチコート」に、スウェットと爽やかなライトインディゴデニムを合わせたスプリングスタイルです。'
         }
     },
-    winter: {
+    4: {
+        monthName: '4月',
+        seasonName: '春本番',
+        themeTitle: '新生活や春の外出を彩るスマートカジュアル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・真冬の冷え込みもおしゃれに包む「暖かボアジャケット × ニット」`,
-            desc: (temp) => `冷え込む気温${temp}℃の冬を乗り切る、保温性抜群の「バッファローチェックボアジップジャケット」とニットのレイヤード。手持ちのパンツと合わせるだけで季節感あふれるトレンド防寒スタイルに。`,
-            outfit: {
-                outerId: 4, // バッファローチェックボアジップジャケット
-                topsId: 6, // チャコール ブーク ニット
-                bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ
-                shoesName: 'ボリュームソールスニーカー'
-            }
+            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '心地よい春風が吹く4月に最適な、端正な「リラックス ダブル ブレスト テーラードジャケット」と清潔感溢れるオックスフォードシャツ、アンクルスラックスの好印象コーデです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・真冬の寒さを防ぐ「グリッドパフジャケット × シャギーニット」`,
-            desc: (temp) => `凍えるような気温${temp}℃でも抜群の暖かさを誇る「グリッドパフジャケット」とふわふわのシャギーニット。手持ちのスウェットパンツと合わせた旬の冬コーデ。`,
-            outfit: {
-                outerId: 102, // グリッドパフジャケット
-                topsId: 105, // シャギーニットオーバーサイズクルーネックセーター
-                bottomsId: 112, // タックイージーワイドスウェットパンツ
-                shoesName: 'スニーカー'
-            }
+            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
+            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '暖かな春の陽気にぴったりな「ボックスシルエットショートトレンチコート」にフルジップパーカーをインした、こなれ感漂う大人カジュアルです。'
+        }
+    },
+    5: {
+        monthName: '5月',
+        seasonName: '初夏・新緑',
+        themeTitle: '爽やかな初夏の風を楽しむ軽快シャツスタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: 'アウターなしで心地よく過ごせる5月。爽快なスカイブルーの「スカイ オックス フォードシャツ」を主役に、ドレープの美しいセミフレアスラックスを合わせました。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
+            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
+            leadText: '日差しが心地よい初夏に、存在感ある「カモフラージュスーパーワイドバギーデニムパンツ」とヴィンテージパーカーを合わせたストリートライクな着こなしです。'
+        }
+    },
+    6: {
+        monthName: '6月',
+        seasonName: '梅雨・初夏',
+        themeTitle: '雨の日も快適に過ごすリラックスストリート',
+        MEN: {
+            outerId: null,
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '湿気や朝晩の冷え込み・冷房対策にちょうどいい「アーバン グレイ ジップフーディ」に、足元を濡らしにくいアンクル丈スラックスを組み合わせました。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: 'ほんのり透け感のある「ドット柄シアーヘンリーネッククロップドTシャツ」でジメジメした梅雨時も涼やかに。涼感とトレンド感を両立させたコーデです。'
+        }
+    },
+    7: {
+        monthName: '7月',
+        seasonName: '盛夏',
+        themeTitle: '夏の暑さを爽やかに乗り切るサマースタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '吸湿性と通気性に優れた薄手の「スカイ オックス フォードシャツ」を腕まくりして着こなす、暑い夏でも清潔感をキープできる都会派サマースタイルです。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
+            leadText: 'トレンドの「ドット柄シアーヘンリーネッククロップドTシャツ」にワイドなバギーデニムを合わせ、真夏の太陽に映えるアクティブなストリート感を出しました。'
+        }
+    },
+    8: {
+        monthName: '8月',
+        seasonName: '真夏',
+        themeTitle: '猛暑日も涼しく快適なサマーホリデースタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '真夏の暑さでもサラリとした肌触りの「スカイ オックス フォードシャツ」に、軽量な「2WAYデタッチャブルナイロンカーゴパンツ」を合わせた機能的リゾートコーデです。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '通気性抜群のシアーTシャツに、柔らかく開放的な「タックイージーワイドスウェットパンツ」をセレクトした真夏の休日リラックススタイルです。'
+        }
+    },
+    9: {
+        monthName: '9月',
+        seasonName: '初秋',
+        themeTitle: '秋の気配を取り入れるスイッチコーディネート',
+        MEN: {
+            outerId: null,
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 12, // ビッグポケットパラシュートカーゴパンツ (¥6,000)
+            leadText: '少しずつ秋風を感じる9月。重厚感のある「ビッグポケットパラシュートカーゴパンツ」にジップフーディを合わせた、季節の変わり目に最適なコーデです。'
+        },
+        WOMEN: {
+            outerId: 16, // レザージャケット (¥9,200)
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '涼感のあるシアーTシャツの上にさっと「レザージャケット」を羽織り、秋の先取りトレンドを表現したスマートコーデです。'
+        }
+    },
+    10: {
+        monthName: '10月',
+        seasonName: '秋晴れ・中秋',
+        themeTitle: '深まる秋を楽しむ大人のテーラード＆ニット',
+        MEN: {
+            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '心地よい秋晴れが続く10月に、差し色の「アーバン ワイン ニット」と端正な「リラックス ダブル テーラードジャケット」を合わせた洗練のドレスカジュアルです。'
+        },
+        WOMEN: {
+            outerId: 16, // レザージャケット (¥9,200)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '秋の定番「レザージャケット」に肉厚なクルーネックスウェットと濃紺インディゴデニムを合わせ、シックで温かみのある大人の装いに仕上げました。'
+        }
+    },
+    11: {
+        monthName: '11月',
+        seasonName: '深秋・晩秋',
+        themeTitle: '晩秋の冷え込みに映えるブランド人気No.1スタイル',
+        MEN: {
+            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '深まる秋の気候に合わせて、MANEKIN人気No.1の「オーバードレープ ダブルトレンチコート」に深みのあるワインニットと美しい落ち感のスラックスをセレクトしました。'
+        },
+        WOMEN: {
+            outerId: 13, // フリースジャケット (¥7,500)
+            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '11月の冷たい風に寄り添うふんわり暖かい「フリースジャケット」に、トレンドのシャギーニットとシルエットの美しいインディゴデニムを合わせた親しみやすい旬スタイルです。'
+        }
+    },
+    12: {
+        monthName: '12月',
+        seasonName: '初冬・冬本番',
+        themeTitle: 'ホリデーシーズンを暖かく包むウィンタールック',
+        MEN: {
+            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
+            topsId: 6,   // チャコール ブーク ニット (¥5,500)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '寒さが本格化する12月に、存在感のあるチェック柄「バッファローチェックボアジップジャケット」と防寒ニットを合わせた暖かく華やかな冬スタイルです。'
+        },
+        WOMEN: {
+            outerId: 14, // グリッドパフジャケット (¥12,800)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '真冬の冷気もしっかりシャットアウトする「グリッドパフジャケット」にスウェットを合わせた、冬の外出をアクティブに楽しむスタイルです。'
         }
     }
 };
 
-// バナー描画用内部ヘルパー
+// ユーザーが手動選択したスタイリング提案の月（null の場合は現在の月を自動適用）
+let _selectedStylingMonth = null;
+
+// 月別（1月〜12月）のおすすめ商品提案プランと実在商品オブジェクトを取得するヘルパー関数
+function getMonthlyStylingPlan(month = null, gender = 'MEN') {
+    const currentRealMonth = new Date().getMonth() + 1;
+    const m = (typeof month === 'number' && month >= 1 && month <= 12)
+        ? month
+        : (_selectedStylingMonth || currentRealMonth);
+    const g = (gender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const monthData = MONTHLY_STYLING_PLANS[m] || MONTHLY_STYLING_PLANS[11];
+    const plan = monthData[g] || monthData.MEN;
+
+    // 実在の SAMPLE_PRODUCTS から商品オブジェクトを取得
+    const outerProd = plan.outerId ? SAMPLE_PRODUCTS.find(p => p.id === plan.outerId) : null;
+    const topsProd = plan.topsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.topsId) : null;
+    const bottomsProd = plan.bottomsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.bottomsId) : null;
+
+    return {
+        month: m,
+        monthName: monthData.monthName,
+        seasonName: monthData.seasonName,
+        themeTitle: monthData.themeTitle,
+        plan,
+        isCurrentMonth: (m === currentRealMonth),
+        prods: {
+            outer: outerProd,
+            tops: topsProd,
+            bottoms: bottomsProd
+        }
+    };
+}
+
+// ユーザーが画面上の月セレクターで月を変更したときの処理関数
+function onSelectStylingMonth(monthVal) {
+    const parsed = parseInt(monthVal, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= 12) {
+        _selectedStylingMonth = parsed;
+    } else {
+        _selectedStylingMonth = null;
+    }
+    // バナー再描画を実行
+    updateTodaySeasonalStyling();
+}
+window.onSelectStylingMonth = onSelectStylingMonth;
+
+// バナー描画用内部ヘルパー（月別のおすすめ商品カタログ SAMPLE_PRODUCTS を主軸に描画）
 function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, locationName = '愛知・名古屋', tempMin = null, tempMax = null, provider = '気象庁(JMA)') {
     const badgeElem = document.getElementById('today-styling-badge');
     const titleElem = document.getElementById('today-styling-title');
     const descElem = document.getElementById('today-styling-desc');
     const btnElem = document.getElementById('btn-apply-today-styling');
+    const selectElem = document.getElementById('today-styling-month-select');
     if (!titleElem || !descElem) return;
 
-    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
-    const plan = planGroup[gender] || planGroup.MEN;
+    // 月別（1月〜12月）のおすすめブランド商品プランを取得
+    const targetMonth = _selectedStylingMonth || month;
+    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
+    const { monthName, themeTitle, plan, prods, isCurrentMonth } = stylingData;
+
+    // 月選択セレクターの選択状態を同期
+    if (selectElem && selectElem.value !== String(targetMonth)) {
+        selectElem.value = String(targetMonth);
+    }
 
     const hasMinMax = (tempMin !== null && tempMax !== null);
     const minMaxLabel = hasMinMax ? `最低${tempMin}℃ / 最高${tempMax}℃ (現在${temp}℃)` : `気温${temp}℃`;
 
     if (badgeElem) {
-        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${seasonInfo.name}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
+        const monthBadgeLabel = isCurrentMonth ? `今月（${monthName}）のおすすめ` : `${monthName}のおすすめ`;
+        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${monthBadgeLabel}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
     }
-    const rawTitle = plan.title(tempMin !== null ? tempMin : temp, weatherText);
-    const cleanTitle = rawTitle.replace(/^気温\d+℃・/, '');
-    const titlePrefix = hasMinMax ? `【${locationName} 最低${tempMin}℃ / 最高${tempMax}℃】` : `【${locationName} 気温${temp}℃】`;
-    titleElem.textContent = `${titlePrefix}${cleanTitle}`;
 
-    // 最低気温と朝晩の寒暖差に合わせたアドバイス文
-    let adviceText = '';
-    if (hasMinMax) {
-        const diff = tempMax - tempMin;
-        if (diff >= 7) {
-            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】寒暖差が${diff}℃と大きいため、朝晩の冷え込みに備えて羽織れるアウターが快適です。`;
-        } else {
-            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】肌寒さを防ぎ快適に過ごせるコーデです。`;
-        }
-    }
-    descElem.textContent = adviceText ? `${adviceText} ${plan.desc(tempMin !== null ? tempMin : temp)}` : plan.desc(temp);
+    // 見出しタイトル：月ごとのおすすめとして商品名を明示
+    const mainItemTitle = prods.outer ? `「${prods.outer.name}」×「${prods.tops.name}」` : `「${prods.tops.name}」スタイル`;
+    const headingMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
+    titleElem.textContent = `【${headingMonthLabel}のおすすめ】${themeTitle}・${mainItemTitle}`;
+
+    // 「今月（○月）は商品の中からこのコーデがおすすめ！」の月全体としての情報を表示（日ごとの気温・寒暖差情報は除外）
+    descElem.textContent = `今月（${monthName}）はブランド商品の中からこのコーデがおすすめ！${plan.leadText}`;
 
     if (btnElem) {
-        btnElem.textContent = `最低${tempMin !== null ? tempMin : temp}℃対応の${seasonInfo.name}おすすめを試着する`;
+        btnElem.textContent = `${headingMonthLabel}のおすすめ商品コーデを試着する`;
     }
 }
 
@@ -4543,13 +4721,16 @@ async function updateTodaySeasonalStyling() {
     }
 }
 
-// 季節・現在日時に合わせたおすすめコーデを一括でマネキンに着せ替えます
+// 月別のおすすめブランド商品（SAMPLE_PRODUCTS）コーデを一括でマネキンに着せ替えます
 function applyTodaySeasonalPresetLook() {
     const now = new Date();
-    const seasonInfo = getCurrentSeasonInfo(now);
+    const month = now.getMonth() + 1;
     const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
-    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
-    const plan = planGroup[gender] || planGroup.MEN;
+
+    // 選択中の月（または現在の月）のブランド商品（SAMPLE_PRODUCTS）を取得
+    const targetMonth = _selectedStylingMonth || month;
+    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
+    const { monthName, prods, isCurrentMonth } = stylingData;
 
     const newOutfit = {
         hat: null,
@@ -4559,90 +4740,53 @@ function applyTodaySeasonalPresetLook() {
         shoes: null
     };
 
-    // アウター
-    if (plan.outfit.outerId) {
-        const outerProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.outerId);
-        if (outerProd) {
-            newOutfit.outer = {
-                id: outerProd.id,
-                name: outerProd.name,
-                category: outerProd.category,
-                color: outerProd.color || 'STANDARD',
-                price: outerProd.price,
-                image: outerProd.image,
-                isOwned: false
-            };
-        }
+    // アウター（商品カタログから選定）
+    if (prods.outer) {
+        newOutfit.outer = {
+            id: prods.outer.id,
+            name: prods.outer.name,
+            category: prods.outer.category,
+            color: (prods.outer.colors && prods.outer.colors[0]) || 'STANDARD',
+            price: prods.outer.price,
+            image: prods.outer.image,
+            isOwned: false
+        };
     }
 
-    // トップス
-    if (plan.outfit.topsId) {
-        const topsProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.topsId);
-        if (topsProd) {
-            newOutfit.tops = {
-                id: topsProd.id,
-                name: topsProd.name,
-                category: topsProd.category,
-                color: topsProd.color || 'STANDARD',
-                price: topsProd.price,
-                image: topsProd.image,
-                isOwned: false
-            };
-        }
+    // トップス（商品カタログから選定）
+    if (prods.tops) {
+        newOutfit.tops = {
+            id: prods.tops.id,
+            name: prods.tops.name,
+            category: prods.tops.category,
+            color: (prods.tops.colors && prods.tops.colors[0]) || 'STANDARD',
+            price: prods.tops.price,
+            image: prods.tops.image,
+            isOwned: false
+        };
     }
 
-    // ボトムス（手持ち服があればそれを優先、なければ商品）
-    const ownedBottom = AppState.myCloset.find(c => c.category === 'BOTTOMS');
-    if (ownedBottom) {
+    // ボトムス（商品カタログから選定）
+    if (prods.bottoms) {
         newOutfit.bottoms = {
-            id: ownedBottom.id,
-            name: ownedBottom.name,
-            category: ownedBottom.category,
-            color: ownedBottom.color,
-            isOwned: true,
-            image: ownedBottom.image
+            id: prods.bottoms.id,
+            name: prods.bottoms.name,
+            category: prods.bottoms.category,
+            color: (prods.bottoms.colors && prods.bottoms.colors[0]) || 'STANDARD',
+            price: prods.bottoms.price,
+            image: prods.bottoms.image,
+            isOwned: false
         };
-    } else if (plan.outfit.bottomsId) {
-        const botProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.bottomsId);
-        if (botProd) {
-            newOutfit.bottoms = {
-                id: botProd.id,
-                name: botProd.name,
-                category: botProd.category,
-                color: botProd.color || 'STANDARD',
-                price: botProd.price,
-                image: botProd.image,
-                isOwned: false
-            };
-        }
     }
 
-    // シューズ
-    const ownedShoes = AppState.myCloset.find(c => c.category === 'SHOES');
-    if (ownedShoes) {
-        newOutfit.shoes = {
-            id: ownedShoes.id,
-            name: ownedShoes.name,
-            category: ownedShoes.category,
-            color: ownedShoes.color,
-            isOwned: true,
-            image: ownedShoes.image
-        };
-    } else {
-        newOutfit.shoes = {
-            id: 'c_shoes_fallback',
-            name: plan.outfit.shoesName || 'クラシック 白レザースニーカー',
-            category: 'SHOES',
-            color: 'WHITE',
-            isOwned: true,
-            image: getCategoryFallbackImage('SHOES')
-        };
-    }
+    // シューズは商品カタログ外のためセットせず未着用のままにします（newOutfit.shoes = null）
 
     AppState.currentOutfit = newOutfit;
     syncStudioStateToBackend({ immediate: true });
-    const minText = (_todayStylingWeatherCache.tempMin !== null) ? ` 最低${_todayStylingWeatherCache.tempMin}℃対応` : '';
-    showToastNotification(`【気象庁 名古屋${minText}】${seasonInfo.name}のおすすめコーデをマネキンにセットしました`);
+
+    const mainName = prods.outer ? prods.outer.name : (prods.tops ? prods.tops.name : '');
+    const toastMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
+    showToastNotification(`【${toastMonthLabel}おすすめ】ブランド商品「${mainName}」等の全身コーデをマネキンにセットしました！`);
     switchStudioTab('create');
 }
 
@@ -4709,7 +4853,7 @@ async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnaps
         if (!res.ok) throw new Error('Studio state save failed');
         // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
         return true;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLスタジオ状態保存エラー:', e);
@@ -4807,7 +4951,7 @@ function syncStudioStateToBackend(options = {}) {
             const ok = await sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
             // 非同期 Promise を完了し、結果値（ok）を呼び出し元へ返します
             resolve(ok);
-        // 上の処理を指定ミリ秒後（400ms 後）に実行するタイマー呼び出しを閉じます
+            // 上の処理を指定ミリ秒後（400ms 後）に実行するタイマー呼び出しを閉じます
         }, 400);
     });
 }
@@ -4877,7 +5021,7 @@ async function syncStudioStateFromBackend() {
             AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
             // アプリ全体状態 AppState.studioGender を最新値（(data.studio_state.studio_gender === '…）に更新します
             AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // アプリ全体状態 AppState.currentOutfit を最新値（{ hat: null, outer: null, tops: null, …）に更新します
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
@@ -4897,7 +5041,7 @@ async function syncStudioStateFromBackend() {
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
         // 条件（typeof updateAIStylingComment === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLスタジオ状態取得エラー:', e);

@@ -30,8 +30,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <!-- メインのスタイルシート「css/style.css?v=20261116_all_favs_v5」を読み込み、全CSSをサイトへ適用します -->
-    <link rel="stylesheet" href="css/style.css?v=20261116_all_favs_v5">
+    <!-- メインのスタイルシート「css/style.css?v=20261119_fav_red_v2」を読み込み、全CSSをサイトへ適用します -->
+    <link rel="stylesheet" href="css/style.css?v=20261119_fav_red_v2">
     <!-- ここまで <head>（裏方設定・CSS読込エリア）の終了です -->
 </head>
 
@@ -1635,18 +1635,40 @@
                     <!-- デザイン・配置用のブロック要素（<div class="studio-recommend-banner">）を開始します -->
                     <div class="studio-recommend-banner">
                         <!-- デザイン・配置用のブロック要素（<div class="banner-badge">）を開始します -->
-                        <div class="banner-badge" id="today-styling-badge">TODAY'S AI STYLING</div>
+                        <div class="banner-header"
+                            style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+                            <div class="banner-badge" id="today-styling-badge" style="margin-bottom:0;">TODAY'S AI
+                                STYLING</div>
+                            <div class="banner-month-selector" style="display:flex;align-items:center;gap:6px;">
+                                <label for="today-styling-month-select"
+                                    style="font-size:0.75rem;color:rgba(255,255,255,0.85);font-weight:600;">表示する月:</label>
+                                <select id="today-styling-month-select" onchange="onSelectStylingMonth(this.value)"
+                                    style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:6px;padding:3px 10px;font-size:0.8rem;cursor:pointer;outline:none;">
+                                    <option value="1">1月</option>
+                                    <option value="2">2月</option>
+                                    <option value="3">3月</option>
+                                    <option value="4">4月</option>
+                                    <option value="5">5月</option>
+                                    <option value="6">6月</option>
+                                    <option value="7">7月</option>
+                                    <option value="8">8月</option>
+                                    <option value="9">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11" selected>11月（今月）</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+                        </div>
                         <!-- セクションの見出し（<h3>: 気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチ…）を表示します -->
-                        <h3 class="banner-title" id="today-styling-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
+                        <h3 class="banner-title" id="today-styling-title">【今月のおすすめ】ブランド商品の中から選定した旬のコーディネート</h3>
                         <!-- 段落テキスト（.banner-desc: あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に…）を表示します -->
                         <p class="banner-desc" id="today-styling-desc">
-                            あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
-                            ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
+                            今月はブランド商品の中からこのコーデがおすすめ！深まる秋の気候に合わせて、MANEKINブランドの最新商品カタログから最適なトータルコーディネートをご提案します。</p>
                         <!-- デザイン・配置用のブロック要素（<div class="banner-actions">）を開始します -->
                         <div class="banner-actions">
                             <!-- 押すと関数 applyPresetLook('trench_daily') を実行する操作ボタン「<button class="btn btn-primary"」です -->
                             <button class="btn btn-primary" id="btn-apply-today-styling"
-                                onclick="applyTodaySeasonalPresetLook()">このおすすめをマネキンで試着する</button>
+                                onclick="applyTodaySeasonalPresetLook()">今月のおすすめ商品コーデを試着する</button>
                             <!-- 押すと関数 switchStudioTab('create') を実行する操作ボタン「自由にコーデを作成する」です -->
                             <button class="btn btn-outline" onclick="switchStudioTab('create')">自由にコーデを作成する</button>
                         </div>
@@ -1751,7 +1773,7 @@
                     </div>
                 </div>
 
-
+                <!-- スマホ版のやつ -->
                 <!-- 特定機能・領域のブロック要素（<div id="studio-pane-create" class="studio-pane active">）を開始します -->
                 <div class="studio-pane active" id="studio-pane-create">
                     <!-- 特定機能・領域のブロック要素（<div id="studio-mobile-tabs" class="studio-mobile-tabs">）を開始します -->
@@ -1768,7 +1790,7 @@
                             onclick="switchMobileStudioView('brand')">お気に入り商品 (<span
                                 id="mob-brand-fav-cnt">0</span>)</button>
                     </div>
-
+                    <!-- パソコン版 -->
                     <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#studio-workspace-grid）です -->
                     <div class="studio-workspace-grid" id="studio-workspace-grid">
                         <!-- 特定機能・領域のブロック要素（<div id="col-studio-closet" class="studio-col studio-col-left">）を開始します -->
@@ -1839,15 +1861,6 @@
                                         </svg>
                                         位置・サイズ微調整
                                     </button>
-                                    <!-- デザイン・配置用のブロック要素（<div class="gender-toggle-wrap">）を開始します -->
-                                    <div class="gender-toggle-wrap">
-                                        <!-- 押すと関数 setMannequinGender('MEN') を実行する操作ボタン「<button class="btn-gender active…」です -->
-                                        <button class="btn-gender active" id="btn-gender-men"
-                                            onclick="setMannequinGender('MEN')">MEN</button>
-                                        <!-- 押すと関数 setMannequinGender('WOMEN') を実行する操作ボタン「<button class="btn-gender" id="b…」です -->
-                                        <button class="btn-gender" id="btn-gender-women"
-                                            onclick="setMannequinGender('WOMEN')">WOMEN</button>
-                                    </div>
                                     <!-- 押すと関数 clearMannequin() を実行する操作ボタン「着用中の服をすべて脱がせる」です -->
                                     <button class="btn-toolbar-clear" onclick="clearMannequin()" title="着用中の服をすべて脱がせる">
                                         <!-- 拡大してもぼやけないベクター形式の SVG アイコン（24x24）を描画します -->
@@ -1866,6 +1879,9 @@
                             </div>
 
                             <!-- 特定機能・領域のブロック要素（<div id="mannequin-stage-box" class="mannequin-stage-box">）を開始します -->
+                            <!-- ondragoverは試着室のステージの領域にドラッグして持ってきたときのイベント -->
+                            <!-- ondragleaveドラッグ中のマウスが、試着室ステージの外側へ通り過ぎて（離れて）行ったときのイベント -->
+                            <!-- ondropはドラッグしていたものを試着室のステージで離した（ドロップした）ときに発生するイベント -->
                             <div class="mannequin-stage-box" id="mannequin-stage-box"
                                 ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)"
                                 ondrop="handleStageDrop(event)">
@@ -1875,6 +1891,7 @@
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
                                         <!-- SVG 内で使い回すグラデーション色などの定義領域（<defs>）です -->
+                                        <!-- 後で再利用するためにグラフィカルオブジェクトを定義することを可能にする -->
                                         <defs>
                                             <!-- SVG 用の線形グラデーション「#chromePoleGrad」（金属メッキの立体光沢表現）を定義します -->
                                             <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1905,30 +1922,42 @@
                                         <!-- SVG パーツをまとめた図形グループ（#stand-pole-group）です -->
                                         <g id="stand-pole-group">
                                             <!-- SVG で長方形（スタンド支柱やカレンダーアイコン枠など）を描く要素です -->
+                                            <!-- 縦に伸びる金属パイプ本体 -->
                                             <rect x="146" y="425" width="8" height="190" rx="3"
                                                 fill="url(#chromePoleGrad)" />
                                             <!-- SVG で長方形（スタンド支柱やカレンダーアイコン枠など）を描く要素です -->
+                                            <!-- パイプの途中にある高さ調整用固定器具 -->
                                             <rect x="143" y="478" width="14" height="12" rx="2" fill="#94a3b8" />
                                             <!-- SVG で丸図形（アイコンの丸やカート車輪・頭など）を描く要素です -->
+                                            <!-- 固定器具についている丸いやつ -->
                                             <circle cx="157" cy="484" r="3" fill="#64748b" />
                                         </g>
 
                                         <!-- SVG パーツをまとめた図形グループ（#stand-base-group）です -->
+                                        <!-- gタグは、グループ化するためのコンテナ要素 -->
                                         <g id="stand-base-group">
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 台座の薄い影 -->
                                             <ellipse cx="150" cy="627" rx="72" ry="10" fill="rgba(0, 0, 0, 0.12)" />
                                             <!-- SVG で多角形（ダイヤアイコンや台形ベースプレート）を描く要素です -->
+                                            <!-- 金属プレートを斜め上から見た台形 -->
                                             <polygon points="85 614, 215 614, 235 628, 65 628"
                                                 fill="url(#chromePlateGrad)" />
                                             <!-- SVG で多角形（ダイヤアイコンや台形ベースプレート）を描く要素です -->
+                                            <!-- 金属プレートの厚みのあるフチ -->
                                             <polygon points="65 628, 235 628, 235 632, 65 632" fill="#475569" />
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 支柱が刺さる中央の根元のリングの外側 -->
                                             <ellipse cx="150" cy="616" rx="10" ry="4" fill="#64748b" />
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 根元のリングの金属ハイライト(光沢) -->
                                             <ellipse cx="150" cy="615" rx="8" ry="3" fill="#cbd5e1" />
                                         </g>
                                     </svg>
 
+
+                                    <!-- ステージ上の靴、ボトムス、トップス、アウター、帽子の領域の枠で、データベースから情報を取り出すので、
+                                    こちらに直接画像URLを書く必要はない -->
                                     <!-- 特定機能・領域のブロック要素（<div id="layer-shoes" class="layer-slot layer-shoes">）を開始します -->
                                     <div class="layer-slot layer-shoes" id="layer-shoes">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-shoes）です -->
@@ -1955,6 +1984,8 @@
                                         <div class="layer-content" id="layer-content-hat"></div>
                                     </div>
                                 </div>
+
+                                <!-- 服の位置・サイズ微調整のパネル -->
                                 <!-- 特定機能・領域のブロック要素（<div id="fitting-adjust-panel" class="fitting-adjust-panel">）を開始します -->
                                 <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
                                     <!-- デザイン・配置用のブロック要素（<div class="adjust-panel-header">）を開始します -->
@@ -1977,6 +2008,7 @@
                                         </div>
                                     </div>
 
+                                    <!-- パネルの中で微調整する部位を決めるナビゲーション(帽子、アウター、トップス、ぼちょむす、靴) -->
                                     <!-- 特定機能・領域のブロック要素（<div id="adjust-slot-tabs" class="adjust-slot-tabs">）を開始します -->
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
                                         <!-- 押すと関数 switchAdjustSlot('hat') を実行する操作ボタン「<button type="button" class="adj…」です -->
@@ -1996,6 +2028,7 @@
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
 
+                                    <!-- 服の位置・サイズ微調整の服の状態 -->
                                     <!-- 特定機能・領域のブロック要素（<div id="adjust-item-status" class="adjust-item-status">）を開始します -->
                                     <div class="adjust-item-status" id="adjust-item-status">
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-item-meta-left">）を開始します -->
@@ -2008,10 +2041,11 @@
                                         <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#adjust-item-type-desc: 初期値 'XS〜XL規格サイズ'）です -->
                                         <span class="adjust-item-type-desc" id="adjust-item-type-desc">XS〜XL規格サイズ</span>
                                     </div>
-
+                                    <!-- 上下位置(Y軸)、左右位置(X軸)、商品サイズ(見た目サイズ)の骨組み -->
                                     <!-- デザイン・配置用のブロック要素（<div class="adjust-sliders-body">）を開始します -->
                                     <div class="adjust-sliders-body">
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
+                                        <!-- 上下位置の領域 -->
                                         <div class="adjust-slider-row">
                                             <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
@@ -2024,17 +2058,17 @@
                                             <div class="slider-input-wrap">
                                                 <!-- 押すと関数 stepAdjust('y', -2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
-                                                    onclick="stepAdjust('y', -2)">▲</button>
+                                                    onclick="stepAdjust('y', -2)">▼</button>
                                                 <!-- 左右にドラッグして数値を連続調整できるスライダー（#slider-adjust-y / handleAdjustInput('y', this.value)）です -->
                                                 <input type="range" class="adjust-range" id="slider-adjust-y" min="-60"
                                                     max="60" value="0" step="1"
                                                     oninput="handleAdjustInput('y', this.value)">
                                                 <!-- 押すと関数 stepAdjust('y', 2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
-                                                    onclick="stepAdjust('y', 2)">▼</button>
+                                                    onclick="stepAdjust('y', 2)">▲</button>
                                             </div>
                                         </div>
-
+                                        <!-- 左右位置の領域 -->
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
                                         <div class="adjust-slider-row">
                                             <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
@@ -2058,7 +2092,7 @@
                                                     onclick="stepAdjust('x', 2)">▶</button>
                                             </div>
                                         </div>
-
+                                        <!-- 商品サイズの領域 -->
                                         <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-brand" class="adjust-slider-row adjust-slider-row-brand">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-brand"
                                             id="adjust-row-scale-brand">
@@ -2105,7 +2139,7 @@
                                                     onclick="stepBrandSize(1)" title="1サイズ大きく">＋</button>
                                             </div>
                                         </div>
-
+                                        <!-- マイクローゼットの商品を着せたときの見た目サイズの領域 -->
                                         <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-free" class="adjust-slider-row adjust-slider-row-free">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free"
                                             style="display: none;">
@@ -2122,8 +2156,8 @@
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('scale', -3)">－</button>
                                                 <!-- 左右にドラッグして数値を連続調整できるスライダー（#slider-adjust-scale / handleAdjustInput('scale', this.value)）です -->
-                                                <input type="range" class="adjust-range" id="slider-adjust-scale"
-                                                    min="70" max="140" value="100" step="1"
+                                                <input type="range" class="adjust-range" id="slider-adjust-scale
+                                                    min=" 70" max="140" value="100" step="1"
                                                     oninput="handleAdjustInput('scale', this.value)">
                                                 <!-- 押すと関数 stepAdjust('scale', 3) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
@@ -2143,7 +2177,7 @@
                                 <div class="wearing-slots-bar" id="wearing-slots-bar">
                                 </div>
                             </div>
-
+                            <!-- 着用中のブランド品の点数と合計金額の領域 -->
                             <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#stage-brand-summary）です -->
                             <div class="stage-brand-summary" id="stage-brand-summary">
                                 <!-- デザイン・配置用のブロック要素（<div class="brand-sum-info">）を開始します -->
@@ -2163,7 +2197,7 @@
                                 </button>
                             </div>
                         </div>
-
+                        <!-- ブランド商品(お気に入り商品)一覧の領域 -->
                         <!-- 特定機能・領域のブロック要素（<div id="col-studio-brand" class="studio-col studio-col-right">）を開始します -->
                         <div class="studio-col studio-col-right" id="col-studio-brand">
                             <!-- デザイン・配置用のブロック要素（<div class="col-header">）を開始します -->
@@ -2179,7 +2213,7 @@
                                 <!-- クリックで画面ハッシュを「#items」へ切り替える SPA リンクです（+ 探す） -->
                                 <a href="#items" class="btn btn-outline-xs" title="商品一覧でお気に入り商品を探す">+ 探す</a>
                             </div>
-
+                            <!-- ブランド商品(お気に入り商品)一覧のジャンル別の領域 -->
                             <!-- 特定機能・領域のブロック要素（<div id="col-brand-filter" class="mini-filter-bar">）を開始します -->
                             <div class="mini-filter-bar" id="col-brand-filter">
                                 <!-- 押すと関数 handleStudioBrandFilter('ALL') を実行する操作ボタン「<button class="mini-chip active"…」です -->
@@ -2202,7 +2236,7 @@
                         </div>
                     </div>
 
-
+                    <!-- AI STYLING COMMENT の領域-->
                     <!-- デザイン・配置用のブロック要素（<div class="studio-bottom-panel">）を開始します -->
                     <div class="studio-bottom-panel">
                         <!-- デザイン・配置用のブロック要素（<div class="ai-comment-card">）を開始します -->
@@ -2232,27 +2266,6 @@
                                 <p class="ai-comment-text" id="ai-comment-text">
                                     左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
                                 </p>
-                                <!-- AIカラー構成診断ボックス（ベース/アソート/アクセント比率・配色調和タイプ判定） -->
-                                <div class="ai-color-diagnosis-box" id="ai-color-diagnosis-box"
-                                    style="margin-top: 12px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 8px; border-left: 3px solid #f59e0b; display: none;">
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
-                                        <span
-                                            style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
-                                            <span>🎨</span> AIカラー構成診断
-                                        </span>
-                                        <span id="ai-color-scheme-type"
-                                            style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: rgba(251,191,36,0.18); color: #fde68a; font-weight: 600;">--</span>
-                                    </div>
-                                    <!-- カラー比率バー -->
-                                    <div id="ai-color-ratio-bar"
-                                        style="height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 8px; background: rgba(255,255,255,0.1);">
-                                    </div>
-                                    <!-- カラー内訳リスト -->
-                                    <div id="ai-color-breakdown-list"
-                                        style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.73rem; color: #e2e8f0;">
-                                    </div>
-                                </div>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="ai-meta-bar">）を開始します -->
                             <div class="ai-meta-bar">
@@ -2264,14 +2277,6 @@
                                     <span class="ai-tag">#ベーシック</span>
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-tag #通年着回し）です -->
                                     <span class="ai-tag">#通年着回し</span>
-                                </div>
-                                <!-- 特定機能・領域のブロック要素（<div id="ai-palette-wrap" class="ai-palette-wrap">）を開始します -->
-                                <div class="ai-palette-wrap" id="ai-palette-wrap">
-                                    <!-- インライン装飾／グルーピング用の <span> 要素（.palette-label カラー構成:）です -->
-                                    <span class="palette-label">カラー構成:</span>
-                                    <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#palette-dots）です -->
-                                    <div class="palette-dots" id="palette-dots">
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2794,11 +2799,11 @@
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
     <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261118_modal_coupons_fix"></script>
+    <script src="js/shop.js?v=20261119_remove_color_diag_v1"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261118_jma_temp_min"></script>
+    <script src="js/studio.js?v=20261119_remove_color_diag_v1"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261118_clean_notice"></script>
+    <script src="js/app.js?v=20261119_remove_color_diag_v1"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
