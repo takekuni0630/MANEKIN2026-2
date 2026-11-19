@@ -1193,10 +1193,36 @@ async function removeCartItem(index) {
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToast('バッグから商品を削除しました');
 }
+ 
+// 注文手続きステップバー（1:注文商品, 2:お届け先・決済, 3:注文確定）のアクティブ表示を更新します
+function updateCheckoutStepper(step = 2) {
+    const stepper = document.querySelector('.checkout-stepper');
+    if (!stepper) return;
+    const items = stepper.querySelectorAll('.step-item');
+    const lines = stepper.querySelectorAll('.step-line');
 
+    items.forEach((item, idx) => {
+        if (idx < step) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+
+    lines.forEach((line, idx) => {
+        if (idx < step - 1) {
+            line.classList.add('active');
+        } else {
+            line.classList.remove('active');
+        }
+    });
+}
 
 // カート確認・注文手続き画面を描画し、ログイン会員名メール自動補完・利用ポイントリセット・金額計算を行います
 function renderCheckoutPage() {
+    // ステップバーをお届け先・決済入力中（ステップ2）に設定します
+    updateCheckoutStepper(2);
+
     // HTML 要素 #checkout-cart-list を取得して変数 cartListEl に格納します
     const cartListEl = document.getElementById('checkout-cart-list');
     // HTML 要素 #checkout-subtotal を取得して変数 subtotalEl に格納します
@@ -2030,6 +2056,7 @@ async function handlePlaceOrder() {
         shipping_fee: calc.shipping,
         // クーポンコードおよびクーポン割引額
         coupon_code: currentAppliedCoupon ? String(currentAppliedCoupon.code || '') : '',
+        coupon_name: currentAppliedCoupon ? (currentAppliedCoupon.name || currentAppliedCoupon.title || '') : '',
         coupon_discount: calc.couponDiscount || 0,
         // 今回支払いに使うポイント数をセットします（商品小計のみ対象）
         used_points: calc.usedPoints,
@@ -2192,6 +2219,13 @@ async function handlePlaceOrder() {
     if (!confirmedOrder.customer_name && AppState.currentUser) {
         confirmedOrder.customer_name = AppState.currentUser.name;
     }
+    // 注文完了画面表示用に適用中クーポンのスナップショットを保持します
+    const appliedCouponSnapshot = currentAppliedCoupon ? {
+        name: currentAppliedCoupon.name || currentAppliedCoupon.title || '会員優待クーポン',
+        code: currentAppliedCoupon.code || '',
+        discount: calc.couponDiscount || 0
+    } : null;
+
     // 使用したクーポンを消滅（1回限り有効）させます
     if (currentAppliedCoupon) {
         if (Array.isArray(AppState.userCoupons)) {
@@ -2251,6 +2285,10 @@ async function handlePlaceOrder() {
     // 条件（completedView）が成り立つか判定し、該当する場合の処理を実行します
     if (completedView) completedView.style.display = 'block';
 
+    // 注文完了に合わせてステップバーを「3: 注文確定（黒丸・黒線）」へ更新します
+    updateCheckoutStepper(3);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // 条件（compOrderNo）が成り立つか判定し、該当する場合の処理を実行します
     if (compOrderNo) compOrderNo.textContent = confirmedOrder.order_no;
     // 条件（compOrderDate）が成り立つか判定し、該当する場合の処理を実行します
@@ -2263,6 +2301,37 @@ async function handlePlaceOrder() {
     if (compEarnedPoints) compEarnedPoints.textContent = `+${calc.earnedPoints.toLocaleString()} pt`;
     // 条件（compBalancePoints）が成り立つか判定し、該当する場合の処理を実行します
     if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
+
+    // クーポン利用情報の表示（クーポン適用時のみ行を表示）
+    const compCouponRow = document.getElementById('comp-coupon-row');
+    const compCouponInfo = document.getElementById('comp-coupon-info');
+    if (compCouponRow && compCouponInfo) {
+        const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
+            ? confirmedOrder.coupon_discount
+            : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
+        if (discount > 0) {
+            compCouponRow.style.display = 'flex';
+            const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
+            const cCode = (appliedCouponSnapshot && appliedCouponSnapshot.code) || confirmedOrder.coupon_code || '';
+            const codeBadge = cCode ? ` [${cCode}]` : '';
+            compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
+        } else {
+            compCouponRow.style.display = 'none';
+        }
+    }
+
+    // ポイント利用情報の表示（ポイント利用時のみ行を表示）
+    const compUsedPointsRow = document.getElementById('comp-used-points-row');
+    const compUsedPoints = document.getElementById('comp-used-points');
+    if (compUsedPointsRow && compUsedPoints) {
+        const usedPts = confirmedOrder.used_points || calc.usedPoints || 0;
+        if (usedPts > 0) {
+            compUsedPointsRow.style.display = 'flex';
+            compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
+        } else {
+            compUsedPointsRow.style.display = 'none';
+        }
+    }
 
     // HTML 要素 #comp-db-status を取得して変数 compDbStatus に格納します
     const compDbStatus = document.getElementById('comp-db-status');
@@ -3633,6 +3702,16 @@ function closeManekinModal() {
     if (modal) modal.classList.remove('open');
 }
 
+// HTML特殊文字のエスケープ処理
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 // マイページの「保有クーポン」を押した時に何のクーポンを所持しているか一覧モーダルを表示します
 async function openMyPageCouponsModal() {
@@ -3655,10 +3734,10 @@ async function openMyPageCouponsModal() {
         `;
     } else {
         listElem.innerHTML = coupons.map(c => {
-            const isUsed = !!c.is_used;
-            const discountLabel = c.discount_label || (c.discount_rate ? `${Math.round(c.discount_rate * 100)}% OFF` : '割引特典');
-            const code = c.code || 'COUPON';
-            const name = c.name || `${discountLabel} クーポン`;
+            const isUsed = Boolean(c.is_used);
+            const discountLabel = c.discount_label || (c.discount_rate ? `${Math.round(c.discount_rate * 100)}% OFF` : (c.discount_amount ? `¥${c.discount_amount} 割引` : '1割引 (10% OFF)'));
+            const code = c.code || c.coupon_code || 'WELCOME10';
+            const name = c.name || c.title || '【初回限定】1割引クーポン (10% OFF)';
 
             if (isUsed) {
                 return `
@@ -3710,7 +3789,6 @@ async function openMyPageCouponsModal() {
     modal.classList.add('active');
     if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
 }
-
 
 // 保有クーポンモーダルを非表示に閉じます
 function closeMyPageCouponsModal() {
@@ -3855,3 +3933,7 @@ window.handlePlaceOrder = handlePlaceOrder;
 window.handleApplyCouponCode = handleApplyCouponCode;
 window.handleCancelCoupon = handleCancelCoupon;
 window.fetchUserCoupons = fetchUserCoupons;
+window.updateCheckoutStepper = updateCheckoutStepper;
+window.openMyPageCouponsModal = openMyPageCouponsModal;
+window.closeMyPageCouponsModal = closeMyPageCouponsModal;
+window.escapeHtml = escapeHtml;
