@@ -1773,7 +1773,7 @@
                     </div>
                 </div>
 
-
+                <!-- スマホ版のやつ -->
                 <!-- 特定機能・領域のブロック要素（<div id="studio-pane-create" class="studio-pane active">）を開始します -->
                 <div class="studio-pane active" id="studio-pane-create">
                     <!-- 特定機能・領域のブロック要素（<div id="studio-mobile-tabs" class="studio-mobile-tabs">）を開始します -->
@@ -1790,7 +1790,7 @@
                             onclick="switchMobileStudioView('brand')">お気に入り商品 (<span
                                 id="mob-brand-fav-cnt">0</span>)</button>
                     </div>
-
+                    <!-- パソコン版 -->
                     <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#studio-workspace-grid）です -->
                     <div class="studio-workspace-grid" id="studio-workspace-grid">
                         <!-- 特定機能・領域のブロック要素（<div id="col-studio-closet" class="studio-col studio-col-left">）を開始します -->
@@ -1861,15 +1861,6 @@
                                         </svg>
                                         位置・サイズ微調整
                                     </button>
-                                    <!-- デザイン・配置用のブロック要素（<div class="gender-toggle-wrap">）を開始します -->
-                                    <div class="gender-toggle-wrap">
-                                        <!-- 押すと関数 setMannequinGender('MEN') を実行する操作ボタン「<button class="btn-gender active…」です -->
-                                        <button class="btn-gender active" id="btn-gender-men"
-                                            onclick="setMannequinGender('MEN')">MEN</button>
-                                        <!-- 押すと関数 setMannequinGender('WOMEN') を実行する操作ボタン「<button class="btn-gender" id="b…」です -->
-                                        <button class="btn-gender" id="btn-gender-women"
-                                            onclick="setMannequinGender('WOMEN')">WOMEN</button>
-                                    </div>
                                     <!-- 押すと関数 clearMannequin() を実行する操作ボタン「着用中の服をすべて脱がせる」です -->
                                     <button class="btn-toolbar-clear" onclick="clearMannequin()" title="着用中の服をすべて脱がせる">
                                         <!-- 拡大してもぼやけないベクター形式の SVG アイコン（24x24）を描画します -->
