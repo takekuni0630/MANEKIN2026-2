@@ -1383,6 +1383,10 @@ function syncAdjustPanelUI() {
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
         // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
+        // if(descElem)はもしステージ上に服が存在していたら
+        // descElem.textContent = .... その表示エリアを書き換える
+        // isFreeScaleSlot ? A : B 条件？が正しいとき(A):違うとき(B)に書き換える
+
         if (descElem) descElem.textContent = isFreeScaleSlot ? '自由サイズ調整（70%〜140%）' : '試着すると調整可能';
 
         // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します

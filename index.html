@@ -2041,10 +2041,11 @@
                                         <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#adjust-item-type-desc: 初期値 'XS〜XL規格サイズ'）です -->
                                         <span class="adjust-item-type-desc" id="adjust-item-type-desc">XS〜XL規格サイズ</span>
                                     </div>
-
+                                    <!-- 上下位置(Y軸)、左右位置(X軸)、商品サイズ(見た目サイズ)の骨組み -->
                                     <!-- デザイン・配置用のブロック要素（<div class="adjust-sliders-body">）を開始します -->
                                     <div class="adjust-sliders-body">
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
+                                        <!-- 上下位置の領域 -->
                                         <div class="adjust-slider-row">
                                             <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
@@ -2057,17 +2058,17 @@
                                             <div class="slider-input-wrap">
                                                 <!-- 押すと関数 stepAdjust('y', -2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
-                                                    onclick="stepAdjust('y', -2)">▲</button>
+                                                    onclick="stepAdjust('y', -2)">▼</button>
                                                 <!-- 左右にドラッグして数値を連続調整できるスライダー（#slider-adjust-y / handleAdjustInput('y', this.value)）です -->
                                                 <input type="range" class="adjust-range" id="slider-adjust-y" min="-60"
                                                     max="60" value="0" step="1"
                                                     oninput="handleAdjustInput('y', this.value)">
                                                 <!-- 押すと関数 stepAdjust('y', 2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
-                                                    onclick="stepAdjust('y', 2)">▼</button>
+                                                    onclick="stepAdjust('y', 2)">▲</button>
                                             </div>
                                         </div>
-
+                                        <!-- 左右位置の領域 -->
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
                                         <div class="adjust-slider-row">
                                             <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
@@ -2091,7 +2092,7 @@
                                                     onclick="stepAdjust('x', 2)">▶</button>
                                             </div>
                                         </div>
-
+                                        <!-- 商品サイズの領域 -->
                                         <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-brand" class="adjust-slider-row adjust-slider-row-brand">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-brand"
                                             id="adjust-row-scale-brand">
@@ -2138,7 +2139,7 @@
                                                     onclick="stepBrandSize(1)" title="1サイズ大きく">＋</button>
                                             </div>
                                         </div>
-
+                                        <!-- マイクローゼットの商品を着せたときの見た目サイズの領域 -->
                                         <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-free" class="adjust-slider-row adjust-slider-row-free">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free"
                                             style="display: none;">
@@ -2155,8 +2156,8 @@
                                                 <button type="button" class="btn-step"
                                                     onclick="stepAdjust('scale', -3)">－</button>
                                                 <!-- 左右にドラッグして数値を連続調整できるスライダー（#slider-adjust-scale / handleAdjustInput('scale', this.value)）です -->
-                                                <input type="range" class="adjust-range" id="slider-adjust-scale"
-                                                    min="70" max="140" value="100" step="1"
+                                                <input type="range" class="adjust-range" id="slider-adjust-scale
+                                                    min=" 70" max="140" value="100" step="1"
                                                     oninput="handleAdjustInput('scale', this.value)">
                                                 <!-- 押すと関数 stepAdjust('scale', 3) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
@@ -2176,7 +2177,7 @@
                                 <div class="wearing-slots-bar" id="wearing-slots-bar">
                                 </div>
                             </div>
-
+                            <!-- 着用中のブランド品の点数と合計金額の領域 -->
                             <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#stage-brand-summary）です -->
                             <div class="stage-brand-summary" id="stage-brand-summary">
                                 <!-- デザイン・配置用のブロック要素（<div class="brand-sum-info">）を開始します -->
@@ -2196,7 +2197,7 @@
                                 </button>
                             </div>
                         </div>
-
+                        <!-- ブランド商品(お気に入り商品)一覧の領域 -->
                         <!-- 特定機能・領域のブロック要素（<div id="col-studio-brand" class="studio-col studio-col-right">）を開始します -->
                         <div class="studio-col studio-col-right" id="col-studio-brand">
                             <!-- デザイン・配置用のブロック要素（<div class="col-header">）を開始します -->
@@ -2212,7 +2213,7 @@
                                 <!-- クリックで画面ハッシュを「#items」へ切り替える SPA リンクです（+ 探す） -->
                                 <a href="#items" class="btn btn-outline-xs" title="商品一覧でお気に入り商品を探す">+ 探す</a>
                             </div>
-
+                            <!-- ブランド商品(お気に入り商品)一覧のジャンル別の領域 -->
                             <!-- 特定機能・領域のブロック要素（<div id="col-brand-filter" class="mini-filter-bar">）を開始します -->
                             <div class="mini-filter-bar" id="col-brand-filter">
                                 <!-- 押すと関数 handleStudioBrandFilter('ALL') を実行する操作ボタン「<button class="mini-chip active"…」です -->
@@ -2235,7 +2236,7 @@
                         </div>
                     </div>
 
-
+                    <!-- AI STYLING COMMENT の領域-->
                     <!-- デザイン・配置用のブロック要素（<div class="studio-bottom-panel">）を開始します -->
                     <div class="studio-bottom-panel">
                         <!-- デザイン・配置用のブロック要素（<div class="ai-comment-card">）を開始します -->
@@ -2265,27 +2266,6 @@
                                 <p class="ai-comment-text" id="ai-comment-text">
                                     左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
                                 </p>
-                                <!-- AIカラー構成診断ボックス（ベース/アソート/アクセント比率・配色調和タイプ判定） -->
-                                <div class="ai-color-diagnosis-box" id="ai-color-diagnosis-box"
-                                    style="margin-top: 12px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 8px; border-left: 3px solid #f59e0b; display: none;">
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
-                                        <span
-                                            style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
-                                            <span>🎨</span> AIカラー構成診断
-                                        </span>
-                                        <span id="ai-color-scheme-type"
-                                            style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: rgba(251,191,36,0.18); color: #fde68a; font-weight: 600;">--</span>
-                                    </div>
-                                    <!-- カラー比率バー -->
-                                    <div id="ai-color-ratio-bar"
-                                        style="height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 8px; background: rgba(255,255,255,0.1);">
-                                    </div>
-                                    <!-- カラー内訳リスト -->
-                                    <div id="ai-color-breakdown-list"
-                                        style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.73rem; color: #e2e8f0;">
-                                    </div>
-                                </div>
                             </div>
                             <!-- デザイン・配置用のブロック要素（<div class="ai-meta-bar">）を開始します -->
                             <div class="ai-meta-bar">
@@ -2297,14 +2277,6 @@
                                     <span class="ai-tag">#ベーシック</span>
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-tag #通年着回し）です -->
                                     <span class="ai-tag">#通年着回し</span>
-                                </div>
-                                <!-- 特定機能・領域のブロック要素（<div id="ai-palette-wrap" class="ai-palette-wrap">）を開始します -->
-                                <div class="ai-palette-wrap" id="ai-palette-wrap">
-                                    <!-- インライン装飾／グルーピング用の <span> 要素（.palette-label カラー構成:）です -->
-                                    <span class="palette-label">カラー構成:</span>
-                                    <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#palette-dots）です -->
-                                    <div class="palette-dots" id="palette-dots">
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2827,11 +2799,11 @@
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
     <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261119_studio_badge_v1"></script>
+    <script src="js/shop.js?v=20261119_remove_color_diag_v1"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261119_studio_badge_v1"></script>
+    <script src="js/studio.js?v=20261119_remove_color_diag_v1"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261119_studio_badge_v1"></script>
+    <script src="js/app.js?v=20261119_remove_color_diag_v1"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
