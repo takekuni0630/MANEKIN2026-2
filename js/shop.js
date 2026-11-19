@@ -20,7 +20,7 @@ function isMobileLocalStorageMode() {
         if (window.matchMedia && window.matchMedia('(max-width: 768px) and (pointer: coarse) and (hover: none)').matches) {
             return true;
         }
-    } catch (e) {}
+    } catch (e) { }
     return false;
 }
 
@@ -207,7 +207,7 @@ async function restoreAuthSessionFromBackend() {
         }
         // 処理結果の基準値として null を呼び出し元へ返して関数を終了します
         return null;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 処理結果の基準値として null を呼び出し元へ返して関数を終了します
         return null;
@@ -492,7 +492,7 @@ function renderCatalogProducts() {
         if (pageTitle) pageTitle.textContent = "MEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "現代の男性に向けた、洗練されたモダンウェア（全12アイテム）";
-    // 前の if が偽で、かつ（AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN'）を満たす場合の別条件分岐です
     } else if (AppState.selectedGender === 'WOMEN' || AppState.selectedGender === 'WOMAN') {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'WOMEN COLLECTION';
@@ -500,7 +500,7 @@ function renderCatalogProducts() {
         if (pageTitle) pageTitle.textContent = "WOMEN COLLECTION";
         // 条件（pageSubtitle）が成り立つか判定し、該当する場合の処理を実行します
         if (pageSubtitle) pageSubtitle.textContent = "凛とした美しさと現代的なリラックス感を纏うウィメンズウェア（全12アイテム）";
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です（デフォルト: HOMEからすべて見るを押した時など）
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（デフォルト: HOMEからすべて見るを押した時など）
     } else {
         // 条件（breadcrumbCurrent）が成り立つか判定し、該当する場合の処理を実行します
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'ALL COLLECTION';
@@ -628,7 +628,7 @@ function renderItemDetail(productId) {
                 ${color}
             </button>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 
     // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
@@ -644,7 +644,7 @@ function renderItemDetail(productId) {
                 ${size}
             </button>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 
     // テンプレートリテラルで組み立てた HTML を要素 detailLayout 内に書き込んで画面を更新します
@@ -740,7 +740,7 @@ function handleColorSelect(chipEl, colorName, imageUrl) {
             mainImg.src = imageUrl;
             // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（mainImg.style.opacity = '1';）
             mainImg.style.opacity = '1';
-        // 上の処理を指定ミリ秒後（120ms 後）に実行するタイマー呼び出しを閉じます
+            // 上の処理を指定ミリ秒後（120ms 後）に実行するタイマー呼び出しを閉じます
         }, 120);
     }
 
@@ -846,7 +846,7 @@ async function syncCartToBackend() {
             if (!res.ok) throw new Error('Cart sync failed');
             // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
             return true;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.warn('[MySQL] カート同期エラー:', e);
@@ -934,7 +934,7 @@ async function syncCartFromBackend(options = {}) {
                 if (idx > -1) {
                     // 変数・配列項目 mergedCurrent[idx].quantity の値を更新・計算します
                     mergedCurrent[idx].quantity = Math.max(mergedCurrent[idx].quantity || 1, item.quantity || 1);
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 配列の末尾に新しい要素を追加します（mergedCurrent.push({ ...item });）
                     mergedCurrent.push({ ...item });
@@ -970,7 +970,7 @@ async function syncCartFromBackend(options = {}) {
                 if (idx > -1) {
                     // 変数・配列項目 finalCart[idx].quantity の値を更新・計算します
                     finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 配列の末尾に新しい要素を追加します（finalCart.push({ ...item });）
                     finalCart.push({ ...item });
@@ -995,7 +995,7 @@ async function syncCartFromBackend(options = {}) {
             // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
             await syncCartToBackend();
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLからのカート取得に失敗しました:', e);
@@ -1045,7 +1045,7 @@ async function handleAddToCartFromDetail(productId) {
     if (existingIndex > -1) {
         // 変数・配列項目 AppState.cart[existingIndex].qua… の値を更新・計算します
         AppState.cart[existingIndex].quantity += 1;
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
         AppState.cart.push({
@@ -1193,7 +1193,7 @@ async function removeCartItem(index) {
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToast('バッグから商品を削除しました');
 }
- 
+
 // 注文手続きステップバー（1:注文商品, 2:お届け先・決済, 3:注文確定）のアクティブ表示を更新します
 function updateCheckoutStepper(step = 2) {
     const stepper = document.querySelector('.checkout-stepper');
@@ -1392,7 +1392,7 @@ function setUserPoints(points, options = {}) {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ points: normalizedPts })
-        }).catch(() => {});
+        }).catch(() => { });
     }
 
     // チェックアウト画面の「保有ポイント: XX pt」表示を即時更新します
@@ -1938,16 +1938,16 @@ async function importOrderToCloset(idx) {
                                     headers: { 'Content-Type': 'application/json' },
                                     credentials: 'include',
                                     body: JSON.stringify({ product_id: itId, user_id: userId })
-                                }).catch(() => {});
-                            } catch (_) {}
+                                }).catch(() => { });
+                            } catch (_) { }
                         }
                     }
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 変数・配列項目 failed の値を更新・計算します
                     failed++;
                 }
-            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (e) {
                 // 変数・配列項目 failed の値を更新・計算します
                 failed++;
@@ -1967,11 +1967,11 @@ async function importOrderToCloset(idx) {
         if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(`👗 注文商品をMySQLのマイクローゼットに登録しました（${added}点）`);
-    // 前の if が偽で、かつ（failed > 0）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（failed > 0）を満たす場合の別条件分岐です
     } else if (failed > 0) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ MySQLへのマイクローゼット登録に失敗しました（サーバー接続を確認してください）');
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('この注文の商品はすでにマイクローゼットに登録済みです');
@@ -2173,7 +2173,7 @@ async function handlePlaceOrder() {
                 // 変数・配列項目 backendUpdatedPoints の値を更新・計算します
                 backendUpdatedPoints = data.updated_points;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ PythonサーバーまたはMySQLに接続できないため注文を確定できませんでした（app.pyとMySQLの起動を確認してください）');
@@ -2264,8 +2264,8 @@ async function handlePlaceOrder() {
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
                         body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
-                    }).catch(() => {});
-                } catch (_) {}
+                    }).catch(() => { });
+                } catch (_) { }
             }
         });
 
@@ -2501,7 +2501,7 @@ async function syncOrdersFromBackend() {
             if (hRes.ok && hData && hData.mysql === 'connected') {
                 // 専用ヘルパー関数 setConnectedPill() を実行して状態や表示ラベルを更新します
                 setConnectedPill();
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 専用ヘルパー関数 setDisconnectedPill() を実行して状態や表示ラベルを更新します
                 setDisconnectedPill();
@@ -2574,12 +2574,12 @@ async function syncOrdersFromBackend() {
                 // チェックアウト画面の保有ポイント表示も最新値へ更新します
                 updateCheckoutCalculations();
             }
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 処理を中断して呼び出し元の catch へエラー内容（throw new Error('API response not ok');）を渡します
             throw new Error('API response not ok');
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn("MySQL注文履歴の取得に失敗しました:", e);
@@ -2641,7 +2641,7 @@ async function handleClearOrderHistory() {
         updateCheckoutCalculations();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('このアカウントのMySQLご注文履歴を初期化しました（0件）');
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('Backend orders delete failed', e);
@@ -2748,7 +2748,7 @@ async function handleRefreshFromMySQL() {
         renderMyPage();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(`✨ MySQLから最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 関連処理 syncOrdersFromBackend() を呼び出して処理・画面を更新します
         await syncOrdersFromBackend();
@@ -2807,7 +2807,7 @@ function renderMyPage() {
                 </button>
             `;
         }
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（userNameEl）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameEl) userNameEl.textContent = 'ゲスト 様';
@@ -2876,7 +2876,7 @@ function renderMyPage() {
                     </td>
                 </tr>
             `;
-        // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
+            // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
         } else if (!AppState.orderHistory || AppState.orderHistory.length === 0) {
             // テンプレートリテラルで組み立てた HTML を要素 ordersTbody 内に書き込んで画面を更新します
             ordersTbody.innerHTML = `
@@ -2886,7 +2886,7 @@ function renderMyPage() {
                     </td>
                 </tr>
             `;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 生成・変換した HTML 文字列を要素 ordersTbody の中身として描画します（購入者列・クーポン割引を追加）
             ordersTbody.innerHTML = AppState.orderHistory.map((order, idx) => `
@@ -2924,7 +2924,7 @@ function renderMyPage() {
         if (favoriteItems.length === 0) {
             // 生成・変換した HTML 文字列を要素 mypageFavGrid の中身として描画します
             mypageFavGrid.innerHTML = '<p style="grid-column: 1/-1; padding: 24px; color: #777;">お気に入り登録された商品はありません。</p>';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 生成・変換した HTML 文字列を要素 mypageFavGrid の中身として描画します
             mypageFavGrid.innerHTML = favoriteItems.slice(0, 4).map(p => createProductCardHTML(p)).join('');
@@ -2991,8 +2991,8 @@ function cleanPurchasedFavorites() {
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
                         body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
-                    }).catch(() => {});
-                } catch (_) {}
+                    }).catch(() => { });
+                } catch (_) { }
             });
         }
         updateFavoriteBadges();
@@ -3084,7 +3084,7 @@ async function syncFavoritesFromBackend() {
                 if (typeof renderMyPage === 'function') renderMyPage();
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLお気に入り取得エラー:', e);
@@ -3160,7 +3160,7 @@ async function handleToggleFavorite(productId) {
         if (isAdded && index === -1) {
             // 配列の末尾に新しい要素を追加します（AppState.favorites.push(productId);）
             AppState.favorites.push(productId);
-        // 前の if が偽で、かつ（!isAdded && index > -1）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（!isAdded && index > -1）を満たす場合の別条件分岐です
         } else if (!isAdded && index > -1) {
             // 配列の指定位置から要素を取り除いて削除します（AppState.favorites.splice(index, 1);）
             AppState.favorites.splice(index, 1);
@@ -3182,7 +3182,7 @@ async function handleToggleFavorite(productId) {
 
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(isAdded ? 'お気に入りに追加しました（MySQL保存）' : 'お気に入りから解除しました（MySQL保存）');
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLお気に入り更新エラー:', e);
@@ -3206,7 +3206,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
             if (isFavorite) {
                 // 要素に CSS クラスを付与して見た目・表示状態を変更します（btn.classList.add('is-favorite');）
                 btn.classList.add('is-favorite');
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 要素から CSS クラスを外して強調や表示を戻します（btn.classList.remove('is-favorite');）
                 btn.classList.remove('is-favorite');
@@ -3229,7 +3229,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
                 </svg>
                 お気に入り解除
             `;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 要素から CSS クラスを外して強調や表示を戻します（detailFavBtn.classList.remove('is-favorite…）
             detailFavBtn.classList.remove('is-favorite');
@@ -3296,7 +3296,7 @@ function renderFavoriteProducts() {
                 <a href="#items" class="btn btn-primary">商品一覧を見る</a>
             </div>
         `;
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 生成・変換した HTML 文字列を要素 favGrid の中身として描画します
         favGrid.innerHTML = favoriteItems.map(p => createProductCardHTML(p)).join('');
@@ -3334,7 +3334,7 @@ function updateAuthNavUI() {
             mobileLoginLink.onclick = handleLogout;
         }
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
     } else {
         if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'none';
         if (headerUserBtn) headerUserBtn.title = 'マイページ / ログイン';
@@ -3361,7 +3361,7 @@ async function handleLogout(e) {
     // スマホ版のlocalStorageログインセッションをクリアします
     try {
         window.localStorage.removeItem('manekin_ls_current_user');
-    } catch (e) {}
+    } catch (e) { }
 
     // PC版の場合はバックエンド API（/api/auth/logout）へリクエストを送信します
     if (!isMobileLocalStorageMode()) {
@@ -3395,7 +3395,7 @@ async function redirectToHome(user, options = {}) {
     try {
         sessionStorage.removeItem('manekin_pending_auth_target');
         localStorage.removeItem('manekin_pending_auth_target');
-    } catch (e) {}
+    } catch (e) { }
 
     // 1. DOM上の全.page-viewからactiveを外し、確実に#view-homeを表示
     const allViews = document.querySelectorAll('.page-view');
@@ -3414,7 +3414,7 @@ async function redirectToHome(user, options = {}) {
         if (window.location.hash !== '#home') {
             window.location.hash = '#home';
         }
-    } catch (e) {}
+    } catch (e) { }
 
     // 4. HOMEのおすすめ商品カードを再描画
     if (typeof renderHomeProducts === 'function') {
@@ -3422,7 +3422,7 @@ async function redirectToHome(user, options = {}) {
     }
 
     // 5. 画面最上部へ即時スクロール
-    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 
     // 6. トースト通知を表示
     if (user && !options.silentToast && typeof showToast === 'function') {
@@ -3431,7 +3431,7 @@ async function redirectToHome(user, options = {}) {
 
     // 7. handleRoutingも#homeを明示指定して呼んで状態を完全同期
     if (typeof handleRouting === 'function') {
-        try { await handleRouting('#home'); } catch (e) {}
+        try { await handleRouting('#home'); } catch (e) { }
     }
 
     // 8. 念押しで最上部スクロール＆#view-homeアクティブ保証
@@ -3439,7 +3439,7 @@ async function redirectToHome(user, options = {}) {
         allViews.forEach(v => v.classList.remove('active'));
         homeView.classList.add('active');
     }
-    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 }
 
 // 互換用エイリアス
@@ -3501,7 +3501,7 @@ async function handleDemoLogin(e) {
             }
             // 変数・配列項目 demoUser の値を更新・計算します
             demoUser = data.user;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
@@ -3615,14 +3615,14 @@ async function handleLogin(e) {
             if (response.ok && data.user && isServerUserId(data.user.id)) {
                 // 変数・配列項目 loggedInUser の値を更新・計算します
                 loggedInUser = data.user;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
                 showToast(data.message || 'メールアドレスまたはパスワードが正しくありません');
                 // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
@@ -3769,14 +3769,14 @@ async function handleRegister(e) {
             if (response.ok && data.user && isServerUserId(data.user.id)) {
                 // 変数・配列項目 newUser の値を更新・計算します
                 newUser = data.user;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
                 showToast(data.message || '会員登録に失敗しました');
                 // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
                 return;
             }
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (err) {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ Pythonサーバー(ポート8080)に接続できないため会員登録できません（app.pyとMySQLの起動を確認してください）');
@@ -3962,7 +3962,7 @@ function showToast(message) {
         toast.classList.add('toast-fadeout');
         // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
         setTimeout(() => toast.remove(), 300);
-    // 上の処理を指定ミリ秒後（2500ms 後）に実行するタイマー呼び出しを閉じます
+        // 上の処理を指定ミリ秒後（2500ms 後）に実行するタイマー呼び出しを閉じます
     }, 2500);
 }
 

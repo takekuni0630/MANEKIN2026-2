@@ -156,7 +156,7 @@ function renderManekinStudio(activeTab = 'create') {
         if (avatarCharElem) avatarCharElem.textContent = (AppState.currentUser.name || 'M').charAt(0);
         // 条件（userRankElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userRankElem) userRankElem.textContent = AppState.currentUser.rank || 'MEMBER';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（userNameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (userNameElem) userNameElem.textContent = 'ゲスト 様';
@@ -220,7 +220,7 @@ function renderManekinStudio(activeTab = 'create') {
         if (profEmail) profEmail.textContent = AppState.currentUser.email || '';
         // 条件（profRank）が成り立つか判定し、該当する場合の処理を実行します
         if (profRank) profRank.textContent = AppState.currentUser.rank || 'REGULAR MEMBER';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（profName）が成り立つか判定し、該当する場合の処理を実行します
         if (profName) profName.textContent = 'ゲスト 様';
@@ -365,7 +365,7 @@ function renderPaneClosetGrid() {
                 </div>
             </div>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -423,7 +423,7 @@ function renderStudioClosetList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
             `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -543,7 +543,7 @@ function renderStudioBrandList() {
                 ${isWearing ? '<span class="studio-card-badge-wearing">着用中</span>' : ''}
             </div>
         `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -621,7 +621,7 @@ function renderStudioFavoritesGrid() {
                 </div>
             </article>
             `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -658,7 +658,7 @@ function toggleWearItem(itemId, isOwned) {
     if (isOwned) {
         // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = AppState.myCloset.find(c => String(c.id) === String(itemId));
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 targetItem の値を更新・計算します
         targetItem = SAMPLE_PRODUCTS.find(p => p.id === parseInt(itemId, 10));
@@ -680,7 +680,7 @@ function toggleWearItem(itemId, isOwned) {
         AppState.currentOutfit[slotKey] = null;
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`「${targetItem.name}」を外しました`);
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 AppState.currentOutfit[slotKey] の値を更新・計算します
         AppState.currentOutfit[slotKey] = {
@@ -861,15 +861,15 @@ function migrateOldBrokenAssets() {
             if (!item.image || item.image.includes('pants_black.jpg') || item.image.includes('tapered_black.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
-            // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
             } else if (item.image.includes('shoes_white.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = defaultSneaker;
-            // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
             } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/アーバングレイジップフーディ.png';
-            // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
+                // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
             } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
                 // 変数・配列項目 item.image の値を更新・計算します
                 item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
@@ -903,19 +903,19 @@ function migrateOldBrokenAssets() {
                     item.image = 'assets/images/men/ストレートレープセミフレアスラックス.png';
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('shoes_white.jpg')）を満たす場合の別条件分岐です
                 } else if (item.image.includes('shoes_white.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = defaultSneaker;
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('sweat_grey.jpg') || item.image.…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('sweat_grey.jpg') || item.image.includes('sweat_white.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/アーバングレイジップフーディ.png';
                     // 変数・配列項目 outfitChanged の値を更新・計算します
                     outfitChanged = true;
-                // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
+                    // 前の if が偽で、かつ（item.image.includes('tshirt_white.jpg') || item.imag…）を満たす場合の別条件分岐です
                 } else if (item.image.includes('tshirt_white.jpg') || item.image.includes('tshirt_black.jpg')) {
                     // 変数・配列項目 item.image の値を更新・計算します
                     item.image = 'assets/images/men/スカイオックスフォードシャツ.png';
@@ -963,7 +963,7 @@ function renderMannequinStage() {
                 const fallback = getCategoryFallbackImage(item.category);
                 // テンプレートリテラルで組み立てた HTML を要素 layerContent 内に書き込んで画面を更新します
                 layerContent.innerHTML = `<img src="${item.image}" alt="${item.name}" class="layer-img" onerror="this.onerror=null;this.src='${fallback}';">`;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 生成・変換した HTML 文字列を要素 layerContent の中身として描画します
                 layerContent.innerHTML = '';
@@ -1061,7 +1061,7 @@ function handleStageSlotClick(slotKey) {
     if (item) {
         // 専用ヘルパー関数 unwearSlot() を実行して状態や表示ラベルを更新します
         unwearSlot(slotKey);
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 関連処理 openStageQuickPicker() を呼び出して処理・画面を更新します
         openStageQuickPicker(slotKey);
@@ -1109,7 +1109,7 @@ function openStageQuickPicker(slotKey) {
     if (myItems.length === 0 && brandItems.length === 0) {
         // 変数・配列項目 html の値を更新・計算します
         html = '<p style="grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 0.75rem; padding: 12px;">選択できるアイテムがありません</p>';
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
         myItems.forEach(item => {
@@ -1209,7 +1209,7 @@ function handleStageDrop(event) {
             // 関連処理 toggleWearItem() を呼び出して処理・画面を更新します
             toggleWearItem(data.itemId, !!data.isOwned);
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.error('Drop error:', e);
@@ -1250,11 +1250,11 @@ function applyFittingOffsets() {
             const bSize = off.brandSize || item.size || 'M';
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = BRAND_SIZE_SCALES[bSize] || 100;
-        // 前の if が偽で、かつ（item && (item.isOwned || isFreeScaleSlot)）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（item && (item.isOwned || isFreeScaleSlot)）を満たす場合の別条件分岐です
         } else if (item && (item.isOwned || isFreeScaleSlot)) {
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 変数・配列項目 effectiveScale の値を更新・計算します
             effectiveScale = (off.customScale !== undefined) ? off.customScale : (off.scale || 100);
@@ -1409,7 +1409,7 @@ function syncAdjustPanelUI() {
             if (valScale) valScale.textContent = `${(off.customScale !== undefined) ? off.customScale : (off.scale || 100)}%`;
             // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
             if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}をクローゼットから着用すると、マネキンに合わせてサイズ（70%〜140%）や位置を自由に微調整できます`;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 条件（rowBrand）が成り立つか判定し、該当する場合の処理を実行します
             if (rowBrand) rowBrand.style.display = 'flex';
@@ -1466,7 +1466,7 @@ function syncAdjustPanelUI() {
         // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = `💡 ${slotKey === 'hat' ? '帽子' : '靴'}はスライダーで大きさを70%〜140%まで自由に拡大・縮小できます（自動保存）`;
 
-    // 前の if が偽で、かつ（!item.isOwned）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（!item.isOwned）を満たす場合の別条件分岐です
     } else if (!item.isOwned) {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
@@ -1513,7 +1513,7 @@ function syncAdjustPanelUI() {
         // 条件（hintElem）が成り立つか判定し、該当する場合の処理を実行します
         if (hintElem) hintElem.textContent = '💡 販売商品はXS〜XLのサイズ規格でマネキン上の表示サイズが変わります（自動保存）';
 
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
@@ -1664,13 +1664,13 @@ function handleAdjustInput(prop, val) {
         const valElem = document.getElementById('val-adjust-y');
         // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
-    // 前の if が偽で、かつ（prop === 'x'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（prop === 'x'）を満たす場合の別条件分岐です
     } else if (prop === 'x') {
         // HTML 要素 #val-adjust-x を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-x');
         // 条件（valElem）が成り立つか判定し、該当する場合の処理を実行します
         if (valElem) valElem.textContent = `${numVal > 0 ? '+' : ''}${numVal}px`;
-    // 前の if が偽で、かつ（prop === 'scale'）を満たす場合の別条件分岐です
+        // 前の if が偽で、かつ（prop === 'scale'）を満たす場合の別条件分岐です
     } else if (prop === 'scale') {
         // HTML 要素 #val-adjust-scale を取得して変数 valElem に格納します
         const valElem = document.getElementById('val-adjust-scale');
@@ -2034,7 +2034,7 @@ function updateAIStylingComment() {
             tags = ['#大人の品格', '#モノトーン+1', '#Aラインシルエット'];
             // 変数・配列項目 score の値を更新・計算します
             score = 98;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 変数・配列項目 tags の値を更新・計算します
             tags = ['#キレイめカジュアル', '#通学デイリー', '#モノトーンアクセント'];
@@ -2227,7 +2227,7 @@ async function handleSaveOutfit(e) {
         if (input) input.value = '';
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLコーデ保存失敗:', err);
@@ -2299,7 +2299,7 @@ function renderSavedOutfitsGrid() {
                 </div>
             </div>
             `;
-    // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
+        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
@@ -2381,7 +2381,7 @@ async function deleteSavedOutfit(outfitId) {
         renderSavedOutfitsGrid();
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLコーデ削除失敗:', err);
@@ -2470,7 +2470,7 @@ async function syncOutfitsFromBackend() {
                 }
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLからの保存コーデ取得に失敗しました:', e);
@@ -2520,7 +2520,7 @@ async function addCurrentBrandItemsToCart() {
         if (existing) {
             // 変数・配列項目 existing.quantity の値を更新・計算します
             existing.quantity = (existing.quantity || 1) + 1;
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
             AppState.cart.push({
@@ -2678,7 +2678,7 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
                 height = Math.round((height * maxDim) / width);
                 // 変数・配列項目 width の値を更新・計算します
                 width = maxDim;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                // 上記の if 条件に当てはまらなかった場合の分岐処理です
             } else {
                 // 変数・配列項目 width の値を更新・計算します
                 width = Math.round((width * maxDim) / height);
@@ -2699,7 +2699,7 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
             canvas.toBlob((blob) => {
                 // 非同期 Promise を完了し、結果値（blob || imageSource）を呼び出し元へ返します
                 resolve(blob || imageSource);
-            // Canvas 画像を PNG 形式（透過対応）で書き出す処理を閉じます
+                // Canvas 画像を PNG 形式（透過対応）で書き出す処理を閉じます
             }, 'image/png');
         };
         // 変数・配列項目 img.onerror の値を更新・計算します
@@ -2709,11 +2709,11 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
         if (typeof imageSource === 'string') {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = imageSource;
-        // 前の if が偽で、かつ（imageSource instanceof Blob）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（imageSource instanceof Blob）を満たす場合の別条件分岐です
         } else if (imageSource instanceof Blob) {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(imageSource);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 非同期 Promise を完了し、結果値（imageSource）を呼び出し元へ返します
             resolve(imageSource);
@@ -2738,7 +2738,7 @@ async function runAiBackgroundRemoval(imageSource) {
             window.imglyRemoveBackground = removeBgFunc;
             // 変数・配列項目 window.imglyAiReady の値を更新・計算します
             window.imglyAiReady = true;
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
         } catch (e) {
             // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
             console.error('AIモジュール読み込みエラー:', e);
@@ -2788,7 +2788,7 @@ async function runAiBackgroundRemoval(imageSource) {
                     if (key.includes('model') || key.includes('onnx')) {
                         // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `AIモデル読込中... (${pct}%)`;
-                    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
                     } else {
                         // 文字要素 subtitle の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
                         subtitle.textContent = `服の輪郭をAI解析・透過処理中... (${pct}%)`;
@@ -2806,7 +2806,7 @@ async function runAiBackgroundRemoval(imageSource) {
         if (overlay) overlay.style.display = 'none';
         // 結果（outputBlob）を呼び出し元へ返却します
         return outputBlob;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 条件（overlay）が成り立つか判定し、該当する場合の処理を実行します
         if (overlay) overlay.style.display = 'none';
@@ -2844,7 +2844,7 @@ function updateClosetPreviewUI(imgUrl, isTransparent = false) {
             preview.classList.add('is-transparent');
             // 条件（badgeTrans）が成り立つか判定し、該当する場合の処理を実行します
             if (badgeTrans) badgeTrans.style.display = 'block';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 要素から CSS クラスを外して強調や表示を戻します（preview.classList.remove('is-transparent')…）
             preview.classList.remove('is-transparent');
@@ -2984,7 +2984,7 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
                 colorSelect.value = result.color;
             }
         }
-    // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
         // 変数・配列項目 card.className の値を更新・計算します
         card.className = 'ai-diagnosis-card is-invalid';
@@ -3102,7 +3102,7 @@ async function analyzeClothingItemShape(source) {
                         if (isAlreadyTransparent) {
                             // 変数・配列項目 isFg の値を更新・計算します
                             isFg = a > 35;
-                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                            // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
                             // 定数 diff を宣言し、値（Math.hypot(r - bgR, g - bgG, b - bgB)）をセットします
                             const diff = Math.hypot(r - bgR, g - bgG, b - bgB);
@@ -3224,7 +3224,7 @@ async function analyzeClothingItemShape(source) {
                             if (!prevWasFg) transitions++;
                             // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = true;
-                        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+                            // 上記の if 条件に当てはまらなかった場合の分岐処理です
                         } else {
                             // 変数・配列項目 prevWasFg の値を更新・計算します
                             prevWasFg = false;
@@ -3349,26 +3349,26 @@ async function analyzeClothingItemShape(source) {
                             if (label.match(/shoe|sneaker|boot|loafer|sandal|clog/)) {
                                 // 変数・配列項目 scores.SHOES の値を更新・計算します
                                 scores.SHOES += 60;
-                            // 前の if が偽で、かつ（label.match(/hat|cap|bonnet|beret|helmet/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/hat|cap|bonnet|beret|helmet/)）を満たす場合の別条件分岐です
                             } else if (label.match(/hat|cap|bonnet|beret|helmet/)) {
                                 // 変数・配列項目 scores.HAT の値を更新・計算します
                                 scores.HAT += 60;
-                            // 前の if が偽で、かつ（label.match(/jean|pant|trouser|skirt/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/jean|pant|trouser|skirt/)）を満たす場合の別条件分岐です
                             } else if (label.match(/jean|pant|trouser|skirt/)) {
                                 // 変数・配列項目 scores.BOTTOMS の値を更新・計算します
                                 scores.BOTTOMS += 60;
-                            // 前の if が偽で、かつ（label.match(/coat|jacket|trench|overcoat/)）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/coat|jacket|trench|overcoat/)）を満たす場合の別条件分岐です
                             } else if (label.match(/coat|jacket|trench|overcoat/)) {
                                 // 変数・配列項目 scores.OUTER の値を更新・計算します
                                 scores.OUTER += 60;
-                            // 前の if が偽で、かつ（label.match(/jersey|shirt|t-shirt|sweater|sweatshirt…）を満たす場合の別条件分岐です
+                                // 前の if が偽で、かつ（label.match(/jersey|shirt|t-shirt|sweater|sweatshirt…）を満たす場合の別条件分岐です
                             } else if (label.match(/jersey|shirt|t-shirt|sweater|sweatshirt|cardigan|vest|top/)) {
                                 // 変数・配列項目 scores.TOPS の値を更新・計算します
                                 scores.TOPS += 60;
                             }
                         }
                     }
-                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
                 } catch (e) {
                     // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                     console.warn('AIモデル判定スキップ:', e);
@@ -3518,7 +3518,7 @@ async function analyzeClothingItemShape(source) {
                     desc: `マイクローゼットに登録可能です。カテゴリとカラー（${detectedColorLabel}）を自動判定しました。`
                 });
 
-            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+                // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (err) {
                 // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.error('形状解析エラー:', err);
@@ -3562,11 +3562,11 @@ async function analyzeClothingItemShape(source) {
         if (typeof source === 'string') {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = source;
-        // 前の if が偽で、かつ（source instanceof Blob）を満たす場合の別条件分岐です
+            // 前の if が偽で、かつ（source instanceof Blob）を満たす場合の別条件分岐です
         } else if (source instanceof Blob) {
             // 変数・配列項目 img.src の値を更新・計算します
             img.src = URL.createObjectURL(source);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 最終結果を resolve() に渡して非同期 Promise を完了させます
             resolve({
@@ -3614,7 +3614,7 @@ async function processClosetImageWithAi(source) {
         };
         // 選択ファイルをブラウザ内でそのまま画像表示できる DataURL 文字列へ非同期変換開始します
         reader.readAsDataURL(blob);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('AI背景削除に失敗、元画像を使用:', err);
@@ -3722,7 +3722,7 @@ function handleClosetImageSelect(e) {
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
             // 選んだ画像またはリサイズ済み画像に対して AI 背景透過と形状分析パイプラインを実行します
             await processClosetImageWithAi(file);
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // 関連処理 updateClosetPreviewUI() を呼び出して処理・画面を更新します
             updateClosetPreviewUI(originalClosetUploadDataUrl, false);
@@ -3967,13 +3967,13 @@ async function handleAddClosetItem(e) {
         closeAddClosetModal();
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット保存エラー:', err);
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToastNotification(`⚠️ MySQLへの手持ち服保存に失敗しました（${err.message || 'サーバー接続を確認してください'}）`);
-    // 成功・失敗に関わらず最後に必ず実行される後始末(finally)ブロックです
+        // 成功・失敗に関わらず最後に必ず実行される後始末(finally)ブロックです
     } finally {
         // 条件（submitBtn）が成り立つか判定し、該当する場合の処理を実行します
         if (submitBtn) {
@@ -4069,7 +4069,7 @@ async function deleteClosetItem(itemId) {
         showToastNotification('手持ちの服をMySQLから削除しました');
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット削除エラー:', err);
@@ -4203,7 +4203,7 @@ async function syncClosetFromBackend() {
                 }
             }
         }
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLクローゼット取得エラー:', e);
@@ -4296,7 +4296,7 @@ async function fetchCurrentTemperature() {
                         parsedWeather = area0.weathers[0].replace(/[\s\u3000]+/g, ' ').trim();
                     }
                 }
-            } catch (we) {}
+            } catch (we) { }
 
             // 気温（最低・最高）の抽出（名古屋: 51106）
             try {
@@ -4324,7 +4324,7 @@ async function fetchCurrentTemperature() {
                         }
                     }
                 }
-            } catch (te) {}
+            } catch (te) { }
 
             if (parsedMin !== null) {
                 result.tempMin = parsedMin;
@@ -4370,7 +4370,7 @@ async function fetchCurrentTemperature() {
                         result.temp = Math.round(omData.current.temperature_2m);
                     }
                 }
-            } catch (oe) {}
+            } catch (oe) { }
         }
     }
 
@@ -4854,7 +4854,7 @@ async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnaps
         if (!res.ok) throw new Error('Studio state save failed');
         // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
         return true;
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLスタジオ状態保存エラー:', e);
@@ -4952,7 +4952,7 @@ function syncStudioStateToBackend(options = {}) {
             const ok = await sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
             // 非同期 Promise を完了し、結果値（ok）を呼び出し元へ返します
             resolve(ok);
-        // 上の処理を指定ミリ秒後（400ms 後）に実行するタイマー呼び出しを閉じます
+            // 上の処理を指定ミリ秒後（400ms 後）に実行するタイマー呼び出しを閉じます
         }, 400);
     });
 }
@@ -5022,7 +5022,7 @@ async function syncStudioStateFromBackend() {
             AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
             // アプリ全体状態 AppState.studioGender を最新値（(data.studio_state.studio_gender === '…）に更新します
             AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // アプリ全体状態 AppState.currentOutfit を最新値（{ hat: null, outer: null, tops: null, …）に更新します
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
@@ -5042,7 +5042,7 @@ async function syncStudioStateFromBackend() {
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
         // 条件（typeof updateAIStylingComment === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof updateAIStylingComment === 'function') updateAIStylingComment();
-    // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (e) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLスタジオ状態取得エラー:', e);
