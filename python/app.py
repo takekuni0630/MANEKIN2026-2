@@ -615,6 +615,11 @@ def create_order():
                     # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値（today_str）です
                     today_str
                 ))
+                # 購入した商品がお気に入りに登録されていた場合、クローゼット登録（購入済み）に伴いお気に入りから自動解除します
+                try:
+                    cursor.execute("DELETE FROM `favorites` WHERE `user_id` = %s AND `product_id` = %s;", (user_id, p_id))
+                except Exception as e_fav:
+                    pass
 
             # 注文後の残高ポイント数（フロントへ返す最新値）の変数を初期化します
             updated_points = None

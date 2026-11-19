@@ -100,6 +100,9 @@ let isCurrentUploadTransparent = false;
 
 // MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
 function switchStudioTab(tabKey) {
+    // クローゼットにある商品はお気に入り一覧から除外・自動解除
+    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
+
     // メディアクエリの画面設計（992px以下）の時だけ、独立したお気に入り画面を開かず、コーデ作成画面内の「お気に入り商品」列へ誘導します
     if (tabKey === 'favorites' && window.innerWidth <= 992) {
         tabKey = 'create';
@@ -465,10 +468,14 @@ function renderStudioBrandList() {
     // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
     const gender = AppState.studioGender || 'MEN';
 
+    // クローゼット所持商品をお気に入りから自動解除
+    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
+    const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
+
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して allFavProducts に入れます
-    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.includes(p.id));
+    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
+    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === p.id) && !ownedIds.has(p.id));
 
     // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
@@ -571,8 +578,12 @@ function renderStudioFavoritesGrid() {
     // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favProducts に入れます
-    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+    // クローゼット所持商品をお気に入りから自動解除
+    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
+    const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
+
+    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
+    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.some(f => Number(f) === p.id) && !ownedIds.has(p.id));
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favProducts.length === 0) {
@@ -4096,6 +4107,7 @@ async function syncClosetFromBackend() {
             }
         }
         AppState.myCloset = saved;
+        if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
         const closetBadge = document.getElementById('studio-closet-badge');
         if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
         const mobClosetCnt = document.getElementById('mob-closet-cnt');
@@ -4164,6 +4176,8 @@ async function syncClosetFromBackend() {
 
                 // アプリ全体状態 AppState.myCloset を最新値（mysqlItems）に更新します
                 AppState.myCloset = mysqlItems;
+                // クローゼット所持商品をお気に入りから自動解除
+                if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
                 // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.log(`✨ [MySQL] マイクローゼット同期完了 (user_id=${targetUserId}): ${AppState.myCloset.length} 点`);
 
@@ -4378,134 +4392,299 @@ function getCurrentSeasonInfo(date = new Date()) {
     }
 }
 
-// 季節ごとのAI提案コーデデータ（MEN / WOMEN それぞれのアイテム・タイトル・説明文）
-const SEASONAL_STYLING_PLANS = {
-    spring: {
+// ==========================================================================
+//  月別（1月〜12月）・ブランド商品おすすめコーデデータ（すべて SAMPLE_PRODUCTS から選定）
+// ==========================================================================
+const MONTHLY_STYLING_PLANS = {
+    1: {
+        monthName: '1月',
+        seasonName: '厳冬期',
+        themeTitle: '真冬の寒さを乗り切るウォームレイヤード',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・爽やかな春風に映える「スカイオックスフォードシャツ」スタイル`,
-            desc: (temp) => `過ごしやすい気温${temp}℃の春風に合わせて、清潔感溢れる「スカイ オックス フォードシャツ」を主役に。手持ちの軽快なスラックスと白スニーカーを合わせることで、好印象な大人のスマートカジュアルが完成します。`,
-            outfit: {
-                outerId: null,
-                topsId: 7, // スカイ オックス フォードシャツ
-                bottomsId: 9, // ストレートレープセミフレアスラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
+            topsId: 6,   // チャコール ブーク ニット (¥5,500)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '真冬の厳しい寒さに備え、防寒性とストリート感を兼ね備えた「バッファローチェックボアジップジャケット」に保温性の高いブークニットと機能的な2WAYナイロンカーゴパンツを合わせました。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・春風に揺れる「シアーヘンリーネック × ライトデニム」`,
-            desc: (temp) => `軽やかな気温${temp}℃の春にぴったりな「ドット柄シアーヘンリーネッククロップドTシャツ」に、手持ちのライトデニムを合わせて、爽やかで抜け感のある春の旬コーデに。`,
-            outfit: {
-                outerId: null,
-                topsId: 108, // ドット柄シアーヘンリーネッククロップドTシャツ
-                bottomsId: 110, // ライトインディゴデニム
-                shoesName: 'キャンバススニーカー'
-            }
+            outerId: 14, // グリッドパフジャケット (¥12,800)
+            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '凍える真冬の気候を暖かく包み込むボリューム感のある「グリッドパフジャケット」に、ふわふわなシャギーニットセーターとリラックスしたスウェットパンツを組み合わせた快適な防寒スタイルです。'
         }
     },
-    summer: {
+    2: {
+        monthName: '2月',
+        seasonName: '晩冬・早春',
+        themeTitle: '春の気配を感じるシックなウィンタースタイル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・夏の暑さを涼しく乗り切る「軽快アンクルスラックス」コーデ`,
-            desc: (temp) => `気温${temp}℃の夏日でも涼しく快適に。「スマートアンクルテーパードイージースラックス」ですっきりとした足元を演出し、シンプルながら洗練された都会的サマーカジュアルに。`,
-            outfit: {
-                outerId: null,
-                topsId: 7, // スカイオックスフォードシャツ
-                bottomsId: 11, // スマートアンクルテーパードイージースラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 3,  // シングルブレストフェイクレザージャケット (¥12,000)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: 'まだ冷え込む2月もスタイリッシュに。上質な光沢感の「シングルブレストフェイクレザージャケット」に深みのあるワインニットと美しいセミフレアスラックスを効かせた洗練コーデです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・真夏のストリートカジュアル「クロップドT × バギーデニム」`,
-            desc: (temp) => `気温${temp}℃の暑い日も涼しげにキマる「クロップドTシャツ」にワイドなデニムを合わせて、開放感とトレンド感を両立したアクティブな夏コーデ。`,
-            outfit: {
-                outerId: null,
-                topsId: 108,
-                bottomsId: 111, // バギーデニム
-                shoesName: 'サンダル/スニーカー'
-            }
+            outerId: 13, // フリースジャケット (¥7,500)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '軽くて暖かい「フリースジャケット」に肉厚なルーズクルーネックスウェットとシルエットの美しいインディゴデニムを合わせた抜け感のある旬カジュアルです。'
         }
     },
-    autumn: {
+    3: {
+        monthName: '3月',
+        seasonName: '早春',
+        themeTitle: '季節の変わり目を快適に繋ぐ春アウタースタイル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・深まる秋の寒暖差に映える「手持ち黒ボトムス × ダブルトレンチコート」`,
-            desc: (temp) => `肌寒さを感じる気温${temp}℃に最適。ブランド人気No.1の「オーバードレープ ダブルトレンチコート」にチャコールニットを重ね着。手持ちの黒ボトムスと合わせるだけで、こなれ感のある都会的な秋冬スマートカジュアルが完成します。`,
-            outfit: {
-                outerId: 1, // オーバードレープ ダブルトレンチコート
-                topsId: 6,  // チャコール ブーク ニット
-                bottomsId: 9, // ストレートレープセミフレアスラックス
-                shoesName: 'クラシック 白レザースニーカー'
-            }
+            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '朝晩と日中の気温差が大きい3月に重宝する「オーバードレープ ダブルトレンチコート」に、着脱しやすいジップフーディとスラックスをレイヤードした大人の春スタイルです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・秋めく街に映える「フリースジャケット × ワイドデニム」`,
-            desc: (temp) => `気温${temp}℃の秋の風に寄り添う、ふんわり暖かい「フリースジャケット」にインディゴデニムを合わせた王道カジュアル。手持ちのスニーカーと合わせて親しみやすいスタイルに。`,
-            outfit: {
-                outerId: 101, // フリースジャケット
-                topsId: 106,  // ヘビーウェイトルーズクルーネックスウェット
-                bottomsId: 109, // ハイウエストワイドドレープタックトラウザー(インディゴデニム)
-                shoesName: '白レザースニーカー'
-            }
+            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '春の訪れを感じさせる軽快な「ボックスシルエットショートトレンチコート」に、スウェットと爽やかなライトインディゴデニムを合わせたスプリングスタイルです。'
         }
     },
-    winter: {
+    4: {
+        monthName: '4月',
+        seasonName: '春本番',
+        themeTitle: '新生活や春の外出を彩るスマートカジュアル',
         MEN: {
-            title: (temp, w) => `気温${temp}℃・真冬の冷え込みもおしゃれに包む「暖かボアジャケット × ニット」`,
-            desc: (temp) => `冷え込む気温${temp}℃の冬を乗り切る、保温性抜群の「バッファローチェックボアジップジャケット」とニットのレイヤード。手持ちのパンツと合わせるだけで季節感あふれるトレンド防寒スタイルに。`,
-            outfit: {
-                outerId: 4, // バッファローチェックボアジップジャケット
-                topsId: 6, // チャコール ブーク ニット
-                bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ
-                shoesName: 'ボリュームソールスニーカー'
-            }
+            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '心地よい春風が吹く4月に最適な、端正な「リラックス ダブル ブレスト テーラードジャケット」と清潔感溢れるオックスフォードシャツ、アンクルスラックスの好印象コーデです。'
         },
         WOMEN: {
-            title: (temp, w) => `気温${temp}℃・真冬の寒さを防ぐ「グリッドパフジャケット × シャギーニット」`,
-            desc: (temp) => `凍えるような気温${temp}℃でも抜群の暖かさを誇る「グリッドパフジャケット」とふわふわのシャギーニット。手持ちのスウェットパンツと合わせた旬の冬コーデ。`,
-            outfit: {
-                outerId: 102, // グリッドパフジャケット
-                topsId: 105, // シャギーニットオーバーサイズクルーネックセーター
-                bottomsId: 112, // タックイージーワイドスウェットパンツ
-                shoesName: 'スニーカー'
-            }
+            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
+            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '暖かな春の陽気にぴったりな「ボックスシルエットショートトレンチコート」にフルジップパーカーをインした、こなれ感漂う大人カジュアルです。'
+        }
+    },
+    5: {
+        monthName: '5月',
+        seasonName: '初夏・新緑',
+        themeTitle: '爽やかな初夏の風を楽しむ軽快シャツスタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: 'アウターなしで心地よく過ごせる5月。爽快なスカイブルーの「スカイ オックス フォードシャツ」を主役に、ドレープの美しいセミフレアスラックスを合わせました。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
+            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
+            leadText: '日差しが心地よい初夏に、存在感ある「カモフラージュスーパーワイドバギーデニムパンツ」とヴィンテージパーカーを合わせたストリートライクな着こなしです。'
+        }
+    },
+    6: {
+        monthName: '6月',
+        seasonName: '梅雨・初夏',
+        themeTitle: '雨の日も快適に過ごすリラックスストリート',
+        MEN: {
+            outerId: null,
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '湿気や朝晩の冷え込み・冷房対策にちょうどいい「アーバン グレイ ジップフーディ」に、足元を濡らしにくいアンクル丈スラックスを組み合わせました。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: 'ほんのり透け感のある「ドット柄シアーヘンリーネッククロップドTシャツ」でジメジメした梅雨時も涼やかに。涼感とトレンド感を両立させたコーデです。'
+        }
+    },
+    7: {
+        monthName: '7月',
+        seasonName: '盛夏',
+        themeTitle: '夏の暑さを爽やかに乗り切るサマースタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
+            leadText: '吸湿性と通気性に優れた薄手の「スカイ オックス フォードシャツ」を腕まくりして着こなす、暑い夏でも清潔感をキープできる都会派サマースタイルです。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
+            leadText: 'トレンドの「ドット柄シアーヘンリーネッククロップドTシャツ」にワイドなバギーデニムを合わせ、真夏の太陽に映えるアクティブなストリート感を出しました。'
+        }
+    },
+    8: {
+        monthName: '8月',
+        seasonName: '真夏',
+        themeTitle: '猛暑日も涼しく快適なサマーホリデースタイル',
+        MEN: {
+            outerId: null,
+            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '真夏の暑さでもサラリとした肌触りの「スカイ オックス フォードシャツ」に、軽量な「2WAYデタッチャブルナイロンカーゴパンツ」を合わせた機能的リゾートコーデです。'
+        },
+        WOMEN: {
+            outerId: null,
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '通気性抜群のシアーTシャツに、柔らかく開放的な「タックイージーワイドスウェットパンツ」をセレクトした真夏の休日リラックススタイルです。'
+        }
+    },
+    9: {
+        monthName: '9月',
+        seasonName: '初秋',
+        themeTitle: '秋の気配を取り入れるスイッチコーディネート',
+        MEN: {
+            outerId: null,
+            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
+            bottomsId: 12, // ビッグポケットパラシュートカーゴパンツ (¥6,000)
+            leadText: '少しずつ秋風を感じる9月。重厚感のある「ビッグポケットパラシュートカーゴパンツ」にジップフーディを合わせた、季節の変わり目に最適なコーデです。'
+        },
+        WOMEN: {
+            outerId: 16, // レザージャケット (¥9,200)
+            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
+            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
+            leadText: '涼感のあるシアーTシャツの上にさっと「レザージャケット」を羽織り、秋の先取りトレンドを表現したスマートコーデです。'
+        }
+    },
+    10: {
+        monthName: '10月',
+        seasonName: '秋晴れ・中秋',
+        themeTitle: '深まる秋を楽しむ大人のテーラード＆ニット',
+        MEN: {
+            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '心地よい秋晴れが続く10月に、差し色の「アーバン ワイン ニット」と端正な「リラックス ダブル テーラードジャケット」を合わせた洗練のドレスカジュアルです。'
+        },
+        WOMEN: {
+            outerId: 16, // レザージャケット (¥9,200)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '秋の定番「レザージャケット」に肉厚なクルーネックスウェットと濃紺インディゴデニムを合わせ、シックで温かみのある大人の装いに仕上げました。'
+        }
+    },
+    11: {
+        monthName: '11月',
+        seasonName: '深秋・晩秋',
+        themeTitle: '晩秋の冷え込みに映えるブランド人気No.1スタイル',
+        MEN: {
+            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
+            topsId: 8,   // アーバン ワイン ニット (¥5,800)
+            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
+            leadText: '深まる秋の気候に合わせて、MANEKIN人気No.1の「オーバードレープ ダブルトレンチコート」に深みのあるワインニットと美しい落ち感のスラックスをセレクトしました。'
+        },
+        WOMEN: {
+            outerId: 13, // フリースジャケット (¥7,500)
+            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
+            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
+            leadText: '11月の冷たい風に寄り添うふんわり暖かい「フリースジャケット」に、トレンドのシャギーニットとシルエットの美しいインディゴデニムを合わせた親しみやすい旬スタイルです。'
+        }
+    },
+    12: {
+        monthName: '12月',
+        seasonName: '初冬・冬本番',
+        themeTitle: 'ホリデーシーズンを暖かく包むウィンタールック',
+        MEN: {
+            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
+            topsId: 6,   // チャコール ブーク ニット (¥5,500)
+            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
+            leadText: '寒さが本格化する12月に、存在感のあるチェック柄「バッファローチェックボアジップジャケット」と防寒ニットを合わせた暖かく華やかな冬スタイルです。'
+        },
+        WOMEN: {
+            outerId: 14, // グリッドパフジャケット (¥12,800)
+            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
+            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
+            leadText: '真冬の冷気もしっかりシャットアウトする「グリッドパフジャケット」にスウェットを合わせた、冬の外出をアクティブに楽しむスタイルです。'
         }
     }
 };
 
-// バナー描画用内部ヘルパー
+// ユーザーが手動選択したスタイリング提案の月（null の場合は現在の月を自動適用）
+let _selectedStylingMonth = null;
+
+// 月別（1月〜12月）のおすすめ商品提案プランと実在商品オブジェクトを取得するヘルパー関数
+function getMonthlyStylingPlan(month = null, gender = 'MEN') {
+    const currentRealMonth = new Date().getMonth() + 1;
+    const m = (typeof month === 'number' && month >= 1 && month <= 12)
+        ? month
+        : (_selectedStylingMonth || currentRealMonth);
+    const g = (gender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const monthData = MONTHLY_STYLING_PLANS[m] || MONTHLY_STYLING_PLANS[11];
+    const plan = monthData[g] || monthData.MEN;
+
+    // 実在の SAMPLE_PRODUCTS から商品オブジェクトを取得
+    const outerProd = plan.outerId ? SAMPLE_PRODUCTS.find(p => p.id === plan.outerId) : null;
+    const topsProd = plan.topsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.topsId) : null;
+    const bottomsProd = plan.bottomsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.bottomsId) : null;
+
+    return {
+        month: m,
+        monthName: monthData.monthName,
+        seasonName: monthData.seasonName,
+        themeTitle: monthData.themeTitle,
+        plan,
+        isCurrentMonth: (m === currentRealMonth),
+        prods: {
+            outer: outerProd,
+            tops: topsProd,
+            bottoms: bottomsProd
+        }
+    };
+}
+
+// ユーザーが画面上の月セレクターで月を変更したときの処理関数
+function onSelectStylingMonth(monthVal) {
+    const parsed = parseInt(monthVal, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= 12) {
+        _selectedStylingMonth = parsed;
+    } else {
+        _selectedStylingMonth = null;
+    }
+    // バナー再描画を実行
+    updateTodaySeasonalStyling();
+}
+window.onSelectStylingMonth = onSelectStylingMonth;
+
+// バナー描画用内部ヘルパー（月別のおすすめ商品カタログ SAMPLE_PRODUCTS を主軸に描画）
 function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, locationName = '愛知・名古屋', tempMin = null, tempMax = null, provider = '気象庁(JMA)') {
     const badgeElem = document.getElementById('today-styling-badge');
     const titleElem = document.getElementById('today-styling-title');
     const descElem = document.getElementById('today-styling-desc');
     const btnElem = document.getElementById('btn-apply-today-styling');
+    const selectElem = document.getElementById('today-styling-month-select');
     if (!titleElem || !descElem) return;
 
-    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
-    const plan = planGroup[gender] || planGroup.MEN;
+    // 月別（1月〜12月）のおすすめブランド商品プランを取得
+    const targetMonth = _selectedStylingMonth || month;
+    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
+    const { monthName, themeTitle, plan, prods, isCurrentMonth } = stylingData;
+
+    // 月選択セレクターの選択状態を同期
+    if (selectElem && selectElem.value !== String(targetMonth)) {
+        selectElem.value = String(targetMonth);
+    }
 
     const hasMinMax = (tempMin !== null && tempMax !== null);
     const minMaxLabel = hasMinMax ? `最低${tempMin}℃ / 最高${tempMax}℃ (現在${temp}℃)` : `気温${temp}℃`;
 
     if (badgeElem) {
-        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${seasonInfo.name}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
+        const monthBadgeLabel = isCurrentMonth ? `今月（${monthName}）のおすすめ` : `${monthName}のおすすめ`;
+        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${monthBadgeLabel}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
     }
-    const rawTitle = plan.title(tempMin !== null ? tempMin : temp, weatherText);
-    const cleanTitle = rawTitle.replace(/^気温\d+℃・/, '');
-    const titlePrefix = hasMinMax ? `【${locationName} 最低${tempMin}℃ / 最高${tempMax}℃】` : `【${locationName} 気温${temp}℃】`;
-    titleElem.textContent = `${titlePrefix}${cleanTitle}`;
 
-    // 最低気温と朝晩の寒暖差に合わせたアドバイス文
-    let adviceText = '';
-    if (hasMinMax) {
-        const diff = tempMax - tempMin;
-        if (diff >= 7) {
-            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】寒暖差が${diff}℃と大きいため、朝晩の冷え込みに備えて羽織れるアウターが快適です。`;
-        } else {
-            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】肌寒さを防ぎ快適に過ごせるコーデです。`;
-        }
-    }
-    descElem.textContent = adviceText ? `${adviceText} ${plan.desc(tempMin !== null ? tempMin : temp)}` : plan.desc(temp);
+    // 見出しタイトル：月ごとのおすすめとして商品名を明示
+    const mainItemTitle = prods.outer ? `「${prods.outer.name}」×「${prods.tops.name}」` : `「${prods.tops.name}」スタイル`;
+    const headingMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
+    titleElem.textContent = `【${headingMonthLabel}のおすすめ】${themeTitle}・${mainItemTitle}`;
+
+    // 「今月（○月）は商品の中からこのコーデがおすすめ！」の月全体としての情報を表示（日ごとの気温・寒暖差情報は除外）
+    descElem.textContent = `今月（${monthName}）はブランド商品の中からこのコーデがおすすめ！${plan.leadText}`;
 
     if (btnElem) {
-        btnElem.textContent = `最低${tempMin !== null ? tempMin : temp}℃対応の${seasonInfo.name}おすすめを試着する`;
+        btnElem.textContent = `${headingMonthLabel}のおすすめ商品コーデを試着する`;
     }
 }
 
@@ -4543,13 +4722,16 @@ async function updateTodaySeasonalStyling() {
     }
 }
 
-// 季節・現在日時に合わせたおすすめコーデを一括でマネキンに着せ替えます
+// 月別のおすすめブランド商品（SAMPLE_PRODUCTS）コーデを一括でマネキンに着せ替えます
 function applyTodaySeasonalPresetLook() {
     const now = new Date();
-    const seasonInfo = getCurrentSeasonInfo(now);
+    const month = now.getMonth() + 1;
     const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
-    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
-    const plan = planGroup[gender] || planGroup.MEN;
+
+    // 選択中の月（または現在の月）のブランド商品（SAMPLE_PRODUCTS）を取得
+    const targetMonth = _selectedStylingMonth || month;
+    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
+    const { monthName, prods, isCurrentMonth } = stylingData;
 
     const newOutfit = {
         hat: null,
@@ -4559,90 +4741,53 @@ function applyTodaySeasonalPresetLook() {
         shoes: null
     };
 
-    // アウター
-    if (plan.outfit.outerId) {
-        const outerProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.outerId);
-        if (outerProd) {
-            newOutfit.outer = {
-                id: outerProd.id,
-                name: outerProd.name,
-                category: outerProd.category,
-                color: outerProd.color || 'STANDARD',
-                price: outerProd.price,
-                image: outerProd.image,
-                isOwned: false
-            };
-        }
+    // アウター（商品カタログから選定）
+    if (prods.outer) {
+        newOutfit.outer = {
+            id: prods.outer.id,
+            name: prods.outer.name,
+            category: prods.outer.category,
+            color: (prods.outer.colors && prods.outer.colors[0]) || 'STANDARD',
+            price: prods.outer.price,
+            image: prods.outer.image,
+            isOwned: false
+        };
     }
 
-    // トップス
-    if (plan.outfit.topsId) {
-        const topsProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.topsId);
-        if (topsProd) {
-            newOutfit.tops = {
-                id: topsProd.id,
-                name: topsProd.name,
-                category: topsProd.category,
-                color: topsProd.color || 'STANDARD',
-                price: topsProd.price,
-                image: topsProd.image,
-                isOwned: false
-            };
-        }
+    // トップス（商品カタログから選定）
+    if (prods.tops) {
+        newOutfit.tops = {
+            id: prods.tops.id,
+            name: prods.tops.name,
+            category: prods.tops.category,
+            color: (prods.tops.colors && prods.tops.colors[0]) || 'STANDARD',
+            price: prods.tops.price,
+            image: prods.tops.image,
+            isOwned: false
+        };
     }
 
-    // ボトムス（手持ち服があればそれを優先、なければ商品）
-    const ownedBottom = AppState.myCloset.find(c => c.category === 'BOTTOMS');
-    if (ownedBottom) {
+    // ボトムス（商品カタログから選定）
+    if (prods.bottoms) {
         newOutfit.bottoms = {
-            id: ownedBottom.id,
-            name: ownedBottom.name,
-            category: ownedBottom.category,
-            color: ownedBottom.color,
-            isOwned: true,
-            image: ownedBottom.image
+            id: prods.bottoms.id,
+            name: prods.bottoms.name,
+            category: prods.bottoms.category,
+            color: (prods.bottoms.colors && prods.bottoms.colors[0]) || 'STANDARD',
+            price: prods.bottoms.price,
+            image: prods.bottoms.image,
+            isOwned: false
         };
-    } else if (plan.outfit.bottomsId) {
-        const botProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.bottomsId);
-        if (botProd) {
-            newOutfit.bottoms = {
-                id: botProd.id,
-                name: botProd.name,
-                category: botProd.category,
-                color: botProd.color || 'STANDARD',
-                price: botProd.price,
-                image: botProd.image,
-                isOwned: false
-            };
-        }
     }
 
-    // シューズ
-    const ownedShoes = AppState.myCloset.find(c => c.category === 'SHOES');
-    if (ownedShoes) {
-        newOutfit.shoes = {
-            id: ownedShoes.id,
-            name: ownedShoes.name,
-            category: ownedShoes.category,
-            color: ownedShoes.color,
-            isOwned: true,
-            image: ownedShoes.image
-        };
-    } else {
-        newOutfit.shoes = {
-            id: 'c_shoes_fallback',
-            name: plan.outfit.shoesName || 'クラシック 白レザースニーカー',
-            category: 'SHOES',
-            color: 'WHITE',
-            isOwned: true,
-            image: getCategoryFallbackImage('SHOES')
-        };
-    }
+    // シューズは商品カタログ外のためセットせず未着用のままにします（newOutfit.shoes = null）
 
     AppState.currentOutfit = newOutfit;
     syncStudioStateToBackend({ immediate: true });
-    const minText = (_todayStylingWeatherCache.tempMin !== null) ? ` 最低${_todayStylingWeatherCache.tempMin}℃対応` : '';
-    showToastNotification(`【気象庁 名古屋${minText}】${seasonInfo.name}のおすすめコーデをマネキンにセットしました`);
+
+    const mainName = prods.outer ? prods.outer.name : (prods.tops ? prods.tops.name : '');
+    const toastMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
+    showToastNotification(`【${toastMonthLabel}おすすめ】ブランド商品「${mainName}」等の全身コーデをマネキンにセットしました！`);
     switchStudioTab('create');
 }
 

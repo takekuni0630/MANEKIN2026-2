@@ -1802,12 +1802,24 @@ async function importOrderToCloset(idx) {
                 };
                 AppState.myCloset.unshift(newItem);
                 added++;
+
+                // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
+                const fIdx = AppState.favorites.indexOf(Number(itId));
+                if (fIdx > -1) {
+                    AppState.favorites.splice(fIdx, 1);
+                    syncAllFavoriteButtons(itId, false);
+                }
             }
         }
         if (added > 0) {
             lsSetJson(`manekin_ls_closet_${userId}`, AppState.myCloset);
+            lsSetJson(`manekin_ls_favorites_${userId}`, AppState.favorites);
+            updateFavoriteBadges();
+            if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+            if (typeof renderStudioItems === 'function') renderStudioItems();
             if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
             if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
+            if (window.location.hash === '#favorites') renderFavoriteProducts();
             showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
         } else {
             showToast('この注文の商品はすでにマイクローゼットに登録済みです');
@@ -1914,6 +1926,21 @@ async function importOrderToCloset(idx) {
                         AppState.myCloset.unshift(newItem);
                         // 変数・配列項目 added の値を更新・計算します
                         added++;
+
+                        // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
+                        const fIdx = AppState.favorites.indexOf(Number(itId));
+                        if (fIdx > -1) {
+                            AppState.favorites.splice(fIdx, 1);
+                            syncAllFavoriteButtons(itId, false);
+                            try {
+                                fetch(`${apiBase}/api/favorites/toggle`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'include',
+                                    body: JSON.stringify({ product_id: itId, user_id: userId })
+                                }).catch(() => {});
+                            } catch (_) {}
+                        }
                     }
                 // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
@@ -1930,6 +1957,10 @@ async function importOrderToCloset(idx) {
 
     // 条件（added > 0）が成り立つか判定し、該当する場合の処理を実行します
     if (added > 0) {
+        updateFavoriteBadges();
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioItems === 'function') renderStudioItems();
+        if (window.location.hash === '#favorites') renderFavoriteProducts();
         // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
         // 条件（typeof renderPaneClosetGrid === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -2214,6 +2245,42 @@ async function handlePlaceOrder() {
             });
         }
     });
+
+    // 購入した商品がお気に入りに登録されていた場合、お気に入り一覧から即座に削除・解除します
+    const purchasedIds = purchasedItems.map(it => Number(it.id || it.product_id)).filter(id => !isNaN(id) && id > 0);
+    if (purchasedIds.length > 0 && Array.isArray(AppState.favorites)) {
+        purchasedIds.forEach(pId => {
+            // 型に依存せず数値一致で配列から完全に削除
+            AppState.favorites = AppState.favorites.filter(favId => Number(favId) !== pId);
+            // ハートボタンの表示を解除状態に更新
+            if (typeof syncAllFavoriteButtons === 'function') {
+                syncAllFavoriteButtons(pId, false);
+            }
+            // MySQL データベースのお気に入りテーブルからも即座に削除
+            if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+                try {
+                    fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
+                    }).catch(() => {});
+                } catch (_) {}
+            }
+        });
+
+        // ナビバッジ・スタジオ表示・お気に入り画面をすべて即時同期
+        updateFavoriteBadges();
+        if (typeof updateStudioBadges === 'function') updateStudioBadges();
+        if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
+        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioItems === 'function') renderStudioItems();
+        if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
+        if (typeof renderMyPage === 'function') renderMyPage();
+        if (isMobileLocalStorageMode()) {
+            lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        }
+    }
 
     // 購入者のお名前を注文データに確実に紐付けます（誰が購入したか保存）
     if (!confirmedOrder.customer_name && AppState.currentUser) {
@@ -2873,6 +2940,71 @@ let _favoritesMutationSeq = 0;
 // ==========================================================================
 //  6. お気に入り管理（ハートボタン状態同期 ＋ MySQL favorites テーブル連動）
 // ==========================================================================
+
+// マイクローゼットに現在登録されているブランド商品の ID 一覧を取得するヘルパー関数
+function getOwnedProductIds() {
+    const ownedIds = new Set();
+    if (Array.isArray(AppState.myCloset)) {
+        AppState.myCloset.forEach(c => {
+            if (c.productId) {
+                ownedIds.add(Number(c.productId));
+            }
+            if (typeof SAMPLE_PRODUCTS !== 'undefined' && c.name) {
+                const matched = SAMPLE_PRODUCTS.find(p => p.name === c.name);
+                if (matched) {
+                    ownedIds.add(matched.id);
+                }
+            }
+        });
+    }
+    return ownedIds;
+}
+window.getOwnedProductIds = getOwnedProductIds;
+
+// 購入済み（マイクローゼット登録済み）の商品をお気に入りリスト（AppState.favorites & MySQL）から自動一掃する関数
+function cleanPurchasedFavorites() {
+    if (!Array.isArray(AppState.favorites) || !Array.isArray(AppState.myCloset)) return false;
+    const ownedIds = getOwnedProductIds();
+    if (ownedIds.size === 0) return false;
+
+    let removedAny = false;
+    const toRemoveFromBackend = [];
+    AppState.favorites = AppState.favorites.filter(id => {
+        const numId = Number(id);
+        if (ownedIds.has(numId)) {
+            removedAny = true;
+            toRemoveFromBackend.push(numId);
+            syncAllFavoriteButtons(numId, false);
+            return false;
+        }
+        return true;
+    });
+
+    if (removedAny) {
+        if (AppState.currentUser && isMobileLocalStorageMode()) {
+            lsSetJson(`manekin_ls_favorites_${AppState.currentUser.id}`, AppState.favorites);
+        } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id) && toRemoveFromBackend.length > 0) {
+            toRemoveFromBackend.forEach(pId => {
+                try {
+                    fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
+                    }).catch(() => {});
+                } catch (_) {}
+            });
+        }
+        updateFavoriteBadges();
+        if (typeof updateStudioBadges === 'function') updateStudioBadges();
+        if (typeof syncAllFavoriteButtons === 'function' && AppState.currentDetailId) {
+            syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
+        }
+    }
+    return removedAny;
+}
+window.cleanPurchasedFavorites = cleanPurchasedFavorites;
+
 // ログイン会員のお気に入り商品ID一覧を取得してハートUIを同期します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncFavoritesFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
@@ -2891,11 +3023,13 @@ async function syncFavoritesFromBackend() {
     if (isMobileLocalStorageMode()) {
         const savedFavs = lsGetJson(`manekin_ls_favorites_${targetUserId}`, []);
         AppState.favorites = Array.isArray(savedFavs) ? savedFavs : [];
+        cleanPurchasedFavorites();
         updateFavoriteBadges();
         if (AppState.currentDetailId && typeof syncAllFavoriteButtons === 'function') {
             syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
         }
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
         if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
         if (typeof renderHomeProducts === 'function') renderHomeProducts();
         if (typeof renderCatalogProducts === 'function') renderCatalogProducts();
@@ -2927,6 +3061,7 @@ async function syncFavoritesFromBackend() {
             if (Array.isArray(data.favorites)) {
                 // アプリ全体状態 AppState.favorites を最新値（data.favorites）に更新します
                 AppState.favorites = data.favorites;
+                cleanPurchasedFavorites();
                 // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
                 updateFavoriteBadges();
                 // 条件（AppState.currentDetailId && typeof syncAllFavoriteBu…）が成り立つか判定し、該当する場合の処理を実行します
@@ -2936,6 +3071,7 @@ async function syncFavoritesFromBackend() {
                 }
                 // 条件（typeof renderStudioBrandList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
                 if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+                if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
                 // 条件（typeof renderFavoriteProducts === 'function'）が成り立つか判定し、該当する場合の処理を実行します
                 if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
                 // 条件（typeof renderHomeProducts === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -3144,8 +3280,12 @@ function renderFavoriteProducts() {
     // 条件（!favGrid）が成り立つか判定し、該当する場合の処理を実行します
     if (!favGrid) return;
 
-    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favoriteItems に入れます
-    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
+    // クローゼット所持商品をお気に入りから自動解除
+    cleanPurchasedFavorites();
+    const ownedIds = getOwnedProductIds();
+
+    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
+    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id) && !ownedIds.has(p.id));
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favoriteItems.length === 0) {
         // テンプレートリテラルで組み立てた HTML を要素 favGrid 内に書き込んで画面を更新します

@@ -1635,18 +1635,36 @@
                     <!-- デザイン・配置用のブロック要素（<div class="studio-recommend-banner">）を開始します -->
                     <div class="studio-recommend-banner">
                         <!-- デザイン・配置用のブロック要素（<div class="banner-badge">）を開始します -->
-                        <div class="banner-badge" id="today-styling-badge">TODAY'S AI STYLING</div>
+                        <div class="banner-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+                            <div class="banner-badge" id="today-styling-badge" style="margin-bottom:0;">TODAY'S AI STYLING</div>
+                            <div class="banner-month-selector" style="display:flex;align-items:center;gap:6px;">
+                                <label for="today-styling-month-select" style="font-size:0.75rem;color:rgba(255,255,255,0.85);font-weight:600;">表示する月:</label>
+                                <select id="today-styling-month-select" onchange="onSelectStylingMonth(this.value)" style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:6px;padding:3px 10px;font-size:0.8rem;cursor:pointer;outline:none;">
+                                    <option value="1">1月</option>
+                                    <option value="2">2月</option>
+                                    <option value="3">3月</option>
+                                    <option value="4">4月</option>
+                                    <option value="5">5月</option>
+                                    <option value="6">6月</option>
+                                    <option value="7">7月</option>
+                                    <option value="8">8月</option>
+                                    <option value="9">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11" selected>11月（今月）</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+                        </div>
                         <!-- セクションの見出し（<h3>: 気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチ…）を表示します -->
-                        <h3 class="banner-title" id="today-styling-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
+                        <h3 class="banner-title" id="today-styling-title">【今月のおすすめ】ブランド商品の中から選定した旬のコーディネート</h3>
                         <!-- 段落テキスト（.banner-desc: あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に…）を表示します -->
                         <p class="banner-desc" id="today-styling-desc">
-                            あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
-                            ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
+                            今月はブランド商品の中からこのコーデがおすすめ！深まる秋の気候に合わせて、MANEKINブランドの最新商品カタログから最適なトータルコーディネートをご提案します。</p>
                         <!-- デザイン・配置用のブロック要素（<div class="banner-actions">）を開始します -->
                         <div class="banner-actions">
                             <!-- 押すと関数 applyPresetLook('trench_daily') を実行する操作ボタン「<button class="btn btn-primary"」です -->
                             <button class="btn btn-primary" id="btn-apply-today-styling"
-                                onclick="applyTodaySeasonalPresetLook()">このおすすめをマネキンで試着する</button>
+                                onclick="applyTodaySeasonalPresetLook()">今月のおすすめ商品コーデを試着する</button>
                             <!-- 押すと関数 switchStudioTab('create') を実行する操作ボタン「自由にコーデを作成する」です -->
                             <button class="btn btn-outline" onclick="switchStudioTab('create')">自由にコーデを作成する</button>
                         </div>
@@ -2794,9 +2812,9 @@
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
     <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261118_modal_coupons_fix"></script>
+    <script src="js/shop.js?v=20261119_clean_favs_v3"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261119_reset"></script>
+    <script src="js/studio.js?v=20261119_clean_favs_v3"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
     <script src="js/app.js?v=20261118_clean_notice"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
