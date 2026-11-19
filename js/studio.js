@@ -922,48 +922,10 @@ function migrateOldBrokenAssets() {
 }
 
 
-// アウターの中にトップスを着る（インナー化）モードの切り替え
-function toggleLayerOrder() {
-    if (AppState.layerOrderInnerMode === undefined) {
-        AppState.layerOrderInnerMode = true; // デフォルトで「中に着る」がON
-    }
-    AppState.layerOrderInnerMode = !AppState.layerOrderInnerMode;
-    renderMannequinStage();
-    if (typeof showToastNotification === 'function') {
-        showToastNotification(AppState.layerOrderInnerMode ? '👕 トップスをアウターの中に着せました' : 'トップスをアウターの手前に配置しました');
-    }
-}
-
 // 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
 function renderMannequinStage() {
-    if (AppState.layerOrderInnerMode === undefined) {
-        AppState.layerOrderInnerMode = true; // デフォルト: 中に着る（アウターが手前、トップスが奥）
-    }
-    const isInnerMode = AppState.layerOrderInnerMode;
-
-    const modelWrap = document.getElementById('mannequin-model-wrap');
-    if (modelWrap) {
-        modelWrap.classList.toggle('tops-front', !isInnerMode);
-    }
-    const orderBtn = document.getElementById('btn-toggle-layer-order');
-    if (orderBtn) {
-        orderBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"></path>
-            </svg>
-            中に着る: ${isInnerMode ? 'ON' : 'OFF'}
-        `;
-    }
-
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
-
-    // アウターとトップスが両方着用されている場合、インナーフィット（袖を中に収める）を適用
-    const hasOuterAndTops = !!(outfit.outer && outfit.outer.image && outfit.tops && outfit.tops.image);
-    const topsSlotElem = document.getElementById('layer-tops');
-    if (topsSlotElem) {
-        topsSlotElem.classList.toggle('is-inner-fit', hasOuterAndTops && isInnerMode);
-    }
     // 定数 slots を宣言し、値（['shoes', 'bottoms', 'tops', 'outer', …）をセットします
     const slots = ['shoes', 'bottoms', 'tops', 'outer', 'hat'];
 
