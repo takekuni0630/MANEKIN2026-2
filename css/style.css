@@ -10,7 +10,7 @@
 @import url('base.css?v=20261116_all_favs_v5');
 
 /* 2. ECショップ画面用スタイル（トップHERO、商品カード、詳細、カート、認証、マイページ）を読み込みます */
-@import url('shop.css?v=20261116_all_favs_v5');
+@import url('shop.css?v=20261119_fav_red_v1');
 
 /* 3. MANEKIN AI試着スタジオ用スタイル（3列レイアウト、クローゼット、位置調整パネル）を読み込みます */
 @import url('studio.css?v=20261116_all_favs_v5');

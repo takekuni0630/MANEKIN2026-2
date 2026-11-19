@@ -432,7 +432,7 @@ function createProductCardHTML(product) {
                 <button class="fav-btn ${isFav ? 'is-favorite' : ''}" 
                         onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
                         aria-label="${isFav ? 'お気に入りを解除' : 'お気に入りに追加'}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="${isFav ? '#e53935' : 'none'}" stroke="${isFav ? '#e53935' : 'currentColor'}" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                 </button>
@@ -3115,6 +3115,7 @@ async function handleToggleFavorite(productId) {
         AppState.favorites.splice(existingIndex, 1);
         isAdded = false;
     }
+    console.log(`❤️ [Favorite] トグル実行: productId=${numId}, isAdded=${isAdded}, 現在のお気に入り一覧=`, AppState.favorites);
 
     // ボタンの見た目（赤ハート・解除）とバッジを即座に同期
     syncAllFavoriteButtons(numId, isAdded);
@@ -3178,12 +3179,21 @@ function syncAllFavoriteButtons(productId, isFavorite) {
         if (rawId && Number(rawId) === numId) {
             const btn = card.querySelector('.fav-btn');
             if (btn) {
+                const svg = btn.querySelector('svg');
                 if (isFavorite) {
                     btn.classList.add('is-favorite');
                     btn.setAttribute('aria-label', 'お気に入りを解除');
+                    if (svg) {
+                        svg.setAttribute('fill', '#e53935');
+                        svg.setAttribute('stroke', '#e53935');
+                    }
                 } else {
                     btn.classList.remove('is-favorite');
                     btn.setAttribute('aria-label', 'お気に入りに追加');
+                    if (svg) {
+                        svg.setAttribute('fill', 'none');
+                        svg.setAttribute('stroke', 'currentColor');
+                    }
                 }
             }
         }
@@ -3195,7 +3205,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
         if (isFavorite) {
             detailFavBtn.classList.add('is-favorite');
             detailFavBtn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 お気に入り解除

@@ -583,13 +583,19 @@
 /* ボタンパーツに対するスタイル定義を開始します（対象: .fav-btn.is-favorite） */
 .fav-btn.is-favorite {
     /* 文字色（テキストカラー）を var(--color-accent) に設定します */
-    color: var(--color-accent);
+    color: var(--color-accent) !important;
 }
 
 /* ボタンパーツに対するスタイル定義を開始します（対象: .fav-btn.is-favorite svg） */
 .fav-btn.is-favorite svg {
     /* SVG アイコン図形の塗りつぶし色を var(--color-accent) に設定します */
-    fill: var(--color-accent);
+    fill: var(--color-accent) !important;
+    stroke: var(--color-accent) !important;
+}
+
+.fav-btn.is-favorite svg path {
+    fill: var(--color-accent) !important;
+    stroke: var(--color-accent) !important;
 }
 
 /* ボタンパーツに対するスタイル定義を開始します（対象: .fav-btn svg） */
@@ -1209,15 +1215,21 @@
     /* 背景の塗りつぶし色を #fff0f0 に設定します */
     background-color: #fff0f0;
     /* 文字色（テキストカラー）を var(--color-accent) に設定します */
-    color: var(--color-accent);
+    color: var(--color-accent) !important;
     /* 枠線の色だけを var(--color-accent) に変更します（主に選択・ホバー強調用） */
-    border-color: var(--color-accent);
+    border-color: var(--color-accent) !important;
 }
 
 /* ボタンパーツ・商品詳細画面パーツに対するスタイル定義を開始します（対象: .btn-detail-fav.is-favorite svg） */
 .btn-detail-fav.is-favorite svg {
     /* SVG アイコン図形の塗りつぶし色を var(--color-accent) に設定します */
-    fill: var(--color-accent);
+    fill: var(--color-accent) !important;
+    stroke: var(--color-accent) !important;
+}
+
+.btn-detail-fav.is-favorite svg path {
+    fill: var(--color-accent) !important;
+    stroke: var(--color-accent) !important;
 }
 
 /* 商品詳細画面パーツに対するスタイル定義を開始します（対象: .detail-description-box） */
