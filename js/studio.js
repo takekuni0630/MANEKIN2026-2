@@ -922,8 +922,44 @@ function migrateOldBrokenAssets() {
 }
 
 
+// アウターとトップスの重なり順（前後）を切り替えます
+function toggleLayerOrder() {
+    AppState.layerOrderOuterFront = !AppState.layerOrderOuterFront;
+    const modelWrap = document.getElementById('mannequin-model-wrap');
+    if (modelWrap) {
+        modelWrap.classList.toggle('outer-front', !!AppState.layerOrderOuterFront);
+    }
+    const btn = document.getElementById('btn-toggle-layer-order');
+    if (btn) {
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"></path>
+            </svg>
+            重ね順: ${AppState.layerOrderOuterFront ? 'アウター前' : 'トップス前'}
+        `;
+    }
+    if (typeof showToastNotification === 'function') {
+        showToastNotification(AppState.layerOrderOuterFront ? 'アウターを手前に配置しました' : 'トップスを手前に配置しました');
+    }
+}
+
 // 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
 function renderMannequinStage() {
+    // 重なり順（outer-front クラス）を反映
+    const modelWrap = document.getElementById('mannequin-model-wrap');
+    if (modelWrap) {
+        modelWrap.classList.toggle('outer-front', !!AppState.layerOrderOuterFront);
+    }
+    const orderBtn = document.getElementById('btn-toggle-layer-order');
+    if (orderBtn) {
+        orderBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"></path>
+            </svg>
+            重ね順: ${AppState.layerOrderOuterFront ? 'アウター前' : 'トップス前'}
+        `;
+    }
+
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
     // 定数 slots を宣言し、値（['shoes', 'bottoms', 'tops', 'outer', …）をセットします
