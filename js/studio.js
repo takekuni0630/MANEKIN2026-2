@@ -100,9 +100,6 @@ let isCurrentUploadTransparent = false;
 
 // MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
 function switchStudioTab(tabKey) {
-    // クローゼットにある商品はお気に入り一覧から除外・自動解除
-    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
-
     // メディアクエリの画面設計（992px以下）の時だけ、独立したお気に入り画面を開かず、コーデ作成画面内の「お気に入り商品」列へ誘導します
     if (tabKey === 'favorites' && window.innerWidth <= 992) {
         tabKey = 'create';
@@ -468,8 +465,6 @@ function renderStudioBrandList() {
     // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
     const gender = AppState.studioGender || 'MEN';
 
-    // クローゼット所持商品をお気に入りから自動解除
-    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
     const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
 
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
@@ -578,8 +573,6 @@ function renderStudioFavoritesGrid() {
     // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // クローゼット所持商品をお気に入りから自動解除
-    if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
     const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
 
     // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
@@ -4107,7 +4100,6 @@ async function syncClosetFromBackend() {
             }
         }
         AppState.myCloset = saved;
-        if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
         const closetBadge = document.getElementById('studio-closet-badge');
         if (closetBadge) closetBadge.textContent = AppState.myCloset.length;
         const mobClosetCnt = document.getElementById('mob-closet-cnt');
@@ -4176,8 +4168,6 @@ async function syncClosetFromBackend() {
 
                 // アプリ全体状態 AppState.myCloset を最新値（mysqlItems）に更新します
                 AppState.myCloset = mysqlItems;
-                // クローゼット所持商品をお気に入りから自動解除
-                if (typeof cleanPurchasedFavorites === 'function') cleanPurchasedFavorites();
                 // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
                 console.log(`✨ [MySQL] マイクローゼット同期完了 (user_id=${targetUserId}): ${AppState.myCloset.length} 点`);
 

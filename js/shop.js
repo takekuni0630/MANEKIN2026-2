@@ -419,7 +419,7 @@ async function applyAccountSession(user, options = {}) {
 // 1商品オブジェクトを受け取り、お気に入りハートボタン・NEWバッジ・画像・価格付きのカードHTML文字列を作ります
 function createProductCardHTML(product) {
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
-    const isFav = AppState.favorites.includes(product.id);
+    const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
     const formattedPrice = "¥" + product.price.toLocaleString();
 
@@ -606,7 +606,7 @@ function renderItemDetail(productId) {
     AppState.selectedSize = product.sizes[1] || "M";
 
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
-    const isFav = AppState.favorites.includes(product.id);
+    const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
     const formattedPrice = "¥" + product.price.toLocaleString();
     // 定数 initialImgUrl を宣言し、値（(product.colorImages && product.colorI…）をセットします
@@ -2259,7 +2259,7 @@ async function handlePlaceOrder() {
             // MySQL データベースのお気に入りテーブルからも即座に削除
             if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
                 try {
-                    fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
+                    fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
@@ -2961,19 +2961,23 @@ function getOwnedProductIds() {
 }
 window.getOwnedProductIds = getOwnedProductIds;
 
-// 購入済み（マイクローゼット登録済み）の商品をお気に入りリスト（AppState.favorites & MySQL）から自動一掃する関数
-function cleanPurchasedFavorites() {
-    if (!Array.isArray(AppState.favorites) || !Array.isArray(AppState.myCloset)) return false;
-    const ownedIds = getOwnedProductIds();
-    if (ownedIds.size === 0) return false;
+// 購入手続き確定時にお気に入りリストから購入済み商品を自動解除する関数
+function cleanPurchasedFavorites(purchasedIds) {
+    if (!Array.isArray(AppState.favorites)) return false;
+    let targetIds = [];
+    if (Array.isArray(purchasedIds) && purchasedIds.length > 0) {
+        targetIds = purchasedIds.map(id => Number(id)).filter(id => !isNaN(id) && id > 0);
+    }
+    if (targetIds.length === 0) return false;
 
+    const targetSet = new Set(targetIds);
     let removedAny = false;
-    const toRemoveFromBackend = [];
+    const removedIds = [];
     AppState.favorites = AppState.favorites.filter(id => {
         const numId = Number(id);
-        if (ownedIds.has(numId)) {
+        if (targetSet.has(numId)) {
             removedAny = true;
-            toRemoveFromBackend.push(numId);
+            removedIds.push(numId);
             syncAllFavoriteButtons(numId, false);
             return false;
         }
@@ -2983,10 +2987,10 @@ function cleanPurchasedFavorites() {
     if (removedAny) {
         if (AppState.currentUser && isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_favorites_${AppState.currentUser.id}`, AppState.favorites);
-        } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id) && toRemoveFromBackend.length > 0) {
-            toRemoveFromBackend.forEach(pId => {
+        } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+            removedIds.forEach(pId => {
                 try {
-                    fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
+                    fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include',
@@ -2997,9 +3001,6 @@ function cleanPurchasedFavorites() {
         }
         updateFavoriteBadges();
         if (typeof updateStudioBadges === 'function') updateStudioBadges();
-        if (typeof syncAllFavoriteButtons === 'function' && AppState.currentDetailId) {
-            syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
-        }
     }
     return removedAny;
 }
@@ -3007,13 +3008,15 @@ window.cleanPurchasedFavorites = cleanPurchasedFavorites;
 
 // ログイン会員のお気に入り商品ID一覧を取得してハートUIを同期します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncFavoritesFromBackend() {
-    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
+    // 未ログイン時はゲスト用ストレージから復元します
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // アプリ全体状態 AppState.favorites を最新値（[]）に更新します
-        AppState.favorites = [];
-        // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
+        try {
+            const guestFavs = JSON.parse(localStorage.getItem('manekin_guest_favorites') || '[]');
+            if (Array.isArray(guestFavs)) {
+                AppState.favorites = guestFavs.map(id => Number(id));
+            }
+        } catch (_) { }
         updateFavoriteBadges();
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
     // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
@@ -3022,8 +3025,7 @@ async function syncFavoritesFromBackend() {
     // スマホ版の場合は localStorage からお気に入り一覧を取得します
     if (isMobileLocalStorageMode()) {
         const savedFavs = lsGetJson(`manekin_ls_favorites_${targetUserId}`, []);
-        AppState.favorites = Array.isArray(savedFavs) ? savedFavs : [];
-        cleanPurchasedFavorites();
+        AppState.favorites = Array.isArray(savedFavs) ? savedFavs.map(id => Number(id)) : [];
         updateFavoriteBadges();
         if (AppState.currentDetailId && typeof syncAllFavoriteButtons === 'function') {
             syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
@@ -3060,8 +3062,7 @@ async function syncFavoritesFromBackend() {
             // 条件（Array.isArray(data.favorites)）が成り立つか判定し、該当する場合の処理を実行します
             if (Array.isArray(data.favorites)) {
                 // アプリ全体状態 AppState.favorites を最新値（data.favorites）に更新します
-                AppState.favorites = data.favorites;
-                cleanPurchasedFavorites();
+                AppState.favorites = data.favorites.map(id => Number(id));
                 // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
                 updateFavoriteBadges();
                 // 条件（AppState.currentDetailId && typeof syncAllFavoriteBu…）が成り立つか判定し、該当する場合の処理を実行します
@@ -3092,148 +3093,115 @@ async function syncFavoritesFromBackend() {
 }
 
 
-// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（スマホ版はlocalStorage、PC版はMySQL保存）
+// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（未ログイン時はローカル保存、ログイン時はMySQL/localStorage保存）
 async function handleToggleFavorite(productId) {
-    // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
-    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ お気に入りを保存するにはログインが必要です');
-        // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-        return;
+    const numId = Number(productId);
+    if (!numId || isNaN(numId)) return;
+
+    if (!Array.isArray(AppState.favorites)) {
+        AppState.favorites = [];
     }
-    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
-    const targetUserId = AppState.currentUser.id;
+
     // 変数・配列項目 _favoritesMutationSeq の値を更新・計算します
     _favoritesMutationSeq++;
 
-    // スマホ版の場合は localStorage でお気に入りをトグル保存します
+    // 1. 即座にUIを楽観的更新（色を即座に反転、バッジ更新）
+    const existingIndex = AppState.favorites.findIndex(f => Number(f) === numId);
+    let isAdded = false;
+    if (existingIndex === -1) {
+        AppState.favorites.push(numId);
+        isAdded = true;
+    } else {
+        AppState.favorites.splice(existingIndex, 1);
+        isAdded = false;
+    }
+
+    // ボタンの見た目（赤ハート・解除）とバッジを即座に同期
+    syncAllFavoriteButtons(numId, isAdded);
+    updateFavoriteBadges();
+    if (typeof updateStudioBadges === 'function') updateStudioBadges();
+    if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+    if (window.location.hash === '#favorites') renderFavoriteProducts();
+    if (typeof renderMyPage === 'function') renderMyPage();
+
+    // 2. ログイン状態に応じた永続化処理
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        // 未ログイン時：ゲスト用ストレージに保存
+        try {
+            localStorage.setItem('manekin_guest_favorites', JSON.stringify(AppState.favorites));
+        } catch (_) { }
+        showToast(isAdded ? 'お気に入りに追加しました（ログインすると会員データに保存されます）' : 'お気に入りから解除しました');
+        return;
+    }
+
+    const targetUserId = AppState.currentUser.id;
+
+    // スマホ版 localStorage モード
     if (isMobileLocalStorageMode()) {
-        const index = AppState.favorites.indexOf(productId);
-        let isAdded = false;
-        if (index === -1) {
-            AppState.favorites.push(productId);
-            isAdded = true;
-        } else {
-            AppState.favorites.splice(index, 1);
-            isAdded = false;
-        }
         lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
-        updateFavoriteBadges();
-        syncAllFavoriteButtons(productId, isAdded);
-        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
-        if (window.location.hash === '#favorites') renderFavoriteProducts();
-        if (typeof renderMyPage === 'function') renderMyPage();
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
         return;
     }
 
-    // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
+    // PC版 MySQL モード
     try {
-        // Flask バックエンド API（/api/favorites/toggle）へ非同期リクエストを送信し、応答を待ち受けます
         const res = await fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
-            // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
             method: 'POST',
-            // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
             headers: { 'Content-Type': 'application/json' },
-            // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
             credentials: 'include',
-            // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
             body: JSON.stringify({
-                // 対象商品のマスタ ID をセットします
-                product_id: productId,
-                // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
-                user_id: targetUserId
+                product_id: numId,
+                user_id: targetUserId,
+                action: isAdded ? 'add' : 'remove'
             })
         });
-        // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
-        if (!res.ok) throw new Error('Favorite toggle API failed');
-        // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
-        const data = await res.json();
-        // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
-        if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) return;
-
-        // 定数 isAdded を宣言し、値（(data.action === 'added')）をセットします
-        const isAdded = (data.action === 'added');
-        // 定数 index を宣言し、値（AppState.favorites.indexOf(productId)）をセットします
-        const index = AppState.favorites.indexOf(productId);
-        // 条件（isAdded && index === -1）が成り立つか判定し、該当する場合の処理を実行します
-        if (isAdded && index === -1) {
-            // 配列の末尾に新しい要素を追加します（AppState.favorites.push(productId);）
-            AppState.favorites.push(productId);
-            // 前の if が偽で、かつ（!isAdded && index > -1）を満たす場合の別条件分岐です
-        } else if (!isAdded && index > -1) {
-            // 配列の指定位置から要素を取り除いて削除します（AppState.favorites.splice(index, 1);）
-            AppState.favorites.splice(index, 1);
-        }
-
-        // 関連処理 updateFavoriteBadges() を呼び出して処理・画面を更新します
-        updateFavoriteBadges();
-        // 関連処理 syncAllFavoriteButtons() を呼び出して処理・画面を更新します
-        syncAllFavoriteButtons(productId, isAdded);
-        // 条件（typeof renderStudioBrandList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
-        // 条件（window.location.hash === '#favorites'）が成り立つか判定し、該当する場合の処理を実行します
-        if (window.location.hash === '#favorites') {
-            // 関連処理 renderFavoriteProducts() を呼び出して処理・画面を更新します
-            renderFavoriteProducts();
-        }
-        // 条件（typeof renderMyPage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof renderMyPage === 'function') renderMyPage();
-
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast(isAdded ? 'お気に入りに追加しました（MySQL保存）' : 'お気に入りから解除しました（MySQL保存）');
-        // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
+        if (!res.ok) throw new Error('Favorite toggle API response not ok');
+        const data = await res.json().catch(() => ({}));
+        showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
     } catch (e) {
-        // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
-        console.warn('MySQLお気に入り更新エラー:', e);
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast('⚠️ MySQLへお気に入りを保存できませんでした（サーバー接続を確認してください）');
+        console.warn('MySQLお気に入り更新エラー (フォールバック保存):', e);
+        try {
+            lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        } catch (_) { }
+        showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
     }
 }
 
 
 // 画面上のすべてのハートボタンと「お気に入り登録済み」ボタン見た目を AppState.favorites に合わせて一括同期します
 function syncAllFavoriteButtons(productId, isFavorite) {
-    // CSS セレクタに一致する複数要素リストを取得し変数 cards に入れます
-    const cards = document.querySelectorAll(`.product-card[data-id="${productId}"]`);
-    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
+    const numId = Number(productId);
+    // CSS セレクタに一致するすべての商品カード要素を安全に取得
+    const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
-        // 定数 btn を宣言し、値（card.querySelector('.fav-btn')）をセットします
-        const btn = card.querySelector('.fav-btn');
-        // 条件（btn）が成り立つか判定し、該当する場合の処理を実行します
-        if (btn) {
-            // 条件（isFavorite）が成り立つか判定し、該当する場合の処理を実行します
-            if (isFavorite) {
-                // 要素に CSS クラスを付与して見た目・表示状態を変更します（btn.classList.add('is-favorite');）
-                btn.classList.add('is-favorite');
-                // 上記の if 条件に当てはまらなかった場合の分岐処理です
-            } else {
-                // 要素から CSS クラスを外して強調や表示を戻します（btn.classList.remove('is-favorite');）
-                btn.classList.remove('is-favorite');
+        const rawId = card.getAttribute('data-id') || card.getAttribute('data - id');
+        if (rawId && Number(rawId) === numId) {
+            const btn = card.querySelector('.fav-btn');
+            if (btn) {
+                if (isFavorite) {
+                    btn.classList.add('is-favorite');
+                    btn.setAttribute('aria-label', 'お気に入りを解除');
+                } else {
+                    btn.classList.remove('is-favorite');
+                    btn.setAttribute('aria-label', 'お気に入りに追加');
+                }
             }
         }
     });
 
-    // HTML 要素 #detail-fav-btn を取得して変数 detailFavBtn に格納します
+    // 商品詳細画面のお気に入りボタンも即座に同期
     const detailFavBtn = document.getElementById('detail-fav-btn');
-    // 条件（detailFavBtn && AppState.currentDetailId === product…）が成り立つか判定し、該当する場合の処理を実行します
-    if (detailFavBtn && AppState.currentDetailId === productId) {
-        // 条件（isFavorite）が成り立つか判定し、該当する場合の処理を実行します
+    if (detailFavBtn && Number(AppState.currentDetailId) === numId) {
         if (isFavorite) {
-            // 要素に CSS クラスを付与して見た目・表示状態を変更します（detailFavBtn.classList.add('is-favorite');）
             detailFavBtn.classList.add('is-favorite');
-            // テンプレートリテラルで組み立てた HTML を要素 detailFavBtn 内に書き込んで画面を更新します
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 お気に入り解除
             `;
-            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
-            // 要素から CSS クラスを外して強調や表示を戻します（detailFavBtn.classList.remove('is-favorite…）
             detailFavBtn.classList.remove('is-favorite');
-            // テンプレートリテラルで組み立てた HTML を要素 detailFavBtn 内に書き込んで画面を更新します
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -3248,7 +3216,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
 // ヘッダーやタブ等のお気に入り件数バッジ（.icon-badge 等）を一括更新します
 function updateFavoriteBadges() {
     // 定数 count を宣言し、値（AppState.favorites.length）をセットします
-    const count = AppState.favorites.length;
+    const count = Array.isArray(AppState.favorites) ? AppState.favorites.length : 0;
     // HTML 要素 #nav-fav-badge を取得して変数 navBadge に格納します
     const navBadge = document.getElementById('nav-fav-badge');
     // HTML 要素 #icon-fav-badge を取得して変数 iconBadge に格納します
@@ -3280,12 +3248,10 @@ function renderFavoriteProducts() {
     // 条件（!favGrid）が成り立つか判定し、該当する場合の処理を実行します
     if (!favGrid) return;
 
-    // クローゼット所持商品をお気に入りから自動解除
-    cleanPurchasedFavorites();
-    const ownedIds = getOwnedProductIds();
+    // お気に入りリストに登録されている商品（型を吸収して数値一致で抽出）
+    const favList = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    const favoriteItems = SAMPLE_PRODUCTS.filter(p => favList.some(f => Number(f) === Number(p.id)));
 
-    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
-    const favoriteItems = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id) && !ownedIds.has(p.id));
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favoriteItems.length === 0) {
         // テンプレートリテラルで組み立てた HTML を要素 favGrid 内に書き込んで画面を更新します
