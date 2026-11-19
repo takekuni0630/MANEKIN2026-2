@@ -922,18 +922,6 @@ function migrateOldBrokenAssets() {
 }
 
 
-// レイヤード自動統合モードの ON / OFF 切り替え
-function toggleSmartLayering() {
-    if (AppState.smartLayeringEnabled === undefined) {
-        AppState.smartLayeringEnabled = true;
-    }
-    AppState.smartLayeringEnabled = !AppState.smartLayeringEnabled;
-    renderMannequinStage();
-    if (typeof showToastNotification === 'function') {
-        showToastNotification(AppState.smartLayeringEnabled ? '✨ 重ね着を1枚に自動統合しました' : '重ね着の自動統合を解除しました');
-    }
-}
-
 // 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
 function renderMannequinStage() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
@@ -971,67 +959,6 @@ function renderMannequinStage() {
             }
         }
     });
-
-    // =========================================================================
-    // スマート・レイヤード合成（アウター＆トップスの自動一体化エンジン）
-    // アウターとトップスが両方選ばれた瞬間に、インナーの袖のハミ出しを自動カットして1枚の服に見せる
-    // =========================================================================
-    if (AppState.smartLayeringEnabled === undefined) {
-        AppState.smartLayeringEnabled = true; // デフォルトで自動統合をON
-    }
-    const hasOuterAndTops = !!(outfit.outer && outfit.outer.image && outfit.tops && outfit.tops.image);
-    const isLayeredActive = hasOuterAndTops && (AppState.smartLayeringEnabled !== false);
-
-    const topsSlotElem = document.getElementById('layer-tops');
-    const outerSlotElem = document.getElementById('layer-outer');
-    const topsContentElem = document.getElementById('layer-content-tops');
-
-    if (topsSlotElem) {
-        topsSlotElem.classList.toggle('is-layered-inner', isLayeredActive);
-    }
-    if (outerSlotElem) {
-        outerSlotElem.classList.toggle('is-layered-outer', isLayeredActive);
-    }
-
-    if (topsContentElem) {
-        if (isLayeredActive && outfit.tops) {
-            const topsName = (outfit.tops.name || '').toLowerCase();
-            const isHoodie = topsName.includes('パーカー') || topsName.includes('フーディ') || topsName.includes('hoodie');
-            if (isHoodie) {
-                // フード付き（パーカー等）: 首元・フード（上部）を幅広く残し、袖（左右腕）のみをスマートカット
-                const hoodiePolygon = 'polygon(18% 0%, 82% 0%, 78% 18%, 75% 28%, 72% 100%, 28% 100%, 25% 28%, 22% 18%)';
-                topsContentElem.style.clipPath = hoodiePolygon;
-                topsContentElem.style.webkitClipPath = hoodiePolygon;
-            } else {
-                // 通常トップス（シャツ・Tシャツ・ニット等）: インナーとして綺麗に収まるポリゴン
-                const regularPolygon = 'polygon(24% 0%, 76% 0%, 76% 20%, 74% 28%, 71% 100%, 29% 100%, 26% 28%, 24% 20%)';
-                topsContentElem.style.clipPath = regularPolygon;
-                topsContentElem.style.webkitClipPath = regularPolygon;
-            }
-        } else {
-            topsContentElem.style.clipPath = '';
-            topsContentElem.style.webkitClipPath = '';
-        }
-    }
-
-    // レイヤード状態バッジ（試着室ツールバー）の表示・切り替え更新
-    const layeredBadge = document.getElementById('smart-layered-badge');
-    if (layeredBadge) {
-        if (hasOuterAndTops) {
-            layeredBadge.style.display = 'inline-flex';
-            if (AppState.smartLayeringEnabled !== false) {
-                layeredBadge.classList.remove('off');
-                layeredBadge.innerHTML = '<span>✨</span> レイヤード統合: ON';
-                layeredBadge.title = 'アウターとトップスの袖のハミ出しを自動カットし、1枚の服のように一体化しています（クリックでOFF）';
-            } else {
-                layeredBadge.classList.add('off');
-                layeredBadge.innerHTML = '<span>⚡</span> レイヤード統合: OFF';
-                layeredBadge.title = 'クリックすると重ね着を自動一体化（スマートレイヤード）します';
-            }
-        } else {
-            layeredBadge.style.display = 'none';
-        }
-    }
 
     // HTML 要素 #wearing-slots-bar を取得して変数 slotsBar に格納します
     const slotsBar = document.getElementById('wearing-slots-bar');
