@@ -465,12 +465,10 @@ function renderStudioBrandList() {
     // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
     const gender = AppState.studioGender || 'MEN';
 
-    const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
-
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
-    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === p.id) && !ownedIds.has(p.id));
+    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
+    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
 
     // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
@@ -573,10 +571,10 @@ function renderStudioFavoritesGrid() {
     // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    const ownedIds = (typeof getOwnedProductIds === 'function') ? getOwnedProductIds() : new Set();
-
-    // 全商品マスター SAMPLE_PRODUCTS からクローゼット未所持のお気に入り商品を抽出
-    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.some(f => Number(f) === p.id) && !ownedIds.has(p.id));
+    // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? AppState.favorites : []）をセットします
+    const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
+    const favProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favProducts.length === 0) {
@@ -599,10 +597,17 @@ function renderStudioFavoritesGrid() {
         const isWearing = isItemWearing(product);
         // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
-            <article class="product-card" data - id="${product.id}" >
+            <article class="product-card" data-id="${product.id}">
                 <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
                     <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="badge-new" style="background: var(--color-black);">試着する</span>
+                    <button class="fav-btn is-favorite" 
+                            onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
+                            aria-label="お気に入りを解除">
+                        <svg viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="product-info">
                     <span class="product-category">${product.category}</span>
@@ -613,7 +618,7 @@ function renderStudioFavoritesGrid() {
                     </button>
                 </div>
             </article>
-            `;
+        `;
         // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
