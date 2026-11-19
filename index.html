@@ -1879,6 +1879,9 @@
                             </div>
 
                             <!-- 特定機能・領域のブロック要素（<div id="mannequin-stage-box" class="mannequin-stage-box">）を開始します -->
+                            <!-- ondragoverは試着室のステージの領域にドラッグして持ってきたときのイベント -->
+                            <!-- ondragleaveドラッグ中のマウスが、試着室ステージの外側へ通り過ぎて（離れて）行ったときのイベント -->
+                            <!-- ondropはドラッグしていたものを試着室のステージで離した（ドロップした）ときに発生するイベント -->
                             <div class="mannequin-stage-box" id="mannequin-stage-box"
                                 ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)"
                                 ondrop="handleStageDrop(event)">
@@ -1888,6 +1891,7 @@
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" id="mannequin-svg">
                                         <!-- SVG 内で使い回すグラデーション色などの定義領域（<defs>）です -->
+                                        <!-- 後で再利用するためにグラフィカルオブジェクトを定義することを可能にする -->
                                         <defs>
                                             <!-- SVG 用の線形グラデーション「#chromePoleGrad」（金属メッキの立体光沢表現）を定義します -->
                                             <linearGradient id="chromePoleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1918,30 +1922,42 @@
                                         <!-- SVG パーツをまとめた図形グループ（#stand-pole-group）です -->
                                         <g id="stand-pole-group">
                                             <!-- SVG で長方形（スタンド支柱やカレンダーアイコン枠など）を描く要素です -->
+                                            <!-- 縦に伸びる金属パイプ本体 -->
                                             <rect x="146" y="425" width="8" height="190" rx="3"
                                                 fill="url(#chromePoleGrad)" />
                                             <!-- SVG で長方形（スタンド支柱やカレンダーアイコン枠など）を描く要素です -->
+                                            <!-- パイプの途中にある高さ調整用固定器具 -->
                                             <rect x="143" y="478" width="14" height="12" rx="2" fill="#94a3b8" />
                                             <!-- SVG で丸図形（アイコンの丸やカート車輪・頭など）を描く要素です -->
+                                            <!-- 固定器具についている丸いやつ -->
                                             <circle cx="157" cy="484" r="3" fill="#64748b" />
                                         </g>
 
                                         <!-- SVG パーツをまとめた図形グループ（#stand-base-group）です -->
+                                        <!-- gタグは、グループ化するためのコンテナ要素 -->
                                         <g id="stand-base-group">
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 台座の薄い影 -->
                                             <ellipse cx="150" cy="627" rx="72" ry="10" fill="rgba(0, 0, 0, 0.12)" />
                                             <!-- SVG で多角形（ダイヤアイコンや台形ベースプレート）を描く要素です -->
+                                            <!-- 金属プレートを斜め上から見た台形 -->
                                             <polygon points="85 614, 215 614, 235 628, 65 628"
                                                 fill="url(#chromePlateGrad)" />
                                             <!-- SVG で多角形（ダイヤアイコンや台形ベースプレート）を描く要素です -->
+                                            <!-- 金属プレートの厚みのあるフチ -->
                                             <polygon points="65 628, 235 628, 235 632, 65 632" fill="#475569" />
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 支柱が刺さる中央の根元のリングの外側 -->
                                             <ellipse cx="150" cy="616" rx="10" ry="4" fill="#64748b" />
                                             <!-- SVG で楕円形（台座の影や支柱根元キャップ）を描く要素です -->
+                                            <!-- 根元のリングの金属ハイライト(光沢) -->
                                             <ellipse cx="150" cy="615" rx="8" ry="3" fill="#cbd5e1" />
                                         </g>
                                     </svg>
 
+
+                                    <!-- ステージ上の靴、ボトムス、トップス、アウター、帽子の領域の枠で、データベースから情報を取り出すので、
+                                    こちらに直接画像URLを書く必要はない -->
                                     <!-- 特定機能・領域のブロック要素（<div id="layer-shoes" class="layer-slot layer-shoes">）を開始します -->
                                     <div class="layer-slot layer-shoes" id="layer-shoes">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-shoes）です -->
@@ -1968,6 +1984,8 @@
                                         <div class="layer-content" id="layer-content-hat"></div>
                                     </div>
                                 </div>
+
+                                <!-- 服の位置・サイズ微調整のパネル -->
                                 <!-- 特定機能・領域のブロック要素（<div id="fitting-adjust-panel" class="fitting-adjust-panel">）を開始します -->
                                 <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
                                     <!-- デザイン・配置用のブロック要素（<div class="adjust-panel-header">）を開始します -->
@@ -1990,6 +2008,7 @@
                                         </div>
                                     </div>
 
+                                    <!-- パネルの中で微調整する部位を決めるナビゲーション(帽子、アウター、トップス、ぼちょむす、靴) -->
                                     <!-- 特定機能・領域のブロック要素（<div id="adjust-slot-tabs" class="adjust-slot-tabs">）を開始します -->
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
                                         <!-- 押すと関数 switchAdjustSlot('hat') を実行する操作ボタン「<button type="button" class="adj…」です -->
@@ -2009,6 +2028,7 @@
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
 
+                                    <!-- 服の位置・サイズ微調整の服の状態 -->
                                     <!-- 特定機能・領域のブロック要素（<div id="adjust-item-status" class="adjust-item-status">）を開始します -->
                                     <div class="adjust-item-status" id="adjust-item-status">
                                         <!-- デザイン・配置用のブロック要素（<div class="adjust-item-meta-left">）を開始します -->
@@ -2807,11 +2827,11 @@
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
     <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261119_studio_fav_v1"></script>
+    <script src="js/shop.js?v=20261119_studio_badge_v1"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261119_studio_fav_v1"></script>
+    <script src="js/studio.js?v=20261119_studio_badge_v1"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261119_studio_fav_v1"></script>
+    <script src="js/app.js?v=20261119_studio_badge_v1"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 

@@ -1440,9 +1440,9 @@ function syncAdjustPanelUI() {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
             // 変数・配列項目 badgeElem.className の値を更新・計算します
-            badgeElem.className = 'adjust-item-tag closet';
-            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-            badgeElem.textContent = slotKey === 'hat' ? '🧢 帽子' : '👟 靴';
+            badgeElem.className = (item.isOwned !== false) ? 'adjust-item-tag closet' : 'adjust-item-tag brand';
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（すべてのジャンルでマイクローゼットに統一）
+            badgeElem.textContent = (item.isOwned !== false) ? '👕 マイクローゼット' : '🏷️ 販売商品';
         }
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
