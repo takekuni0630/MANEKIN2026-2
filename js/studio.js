@@ -227,9 +227,6 @@ function renderManekinStudio(activeTab = 'create') {
         if (profRank) profRank.textContent = 'GUEST';
     }
 
-    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
-    syncGenderToggleUI();
-
     // 値（activeTab)）に応じて処理ケースを分岐する switch 文を開始します
     switch (activeTab) {
         // 値が 'home' だった場合の専用処理ルートです
@@ -462,8 +459,6 @@ function renderStudioBrandList() {
 
     // 定数 filter を宣言し、値（AppState.studioBrandFilter || 'ALL'）をセットします
     const filter = AppState.studioBrandFilter || 'ALL';
-    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
-    const gender = AppState.studioGender || 'MEN';
 
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
@@ -550,15 +545,6 @@ function handleStudioBrandFilter(cat) {
         // 条件に応じて要素の CSS クラスを ON / OFF 切り替えします（btn.classList.toggle('active', btn.getAttr…）
         btn.classList.toggle('active', btn.getAttribute('data-brand-cat') === cat);
     });
-    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
-    renderStudioBrandList();
-}
-
-
-// 右カラムの「お気に入り商品のみ表示」トグルボタン状態を切り替えます
-function toggleBrandFavFilter(chk) {
-    // アプリ全体状態 AppState.studioBrandFavOnly を最新値（chk.checked）に更新します
-    AppState.studioBrandFavOnly = chk.checked;
     // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
     renderStudioBrandList();
 }
@@ -1099,7 +1085,7 @@ function openStageQuickPicker(slotKey) {
     // 定数 myItems を宣言し、値（AppState.myCloset.filter(c => c.catego…）をセットします
     const myItems = AppState.myCloset.filter(c => c.category === catInfo.cat);
     // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して brandItems に入れます
-    const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat && (!p.gender || p.gender === AppState.studioGender));
+    const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat);
 
     // 再代入可能な変数 html を宣言し、値（''）をセットします
     let html = '';
@@ -1751,43 +1737,6 @@ function resetFittingOffsets() {
     syncStudioStateToBackend({ immediate: true });
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
     showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
-}
-
-
-// ツールバーの MEN / WOMEN マネキン性別ボタンの表示(.active)を AppState.studioGender に揃えます
-function syncGenderToggleUI() {
-    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
-    const gender = AppState.studioGender || 'MEN';
-    // HTML 要素 #btn-gender-men を取得して変数 btnMen に格納します
-    const btnMen = document.getElementById('btn-gender-men');
-    // HTML 要素 #btn-gender-women を取得して変数 btnWomen に格納します
-    const btnWomen = document.getElementById('btn-gender-women');
-    // 条件（btnMen）が成り立つか判定し、該当する場合の処理を実行します
-    if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
-    // 条件（btnWomen）が成り立つか判定し、該当する場合の処理を実行します
-    if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
-}
-
-
-// マネキン性別モデルを 'MEN' または 'WOMEN' へ切り替え、着用ステージ更新＆MySQL保存します
-function setMannequinGender(gender) {
-    // アプリ全体状態 AppState.studioGender を最新値（gender）に更新します
-    AppState.studioGender = gender;
-    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
-    syncGenderToggleUI();
-    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
-    syncStudioStateToBackend({ immediate: true });
-
-    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
-    renderStudioBrandList();
-
-    // マネキン性別変更に合わせて TODAY'S AI STYLING の提案内容も更新します
-    if (typeof updateTodaySeasonalStyling === 'function') {
-        updateTodaySeasonalStyling();
-    }
-
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
 }
 
 
@@ -4693,7 +4642,7 @@ async function updateTodaySeasonalStyling() {
     const month = now.getMonth() + 1;
     const date = now.getDate();
     const seasonInfo = getCurrentSeasonInfo(now);
-    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const gender = 'MEN';
 
     // 1. まず即座に愛知の推定気温で仮描画（待たずに即時表示）
     const initialTemp = calculateEstimatedTemperature(now);
@@ -4725,7 +4674,7 @@ async function updateTodaySeasonalStyling() {
 function applyTodaySeasonalPresetLook() {
     const now = new Date();
     const month = now.getMonth() + 1;
-    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const gender = 'MEN';
 
     // 選択中の月（または現在の月）のブランド商品（SAMPLE_PRODUCTS）を取得
     const targetMonth = _selectedStylingMonth || month;
@@ -4892,8 +4841,8 @@ function flushPendingStudioStateSync() {
     const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
     const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
-    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
-    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    // 定数 genderSnapshot を宣言し、値（'MEN'）をセットします
+    const genderSnapshot = 'MEN';
     // 結果（sendStudioStateRequest(targetUserId, outfitSnaps…）を呼び出し元へ返却します
     return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
 }
@@ -4923,8 +4872,8 @@ function syncStudioStateToBackend(options = {}) {
     const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
     const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
-    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
-    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    // 定数 genderSnapshot を宣言し、値（'MEN'）をセットします
+    const genderSnapshot = 'MEN';
     // 定数 seq を宣言し、値（++_studioStateSyncSeq）をセットします
     const seq = ++_studioStateSyncSeq;
 

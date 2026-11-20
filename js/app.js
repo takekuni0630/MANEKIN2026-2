@@ -15,8 +15,6 @@ const AppState = {
     cart: [],
     // 商品詳細ページで現在表示対象になっている商品ID（初期値は 1 番）
     currentDetailId: 1,
-    // 商品詳細ページで選択中のカラー名（初期値は WHITE）
-    selectedColor: "WHITE",
     // 商品詳細ページで選択中のサイズ名（初期値は M）
     selectedSize: "M",
     // ログインユーザーの注文履歴配列（MySQL orders テーブルから取得します）
@@ -51,22 +49,16 @@ const AppState = {
     savedOutfits: [],
     // スタジオ画面で今開いている左/下パネルのタブ名（初期値 'create'）
     studioActiveTab: 'create',
-    // マネキンの性別モデル設定（'MEN' または 'WOMEN'）
-    studioGender: 'MEN',
     // スタジオ内のマイクローゼット絞り込みカテゴリ（'ALL' は全表示）
     studioClosetFilter: 'ALL',
     // スタジオ内のブランド商品絞り込みカテゴリ（'ALL' は全表示）
     studioBrandFilter: 'ALL',
-    // ブランド商品リストを「お気に入りのみ」に絞るかどうかの真偽フラグ
-    studioBrandFavOnly: false,
     // スマホ画面幅でスタジオを表示するときのアクティブ表示切り替え（'mannequin' 優先）
     studioMobileView: 'mannequin',
     // 位置・拡大率調整パネルで現在操作中の部位キー（初期値 'outer'）
     activeAdjustSlot: 'outer',
     // 部位ごとの X/Y ズレ・拡大率・サイズ設定を shop.js のヘルパーから初期化します
-    fittingOffsets: getDefaultFittingOffsets(),
-    // 身長・体型・スタイル設定の初期値を shop.js のヘルパーから初期化します
-    userBodyProfile: getDefaultBodyProfile()
+    fittingOffsets: getDefaultFittingOffsets()
 };
 
 // 起動時 MySQL セッション復元が先に終わるまでルート判定を待たせるための同期制御変数
@@ -94,8 +86,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCatalogProducts();
     // 新作一覧画面（NEW ITEM）の商品カードを描画します
     renderNewItems();
-    // スタジオ性別切替ボタンの見た目（MEN/WOMEN）を AppState に合わせて同期します
-    if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
 
     // サーバー側の HttpOnly セッション Cookie を検証し、ログイン中アカウントを復元する非同期処理を開始します
     _authBootstrapPromise = (async () => {
@@ -111,12 +101,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (restoredUser && typeof applyAccountSession === 'function') {
                 // そのアカウント専用のカート・注文・お気に入り・スタジオ状態を MySQL から一括復元します
                 await applyAccountSession(restoredUser, { fromSessionRestore: true });
-            // 未ログイン（ゲスト状態）だった場合の分岐です
+                // 未ログイン（ゲスト状態）だった場合の分岐です
             } else {
                 // 未ログイン状態の注文リストは空として安全に同期終了します
                 await syncOrdersFromBackend();
             }
-        // 成功・失敗に関わらず最後に必ず実行される後処理ブロックです
+            // 成功・失敗に関わらず最後に必ず実行される後処理ブロックです
         } finally {
             // 認証確認の完了フラグを true にして、ルーティング処理が進めるようにします
             _authBootstrapDone = true;
@@ -252,7 +242,7 @@ async function handleRouting(forcedRoute) {
                 AppState.currentDetailId = paramId;
                 // 該当商品の写真・カラー・サイズボタン・在庫説明を描画します
                 renderItemDetail(paramId);
-            // ID指定が無かった場合のフォールバック処理です
+                // ID指定が無かった場合のフォールバック処理です
             } else {
                 // 不正な空詳細ページを防ぐため一覧画面 '#items' へ戻します
                 window.location.hash = '#items';
@@ -402,7 +392,7 @@ function updateAuthNoticeBanner() {
         if (loginDesc) loginDesc.innerHTML = descText;
         if (regTitle) regTitle.textContent = titleText;
         if (regDesc) regDesc.innerHTML = descText;
-    // 直前に MANEKIN AIスタジオへ入ろうとして弾かれた場合の専用文言を設定します
+        // 直前に MANEKIN AIスタジオへ入ろうとして弾かれた場合の専用文言を設定します
     } else if (target === 'manekin') {
         // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
@@ -420,7 +410,7 @@ function updateAuthNoticeBanner() {
         if (regTitle) regTitle.textContent = titleText;
         // 会員登録画面側アラートの本文をHTMLとして反映します
         if (regDesc) regDesc.innerHTML = descText;
-    // 直前に注文手続きページ（checkout）から認証誘導された場合の分岐です
+        // 直前に注文手続きページ（checkout）から認証誘導された場合の分岐です
     } else if (target === 'checkout') {
         // ログイン画面側の警告バナーを表示状態にします
         if (loginAlert) loginAlert.style.display = 'block';
@@ -438,7 +428,7 @@ function updateAuthNoticeBanner() {
         if (regTitle) regTitle.textContent = titleText;
         // 会員登録画面側アラートの本文を反映します
         if (regDesc) regDesc.innerHTML = descText;
-    // 通常のログイン／新規登録アクセス（誘導元なし）の場合の分岐です
+        // 通常のログイン／新規登録アクセス（誘導元なし）の場合の分岐です
     } else {
         // ログイン画面側の誘導バナーを非表示にします
         if (loginAlert) loginAlert.style.display = 'none';
@@ -688,8 +678,6 @@ window.toggleWearItem = toggleWearItem;
 window.unwearSlot = unwearSlot;
 // マネキンの全着用服をまとめてリセットする関数を公開します
 window.clearMannequin = clearMannequin;
-// マネキンの性別（MEN / WOMEN）切り替え関数を公開します
-window.setMannequinGender = setMannequinGender;
 // スマホ表示時のマネキン画面／操作パネル切り替え関数を公開します
 window.switchMobileStudioView = switchMobileStudioView;
 // 現在のコーディネートを MySQL saved_outfits へ保存する関数を公開します
@@ -714,10 +702,6 @@ window.handlePaneClosetFilter = handlePaneClosetFilter;
 window.handleStudioClosetFilter = handleStudioClosetFilter;
 // ブランド商品リストの部位絞り込み関数を公開します
 window.handleStudioBrandFilter = handleStudioBrandFilter;
-// ブランドリストのお気に入り限定トグル関数を公開します
-window.toggleBrandFavFilter = toggleBrandFavFilter;
-// 体型プロフィール（身長・体型・好み）保存関数を公開します
-window.handleSaveBodyProfile = handleSaveBodyProfile;
 // 位置・サイズ微調整パネルの開閉関数を公開します
 window.toggleFittingAdjustPanel = toggleFittingAdjustPanel;
 // 位置調整対象スロット切替関数を公開します

@@ -279,13 +279,6 @@ function getDefaultFittingOffsets() {
 }
 
 
-// 身長・体型・好みのテイストのデフォルトプロフィール辞書を返します
-function getDefaultBodyProfile() {
-    // 結果（{ height: 172, bodyType: 'REGULAR', styleTaste: …）を呼び出し元へ返却します
-    return { height: 172, bodyType: 'REGULAR', styleTaste: 'MINIMAL' };
-}
-
-
 // アカウント切り替え時の総括関数：旧ストレージ消去→保留スタジオ同期→メモリ初期化→MySQLから全データ並列復元を行います
 async function applyAccountSession(user, options = {}) {
     // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
@@ -322,10 +315,6 @@ async function applyAccountSession(user, options = {}) {
     AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
     // アプリ全体状態 AppState.fittingOffsets を最新値（getDefaultFittingOffsets()）に更新します
     AppState.fittingOffsets = getDefaultFittingOffsets();
-    // アプリ全体状態 AppState.studioGender を最新値（'MEN'）に更新します
-    AppState.studioGender = 'MEN';
-    // アプリ全体状態 AppState.userBodyProfile を最新値（getDefaultBodyProfile()）に更新します
-    AppState.userBodyProfile = getDefaultBodyProfile();
     // アプリ全体状態 AppState.userCoupons を最新値（[]）に更新します
     AppState.userCoupons = [];
     // 現在適用中のクーポンを初期化します
@@ -335,8 +324,6 @@ async function applyAccountSession(user, options = {}) {
     if (!user) {
         // アプリ全体状態 AppState.currentUser を最新値（null）に更新します
         AppState.currentUser = null;
-        // 条件（typeof syncGenderToggleUI === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
         // 条件（typeof renderMannequinStage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         // 条件（typeof updateCartBadge === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -363,8 +350,6 @@ async function applyAccountSession(user, options = {}) {
     AppState.currentUser = user;
 
     try {
-        // 条件（typeof syncGenderToggleUI === 'function'）が成り立つか判定し、該当する場合の処理を実行します
-        if (typeof syncGenderToggleUI === 'function') syncGenderToggleUI();
         // 条件（typeof renderMannequinStage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         // 条件（typeof updateCartBadge === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -600,8 +585,6 @@ function renderItemDetail(productId) {
         breadcrumbName.textContent = product.name;
     }
 
-    // アプリ全体状態 AppState.selectedColor を最新値（product.colors[0]）に更新します
-    AppState.selectedColor = product.colors[0];
     // アプリ全体状態 AppState.selectedSize を最新値（product.sizes[1] || "M"）に更新します
     AppState.selectedSize = product.sizes[1] || "M";
 
@@ -609,27 +592,8 @@ function renderItemDetail(productId) {
     const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
     const formattedPrice = "¥" + product.price.toLocaleString();
-    // 定数 initialImgUrl を宣言し、値（(product.colorImages && product.colorI…）をセットします
-    const initialImgUrl = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
-
-    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
-    const colorChipsHTML = product.colors.map((color, idx) => {
-        // 定数 isSelected を宣言し、値（(color === AppState.selectedColor)）をセットします
-        const isSelected = (color === AppState.selectedColor);
-        // 定数 mappedImg を宣言し、値（(product.colorImages && product.colorI…）をセットします
-        const mappedImg = (product.colorImages && product.colorImages[color]) || product.image;
-        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
-        return `
-            <button type="button" 
-                    class="color-chip ${isSelected ? 'selected' : ''}" 
-                    data-color="${color}" 
-                    data-img="${mappedImg}" 
-                    onclick="handleColorSelect(this, '${color}', '${mappedImg}')">
-                ${color}
-            </button>
-        `;
-        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
-    }).join('');
+    // 定数 initialImgUrl を宣言し、値（product.image）をセットします
+    const initialImgUrl = product.image;
 
     // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
     const sizeChipsHTML = product.sizes.map((size, idx) => {
@@ -667,13 +631,6 @@ function renderItemDetail(productId) {
             <div class="detail-options">
                 <div class="option-group">
                     <p class="option-group-title">
-                        COLOR: <span class="current-selected-label" id="label-selected-color">${AppState.selectedColor}</span>
-                    </p>
-                    <div class="color-chips" id="detail-color-chips">${colorChipsHTML}</div>
-                </div>
-
-                <div class="option-group">
-                    <p class="option-group-title">
                         SIZE: <span class="current-selected-label" id="label-selected-size">${AppState.selectedSize}</span>
                     </p>
                     <div class="size-chips" id="detail-size-chips">${sizeChipsHTML}</div>
@@ -702,50 +659,12 @@ function renderItemDetail(productId) {
                 <ul class="detail-spec-list">
                     <li>・素材：${product.material}</li>
                     <li>・洗濯機洗い可（ネット使用推奨）</li>
-                    <li>・透け感：なし（WHITEのみ極微小）</li>
+                    <li>・透け感：なし</li>
                     <li>・伸縮性：適度にあり</li>
                 </ul>
             </div>
         </div>
     `;
-}
-
-
-// 商品詳細でカラーボタンが押されたときに AppState.selectedColor を更新しボタン枠と表示文言を切り替えます
-function handleColorSelect(chipEl, colorName, imageUrl) {
-    // 定数 parent を宣言し、値（chipEl.parentElement）をセットします
-    const parent = chipEl.parentElement;
-    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
-    parent.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
-    // 要素に CSS クラスを付与して見た目・表示状態を変更します（chipEl.classList.add('selected');）
-    chipEl.classList.add('selected');
-
-    // アプリ全体状態 AppState.selectedColor を最新値（colorName）に更新します
-    AppState.selectedColor = colorName;
-
-    // HTML 要素 #label-selected-color を取得して変数 labelColor に格納します
-    const labelColor = document.getElementById('label-selected-color');
-    // 条件（labelColor）が成り立つか判定し、該当する場合の処理を実行します
-    if (labelColor) labelColor.textContent = colorName;
-
-    // HTML 要素 #detail-main-img を取得して変数 mainImg に格納します
-    const mainImg = document.getElementById('detail-main-img');
-    // 条件（mainImg && imageUrl）が成り立つか判定し、該当する場合の処理を実行します
-    if (mainImg && imageUrl) {
-        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（mainImg.style.opacity = '0.25';）
-        mainImg.style.opacity = '0.25';
-        // 遅延実行タイマーのセットまたは重複防止用キャンセルを行います
-        setTimeout(() => {
-            // 変数・配列項目 mainImg.src の値を更新・計算します
-            mainImg.src = imageUrl;
-            // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（mainImg.style.opacity = '1';）
-            mainImg.style.opacity = '1';
-            // 上の処理を指定ミリ秒後（120ms 後）に実行するタイマー呼び出しを閉じます
-        }, 120);
-    }
-
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`カラー: ${colorName} に切り替えました`);
 }
 
 
@@ -1032,13 +951,15 @@ async function handleAddToCartFromDetail(productId) {
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して prevCart に保存します
     const prevCart = JSON.parse(JSON.stringify(AppState.cart || []));
 
-    // 定数 currentImg を宣言し、値（(product.colorImages && product.colorI…）をセットします
-    const currentImg = (product.colorImages && product.colorImages[AppState.selectedColor]) || product.image;
+    // 定数 currentImg を宣言し、値（product.image）をセットします
+    const currentImg = product.image;
+    // 定数 defaultColor を宣言し、値（(product.colors && product.colors[0]) || 'DEFAULT'）をセットします
+    const defaultColor = (product.colors && product.colors[0]) || 'DEFAULT';
 
     // 定数 existingIndex を宣言し、値（AppState.cart.findIndex(）をセットします
     const existingIndex = AppState.cart.findIndex(
         // 変数・配列項目 item の値を更新・計算します
-        item => item.id === product.id && item.color === AppState.selectedColor && item.size === AppState.selectedSize
+        item => item.id === product.id && item.size === AppState.selectedSize
     );
 
     // 条件（existingIndex > -1）が成り立つか判定し、該当する場合の処理を実行します
@@ -1056,7 +977,7 @@ async function handleAddToCartFromDetail(productId) {
             // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
             category: product.category || 'TOPS',
             // カラー名
-            color: AppState.selectedColor,
+            color: defaultColor,
             // 選択サイズ
             size: AppState.selectedSize,
             // 単価・価格（円）
@@ -1087,13 +1008,13 @@ async function handleAddToCartFromDetail(productId) {
             return false;
         }
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast(`「${product.name} (${AppState.selectedColor}/${AppState.selectedSize})」をバッグに追加しMySQLに保存しました`);
+        showToast(`「${product.name} (${AppState.selectedSize})」をバッグに追加しMySQLに保存しました`);
         // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
         return true;
     }
 
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`「${product.name} (${AppState.selectedColor}/${AppState.selectedSize})」をバッグに追加しました（ログインでMySQLに保存）`);
+    showToast(`「${product.name} (${AppState.selectedSize})」をバッグに追加しました（ログインでMySQLに保存）`);
     // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
     return true;
 }
@@ -3995,8 +3916,6 @@ window.isServerUserId = isServerUserId;
 window.restoreAuthSessionFromBackend = restoreAuthSessionFromBackend;
 // 変数・配列項目 window.getDefaultFittingOffsets の値を更新・計算します
 window.getDefaultFittingOffsets = getDefaultFittingOffsets;
-// 変数・配列項目 window.getDefaultBodyProfile の値を更新・計算します
-window.getDefaultBodyProfile = getDefaultBodyProfile;
 // 変数・配列項目 window.applyAccountSession の値を更新・計算します
 window.applyAccountSession = applyAccountSession;
 // 変数・配列項目 window.getUserPoints の値を更新・計算します
