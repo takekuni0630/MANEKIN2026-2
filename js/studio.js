@@ -4921,13 +4921,10 @@ async function syncStudioStateFromBackend() {
         if (saved && typeof saved === 'object') {
             AppState.currentOutfit = saved.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             AppState.fittingOffsets = saved.fitting_offsets || getDefaultFittingOffsets();
-            AppState.studioGender = (saved.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
         } else {
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             AppState.fittingOffsets = getDefaultFittingOffsets();
-            AppState.studioGender = 'MEN';
         }
-        syncGenderToggleUI();
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
@@ -4968,20 +4965,14 @@ async function syncStudioStateFromBackend() {
             AppState.currentOutfit = data.studio_state.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             // アプリ全体状態 AppState.fittingOffsets を最新値（data.studio_state.fitting_offsets || g…）に更新します
             AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
-            // アプリ全体状態 AppState.studioGender を最新値（(data.studio_state.studio_gender === '…）に更新します
-            AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
             // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // アプリ全体状態 AppState.currentOutfit を最新値（{ hat: null, outer: null, tops: null, …）に更新します
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             // アプリ全体状態 AppState.fittingOffsets を最新値（getDefaultFittingOffsets()）に更新します
             AppState.fittingOffsets = getDefaultFittingOffsets();
-            // アプリ全体状態 AppState.studioGender を最新値（'MEN'）に更新します
-            AppState.studioGender = 'MEN';
         }
 
-        // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
-        syncGenderToggleUI();
         // 条件（typeof renderMannequinStage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -4995,25 +4986,6 @@ async function syncStudioStateFromBackend() {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.warn('MySQLスタジオ状態取得エラー:', e);
     }
-}
-
-
-// 身長・体型・好みのテイスト設定をメモリ反映してスタジオプロフィール完了通知を出します
-function handleSaveBodyProfile(e) {
-    // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
-    e.preventDefault();
-    // HTML 要素 #body-height を取得して変数 height に格納します
-    const height = document.getElementById('body-height')?.value || 172;
-    // HTML 要素 #body-type を取得して変数 type に格納します
-    const type = document.getElementById('body-type')?.value || 'REGULAR';
-    // HTML 要素 #style-taste を取得して変数 taste に格納します
-    const taste = document.getElementById('style-taste')?.value || 'MINIMAL';
-
-    // アプリ全体状態 AppState.userBodyProfile を最新値（{ height, bodyType: type, styleTaste: …）に更新します
-    AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
-
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToastNotification('体型および好みの設定を反映しました');
 }
 
 
@@ -5086,8 +5058,6 @@ window.syncStudioStateToBackend = syncStudioStateToBackend;
 window.syncStudioStateFromBackend = syncStudioStateFromBackend;
 // デバウンス待ち中の試着変更があれば先に MySQL へ確定送信してから後続処理へ進みます
 window.flushPendingStudioStateSync = flushPendingStudioStateSync;
-// 変数・配列項目 window.syncGenderToggleUI の値を更新・計算します
-window.syncGenderToggleUI = syncGenderToggleUI;
 // 変数・配列項目 window.bumpClosetMutationSeq の値を更新・計算します
 window.bumpClosetMutationSeq = bumpClosetMutationSeq;
 window.updateTodaySeasonalStyling = updateTodaySeasonalStyling;
