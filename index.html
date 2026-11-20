@@ -2574,7 +2574,7 @@
                             <!-- 対応する入力欄（for=cat-radio-label）の見出しラベル「」です -->
                             <label class="cat-radio-label">
                                 <!-- 複数候補から 1 つだけを選ぶラジオボタン（name=closet_category / value=BOTTOMS）です -->
-                                <input type="radio" name="closet_category" value="BOTTOMS" required checked>
+                                <input type="radio" name="closet_category" value="BOTTOMS" required>
                                 <!-- インライン装飾／グルーピング用の <span> 要素（. ボトムス (スラックス/デニム/スウェット)）です -->
                                 <span>ボトムス (スラックス/デニム/スウェット)</span>
                             </label>
@@ -2684,10 +2684,10 @@
                         <!-- 文節の途中で不自然に改行されないようまとめる補助スパン（研ぎ澄まされたシンプルを日常に。）です -->
                         <span class="keep-phrase">研ぎ澄まされたシンプルを日常に。</span><br>
                         <!-- 文節の途中で不自然に改行されないようまとめる補助スパン（20代〜30代に向けたニュースタンダードウェアを展開する、 <s…）です -->
-                        <span class="keep-phrase">20代〜30代に向けたニュースタンダードウェアを展開する、</span><span
-                            class="keep-phrase">モダンアパレルECストアです。</span>
+                        <span class="keep-phrase">20代〜30代に向けたニュースタンダードウェアを<br>展開する、モダンアパレルECストアです。</span>
                     </p>
                 </div>
+
                 <!-- デザイン・配置用のブロック要素（<div class="footer-links-column">）を開始します -->
                 <div class="footer-links-column">
                     <!-- セクションの見出し（<h4>: NAVIGATION）を表示します -->
@@ -2762,6 +2762,7 @@
     <script type="module">
         // ネット未接続時やCDNブロック時でもエラーでサイト全体が止まらないよう try 〜 catch で囲みます
         try {
+            // htmlで読み込んだAIをJavaScriptで使用できるようにする
             // ブラウザ完結型 AI 背景切り抜きライブラリ(@imgly/background-removal)を CDN から動的読み込みします
             const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
             // 読み込んだ背景透過関数 removeBackground を他の通常JS(studio.js等)からも呼べるよう window に登録します
