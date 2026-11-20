@@ -1,13 +1,10 @@
 // ==========================================================================
-//  js/shop.js - ECショップ機能・会員認証・MySQLデータ同期・共通UI
-//  商品カード生成、詳細表示、カート＆チェックアウト、ポイント計算、認証、
-//  お気に入り、マイページ描画、および Flask API (MySQL) 同期を担当します。
+// 【関数】isMobileLocalStorageMode()
+// 【役割】パソコン版かスマホ版（localStorage動作モード）かを判定する
+// 【具体的な処理内容】
+//   ・画面のURLや設定を見て、スマホ向けの簡易保存（localStorage）を使うか、
+//     PC用のPython+MySQLサーバーを使うかを切り替えます
 // ==========================================================================
-
-// ==========================================================================
-//  1. 認証・セッション管理 & API通信基盤（MySQL一本化・Cookieセッション復元）
-// ==========================================================================
-// スマホ版かどうかを判定します（スマホ版のみ localStorage を使用し、デスクトップ版は必ず Python + MySQL を使用します）
 function isMobileLocalStorageMode() {
     try {
         const ua = navigator.userAgent || '';
@@ -24,7 +21,13 @@ function isMobileLocalStorageMode() {
     return false;
 }
 
-// スマホ版 localStorage 安全読み書きヘルパー
+// ==========================================================================
+// 【関数】lsGetJson(key, fallback)
+// 【役割】スマホ用のブラウザ保存（localStorage）からデータを安全に取り出す
+// 【具体的な処理内容】
+//   ・保存されているJSONデータをJavaScriptオブジェクトに変換して返します
+//   ・データが無い場合や壊れている場合は初期値（fallback）を返します
+// ==========================================================================
 function lsGetJson(key, fallback) {
     if (!isMobileLocalStorageMode()) return fallback;
     try {
@@ -36,6 +39,12 @@ function lsGetJson(key, fallback) {
     }
 }
 
+// ==========================================================================
+// 【関数】lsSetJson(key, val)
+// 【役割】スマホ用のブラウザ保存（localStorage）へデータを安全に保存する
+// 【具体的な処理内容】
+//   ・配列やオブジェクトをJSON文字列に変換してlocalStorageに書き込みます
+// ==========================================================================
 function lsSetJson(key, val) {
     if (!isMobileLocalStorageMode()) return false;
     try {
@@ -47,7 +56,13 @@ function lsSetJson(key, val) {
     }
 }
 
-// スマホ版：新規ユーザー用の初期手持ち服3点セット
+// ==========================================================================
+// 【関数】getDefaultMobileClosetItems()
+// 【役割】スマホ版を初めて開いた人用の「初期手持ち服3点セット」を用意する
+// 【具体的な処理内容】
+//   ・クローゼットが空っぽだと試着が楽しめないため、最初から使える
+//     帽子・トップス・ボトムスの初期サンプル服データを返します
+// ==========================================================================
 function getDefaultMobileClosetItems() {
     return [
         {
@@ -83,7 +98,12 @@ function getDefaultMobileClosetItems() {
     ];
 }
 
-// スマホ版：ユーザーの初期データ（初回限定10%OFFクーポン・初期クローゼット等）をlocalStorageに準備します
+// ==========================================================================
+// 【関数】ensureMobileUserInitialized(user)
+// 【役割】スマホ版ユーザーの初回登録時に必要な初期データを準備する
+// 【具体的な処理内容】
+//   ・初回の「10%OFFクーポン」や「サンプルの手持ち服」をスマホの保存領域に自動セットします
+// ==========================================================================
 function ensureMobileUserInitialized(user) {
     if (!isMobileLocalStorageMode() || !user || !user.id) return;
     const uid = String(user.id);
@@ -116,8 +136,13 @@ function ensureMobileUserInitialized(user) {
     }
 }
 
-// デスクトップ版ではすべての manekin* キー（manekin_ls_* を含む）を完全消去して MySQL 一本化を保証します。
-// スマホ版（isMobileLocalStorageMode() === true）のときだけ manekin_ls_* キーを保持します。
+// ==========================================================================
+// 【関数】purgeAllManekinLocalStorage()
+// 【役割】パソコン版で動かす時に、古いブラウザの一時データを綺麗に掃除する
+// 【具体的な処理内容】
+//   ・PC版ではMySQLサーバーのみを使うため、以前のlocalStorageデータが
+//     混ざって誤作動しないように削除します
+// ==========================================================================
 function purgeAllManekinLocalStorage() {
     const isMobile = isMobileLocalStorageMode();
     [window.localStorage, window.sessionStorage].forEach(storage => {
@@ -150,8 +175,12 @@ window.addEventListener('resize', () => {
     }
 });
 
-
-// 通信先の Flask API サーバーURLを返します（8080番ポート配信時は相対パス ''、それ以外は http://ホスト:8080）
+// ==========================================================================
+// 【関数】getApiBaseUrl()
+// 【役割】通信先のPython（Flask）サーバーのURLを取得する
+// 【具体的な処理内容】
+//   ・現在開いているURLから、APIサーバー（http://127.0.0.1:8080 など）のアドレスを判定して返します
+// ==========================================================================
 function getApiBaseUrl() {
     // 条件（window.location.protocol !== 'file:' && (window.loca…）が成り立つか判定し、該当する場合の処理を実行します
     if (window.location.protocol !== 'file:' && (window.location.port === '8080' || window.__MANEKIN_API_ORIGIN__ === 'self')) {
@@ -164,15 +193,24 @@ function getApiBaseUrl() {
     return `http://${host}:8080`;
 }
 
-
-// 渡されたユーザーIDが MySQL が採番した有効な正の整数（例: 1, 2, 15）かを正規表現で判定します
+// ==========================================================================
+// 【関数】isServerUserId(uid)
+// 【役割】ユーザーIDがサーバー（MySQL）で発行された本物の会員IDかをチェックする
+// 【具体的な処理内容】
+//   ・IDが正の数値（1, 2, 3...など）かどうかを判定し、本物のログイン会員かどうかを確かめます
+// ==========================================================================
 function isServerUserId(uid) {
     // 結果（uid !== null && uid !== undefined && /^\d+$/.tes…）を呼び出し元へ返却します
     return uid !== null && uid !== undefined && /^\d+$/.test(String(uid));
 }
 
-
-// ページ読込時にログイン会員を復元します（スマホ版はlocalStorageから、PC版はバックエンド /api/auth/me から復元）
+// ==========================================================================
+// 【関数】restoreAuthSessionFromBackend()
+// 【役割】ページを開いた時に「前回ログインしていた会員」を自動で復元する
+// 【具体的な処理内容】
+//   ・ブラウザのCookie（セッション）を使ってサーバーに問い合わせ、
+//     ログイン中ならそのユーザー情報を取り出して画面に反映します
+// ==========================================================================
 async function restoreAuthSessionFromBackend() {
     // スマホ版の場合は localStorage からログインセッションを復元します
     if (isMobileLocalStorageMode()) {
@@ -214,8 +252,12 @@ async function restoreAuthSessionFromBackend() {
     }
 }
 
-
-// ログイン／ログアウト／アカウント切替時に注文フォームやポイント入力欄の残留文字を初期化します
+// ==========================================================================
+// 【関数】resetAccountScopedDomInputs(user)
+// 【役割】ログインやログアウト時に、入力フォームの文字をリセットする
+// 【具体的な処理内容】
+//   ・別のアカウントの情報が残らないよう、配送先住所やポイント入力欄の数値をクリアします
+// ==========================================================================
 function resetAccountScopedDomInputs(user) {
     // 条件（typeof checkoutUsedPoints !== 'undefined'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof checkoutUsedPoints !== 'undefined') {
@@ -260,8 +302,13 @@ function resetAccountScopedDomInputs(user) {
     if (closetItemName) closetItemName.value = '';
 }
 
-
-// 試着スタジオ5部位の位置ズレ(X/Y)・拡大率・ブランドサイズの初期値オブジェクトを新しく生成して返します
+// ==========================================================================
+// 【関数】getDefaultFittingOffsets()
+// 【役割】マネキン試着の服の位置や大きさの初期値（デフォルト設定）を作る
+// 【具体的な処理内容】
+//   ・帽子・アウター・トップス・ボトムス・靴の各部位について、
+//     ズレ量0、大きさ100%の基本設定オブジェクトを返します
+// ==========================================================================
 function getDefaultFittingOffsets() {
     // まとめた結果オブジェクトを生成して呼び出し元へ返却します
     return {
@@ -278,8 +325,13 @@ function getDefaultFittingOffsets() {
     };
 }
 
-
-// アカウント切り替え時の総括関数：旧ストレージ消去→保留スタジオ同期→メモリ初期化→MySQLから全データ並列復元を行います
+// ==========================================================================
+// 【関数】applyAccountSession(user, options = {})
+// 【役割】ログイン・ログアウト時に、その人専用のデータをごっそり入れ替える
+// 【具体的な処理内容】
+//   ・前の人のデータをメモリから消去し、新しくログインした会員のカートや
+//     お気に入り、クローゼットなどをサーバーから読み込んで画面を更新します
+// ==========================================================================
 async function applyAccountSession(user, options = {}) {
     // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
     purgeAllManekinLocalStorage();
@@ -397,11 +449,13 @@ async function applyAccountSession(user, options = {}) {
     }
 }
 
-
 // ==========================================================================
-//  2. 商品カード生成・カタログ一覧・新作一覧・商品詳細表示
+// 【関数】createProductCardHTML(product)
+// 【役割】商品1個分の表示カード（HTML）を組み立てる
+// 【具体的な処理内容】
+//   ・商品の写真、名前、価格、NEWバッジ、お気に入りハートボタンなどが
+//     揃ったカードのHTMLを作って返します
 // ==========================================================================
-// 1商品オブジェクトを受け取り、お気に入りハートボタン・NEWバッジ・画像・価格付きのカードHTML文字列を作ります
 function createProductCardHTML(product) {
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
     const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
@@ -431,8 +485,13 @@ function createProductCardHTML(product) {
     `;
 }
 
-
-// トップ画面に PICK UP おすすめ商品（4点）と新着商品（4点）を描画します
+// ==========================================================================
+// 【関数】renderHomeProducts()
+// 【役割】トップ画面（HOME）におすすめ商品と新着商品を表示する
+// 【具体的な処理内容】
+//   ・全商品の中からおすすめ4点と新作4点をピックアップし、
+//     トップ画面のグリッドに並べて表示します
+// ==========================================================================
 function renderHomeProducts() {
     // HTML 要素 #home-featured-grid を取得して変数 featuredContainer に格納します
     const featuredContainer = document.getElementById('home-featured-grid');
@@ -454,8 +513,13 @@ function renderHomeProducts() {
     }
 }
 
-
-// 選択中の性別(ALL/MEN/WOMEN)・カテゴリ・並び順で商品を絞り込みソートしてカタログ画面へ描画します
+// ==========================================================================
+// 【関数】renderCatalogProducts()
+// 【役割】商品一覧（CATALOG）画面に商品を並べて表示する
+// 【具体的な処理内容】
+//   ・選ばれているカテゴリ（トップス、ボトムスなど）や
+//     並び順（おすすめ順、価格が安い順など）に合わせて商品を絞り込んで表示します
+// ==========================================================================
 function renderCatalogProducts() {
     // HTML 要素 #catalog-product-grid を取得して変数 gridContainer に格納します
     const gridContainer = document.getElementById('catalog-product-grid');
@@ -539,8 +603,12 @@ function renderCatalogProducts() {
     gridContainer.innerHTML = items.map(p => createProductCardHTML(p)).join('');
 }
 
-
-// 新着フラグ(isNew: true)が付いた新作アイテムだけを抽出して新作一覧画面へ描画します
+// ==========================================================================
+// 【関数】renderNewItems()
+// 【役割】新作アイテム一覧画面に「NEW」の服だけを集めて表示する
+// 【具体的な処理内容】
+//   ・新作フラグ（isNew: true）が付いている商品だけを抽出して画面に並べます
+// ==========================================================================
 function renderNewItems() {
     // HTML 要素 #new-items-grid を取得して変数 gridContainer に格納します
     const gridContainer = document.getElementById('new-items-grid');
@@ -552,15 +620,24 @@ function renderNewItems() {
     gridContainer.innerHTML = newItems.map(p => createProductCardHTML(p)).join('');
 }
 
-
-// クリックされた商品IDの詳細画面('#item-detail?id=〇〇')へハッシュ遷移させます
+// ==========================================================================
+// 【関数】navigateToDetail(productId)
+// 【役割】クリックされた商品の「商品詳細画面」へページを移動する
+// 【具体的な処理内容】
+//   ・URLの末尾を `#item-detail?id=商品番号` に変更して、詳細画面を開きます
+// ==========================================================================
 function navigateToDetail(productId) {
     // 変数・配列項目 window.location.hash の値を更新・計算します
     window.location.hash = `#item-detail?id=${productId}`;
 }
 
-
-// 指定IDの商品を詳細画面へ描画します（色ボタン・サイズボタン・お気に入り状態・カート追加・今すぐ購入）
+// ==========================================================================
+// 【関数】renderItemDetail(productId)
+// 【役割】商品詳細画面にその商品の詳しい情報を描画する
+// 【具体的な処理内容】
+//   ・指定された商品の写真、説明文、素材情報、サイズ選択チップ、
+//     今すぐ購入ボタン、カート追加ボタンを画面に組み立てて表示します
+// ==========================================================================
 function renderItemDetail(productId) {
     // HTML 要素 #item-detail-layout を取得して変数 detailLayout に格納します
     const detailLayout = document.getElementById('item-detail-layout');
@@ -667,8 +744,12 @@ function renderItemDetail(productId) {
     `;
 }
 
-
-// 商品詳細でサイズボタンが押されたときに AppState.selectedSize を更新します
+// ==========================================================================
+// 【関数】handleSizeSelect(chipEl, sizeName)
+// 【役割】商品詳細画面でサイズ（S/M/Lなど）を選んだときの処理
+// 【具体的な処理内容】
+//   ・クリックされたサイズボタンをアクティブ（黒色）にし、選んだサイズを記憶します
+// ==========================================================================
 function handleSizeSelect(chipEl, sizeName) {
     // 定数 parent を宣言し、値（chipEl.parentElement）をセットします
     const parent = chipEl.parentElement;
@@ -698,13 +779,23 @@ let _cartSyncPromise = Promise.resolve();
 // ユーザーごとの最新カート操作順番を記録し、古い通信応答による先祖返りを防ぐ連番管理マップです
 const _cartSyncSeqByUser = {};
 
-// カート非同期同期の競合(古い応答による上書き)を防ぐため、ユーザーごとの連番シーケンスを取得します
+// ==========================================================================
+// 【関数】getCartUserSeq(uid)
+// 【役割】カート通信の順番が前後して壊れないようにするための管理番号を取得する
+// 【具体的な処理内容】
+//   ・非同期通信のズレによる上書きを防ぐための連番を管理します
+// ==========================================================================
 function getCartUserSeq(uid) {
     // 結果（_cartSyncSeqByUser[String(uid)] || 0）を呼び出し元へ返却します
     return _cartSyncSeqByUser[String(uid)] || 0;
 }
 
-// カート変更や送信ごとにユーザー別シーケンス番号を +1 進めます
+// ==========================================================================
+// 【関数】bumpCartUserSeq(uid)
+// 【役割】カート通信の管理番号を +1 カウントアップする
+// 【具体的な処理内容】
+//   ・新しい操作が行われたことを示すために連番を増やします
+// ==========================================================================
 function bumpCartUserSeq(uid) {
     // 定数 k を宣言し、値（String(uid)）をセットします
     const k = String(uid);
@@ -714,8 +805,12 @@ function bumpCartUserSeq(uid) {
     return _cartSyncSeqByUser[k];
 }
 
-
-// 現在の AppState.cart 配列を直列チェーン化し、保存同期します（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】syncCartToBackend()
+// 【役割】現在のカートの中身をサーバー（MySQL）に保存する
+// 【具体的な処理内容】
+//   ・カートに入っている商品のリストをサーバーへ送信して、データベースを最新状態に更新します
+// ==========================================================================
 async function syncCartToBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -780,8 +875,13 @@ async function syncCartToBackend() {
     return _cartSyncPromise;
 }
 
-
-// 該当ユーザーのカートを取得し（ゲストカート引き継ぎ指定があれば加算合算して）画面更新します（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】syncCartFromBackend(options = {})
+// 【役割】サーバー（MySQL）から最新のカートの中身を読み取って画面に反映する
+// 【具体的な処理内容】
+//   ・データベースに保存されているカート商品を取得し、
+//     ヘッダーの数字バッジやお会計画面のリストを更新します
+// ==========================================================================
 async function syncCartFromBackend(options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -921,8 +1021,12 @@ async function syncCartFromBackend(options = {}) {
     }
 }
 
-
-// ヘッダー右側カートアイコン等の数量バッジ（現在合計点数）を再計算して表示更新します
+// ==========================================================================
+// 【関数】updateCartBadge()
+// 【役割】ヘッダーにあるカートアイコン右上の「現在の点数バッジ」を更新する
+// 【具体的な処理内容】
+//   ・カート内の商品の合計数量（例: 3点）を計算し、赤いバッジの数字を書き換えます
+// ==========================================================================
 function updateCartBadge() {
     // 条件（!AppState.cart || !Array.isArray(AppState.cart)）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart || !Array.isArray(AppState.cart)) {
@@ -940,8 +1044,13 @@ function updateCartBadge() {
     }
 }
 
-
-// 詳細画面で選んだ商品（ID・カラー・サイズ）を AppState.cart へ追加（同一仕様なら数量加算）し、MySQL同期します
+// ==========================================================================
+// 【関数】handleAddToCartFromDetail(productId)
+// 【役割】商品詳細画面で「ショッピングバッグに追加する」を押したときの処理
+// 【具体的な処理内容】
+//   ・選んだサイズと商品をカートに追加（すでにあれば数量を+1）し、
+//     サーバーに保存して完了通知メッセージを出します
+// ==========================================================================
 async function handleAddToCartFromDetail(productId) {
     // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して product に入れます
     const product = SAMPLE_PRODUCTS.find(p => p.id === productId);
@@ -1019,8 +1128,13 @@ async function handleAddToCartFromDetail(productId) {
     return true;
 }
 
-
-// 今すぐ購入ボタン押下時に商品をカートへ追加した上で購入手続きページ('#checkout')へ遷移します
+// ==========================================================================
+// 【関数】handleBuyNow(productId)
+// 【役割】「今すぐ購入する」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・その商品をカートに追加した上で、そのまま購入手続きページ（#checkout）へ
+//     一気に移動します（未ログインならログインへ誘導）
+// ==========================================================================
 async function handleBuyNow(productId) {
     // 定数 added を宣言し、値（await handleAddToCartFromDetail(produc…）をセットします
     const added = await handleAddToCartFromDetail(productId);
@@ -1042,8 +1156,13 @@ async function handleBuyNow(productId) {
     window.location.hash = '#checkout';
 }
 
-
-// チェックアウト画面の「＋／－」ボタンでカート商品の数量を増減（0個以下なら削除）し、MySQL同期＆合計再計算します
+// ==========================================================================
+// 【関数】updateCartItemQty(index, delta)
+// 【役割】お会計画面で商品の数量を「＋」または「－」したときの処理
+// 【具体的な処理内容】
+//   ・数量を1つ増やしたり減らしたり（0個になったらカートから削除）して、
+//     合計金額を自動再計算しサーバーへ保存します
+// ==========================================================================
 async function updateCartItemQty(index, delta) {
     // 条件（!AppState.cart[index]）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart[index]) return;
@@ -1079,8 +1198,12 @@ async function updateCartItemQty(index, delta) {
     }
 }
 
-
-// チェックアウト画面の削除ボタンでカートから該当商品を削除し、MySQL同期＆再描画します
+// ==========================================================================
+// 【関数】removeCartItem(index)
+// 【役割】お会計画面で商品の「削除」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・指定された商品をカートから完全に削除し、金額を再計算してサーバーへ保存します
+// ==========================================================================
 async function removeCartItem(index) {
     // 条件（!AppState.cart[index]）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart[index]) return;
@@ -1115,7 +1238,13 @@ async function removeCartItem(index) {
     showToast('バッグから商品を削除しました');
 }
 
-// 注文手続きステップバー（1:注文商品, 2:お届け先・決済, 3:注文確定）のアクティブ表示を更新します
+// ==========================================================================
+// 【関数】updateCheckoutStepper(step = 2)
+// 【役割】購入手続きの「進捗ステップバー」の見た目を切り替える
+// 【具体的な処理内容】
+//   ・「1:注文商品 → 2:お届け先・決済 → 3:完了」の進捗に合わせて、
+//     ステップバーの丸い数字を青く光らせます
+// ==========================================================================
 function updateCheckoutStepper(step = 2) {
     const stepper = document.querySelector('.checkout-stepper');
     if (!stepper) return;
@@ -1139,7 +1268,13 @@ function updateCheckoutStepper(step = 2) {
     });
 }
 
-// カート確認・注文手続き画面を描画し、ログイン会員名メール自動補完・利用ポイントリセット・金額計算を行います
+// ==========================================================================
+// 【関数】renderCheckoutPage()
+// 【役割】お会計・注文手続き画面（#checkout）全体を描画する
+// 【具体的な処理内容】
+//   ・カート内の商品一覧、お届け先住所フォーム、使えるクーポン一覧、
+//     ポイント入力欄、お支払い金額の計算表を画面に表示します
+// ==========================================================================
 function renderCheckoutPage() {
     // ステップバーをお届け先・決済入力中（ステップ2）に設定します
     updateCheckoutStepper(2);
@@ -1243,11 +1378,13 @@ function renderCheckoutPage() {
     updateCheckoutCalculations();
 }
 
-
 // ==========================================================================
-//  4. チェックアウト（購入手続き）・ポイント割引計算・注文確定トランザクション
+// 【関数】calculateNetPointsFromOrders(ordersList)
+// 【役割】過去の注文履歴から、今使える本当の保有ポイント数を計算する
+// 【具体的な処理内容】
+//   ・注文で獲得したポイントを足し、利用したポイントを引いて、
+//     現在の正しいポイント残高を算出します
 // ==========================================================================
-// 注文履歴（AppState.orderHistory）から「購入で加算されたポイント合計 − 利用したポイント合計」を算出します
 function calculateNetPointsFromOrders(ordersList) {
     const list = Array.isArray(ordersList) ? ordersList : (AppState.orderHistory || []);
     if (!list || list.length === 0) return 0;
@@ -1268,7 +1405,12 @@ function calculateNetPointsFromOrders(ordersList) {
     return Math.max(0, totalEarned - totalUsed);
 }
 
-// 現在ログイン中の会員が持つ利用可能ポイント残高（数値）を返します（購入で加算されたポイントの合計）
+// ==========================================================================
+// 【関数】getUserPoints()
+// 【役割】ログイン中の会員の現在の保有ポイント数を取得する
+// 【具体的な処理内容】
+//   ・会員データや注文履歴から現在のポイントを調べて返します
+// ==========================================================================
 function getUserPoints() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return 0;
@@ -1288,8 +1430,12 @@ function getUserPoints() {
     return Number(AppState.currentUser.points) || 0;
 }
 
-
-// 注文でのポイント増減後に AppState.currentUser.points と表示UI（チェックアウト・マイページ両方）を最新値へ更新します
+// ==========================================================================
+// 【関数】setUserPoints(points, options = {})
+// 【役割】会員の保有ポイント数を更新する
+// 【具体的な処理内容】
+//   ・ポイント数値をメモリや画面の表示に反映します
+// ==========================================================================
 function setUserPoints(points, options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return;
@@ -1343,7 +1489,12 @@ let checkoutUsedPoints = 0;
 // 現在チェックアウトで適用されているクーポンオブジェクト（未適用時は null）
 let currentAppliedCoupon = null;
 
-// ユーザーの保有クーポン一覧を取得して同期します（スマホ版はlocalStorage、PC版はAPI＋フォールバック対応）
+// ==========================================================================
+// 【関数】fetchUserCoupons()
+// 【役割】ログイン中の会員が持っているクーポン一覧をサーバーから取得する
+// 【具体的な処理内容】
+//   ・利用可能な割引クーポン（初回10%OFF、誕生月500円引など）のデータをサーバーから読み込みます
+// ==========================================================================
 async function fetchUserCoupons() {
     const defaultWelcomeCoupon = {
         id: 1,
@@ -1403,7 +1554,12 @@ async function fetchUserCoupons() {
     return AppState.userCoupons;
 }
 
-// チェックアウト画面の所持クーポン選択UI（「適用する」「利用しない」ボタン選択式）を描画します
+// ==========================================================================
+// 【関数】renderCheckoutCoupons()
+// 【役割】お会計画面に「利用できるクーポン一覧」の選択ボタンを描画する
+// 【具体的な処理内容】
+//   ・持っているクーポンを並べて表示し、ワンクリックで適用できるようにします
+// ==========================================================================
 function renderCheckoutCoupons() {
     const listEl = document.getElementById('checkout-coupons-list');
     const badgeEl = document.getElementById('checkout-coupon-status-badge');
@@ -1466,7 +1622,13 @@ function renderCheckoutCoupons() {
     }).join('');
 }
 
-// クーポンの選択適用処理（何割引きクーポン）
+// ==========================================================================
+// 【関数】handleApplyCouponCode(code)
+// 【役割】クーポンを選んだときに割引を適用する
+// 【具体的な処理内容】
+//   ・選ばれたクーポンが有効かチェックし、合計金額から値引き（10%OFFや500円引きなど）を
+//     計算して画面に反映します
+// ==========================================================================
 function handleApplyCouponCode(code) {
     const targetCode = String(code || 'WELCOME10').trim().toUpperCase();
     if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
@@ -1495,7 +1657,12 @@ function handleApplyCouponCode(code) {
     showToast(`🎉 クーポン「${coupon.name}」を適用しました！（商品代金から ${coupon.discount_label} 引き）`);
 }
 
-// クーポンを利用しない（適用解除）処理
+// ==========================================================================
+// 【関数】handleCancelCoupon()
+// 【役割】適用中のクーポンを解除する
+// 【具体的な処理内容】
+//   ・クーポンの利用を取り消し、通常のお支払い金額に戻します
+// ==========================================================================
 function handleCancelCoupon() {
     const hadCoupon = Boolean(currentAppliedCoupon);
     currentAppliedCoupon = null;
@@ -1506,9 +1673,13 @@ function handleCancelCoupon() {
     }
 }
 
-
-// カート小計・送料(5,000円以上無料 / 未満550円)・クーポン割引・利用ポイント割引・最終支払額をリアルタイム計算します
-// ※重要: ポイントは配送料には影響せず、確実に配送料は払う必要があります（ポイント上限は割引後小計まで）
+// ==========================================================================
+// 【関数】updateCheckoutCalculations()
+// 【役割】お会計画面の「小計・値引き・送料・最終お支払い合計」を自動計算する
+// 【具体的な処理内容】
+//   ・商品代金からクーポン値引きとポイント利用を引き、
+//     送料（税込5,000円以上で無料、未満は550円）を足して、最終的な支払合計を計算します
+// ==========================================================================
 function updateCheckoutCalculations() {
     // HTML 要素の取得
     const subtotalEl = document.getElementById('checkout-subtotal');
@@ -1613,8 +1784,12 @@ function updateCheckoutCalculations() {
     };
 }
 
-
-// 利用ポイント数入力欄の手入力値を保有ポイント・上限金額以内に丸め、支払額を再計算します
+// ==========================================================================
+// 【関数】handlePointsInputChange()
+// 【役割】ポイント利用入力欄に数字を手入力したときの処理
+// 【具体的な処理内容】
+//   ・持っているポイント数や商品代金を超えないよう安全にチェックして、支払額を再計算します
+// ==========================================================================
 function handlePointsInputChange() {
     // HTML 要素 #checkout-use-points を取得して変数 pointInput に格納します
     const pointInput = document.getElementById('checkout-use-points');
@@ -1626,9 +1801,12 @@ function handlePointsInputChange() {
     updateCheckoutCalculations();
 }
 
-
-// 「すべて使う」ボタン押下時に保有ポイントとお支払い金額（商品代金上限）の小さい方を自動入力します
-// ※配送料にはポイントを使えないため、商品代金が上限となります
+// ==========================================================================
+// 【関数】handleUseAllPoints()
+// 【役割】「全ポイントを使う」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・持っているポイントを上限いっぱいまで自動入力して、最大割引を適用します
+// ==========================================================================
 function handleUseAllPoints() {
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     let couponDiscount = 0;
@@ -1651,8 +1829,12 @@ function handleUseAllPoints() {
     showToast(`✨ 保有ポイントから ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円分）を商品代金に適用しました（※配送料はポイント対象外です）`);
 }
 
-
-// 「解除」ボタン押下時に利用ポイントを 0 に戻して再計算します
+// ==========================================================================
+// 【関数】handleResetPoints()
+// 【役割】ポイントの「解除」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・利用ポイントを0に戻して、通常のお支払い金額に再計算します
+// ==========================================================================
 function handleResetPoints() {
     // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
     checkoutUsedPoints = 0;
@@ -1666,8 +1848,12 @@ function handleResetPoints() {
     showToast('ポイント利用を取り消しました');
 }
 
-
-// 注文履歴から過去の購入服をワンクリックでマイクローゼットへ取り込みます（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】importOrderToCloset(idx)
+// 【役割】購入履歴から「買った服」をワンクリックでマイクローゼットへ取り込む
+// 【具体的な処理内容】
+//   ・過去に注文した服を、試着マネキンで着せ替えられる手持ち服としてクローゼットに追加登録します
+// ==========================================================================
 async function importOrderToCloset(idx) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -1899,8 +2085,14 @@ async function importOrderToCloset(idx) {
     }
 }
 
-
-// 注文確定ボタン押下時の処理：ログイン確認→配送先バリデーション→POST /api/orders送信→履歴更新→カート空化→完了モーダル表示
+// ==========================================================================
+// 【関数】handlePlaceOrder()
+// 【役割】「注文を確定する」ボタンを押したときのメイン処理
+// 【具体的な処理内容】
+//   1. お届け先住所や電話番号の入力チェック
+//   2. サーバーへ注文データを送信（MySQLへ保存）
+//   3. カートを空にして、購入完了モーダルを表示
+// ==========================================================================
 async function handlePlaceOrder() {
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (AppState.cart.length === 0) {
@@ -2348,11 +2540,12 @@ async function handlePlaceOrder() {
 // 再代入可能な変数 _ordersMutationSeq を宣言し、値（0）をセットします
 let _ordersMutationSeq = 0;
 
-
 // ==========================================================================
-//  5. 注文履歴同期・MySQL接続再読込・マイページ描画
+// 【関数】syncOrdersFromBackend()
+// 【役割】サーバー（MySQL）からログイン会員の過去の注文履歴を取得する
+// 【具体的な処理内容】
+//   ・注文番号、購入日時、商品、合計金額などの一覧をサーバーから読み込んで画面に反映します
 // ==========================================================================
-// 現在ログイン会員の注文履歴を取得して画面更新します（スマホ版はlocalStorage、PC版はバックエンドMySQL）
 async function syncOrdersFromBackend() {
     // HTML 要素 #mysql-status-pill を取得して変数 statusPill に格納します
     const statusPill = document.getElementById('mysql-status-pill');
@@ -2509,8 +2702,12 @@ async function syncOrdersFromBackend() {
     }
 }
 
-
-// 現在のログイン会員の注文履歴を初期化削除します（スマホ版はlocalStorage、PC版はサーバーMySQL）
+// ==========================================================================
+// 【関数】handleClearOrderHistory()
+// 【役割】マイページの注文履歴を全削除（リセット）する
+// 【具体的な処理内容】
+//   ・テスト用などに保存されている過去の注文履歴をすべて消去します
+// ==========================================================================
 async function handleClearOrderHistory() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -2571,8 +2768,12 @@ async function handleClearOrderHistory() {
     }
 }
 
-
-// マイページの「最新データに更新」ボタン押下時に注文・お気に入り・カート・クローゼットを再取得します
+// ==========================================================================
+// 【関数】handleRefreshFromMySQL()
+// 【役割】マイページの「最新データに更新」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・注文履歴・お気に入り・カート・クローゼットの全データをサーバーから一括で再取得して画面を最新化します
+// ==========================================================================
 async function handleRefreshFromMySQL() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -2678,8 +2879,13 @@ async function handleRefreshFromMySQL() {
     }
 }
 
-
-// マイページ画面に会員ランク・ポイント・注文履歴テーブル・統計・お気に入り商品一覧を描画します
+// ==========================================================================
+// 【関数】renderMyPage()
+// 【役割】マイページ画面（会員ランク、ポイント、購入履歴、お気に入り服など）を描画する
+// 【具体的な処理内容】
+//   ・現在の会員ランクや保有ポイント数、過去に買った注文履歴の一覧表、
+//     お気に入り商品などを綺麗に整えて画面に表示します
+// ==========================================================================
 function renderMyPage() {
     // HTML 要素 #mypage-user-name を取得して変数 userNameEl に格納します
     const userNameEl = document.getElementById('mypage-user-name');
@@ -2857,12 +3063,12 @@ function renderMyPage() {
 // 再代入可能な変数 _favoritesMutationSeq を宣言し、値（0）をセットします
 let _favoritesMutationSeq = 0;
 
-
 // ==========================================================================
-//  6. お気に入り管理（ハートボタン状態同期 ＋ MySQL favorites テーブル連動）
+// 【関数】getOwnedProductIds()
+// 【役割】マイクローゼットに登録済みの商品ID一覧を取得する
+// 【具体的な処理内容】
+//   ・すでに自分が持っている服のIDを調べてリストで返します
 // ==========================================================================
-
-// マイクローゼットに現在登録されているブランド商品の ID 一覧を取得するヘルパー関数
 function getOwnedProductIds() {
     const ownedIds = new Set();
     if (Array.isArray(AppState.myCloset)) {
@@ -2882,7 +3088,12 @@ function getOwnedProductIds() {
 }
 window.getOwnedProductIds = getOwnedProductIds;
 
-// 購入手続き確定時にお気に入りリストから購入済み商品を自動解除する関数
+// ==========================================================================
+// 【関数】cleanPurchasedFavorites(purchasedIds)
+// 【役割】商品を購入した後に、その商品をお気に入りリストから自動で外す
+// 【具体的な処理内容】
+//   ・「もう買った服」はお気に入りに入れておく必要がないため、自動で整理します
+// ==========================================================================
 function cleanPurchasedFavorites(purchasedIds) {
     if (!Array.isArray(AppState.favorites)) return false;
     let targetIds = [];
@@ -2927,7 +3138,13 @@ function cleanPurchasedFavorites(purchasedIds) {
 }
 window.cleanPurchasedFavorites = cleanPurchasedFavorites;
 
-// ログイン会員のお気に入り商品ID一覧を取得してハートUIを同期します（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】syncFavoritesFromBackend()
+// 【役割】サーバー（MySQL）から「お気に入り登録した商品ID一覧」を取得する
+// 【具体的な処理内容】
+//   ・自分がハートを付けた服の一覧をサーバーから読み込んで、
+//     画面上のハートマークを赤色（ON）にします
+// ==========================================================================
 async function syncFavoritesFromBackend() {
     // 未ログイン時はゲスト用ストレージから復元します
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -3013,8 +3230,13 @@ async function syncFavoritesFromBackend() {
     }
 }
 
-
-// ハートボタン押下時のお気に入り登録／解除トグル処理を行います（未ログイン時はローカル保存、ログイン時はMySQL/localStorage保存）
+// ==========================================================================
+// 【関数】handleToggleFavorite(productId)
+// 【役割】商品の「ハート（お気に入り）」ボタンを押したときの登録／解除切り替え
+// 【具体的な処理内容】
+//   ・お気に入りに入っていなければ追加、すでに入っていれば解除して、
+//     サーバーに保存しハートの見た目を切り替えます
+// ==========================================================================
 async function handleToggleFavorite(productId) {
     const numId = Number(productId);
     if (!numId || isNaN(numId)) return;
@@ -3089,8 +3311,13 @@ async function handleToggleFavorite(productId) {
     }
 }
 
-
-// 画面上のすべてのハートボタンと「お気に入り登録済み」ボタン見た目を AppState.favorites に合わせて一括同期します
+// ==========================================================================
+// 【関数】syncAllFavoriteButtons(productId, isFavorite)
+// 【役割】画面上にある同じ商品のハートボタンの見た目を一斉に揃える
+// 【具体的な処理内容】
+//   ・トップ画面、一覧画面、詳細画面などで同じ商品のハートマークが
+//     ズレないよう、すべて同時にON/OFF切り替えます
+// ==========================================================================
 function syncAllFavoriteButtons(productId, isFavorite) {
     const numId = Number(productId);
     // CSS セレクタに一致するすべての商品カード要素を安全に取得
@@ -3143,8 +3370,12 @@ function syncAllFavoriteButtons(productId, isFavorite) {
     }
 }
 
-
-// ヘッダーやタブ等のお気に入り件数バッジ（.icon-badge 等）を一括更新します
+// ==========================================================================
+// 【関数】updateFavoriteBadges()
+// 【役割】ヘッダーやお気に入りタブにある「お気に入り件数バッジ」を更新する
+// 【具体的な処理内容】
+//   ・現在お気に入りに入っている服の合計数を数えて、バッジの数字を書き換えます
+// ==========================================================================
 function updateFavoriteBadges() {
     // 定数 count を宣言し、値（AppState.favorites.length）をセットします
     const count = Array.isArray(AppState.favorites) ? AppState.favorites.length : 0;
@@ -3171,8 +3402,12 @@ function updateFavoriteBadges() {
     if (mobBrandFavCnt) mobBrandFavCnt.textContent = count;
 }
 
-
-// お気に入り一覧画面('#favorites')に該当商品カード（0件時は案内カード）を描画します
+// ==========================================================================
+// 【関数】renderFavoriteProducts()
+// 【役割】お気に入り画面（#favorites）にお気に入り登録した商品のカード一覧を表示する
+// 【具体的な処理内容】
+//   ・ハートを付けた服だけを並べて表示します（0件の場合は「お気に入りはまだありません」と表示）
+// ==========================================================================
 function renderFavoriteProducts() {
     // HTML 要素 #favorite-product-grid を取得して変数 favGrid に格納します
     const favGrid = document.getElementById('favorite-product-grid');
@@ -3200,11 +3435,13 @@ function renderFavoriteProducts() {
     }
 }
 
-
 // ==========================================================================
-//  7. 会員認証 UI（ログイン・新規登録・デモログイン・ログアウト）
+// 【関数】updateAuthNavUI()
+// 【役割】ログイン状態に応じてヘッダーのボタン（ログイン／マイページ）を切り替える
+// 【具体的な処理内容】
+//   ・未ログインなら「ログイン / 会員登録」ボタンを表示
+//   ・ログイン中なら「〇〇様（マイページ）」とログアウトボタンを表示します
 // ==========================================================================
-// ヘッダーやマイページのログイン状態表示（ユーザーアイコンのオンライン表示など）を切り替えます
 function updateAuthNavUI() {
     // HTML 要素 #nav-auth-link を取得（ナビから削除された場合は null）
     const authLink = document.getElementById('nav-auth-link');
@@ -3249,8 +3486,12 @@ function updateAuthNavUI() {
     }
 }
 
-
-// ログアウト実行：スマホ版はlocalStorageのログインセッションを解除、PC版はPOST /api/auth/logoutでサーバーセッションを破棄し、HOMEへ戻ります
+// ==========================================================================
+// 【関数】handleLogout(e)
+// 【役割】「ログアウト」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・サーバーのログインセッションを終了し、データを初期化して、ホーム画面へ戻ります
+// ==========================================================================
 async function handleLogout(e) {
     // 条件（e && typeof e.preventDefault === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
@@ -3284,8 +3525,13 @@ async function handleLogout(e) {
     showToast('ログアウトしました');
 }
 
-
-// ログイン成功後に確実にHOME画面へ自動復帰する関数（どこにも行かず一旦HOMEに戻る）
+// ==========================================================================
+// 【関数】redirectToHome(user, options = {})
+// 【役割】ログイン成功時やログアウト時に、確実にホーム画面へ安全に戻す
+// 【具体的な処理内容】
+//   ・表示画面を `#home` に切り替えて、メニューの選択状態や商品一覧を再描画し、
+//     ページ最上部へスクロールします
+// ==========================================================================
 async function redirectToHome(user, options = {}) {
     // 保持していた一時遷移先を完全にクリア
     AppState.pendingAuthTarget = null;
@@ -3343,8 +3589,12 @@ async function redirectToHome(user, options = {}) {
 const navigateAfterAuth = redirectToHome;
 window.redirectToHome = redirectToHome;
 
-
-// デモログインボタン用：スマホ版はlocalStorage、PC版はPOST /api/auth/demoでデモ会員へログインし、HOME画面へ戻ります
+// ==========================================================================
+// 【関数】handleDemoLogin(e)
+// 【役割】「デモアカウントで簡単お試しログイン」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・メールアドレスやパスワードを入力せずに、ワンクリックでテスト用ゴールド会員としてログインします
+// ==========================================================================
 async function handleDemoLogin(e) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
@@ -3422,8 +3672,13 @@ async function handleDemoLogin(e) {
     await redirectToHome(demoUser, { silentToast: true });
 }
 
-
-// ログインフォーム送信処理：スマホ版はlocalStorage、PC版はPOST /api/auth/loginで認証し、HOME画面へ戻ります
+// ==========================================================================
+// 【関数】handleLogin(e)
+// 【役割】ログインフォームでメールアドレスとパスワードを送信したときの処理
+// 【具体的な処理内容】
+//   ・入力されたメールアドレスとパスワードをサーバーへ送り、
+//     認証が成功したらその会員としてログインしてホームへ戻ります
+// ==========================================================================
 async function handleLogin(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -3557,8 +3812,13 @@ async function handleLogin(e) {
     }
 }
 
-
-// 会員登録フォーム送信処理：スマホ版はlocalStorage、PC版はPOST /api/auth/registerで新規会員作成＆ログインし、HOME画面へ戻ります
+// ==========================================================================
+// 【関数】handleRegister(e)
+// 【役割】新規会員登録フォームを送信したときの処理
+// 【具体的な処理内容】
+//   ・入力された名前、メールアドレス、パスワードをサーバーへ送り、
+//     新しい会員アカウントを作成して自動ログインします
+// ==========================================================================
 async function handleRegister(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -3713,11 +3973,12 @@ async function handleRegister(e) {
     }
 }
 
-
 // ==========================================================================
-//  8. 共通 UI 部品（モーダルダイアログ・トースト通知・スマホドロワー）
+// 【関数】openManekinModal(title, contentHtml)
+// 【役割】お知らせやガイドなどのポップアップ画面（モーダル）を開く
+// 【具体的な処理内容】
+//   ・指定されたタイトルと本文で画面中央にポップアップを表示します
 // ==========================================================================
-// 汎用通知モーダル（注文完了や利用ガイドなど）を指定タイトル・本文HTMLで開きます
 function openManekinModal() {
     // HTML 要素 #manekin-modal を取得して変数 modal に格納します
     const modal = document.getElementById('manekin-modal');
@@ -3730,8 +3991,12 @@ function openManekinModal() {
     }
 }
 
-
-// 汎用通知モーダルを非表示に閉じます
+// ==========================================================================
+// 【関数】closeManekinModal()
+// 【役割】ポップアップ画面（モーダル）を閉じる
+// 【具体的な処理内容】
+//   ・開いているモーダルを非表示にします
+// ==========================================================================
 function closeManekinModal() {
     // HTML 要素 #manekin-modal を取得して変数 modal に格納します
     const modal = document.getElementById('manekin-modal');
@@ -3739,7 +4004,12 @@ function closeManekinModal() {
     if (modal) modal.classList.remove('open');
 }
 
-// HTML特殊文字のエスケープ処理
+// ==========================================================================
+// 【関数】escapeHtml(str)
+// 【役割】悪意あるスクリプト（XSS攻撃）を防ぐために文字を安全に変換する
+// 【具体的な処理内容】
+//   ・`<` や `>` などの危険な記号を安全な文字コードに変換します
+// ==========================================================================
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -3750,7 +4020,12 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// マイページの「保有クーポン」を押した時に何のクーポンを所持しているか一覧モーダルを表示します
+// ==========================================================================
+// 【関数】openMyPageCouponsModal()
+// 【役割】マイページの「保有クーポン一覧を見る」を押したときにクーポン一覧ポップアップを開く
+// 【具体的な処理内容】
+//   ・持っているクーポンの詳細（割引内容や有効期限）をモーダルウィンドウに一覧表示します
+// ==========================================================================
 async function openMyPageCouponsModal() {
     // 最新の保有クーポン配列を同期します
     await fetchUserCoupons();
@@ -3827,7 +4102,12 @@ async function openMyPageCouponsModal() {
     if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
 }
 
-// 保有クーポンモーダルを非表示に閉じます
+// ==========================================================================
+// 【関数】closeMyPageCouponsModal()
+// 【役割】保有クーポン一覧ポップアップを閉じる
+// 【具体的な処理内容】
+//   ・クーポンのモーダルを非表示にします
+// ==========================================================================
 function closeMyPageCouponsModal() {
     const modal = document.getElementById('modal-user-coupons');
     if (modal) {
@@ -3836,8 +4116,12 @@ function closeMyPageCouponsModal() {
     }
 }
 
-
-// 画面右下に数秒間だけ表示して自動で消えるトースト通知バナーを表示します
+// ==========================================================================
+// 【関数】showToast(message)
+// 【役割】画面右下に数秒間だけメッセージ（黒い帯）を表示して自動で消す
+// 【具体的な処理内容】
+//   ・「カートに追加しました」「ログインしました」などの完了メッセージを通知します
+// ==========================================================================
 function showToast(message) {
     // HTML 要素 #toast-container を取得して変数 container に格納します
     const container = document.getElementById('toast-container');
@@ -3863,8 +4147,12 @@ function showToast(message) {
     }, 2500);
 }
 
-
-// スマートフォン用ハンバーガーメニュー（スライドドロワー）と暗い背景幕を開きます
+// ==========================================================================
+// 【関数】openMobileDrawer()
+// 【役割】スマホ画面で左上のハンバーガーメニューを押したときにメニューを開く
+// 【具体的な処理内容】
+//   ・画面左からスライドメニューを出し、背景を暗くします
+// ==========================================================================
 function openMobileDrawer() {
     // HTML 要素 #mobile-menu-drawer を取得して変数 drawer に格納します
     const drawer = document.getElementById('mobile-menu-drawer');
@@ -3881,8 +4169,12 @@ function openMobileDrawer() {
     }
 }
 
-
-// スマートフォン用スライドメニューと背景暗転幕を閉じます
+// ==========================================================================
+// 【関数】closeMobileDrawer()
+// 【役割】スマホのメニューや暗い背景を押したときにメニューを閉じる
+// 【具体的な処理内容】
+//   ・開いていたスライドメニューを元の位置に引っ込めます
+// ==========================================================================
 function closeMobileDrawer() {
     // HTML 要素 #mobile-menu-drawer を取得して変数 drawer に格納します
     const drawer = document.getElementById('mobile-menu-drawer');

@@ -97,8 +97,12 @@ let originalClosetUploadDataUrl = '';
 // 現在選択中の画像に背景透過処理が完了しているかを示すフラグです
 let isCurrentUploadTransparent = false;
 
-
-// MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
+// ==========================================================================
+// 【関数】switchStudioTab(tabKey)
+// 【役割】スタジオ上部のメインタブ（ホーム/クローゼット/お気に入り/コーデ作成/保存済み）を切り替える
+// 【具体的な処理内容】
+//   ・選ばれたタブに応じて、表示するパネルやボタンの表示・非表示を切り替えます
+// ==========================================================================
 function switchStudioTab(tabKey) {
     // メディアクエリの画面設計（992px以下）の時だけ、独立したお気に入り画面を開かず、コーデ作成画面内の「お気に入り商品」列へ誘導します
     if (tabKey === 'favorites' && window.innerWidth <= 992) {
@@ -136,8 +140,12 @@ function switchStudioTab(tabKey) {
     renderManekinStudio(tabKey);
 }
 
-
-// スタジオ画面全体のヘッダー会員情報・件数バッジ・各タブの最新描画を統括して更新します
+// ==========================================================================
+// 【関数】renderManekinStudio(activeTab = 'create')
+// 【役割】試着スタジオ画面全体（会員情報、タブ表示、服一覧）を最新状態に描画する
+// 【具体的な処理内容】
+//   ・ログイン中の会員名やポイントを表示し、指定されたタブ（初期値はコーデ作成）の内容を描画します
+// ==========================================================================
 function renderManekinStudio(activeTab = 'create') {
     // HTML 要素 #studio-user-name を取得して変数 userNameElem に格納します
     const userNameElem = document.getElementById('studio-user-name');
@@ -294,8 +302,12 @@ const BRAND_SIZE_SCALES = {
     'XL': 112
 };
 
-
-// スタジオ「マイクローゼット」タブ内に所有している服カード一覧を描画します
+// ==========================================================================
+// 【関数】renderPaneClosetGrid()
+// 【役割】スタジオの「マイクローゼット」タブに、持っている服の一覧カードを表示する
+// 【具体的な処理内容】
+//   ・自分が登録した手持ち服や購入した服のカードをグリッド状に並べて表示します
+// ==========================================================================
 function renderPaneClosetGrid() {
     // HTML 要素 #closet-items-grid を取得して変数 grid に格納します
     const grid = document.getElementById('closet-items-grid');
@@ -363,8 +375,12 @@ function renderPaneClosetGrid() {
     }).join('');
 }
 
-
-// 3列試着画面の左カラム「1. 手持ちの服」一覧カードを描画します（クリック着用＆ドラッグ対応）
+// ==========================================================================
+// 【関数】renderStudioClosetList()
+// 【役割】試着室の左側カラム「手持ちの服一覧」を描画する
+// 【具体的な処理内容】
+//   ・ドラッグ＆ドロップまたはクリックでマネキンに着せられる手持ち服のリストを表示します
+// ==========================================================================
 function renderStudioClosetList() {
     // HTML 要素 #studio-closet-list を取得して変数 list に格納します
     const list = document.getElementById('studio-closet-list');
@@ -421,8 +437,12 @@ function renderStudioClosetList() {
     }).join('');
 }
 
-
-// マイクローゼットタブのカテゴリ絞り込みボタン押下時の再描画処理です
+// ==========================================================================
+// 【関数】handlePaneClosetFilter(cat)
+// 【役割】マイクローゼットタブでカテゴリ（帽子、トップス等）を絞り込んだときの処理
+// 【具体的な処理内容】
+//   ・選ばれたカテゴリの服だけを抽出してマイクローゼット画面を再描画します
+// ==========================================================================
 function handlePaneClosetFilter(cat) {
     // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
@@ -435,8 +455,12 @@ function handlePaneClosetFilter(cat) {
     renderPaneClosetGrid();
 }
 
-
-// 3列スタジオ左カラムのカテゴリチップ絞り込み時の再描画処理です
+// ==========================================================================
+// 【関数】handleStudioClosetFilter(cat)
+// 【役割】試着室左側カラムのカテゴリフィルター（ALL、TOPS等）を切り替えたときの処理
+// 【具体的な処理内容】
+//   ・選ばれたカテゴリの手持ち服だけを左カラムに表示します
+// ==========================================================================
 function handleStudioClosetFilter(cat) {
     // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
@@ -449,8 +473,12 @@ function handleStudioClosetFilter(cat) {
     renderStudioClosetList();
 }
 
-
-// 3列試着画面の右カラム「3. ブランド商品」リスト（お気に入りフィルタ・カテゴリ絞込反映）を描画します
+// ==========================================================================
+// 【関数】renderStudioBrandList()
+// 【役割】試着室の右側カラム「ブランド商品一覧」を描画する
+// 【具体的な処理内容】
+//   ・マネキンに試着できるショップの販売商品を一覧表示します
+// ==========================================================================
 function renderStudioBrandList() {
     // HTML 要素 #studio-brand-list を取得して変数 list に格納します
     const list = document.getElementById('studio-brand-list');
@@ -535,8 +563,12 @@ function renderStudioBrandList() {
     }).join('');
 }
 
-
-// 右カラムブランド商品一覧のカテゴリ絞り込みチップ切替処理です
+// ==========================================================================
+// 【関数】handleStudioBrandFilter(cat)
+// 【役割】試着室右側カラムのカテゴリフィルターを切り替えたときの処理
+// 【具体的な処理内容】
+//   ・選ばれたカテゴリの販売商品だけを右カラムに表示します
+// ==========================================================================
 function handleStudioBrandFilter(cat) {
     // アプリ全体状態 AppState.studioBrandFilter を最新値（cat）に更新します
     AppState.studioBrandFilter = cat;
@@ -549,8 +581,12 @@ function handleStudioBrandFilter(cat) {
     renderStudioBrandList();
 }
 
-
-// スタジオ「お気に入り商品」タブにハート登録済み商品カード一覧を描画します
+// ==========================================================================
+// 【関数】renderStudioFavoritesGrid()
+// 【役割】スタジオの「お気に入り商品」タブにハートを付けた服の一覧を表示する
+// 【具体的な処理内容】
+//   ・ショップでお気に入り登録した商品カードを一覧表示し、そこから直接試着できるようにします
+// ==========================================================================
 function renderStudioFavoritesGrid() {
     // HTML 要素 #studio-fav-grid を取得して変数 grid に格納します
     const grid = document.getElementById('studio-fav-grid');
@@ -609,11 +645,12 @@ function renderStudioFavoritesGrid() {
     }).join('');
 }
 
-
 // ==========================================================================
-//  3. マネキン試着・着脱・ドラッグ＆ドロップ・クイックピッカー操作
+// 【関数】isItemWearing(item)
+// 【役割】その服が「いまマネキンに着せられているか」を判定する
+// 【具体的な処理内容】
+//   ・マネキンの帽子・トップス・ボトムス等のスロットを調べ、同じ服を着ていればtrueを返します
 // ==========================================================================
-// 渡されたアイテムが現在マネキンの対応部位スロットに着用されているか真偽値で判定します
 function isItemWearing(item) {
     // 定数 outfit を宣言し、値（AppState.currentOutfit）をセットします
     const outfit = AppState.currentOutfit;
@@ -633,8 +670,13 @@ function isItemWearing(item) {
     return false;
 }
 
-
-// アイテムカード押下時に「着ていなければマネキンに着用 / 着用中なら脱ぐ」を切り替え、AI診断＆MySQL同期します
+// ==========================================================================
+// 【関数】toggleWearItem(itemId, isOwned)
+// 【役割】服カードをクリックしたときに「着る / 脱ぐ」を切り替える
+// 【具体的な処理内容】
+//   ・まだ着ていなければマネキンに着せ、すでに着ていれば脱がせて、
+//     画面を再描画しサーバーに保存します
+// ==========================================================================
 function toggleWearItem(itemId, isOwned) {
     // 再代入可能な変数 targetItem を宣言し、値（null）をセットします
     let targetItem = null;
@@ -702,8 +744,12 @@ function toggleWearItem(itemId, isOwned) {
     updateAIStylingComment();
 }
 
-
-// カテゴリ文字列('OUTER'/'TOPS'等)をマネキンスロット名('outer'/'tops'等)へ小文字正規化します
+// ==========================================================================
+// 【関数】getSlotKeyByCategory(category)
+// 【役割】服のカテゴリ名（'TOPS'など）をマネキンの部位名（'tops'など）に変換する
+// 【具体的な処理内容】
+//   ・大文字のカテゴリ名を小文字の部位スロットキーに直して返します
+// ==========================================================================
 function getSlotKeyByCategory(category) {
     // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
@@ -722,8 +768,12 @@ function getSlotKeyByCategory(category) {
     }
 }
 
-
-// 指定した部位スロット('hat'〜'shoes')の服だけをマネキンから脱がせて MySQL 同期します
+// ==========================================================================
+// 【関数】unwearSlot(slotKey)
+// 【役割】マネキンの指定部位（帽子、トップスなど）の服を脱がせる
+// 【具体的な処理内容】
+//   ・その部位の服を空（null）にして、マネキンを再描画しサーバーへ保存します
+// ==========================================================================
 function unwearSlot(slotKey) {
     // 条件（AppState.currentOutfit[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit[slotKey]) {
@@ -747,8 +797,12 @@ function unwearSlot(slotKey) {
     }
 }
 
-
-// マネキンの全5部位を一度に空に戻します（UI更新あり）
+// ==========================================================================
+// 【関数】resetMannequinOutfit(silent = false)
+// 【役割】マネキンに着せている服を全身すべて脱がせてリセットする
+// 【具体的な処理内容】
+//   ・5部位すべての服を空にし、マネキンを初期状態に戻します
+// ==========================================================================
 function resetMannequinOutfit(silent = false) {
     // アプリ全体状態 AppState.currentOutfit を最新値（{）に更新します
     AppState.currentOutfit = {
@@ -781,15 +835,23 @@ function resetMannequinOutfit(silent = false) {
     updateAIStylingComment();
 }
 
-
-// ツールバー「全身クリア」ボタン押下時にマネキンの服をすべてリセットして通知します
+// ==========================================================================
+// 【関数】clearMannequin()
+// 【役割】ツールバーの「全身クリア」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・マネキンの服をすべて脱がせて、「マネキンをクリアしました」と通知します
+// ==========================================================================
 function clearMannequin() {
     // 関連処理 resetMannequinOutfit() を呼び出して処理・画面を更新します
     resetMannequinOutfit(false);
 }
 
-
-// 画像読み込み失敗(onerror)時にカテゴリに応じた代用ブランド画像パスを返します
+// ==========================================================================
+// 【関数】getCategoryFallbackImage(category)
+// 【役割】写真の読み込みに失敗したときの「代わりのダミー画像」を取得する
+// 【具体的な処理内容】
+//   ・画像のリンク切れが起きた際に、カテゴリに応じた標準の服画像を表示して画面崩れを防ぎます
+// ==========================================================================
 function getCategoryFallbackImage(category) {
     // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
@@ -818,8 +880,12 @@ function getCategoryFallbackImage(category) {
     }
 }
 
-
-// 古いデータに含まれる旧ファイル名画像を現行フォルダの実在画像パスへメモリ補正します
+// ==========================================================================
+// 【関数】migrateOldBrokenAssets()
+// 【役割】古い服データの画像パスを、現在の正しい画像パスへ自動補正する
+// 【具体的な処理内容】
+//   ・ファイル名が変わった古い画像URLを最新の画像URLへ置き換えます
+// ==========================================================================
 function migrateOldBrokenAssets() {
     // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
     if (typeof purgeAllManekinLocalStorage === 'function') {
@@ -916,8 +982,13 @@ function migrateOldBrokenAssets() {
     }
 }
 
-
-// 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
+// ==========================================================================
+// 【関数】renderMannequinStage()
+// 【役割】中央のマネキン試着室ステージ（重なり順、服の画像、着用中スロット）を描画する
+// 【具体的な処理内容】
+//   ・マネキンの素体画像の上に、現在着ている服の画像を正しい重なり順
+//     （下着→ボトムス→トップス→アウター→帽子）で重ねて表示します
+// ==========================================================================
 function renderMannequinStage() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -1033,8 +1104,13 @@ function renderMannequinStage() {
     }
 }
 
-
-// 着用中スロットチップ押下時の処理：着ていれば調整パネル対象切替、未着用ならクイックピッカーを開きます
+// ==========================================================================
+// 【関数】handleStageSlotClick(slotKey)
+// 【役割】試着室下部の着用スロット（帽子・トップス等）をクリックしたときの処理
+// 【具体的な処理内容】
+//   ・服を着ていれば「サイズ微調整パネル」を開き、
+//     着ていなければ「簡易着せ替えピッカー」を開きます
+// ==========================================================================
 function handleStageSlotClick(slotKey) {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -1052,8 +1128,13 @@ function handleStageSlotClick(slotKey) {
     }
 }
 
-
-// 未着用部位を選んだとき、手持ち服やブランド服からすぐ着せられる簡易選択リストを表示します
+// ==========================================================================
+// 【関数】openStageQuickPicker(slotKey)
+// 【役割】部位を選んで直接着せ替えられる「簡易選択ポップアップ」を開く
+// 【具体的な処理内容】
+//   ・その部位に着せられる手持ち服と販売商品を一覧表示し、
+//     選んですぐに着せ替えられます
+// ==========================================================================
 function openStageQuickPicker(slotKey) {
     // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
@@ -1134,8 +1215,12 @@ function openStageQuickPicker(slotKey) {
     handleStudioBrandFilter(catInfo.cat);
 }
 
-
-// 簡易部位選択ポップアップ要素を DOM から取り除きます
+// ==========================================================================
+// 【関数】closeStageQuickPicker()
+// 【役割】簡易選択ポップアップを閉じる
+// 【具体的な処理内容】
+//   ・開いていたポップアップを画面から消去します
+// ==========================================================================
 function closeStageQuickPicker() {
     // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
@@ -1143,8 +1228,12 @@ function closeStageQuickPicker() {
     if (picker) picker.style.display = 'none';
 }
 
-
-// 左右リストの服カードをドラッグ開始したとき、アイテム識別情報を dataTransfer に格納します
+// ==========================================================================
+// 【関数】handleCardDragStart(event, itemId, isOwned)
+// 【役割】服カードをドラッグし始めたときの処理
+// 【具体的な処理内容】
+//   ・つかんだ服のIDや手持ち服フラグをドラッグデータ（dataTransfer）に記憶させます
+// ==========================================================================
 function handleCardDragStart(event, itemId, isOwned) {
     // ドラッグ中のアイテム種類とIDを文字列データとしてブラウザの転送領域へ格納します
     event.dataTransfer.setData('text/plain', JSON.stringify({ itemId, isOwned }));
@@ -1152,8 +1241,12 @@ function handleCardDragStart(event, itemId, isOwned) {
     event.dataTransfer.effectAllowed = 'copy';
 }
 
-
-// マネキンステージ上にドラッグカーソルが乗ったとき、ドロップ許可スタイルを付けます
+// ==========================================================================
+// 【関数】handleStageDragOver(event)
+// 【役割】服をマネキンステージの上にドラッグして持ってきたときの処理
+// 【具体的な処理内容】
+//   ・ドロップ可能であることをブラウザに伝え、ステージに青い枠線を付けて目立たせます
+// ==========================================================================
 function handleStageDragOver(event) {
     // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
@@ -1165,8 +1258,12 @@ function handleStageDragOver(event) {
     if (box) box.classList.add('is-dragover');
 }
 
-
-// ドラッグがマネキンステージ領域から離れたとき、ハイライト枠を消します
+// ==========================================================================
+// 【関数】handleStageDragLeave(event)
+// 【役割】ドラッグ中の服がマネキンステージの外へ離れたときの処理
+// 【具体的な処理内容】
+//   ・ステージの枠線の強調表示を元に戻します
+// ==========================================================================
 function handleStageDragLeave(event) {
     // HTML 要素 #mannequin-stage-box を取得して変数 box に格納します
     const box = document.getElementById('mannequin-stage-box');
@@ -1174,8 +1271,12 @@ function handleStageDragLeave(event) {
     if (box) box.classList.remove('is-dragover');
 }
 
-
-// マネキンステージへ服カードがドロップされたとき、その服をマネキンへ着せ替えます
+// ==========================================================================
+// 【関数】handleStageDrop(event)
+// 【役割】マネキンステージの上で服を離した（ドロップした）ときの処理
+// 【具体的な処理内容】
+//   ・ドラッグしていた服をマネキンに着用させ、画面を更新してサーバーに保存します
+// ==========================================================================
 function handleStageDrop(event) {
     // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
@@ -1200,11 +1301,13 @@ function handleStageDrop(event) {
     }
 }
 
-
 // ==========================================================================
-//  4. フィット感・位置(X/Y)・XS〜XLサイズ・自由拡大率のリアルタイム微調整
+// 【関数】applyFittingOffsets()
+// 【役割】スライダーで変更した服の位置や大きさをマネキン上の服に即時反映する
+// 【具体的な処理内容】
+//   ・CSSの `transform: translate(...) scale(...)` を使って、
+//     服画像をミリ単位・パーセント単位で動かします
 // ==========================================================================
-// 部位別の X/Y オフセット・ブランドサイズ換算スケール・自由拡大率を CSS transform として各服画像に即時適用します
 function applyFittingOffsets() {
     // 定数 offsets を宣言し、値（AppState.fittingOffsets || {}）をセットします
     const offsets = AppState.fittingOffsets || {};
@@ -1253,8 +1356,12 @@ function applyFittingOffsets() {
     });
 }
 
-
-// ツールバー「位置・サイズ微調整」パネルの表示／非表示を切り替えます
+// ==========================================================================
+// 【関数】toggleFittingAdjustPanel()
+// 【役割】ツールバーの「服の位置・サイズ微調整」パネルを開閉する
+// 【具体的な処理内容】
+//   ・調整パネルの表示／非表示を切り替えます
+// ==========================================================================
 function toggleFittingAdjustPanel() {
     // HTML 要素 #fitting-adjust-panel を取得して変数 panel に格納します
     const panel = document.getElementById('fitting-adjust-panel');
@@ -1277,8 +1384,12 @@ function toggleFittingAdjustPanel() {
     }
 }
 
-
-// 調整パネル内の部位タブ(帽子/アウター/トップス/ボトムス/靴)を切り替えます
+// ==========================================================================
+// 【関数】switchAdjustSlot(slotKey)
+// 【役割】調整パネル内で微調整する部位（帽子／アウター／トップス／ボトムス／靴）を切り替える
+// 【具体的な処理内容】
+//   ・選ばれた部位のタブをアクティブにし、その服の現在の位置・サイズ数値をスライダーに反映します
+// ==========================================================================
 function switchAdjustSlot(slotKey) {
     // アプリ全体状態 AppState.activeAdjustSlot を最新値（slotKey）に更新します
     AppState.activeAdjustSlot = slotKey;
@@ -1291,8 +1402,13 @@ function switchAdjustSlot(slotKey) {
     syncAdjustPanelUI();
 }
 
-
-// 現在選択中の部位が「販売商品(XS〜XL)」か「手持ち服(%自由拡大)」かに合わせて調整スライダーと数値を同期表示します
+// ==========================================================================
+// 【関数】syncAdjustPanelUI()
+// 【役割】選択中の部位に合わせて、調整パネルのスライダーや数値を最新表示に同期する
+// 【具体的な処理内容】
+//   ・「販売商品（XS〜XL規格サイズ）」か「手持ち服（自由拡大率）」かに応じて、
+//     適切な調整バーを表示します
+// ==========================================================================
 function syncAdjustPanelUI() {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1532,8 +1648,12 @@ function syncAdjustPanelUI() {
     }
 }
 
-
-// ブランド商品の規格サイズスライダー(0〜4)またはタグ押下時に XS〜XL サイズ設定を更新し、MySQL保存します
+// ==========================================================================
+// 【関数】handleBrandSizeInput(val)
+// 【役割】販売商品のサイズスライダー（XS〜XL）を動かしたときの処理
+// 【具体的な処理内容】
+//   ・選ばれたサイズ規格に合わせてマネキン上の服の大きさを拡大・縮小し、自動保存します
+// ==========================================================================
 function handleBrandSizeInput(val) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1600,8 +1720,12 @@ function handleBrandSizeInput(val) {
     syncStudioStateToBackend({ immediate: false });
 }
 
-
-// ブランドサイズの「＋／－」ボタンで 1 段階サイズを上下させます
+// ==========================================================================
+// 【関数】stepBrandSize(delta)
+// 【役割】販売商品サイズの「＋」「－」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・サイズを1段階大きく（S→M）または小さく（L→M）変更します
+// ==========================================================================
 function stepBrandSize(delta) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1624,8 +1748,12 @@ function stepBrandSize(delta) {
     handleBrandSizeInput(baseIdx + delta);
 }
 
-
-// 上下Y・左右X・自由拡大率%スライダーが動いたとき、即座にマネキン表示へ反映して MySQL 自動保存を予約します
+// ==========================================================================
+// 【関数】handleAdjustInput(prop, val)
+// 【役割】服の上下位置(Y軸)・左右位置(X軸)・拡大率スライダーを動かしたときの処理
+// 【具体的な処理内容】
+//   ・スライダーの数値を服画像にリアルタイム反映し、位置を微調整します
+// ==========================================================================
 function handleAdjustInput(prop, val) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1673,8 +1801,12 @@ function handleAdjustInput(prop, val) {
     syncStudioStateToBackend({ immediate: false });
 }
 
-
-// X/Y/拡大率の micro 微調整ボタン（▲▼◀▶＋－）押下時に値を指定刻みで変更します
+// ==========================================================================
+// 【関数】stepAdjust(prop, delta)
+// 【役割】位置調整スライダー横の「＋」「－」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・位置やサイズを1ステップずつ細かく刻んで変更します
+// ==========================================================================
 function stepAdjust(prop, delta) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1703,8 +1835,12 @@ function stepAdjust(prop, delta) {
     if (slider) slider.value = nextVal;
 }
 
-
-// 現在調整中の部位（位置・拡大・サイズ）を初期値へリセットします
+// ==========================================================================
+// 【関数】resetFittingOffsets()
+// 【役割】調整パネルの「リセット」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・現在選んでいる部位の位置ズレや拡大率を初期値（0, 100%）に戻します
+// ==========================================================================
 function resetFittingOffsets() {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1739,8 +1875,12 @@ function resetFittingOffsets() {
     showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
 }
 
-
-// スマホ表示幅のとき「マネキン試着室／手持ちの服／ブランド商品」の3列切り替えタブを制御します
+// ==========================================================================
+// 【関数】switchMobileStudioView(viewKey)
+// 【役割】スマホ表示時の「試着室／手持ち服／商品リスト」の表示切り替えタブ
+// 【具体的な処理内容】
+//   ・画面幅が狭いスマホで、マネキン画面・左棚・右棚を切り替えて表示します
+// ==========================================================================
 function switchMobileStudioView(viewKey) {
     // アプリ全体状態 AppState.studioMobileView を最新値（viewKey）に更新します
     AppState.studioMobileView = viewKey;
@@ -1766,12 +1906,12 @@ function switchMobileStudioView(viewKey) {
     if (colBrand) colBrand.classList.toggle('mobile-active', viewKey === 'brand');
 }
 
-
 // ==========================================================================
-//  5. AIスタイリング自動診断・保存済みコーデ（Lookbook）＆一括カート追加
+// 【関数】analyzeOutfitColorComposition(outfit)
+// 【役割】現在着ているコーディネートの色合い（カラー構成比率）を分析する
+// 【具体的な処理内容】
+//   ・着ている服の色を抽出して、全体の色バランスを算出します
 // ==========================================================================
-
-// コーディネート内の各部位の面積比重からカラー構成比率（ベース/アソート/アクセント）および配色理論をAI解析します
 function analyzeOutfitColorComposition(outfit) {
     if (!outfit) return { breakdown: [], schemeType: '--', schemeComment: '', tags: [] };
 
@@ -1876,7 +2016,13 @@ function analyzeOutfitColorComposition(outfit) {
     };
 }
 
-// 現在着せている服の組み合わせ（アウター・色構成・部位充実度）を解析し、AIスコア・アドバイス文・カラー構成ドットを更新します
+// ==========================================================================
+// 【関数】updateAIStylingComment()
+// 【役割】マネキンのコーデを見て「AIスタイリングアドバイス」を自動生成して表示する
+// 【具体的な処理内容】
+//   ・着ている服の種類や色の組み合わせ、季節をAIが総合診断し、
+//     褒め言葉やアドバイスコメントを表示します
+// ==========================================================================
 function updateAIStylingComment() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -2054,8 +2200,12 @@ function updateAIStylingComment() {
     if (scoreStarsElem) scoreStarsElem.textContent = '';
 }
 
-
-// コーデ保存用の人気シーンチップ押下時にそのタイトル名をテキスト入力欄へ入力します
+// ==========================================================================
+// 【関数】applyPresetName(name)
+// 【役割】コーデ保存モーダルで、提案されたコーデ名をクリックして入力欄に入れる
+// 【具体的な処理内容】
+//   ・「春の爽やかデニムコーデ」などのプリセット名を保存名入力欄に自動セットします
+// ==========================================================================
 function applyPresetName(name) {
     // HTML 要素 #outfit-name-input を取得して変数 input に格納します
     const input = document.getElementById('outfit-name-input');
@@ -2067,8 +2217,13 @@ function applyPresetName(name) {
 // 再代入可能な変数 _outfitsMutationSeq を宣言し、値（0）をセットします
 let _outfitsMutationSeq = 0;
 
-
-// 現在マネキンに着せているコーデに名前とAIコメントを添えて MySQL saved_outfits へ保存します
+// ==========================================================================
+// 【関数】handleSaveOutfit(e)
+// 【役割】「このコーディネートを保存する」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・現在着ている服の組み合わせに名前を付けて、サーバー（MySQL）の
+//     保存済みコーデ一覧に登録します
+// ==========================================================================
 async function handleSaveOutfit(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -2187,8 +2342,13 @@ async function handleSaveOutfit(e) {
     }
 }
 
-
-// 「保存したコーデ（ルックブック）」タブ内にカード形式で保存コーデ一覧と「このコーデを再現」「削除」を描画します
+// ==========================================================================
+// 【関数】renderSavedOutfitsGrid()
+// 【役割】スタジオの「保存済み」タブに過去に保存したコーデ一覧を表示する
+// 【具体的な処理内容】
+//   ・以前保存したコーディネートカードを一覧表示し、ワンクリックで
+//     マネキンに着せ替えられるようにします
+// ==========================================================================
 function renderSavedOutfitsGrid() {
     // HTML 要素 #saved-outfits-grid を取得して変数 grid に格納します
     const grid = document.getElementById('saved-outfits-grid');
@@ -2254,8 +2414,12 @@ function renderSavedOutfitsGrid() {
     }).join('');
 }
 
-
-// 保存済みコーデカードからクリックで当時の服5部位を一括再試着させ、試着タブへ切り替えます
+// ==========================================================================
+// 【関数】restoreOutfit(outfitId)
+// 【役割】保存済みコーデカードの「このコーデを着る」を押したときの処理
+// 【具体的な処理内容】
+//   ・保存されていた5部位の服を一括でマネキンに丸ごと着せ替えます
+// ==========================================================================
 function restoreOutfit(outfitId) {
     // 定数 target を宣言し、値（AppState.savedOutfits.find(o => o.id =…）をセットします
     const target = AppState.savedOutfits.find(o => o.id === outfitId);
@@ -2273,8 +2437,12 @@ function restoreOutfit(outfitId) {
     switchStudioTab('create');
 }
 
-
-// 指定した保存済みコーデを削除します（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】deleteSavedOutfit(outfitId)
+// 【役割】保存済みコーデカードの「削除」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・そのコーディネートをサーバー（MySQL）から削除します
+// ==========================================================================
 async function deleteSavedOutfit(outfitId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -2341,8 +2509,12 @@ async function deleteSavedOutfit(outfitId) {
     }
 }
 
-
-// ログイン会員の保存済みコーディネート一覧を取得します（スマホ版はlocalStorage、PC版はMySQL）
+// ==========================================================================
+// 【関数】syncOutfitsFromBackend()
+// 【役割】サーバー（MySQL）から保存済みコーディネート一覧を取得する
+// 【具体的な処理内容】
+//   ・ログイン会員が保存したコーデをデータベースから読み込んで画面に反映します
+// ==========================================================================
 async function syncOutfitsFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
@@ -2428,8 +2600,12 @@ async function syncOutfitsFromBackend() {
     }
 }
 
-
-// 現在マネキンで試着中のブランド販売商品をまとめてショッピングカートに追加し、MySQL同期します
+// ==========================================================================
+// 【関数】addCurrentBrandItemsToCart()
+// 【役割】「マネキンが着ている販売商品をまとめてカートに追加」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・マネキンが着ている服のうち、ショップの販売商品を一括でショッピングカートへ追加します
+// ==========================================================================
 async function addCurrentBrandItemsToCart() {
     // 条件（!AppState.cart || !Array.isArray(AppState.cart)）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart || !Array.isArray(AppState.cart)) {
@@ -2521,11 +2697,12 @@ async function addCurrentBrandItemsToCart() {
     showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しMySQLへ保存しました！`);
 }
 
-
 // ==========================================================================
-//  6. 手持ち服登録モーダル・AI背景透過（@imgly）＆ Canvas＋MobileNet形状診断
+// 【関数】openAddClosetModal()
+// 【役割】「手持ちの服を登録する」ポップアップ（モーダル）を開く
+// 【具体的な処理内容】
+//   ・写真アップロードや服の名前入力を行う登録ウィンドウを画面に表示します
 // ==========================================================================
-// 「手持ちの服を登録する」モーダルを開き、アップロード一時変数を初期化します
 function openAddClosetModal() {
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
@@ -2543,8 +2720,12 @@ function openAddClosetModal() {
     }
 }
 
-
-// 手持ち服登録モーダルを閉じてフォーム入力と画像をリセットします
+// ==========================================================================
+// 【関数】closeAddClosetModal()
+// 【役割】手持ち服登録ポップアップを閉じる
+// 【具体的な処理内容】
+//   ・登録ウィンドウを非表示にし、プレビュー画像をリセットします
+// ==========================================================================
 function closeAddClosetModal() {
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
@@ -2599,8 +2780,12 @@ function closeAddClosetModal() {
     if (form) form.reset();
 }
 
-
-// アップロードされた高解像度画像を、AI認識とDB保存に丁度いい最大辺長へ Canvas で縮小圧縮します
+// ==========================================================================
+// 【関数】resizeImageForAi(imageSource, maxDim = 1024)
+// 【役割】アップロードされた写真が大きすぎる場合に、AIが解析しやすいサイズに縮小する
+// 【具体的な処理内容】
+//   ・高画質な写真でもブラウザがフリーズしないよう、最大幅1024pxに安全にリサイズします
+// ==========================================================================
 function resizeImageForAi(imageSource, maxDim = 1024) {
     // 条件（typeof Image === 'undefined'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof Image === 'undefined') return Promise.resolve(imageSource);
@@ -2672,8 +2857,12 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
     });
 }
 
-
-// ブラウザAI（@imgly/background-removal）を優先使用（失敗時はCanvasエッジ自動透過フォールバック）して服の背景を透明化します
+// ==========================================================================
+// 【関数】runAiBackgroundRemoval(imageSource)
+// 【役割】服の写真から背景を自動で切り抜く（背景透明化AI）
+// 【具体的な処理内容】
+//   ・AIを使って服の輪郭を検出し、壁や床などの背景を透明にして服だけの画像を作ります
+// ==========================================================================
 async function runAiBackgroundRemoval(imageSource) {
     // 再代入可能な変数 removeBgFunc を宣言し、値（window.imglyRemoveBackground）をセットします
     let removeBgFunc = window.imglyRemoveBackground;
@@ -2766,8 +2955,12 @@ async function runAiBackgroundRemoval(imageSource) {
     }
 }
 
-
-// プレビュー領域にアップロード画像（透過済/元画像）と「AI透過済」「やり直し」ボタン状態を反映します
+// ==========================================================================
+// 【関数】updateClosetPreviewUI(imgUrl, isTransparent = false)
+// 【役割】手持ち服登録モーダル内の「プレビュー画像枠」を更新する
+// 【具体的な処理内容】
+//   ・切り抜かれた服の画像をプレビュー枠に表示します
+// ==========================================================================
 function updateClosetPreviewUI(imgUrl, isTransparent = false) {
     // HTML 要素 #closet-img-preview を取得して変数 preview に格納します
     const preview = document.getElementById('closet-img-preview');
@@ -2825,8 +3018,12 @@ let currentAiAnalysisResult = null;
 // 再代入可能な変数 _mobilenetModelPromise を宣言し、値（null）をセットします
 let _mobilenetModelPromise = null;
 
-
-// TensorFlow.js の MobileNet 画像分類モデルを初回だけロードしてキャッシュ返却するシングルトン関数です
+// ==========================================================================
+// 【関数】getMobileNetModel()
+// 【役割】服の種類（シャツ、パンツなど）を自動判定する画像認識AIモデルを読み込む
+// 【具体的な処理内容】
+//   ・ブラウザ上で画像分類AIモデル（MobileNet）を1度だけロードしてキャッシュします
+// ==========================================================================
 function getMobileNetModel() {
     // 条件（!window.mobilenet）が成り立つか判定し、該当する場合の処理を実行します
     if (!window.mobilenet) return Promise.resolve(null);
@@ -2844,8 +3041,12 @@ function getMobileNetModel() {
     return _mobilenetModelPromise;
 }
 
-
-// モーダル内の AI 形状診断ボックスを「解析中 / 認識成功 / 要確認エラー」の見た目に書き換えます
+// ==========================================================================
+// 【関数】updateAiDiagnosisUI(result, isAnalyzing = false)
+// 【役割】AI服種別診断のステータス（解析中 / 成功 / エラー）を画面に表示する
+// 【具体的な処理内容】
+//   ・「解析中...」や「トップスと判定されました」などのメッセージを表示します
+// ==========================================================================
 function updateAiDiagnosisUI(result, isAnalyzing = false) {
     // HTML 要素 #ai-diagnosis-card を取得して変数 card に格納します
     const card = document.getElementById('ai-diagnosis-card');
@@ -2950,8 +3151,12 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
     }
 }
 
-
-// アップロード画像から背景除去後のシルエット縦横比・股下有無・幅分布 ＋ MobileNet推論で服種別と不正画像(顔/風景等)を判定します
+// ==========================================================================
+// 【関数】analyzeClothingItemShape(source)
+// 【役割】写真の形（縦横比やシルエット）から服のカテゴリを自動判定する
+// 【具体的な処理内容】
+//   ・細長いからボトムス、正方形に近いからトップスなど、服の形状をAIで分析してカテゴリを推測します
+// ==========================================================================
 async function analyzeClothingItemShape(source) {
     // 非同期完了を await で待てる Promise オブジェクトを作成して返します
     return new Promise((resolve) => {
@@ -3536,8 +3741,12 @@ async function analyzeClothingItemShape(source) {
     });
 }
 
-
-// 写真選択後の背景透過パイプライン：AI切抜→プレビュー反映→形状認識による自動カテゴリセットを順次実行します
+// ==========================================================================
+// 【関数】processClosetImageWithAi(source)
+// 【役割】写真を選んだあとの「AI切り抜き＆カテゴリ自動判定」の一連の流れを実行する
+// 【具体的な処理内容】
+//   ・写真を受け取り、①背景除去 → ②プレビュー表示 → ③カテゴリ自動判定 を順番に行います
+// ==========================================================================
 async function processClosetImageWithAi(source) {
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
@@ -3587,8 +3796,12 @@ async function processClosetImageWithAi(source) {
     }
 }
 
-
-// サンプルプリセットチップ（黒キャップ・白スニーカー等）が選ばれたときにフォームへ名前・カテゴリ・画像を自動セットします
+// ==========================================================================
+// 【関数】selectPresetImage(presetKey, presetName)
+// 【役割】サンプル写真チップを選んだときの処理
+// 【具体的な処理内容】
+//   ・サンプルの服写真を選んだときに、自動で名前やカテゴリを入力欄にセットします
+// ==========================================================================
 function selectPresetImage(presetKey, presetName) {
     // 定数 preset を宣言し、値（PRESET_CLOSET_PRESETS[presetKey]）をセットします
     const preset = PRESET_CLOSET_PRESETS[presetKey];
@@ -3642,8 +3855,12 @@ function selectPresetImage(presetKey, presetName) {
     updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
-
-// ファイル入力欄(<input type='file'>)で選ばれた写真を FileReader で読み込み、AI背景削除・形状分析を開始します
+// ==========================================================================
+// 【関数】handleClosetImageSelect(e)
+// 【役割】手持ち服登録で画像ファイルを選択（または撮影）したときの処理
+// 【具体的な処理内容】
+//   ・選ばれた写真ファイルを読み込み、AI背景切り抜き処理を開始します
+// ==========================================================================
 function handleClosetImageSelect(e) {
     // 定数 file を宣言し、値（e.target.files[0]）をセットします
     const file = e.target.files[0];
@@ -3689,8 +3906,12 @@ function handleClosetImageSelect(e) {
     reader.readAsDataURL(file);
 }
 
-
-// 「もう一度 AI で背景を切り抜く」手動やり直しボタンが押されたときの再処理関数です
+// ==========================================================================
+// 【関数】triggerManualBgRemoval()
+// 【役割】「もう一度AIで背景を切り抜く」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・背景の切り抜きを最初から再実行します
+// ==========================================================================
 async function triggerManualBgRemoval() {
     // 定数 target を宣言し、値（originalClosetUploadDataUrl || current…）をセットします
     const target = originalClosetUploadDataUrl || currentClosetUploadDataUrl;
@@ -3705,8 +3926,12 @@ async function triggerManualBgRemoval() {
     await processClosetImageWithAi(target);
 }
 
-
-// 背景透過前の元の写真へワンクリックで切り替えるボタン処理です
+// ==========================================================================
+// 【関数】restoreOriginalUploadImage()
+// 【役割】「切り抜き前の元の写真に戻す」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・AIで切り抜く前の元写真にプレビューを戻します
+// ==========================================================================
 async function restoreOriginalUploadImage() {
     // 条件（!originalClosetUploadDataUrl）が成り立つか判定し、該当する場合の処理を実行します
     if (!originalClosetUploadDataUrl) return;
@@ -3734,15 +3959,23 @@ async function restoreOriginalUploadImage() {
 // 再代入可能な変数 _closetMutationSeq を宣言し、値（0）をセットします
 let _closetMutationSeq = 0;
 
-
-// クローゼットの登録・削除時に最新操作を保証する連番ミューテーションカウンタを進めます
+// ==========================================================================
+// 【関数】bumpClosetMutationSeq()
+// 【役割】クローゼット操作の連番管理カウンタを進める
+// 【具体的な処理内容】
+//   ・登録や削除の通信が前後して狂わないよう管理番号を増やします
+// ==========================================================================
 function bumpClosetMutationSeq() {
     // 変数・配列項目 _closetMutationSeq の値を更新・計算します
     _closetMutationSeq++;
 }
 
-
-// 「クローゼットに登録する」送信時処理：入力チェック・POST /api/closet/add 保存・UI再描画・モーダル閉鎖を行います
+// ==========================================================================
+// 【関数】handleAddClosetItem(e)
+// 【役割】「クローゼットに登録する」ボタンを押したときの保存処理
+// 【具体的な処理内容】
+//   ・服の名前・カテゴリ・切り抜き画像をサーバー（MySQL）へ送信して保存し、試着室に追加します
+// ==========================================================================
 async function handleAddClosetItem(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -3936,8 +4169,12 @@ async function handleAddClosetItem(e) {
     }
 }
 
-
-// マイクローゼットから指定アイテムを MySQL（DELETE /api/closet/delete/...）と着用中スロット両方から削除します
+// ==========================================================================
+// 【関数】deleteClosetItem(itemId)
+// 【役割】手持ち服カードの「ゴミ箱（削除）」ボタンを押したときの処理
+// 【具体的な処理内容】
+//   ・その服をクローゼットから削除し、マネキンが着ていれば自動で脱がせます
+// ==========================================================================
 async function deleteClosetItem(itemId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -4029,8 +4266,12 @@ async function deleteClosetItem(itemId) {
     }
 }
 
-
-// ログイン会員の登録服＆購入済み服を MySQL（GET /api/closet/...）から取得してスタジオへ反映します
+// ==========================================================================
+// 【関数】syncClosetFromBackend()
+// 【役割】サーバー（MySQL）からログイン会員の手持ち服一覧を取得する
+// 【具体的な処理内容】
+//   ・データベースに登録されている自分の服を読み込んで、左カラムやクローゼット画面に並べます
+// ==========================================================================
 async function syncClosetFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
@@ -4174,7 +4415,12 @@ let _todayStylingWeatherCache = {
     fetchedAt: 0
 };
 
-// 現在日時（月・時間帯）から愛知（名古屋）のリアルな推定気温を算出するフォールバック関数
+// ==========================================================================
+// 【関数】calculateEstimatedTemperature(date = new Date())
+// 【役割】現在日時（月と時間帯）から愛知県（名古屋）のリアルな推定気温を計算する
+// 【具体的な処理内容】
+//   ・気象庁との通信が取れないときの予備として、季節と昼夜に応じた現実的な気温を計算します
+// ==========================================================================
 function calculateEstimatedTemperature(date = new Date()) {
     const month = date.getMonth() + 1; // 1〜12月
     const hour = date.getHours();       // 0〜23時
@@ -4201,7 +4447,12 @@ function calculateEstimatedTemperature(date = new Date()) {
     return base.night;
 }
 
-// 気象庁（JMA）公式予報・アメダスから愛知県（名古屋）の最低気温・最高気温・現在気温・天候を取得する非同期関数
+// ==========================================================================
+// 【関数】fetchCurrentTemperature()
+// 【役割】気象庁（JMA）公式データから愛知県（名古屋）の気温と天気を取得する
+// 【具体的な処理内容】
+//   ・気象庁の最新天気予報・アメダスから、最低気温・最高気温・天気を自動取得します
+// ==========================================================================
 async function fetchCurrentTemperature() {
     const now = Date.now();
     // 5分以内のキャッシュがあれば再利用
@@ -4326,7 +4577,12 @@ async function fetchCurrentTemperature() {
     return result;
 }
 
-// 現在の日時から季節情報（春・夏・秋・冬）と季節ラベルを判定
+// ==========================================================================
+// 【関数】getCurrentSeasonInfo(date = new Date())
+// 【役割】現在の日時から「春・夏・秋・冬」の季節情報を判定する
+// 【具体的な処理内容】
+//   ・3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬として季節ラベルを返します
+// ==========================================================================
 function getCurrentSeasonInfo(date = new Date()) {
     const month = date.getMonth() + 1; // 1〜12月
     if (month >= 3 && month <= 5) {
@@ -4553,7 +4809,12 @@ const MONTHLY_STYLING_PLANS = {
 // ユーザーが手動選択したスタイリング提案の月（null の場合は現在の月を自動適用）
 let _selectedStylingMonth = null;
 
-// 月別（1月〜12月）のおすすめ商品提案プランと実在商品オブジェクトを取得するヘルパー関数
+// ==========================================================================
+// 【関数】getMonthlyStylingPlan(month = null, gender = 'MEN')
+// 【役割】月別（1月〜12月）のおすすめコーディネート提案データを取得する
+// 【具体的な処理内容】
+//   ・季節の気温にぴったりなおすすめブランド服の組み合わせプランを返します
+// ==========================================================================
 function getMonthlyStylingPlan(month = null, gender = 'MEN') {
     const currentRealMonth = new Date().getMonth() + 1;
     const m = (typeof month === 'number' && month >= 1 && month <= 12)
@@ -4583,7 +4844,12 @@ function getMonthlyStylingPlan(month = null, gender = 'MEN') {
     };
 }
 
-// ユーザーが画面上の月セレクターで月を変更したときの処理関数
+// ==========================================================================
+// 【関数】onSelectStylingMonth(monthVal)
+// 【役割】AIスタイリングバナーで別の月を選んだときの処理
+// 【具体的な処理内容】
+//   ・選ばれた月のおすすめコーデ提案にバナーの表示を切り替えます
+// ==========================================================================
 function onSelectStylingMonth(monthVal) {
     const parsed = parseInt(monthVal, 10);
     if (!isNaN(parsed) && parsed >= 1 && parsed <= 12) {
@@ -4596,7 +4862,12 @@ function onSelectStylingMonth(monthVal) {
 }
 window.onSelectStylingMonth = onSelectStylingMonth;
 
-// バナー描画用内部ヘルパー（月別のおすすめ商品カタログ SAMPLE_PRODUCTS を主軸に描画）
+// ==========================================================================
+// 【関数】renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, ...)
+// 【役割】「TODAY'S AI STYLING」バナーを描画する
+// 【具体的な処理内容】
+//   ・気象庁の気温・天気、季節のアドバイス、おすすめアイテムをバナーに綺麗に表示します
+// ==========================================================================
 function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, locationName = '愛知・名古屋', tempMin = null, tempMax = null, provider = '気象庁(JMA)') {
     const badgeElem = document.getElementById('today-styling-badge');
     const titleElem = document.getElementById('today-styling-title');
@@ -4636,7 +4907,12 @@ function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, 
     }
 }
 
-// TODAY'S AI STYLING バナーの気温と提案テキストを更新（気象庁JMAの愛知・名古屋最低気温と連動）
+// ==========================================================================
+// 【関数】updateTodaySeasonalStyling()
+// 【役割】TODAY'S AI STYLING バナーの気温と提案テキストを最新状態に更新する
+// 【具体的な処理内容】
+//   ・気象庁から名古屋の最新気温を取得し、バナーを自動更新します
+// ==========================================================================
 async function updateTodaySeasonalStyling() {
     const now = new Date();
     const month = now.getMonth() + 1;
@@ -4670,7 +4946,12 @@ async function updateTodaySeasonalStyling() {
     }
 }
 
-// 月別のおすすめブランド商品（SAMPLE_PRODUCTS）コーデを一括でマネキンに着せ替えます
+// ==========================================================================
+// 【関数】applyTodaySeasonalPresetLook()
+// 【役割】AIスタイリングバナーの「このコーデを一括試着」を押したときの処理
+// 【具体的な処理内容】
+//   ・今月おすすめの季節コーディネート一式を、ワンクリックでマネキンに着せ替えます
+// ==========================================================================
 function applyTodaySeasonalPresetLook() {
     const now = new Date();
     const month = now.getMonth() + 1;
@@ -4739,7 +5020,12 @@ function applyTodaySeasonalPresetLook() {
     switchStudioTab('create');
 }
 
-// 既存互換用ラッパー
+// ==========================================================================
+// 【関数】applyPresetLook(lookKey)
+// 【役割】プリセットコーデを着用するための互換用関数
+// 【具体的な処理内容】
+//   ・指定されたコーデをマネキンに着用させます
+// ==========================================================================
 function applyPresetLook(lookKey) {
     applyTodaySeasonalPresetLook();
 }
@@ -4752,8 +5038,12 @@ let _studioStateSyncSeq = 0;
 // 再代入可能な変数 _lastStudioSyncErrorToastAt を宣言し、値（0）をセットします
 let _lastStudioSyncErrorToastAt = 0;
 
-
-// 現在のマネキン着用状態・位置調整・性別設定を MySQL（POST /api/studio-state/save）へ送信します（keepalive対応）
+// ==========================================================================
+// 【関数】sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot)
+// 【役割】マネキンの現在の着用服や位置調整データをサーバー（MySQL）へ送信する通信処理
+// 【具体的な処理内容】
+//   ・ページを閉じたり移動しても試着中の服が消えないよう、データベースに保存します
+// ==========================================================================
 async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot) {
     // 条件（typeof isServerUserId === 'function' && !isServerUse…）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
@@ -4820,8 +5110,12 @@ async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnaps
     }
 }
 
-
-// 遅延保存(デバウンス)待ちのスタジオ変更が残っていればタイマーを即解除して先に MySQL 送信を完了させます
+// ==========================================================================
+// 【関数】flushPendingStudioStateSync()
+// 【役割】保留中のマネキン保存処理があれば、タイマーを待たずに即時送信する
+// 【具体的な処理内容】
+//   ・ログアウトや画面移動の直前に、未保存の着せ替えデータを確実にMySQLへ保存完了させます
+// ==========================================================================
 function flushPendingStudioStateSync() {
     // 条件（!_studioStateSyncTimer）が成り立つか判定し、該当する場合の処理を実行します
     if (!_studioStateSyncTimer) return Promise.resolve(false);
@@ -4847,8 +5141,12 @@ function flushPendingStudioStateSync() {
     return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
 }
 
-
-// 試着や位置微調整の連続操作をまとめるデバウンス付き(220ms後)MySQL自動保存スケジューラです
+// ==========================================================================
+// 【関数】syncStudioStateToBackend(options = {})
+// 【役割】マネキンの着せ替えやサイズ調整の連続操作を、少し待ってから自動保存する（デバウンス保存）
+// 【具体的な処理内容】
+//   ・スライダーを動かしている途中で通信がパンクしないよう、操作が止まってからサーバーへ保存します
+// ==========================================================================
 function syncStudioStateToBackend(options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -4905,8 +5203,12 @@ function syncStudioStateToBackend(options = {}) {
     });
 }
 
-
-// ログイン後・スタジオ遷移時に MySQL（GET /api/studio-state/...）から前回の試着服と微調整値を復元します
+// ==========================================================================
+// 【関数】syncStudioStateFromBackend()
+// 【役割】ログイン時やスタジオを開いた時に、前回試着していた服とサイズ設定を復元する
+// 【具体的な処理内容】
+//   ・サーバーから前回のマネキン状態を読み込み、着ていた服や位置の微調整をそのまま元通りに再現します
+// ==========================================================================
 async function syncStudioStateFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -4988,11 +5290,12 @@ async function syncStudioStateFromBackend() {
     }
 }
 
-
 // ==========================================================================
-//  8. 日本語カテゴリ／カラーHEX変換・通知用補助ヘルパー関数
+// 【関数】getCategoryNameJP(cat)
+// 【役割】英語のカテゴリ名（'HAT'、'TOPS'等）を日本語（'帽子'、'トップス'等）に変換する
+// 【具体的な処理内容】
+//   ・画面に分かりやすく表示するための翻訳ヘルパー関数です
 // ==========================================================================
-// 英語カテゴリ('HAT'〜'SHOES')を見やすい日本語表示名へ変換する補助関数です
 function getCategoryNameJP(cat) {
     // 値（cat)）に応じて処理ケースを分岐する switch 文を開始します
     switch (cat) {
@@ -5011,8 +5314,12 @@ function getCategoryNameJP(cat) {
     }
 }
 
-
-// カラー名('BLACK'/'WHITE'/'NAVY'等)からAIカラーパレットドット用の16進カラーコードを返します
+// ==========================================================================
+// 【関数】getColorHex(colorName)
+// 【役割】英語のカラー名（'BLACK'、'NAVY'等）を16進カラーコード（#000000等）に変換する
+// 【具体的な処理内容】
+//   ・カラーパレットのドットや色見本を描画するための色コードを返します
+// ==========================================================================
 function getColorHex(colorName) {
     // 値（colorName)）に応じて処理ケースを分岐する switch 文を開始します
     switch (colorName) {
@@ -5037,8 +5344,12 @@ function getColorHex(colorName) {
     }
 }
 
-
-// toast.js の showToast があればそちらを使い、無ければコンソール代替する通知ラッパーです
+// ==========================================================================
+// 【関数】showToastNotification(message)
+// 【役割】スタジオ用のトースト通知を表示する補助関数
+// 【具体的な処理内容】
+//   ・画面右下に操作結果メッセージを通知します
+// ==========================================================================
 function showToastNotification(message) {
     // 条件（typeof showToast === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof showToast === 'function') {
