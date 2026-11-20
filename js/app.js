@@ -7,35 +7,38 @@
 //  ・サイト全体のボタンやリンクが押されたときのイベント一括登録（初期化処理）
 // ==========================================================================
 
-// 1. アプリケーション状態管理（AppState）: メモリ上で画面状態を一元管理（※永続化は MySQL のみ）
-// 現在ログイン中のユーザーやカート・試着状態などをまとめる管理オブジェクト AppState を定義します
+// ==========================================================================
+// 【データ管理】AppState（アプリ全体の共通メモリデータ）
+// 【役割】現在開いている画面の状態や、ログイン情報、カートの中身などを一時記憶しておく場所です
+// ==========================================================================
 const AppState = {
-    // お気に入り登録した商品IDを並べる配列（ログイン後に MySQL favorites テーブルから同期します）
+    // ハートを押してお気に入りにした商品のID一覧（例: [1, 5, 8]）
     favorites: [],
-    // ログイン中の会員情報オブジェクト（未ログイン時は null）
+    // いまログインしている会員の情報（名前やメールアドレスなど。未ログイン時は null）
     currentUser: null,
-    // ショッピングカート内の商品リスト配列（ログイン中は MySQL cart_items と連動します）
+    // ショッピングカートに入っている商品リスト
     cart: [],
-    // 商品詳細ページで現在表示対象になっている商品ID（初期値は 1 番）
+    // 商品詳細ページで現在開いている商品のID番号
     currentDetailId: 1,
-    // 商品詳細ページで選択中のサイズ名（初期値は M）
+    // 商品詳細ページで選ばれている服のサイズ（初期値は M）
     selectedSize: "M",
-    // ログインユーザーの注文履歴配列（MySQL orders テーブルから取得します）
+    // ログイン中の会員の過去の注文履歴リスト
     orderHistory: [],
-    // ログインユーザーの所持クーポン一覧配列（MySQL user_coupons テーブルから取得）
+    // ログイン中の会員が持っているクーポン一覧（10%OFFクーポンなど）
     userCoupons: [],
-    // 商品一覧ページの対象性別（'ALL' / 'MEN' / 'WOMEN'）
+    // 商品一覧ページで絞り込んでいる性別（'ALL', 'MEN', 'WOMEN'）
     selectedGender: "ALL",
-    // 商品一覧ページのカテゴリ絞り込み状態（'ALL' は全カテゴリ表示）
+    // 商品一覧ページで絞り込んでいるカテゴリ（'ALL', 'TOPS', 'BOTTOMS'など）
     selectedCategory: "ALL",
-    // 商品一覧ページの並び順（'default' はおすすめ順）
+    // 商品一覧ページの並び順（'default': おすすめ順, 'price-asc': 価格が安い順など）
     selectedSort: "default",
-    // 未ログインで認証必須画面へ入った場合の、ログイン完了後の自動復帰先（'manekin' / 'checkout'）
+    // 未ログインの人が「試着室」や「お会計」を押した時の、ログイン後の戻り先画面
     pendingAuthTarget: null,
 
-    // AI試着スタジオ用：自分の登録服や購入済みアイテム一覧配列（MySQL closet_items から取得）
+    // --- ここから試着室（MANEKIN AIスタジオ）用のデータ ---
+    // 自分が持っている服のリスト（手持ち服の写真や、過去に購入した服）
     myCloset: [],
-    // AI試着スタジオ用：マネキンに今着せている5部位のスロット管理オブジェクト
+    // マネキンが現在着ている服（帽子・アウター・トップス・ボトムス・靴の5箇所）
     currentOutfit: {
         // 帽子スロット（未着用時は null）
         hat: null,
@@ -48,19 +51,19 @@ const AppState = {
         // シューズスロット（未着用時は null）
         shoes: null
     },
-    // スタジオで保存したコーディネート一覧配列（MySQL saved_outfits から取得）
+    // お気に入りのコーディネートとして保存したセットの一覧
     savedOutfits: [],
-    // スタジオ画面で今開いている左/下パネルのタブ名（初期値 'create'）
+    // 試着室の中で今開いているタブの名前（初期値はコーデ作成 'create'）
     studioActiveTab: 'create',
-    // スタジオ内のマイクローゼット絞り込みカテゴリ（'ALL' は全表示）
+    // 試着室の手持ち服リストで絞り込んでいるカテゴリ（'ALL' は全表示）
     studioClosetFilter: 'ALL',
-    // スタジオ内のブランド商品絞り込みカテゴリ（'ALL' は全表示）
+    // 試着室のショップ商品リストで絞り込んでいるカテゴリ（'ALL' は全表示）
     studioBrandFilter: 'ALL',
     // スマホ画面幅でスタジオを表示するときのアクティブ表示切り替え（'mannequin' 優先）
     studioMobileView: 'mannequin',
-    // 位置・拡大率調整パネルで現在操作中の部位キー（初期値 'outer'）
+    // 服の位置・サイズ微調整パネルで、いま動かしている服の部位（初期値 'outer'）
     activeAdjustSlot: 'outer',
-    // 部位ごとの X/Y ズレ・拡大率・サイズ設定を shop.js のヘルパーから初期化します
+    // 各部位の服の位置ズレ（上下・左右）や拡大率の微調整データ
     fittingOffsets: getDefaultFittingOffsets()
 };
 
@@ -70,8 +73,18 @@ let _authBootstrapDone = false;
 // 上記確認処理の完了を他関数が await して待つための Promise 参照を保持します
 let _authBootstrapPromise = null;
 
-// 2. アプリ起動時の初期化処理（HTML読込完了時 DOMContentLoaded に1回だけ実行）
-// HTML要素がすべて解析されたタイミング(DOMContentLoaded)で非同期初期化処理を開始します
+// ==========================================================================
+// 【初期化処理】DOMContentLoaded イベントリスナー
+// 【役割】HTMLの読み込みが終わった瞬間に、アプリの初期準備をまとめて実行する
+// 【具体的な処理内容】
+//   1. 過去の不要な一時データをクリアする
+//   2. ヘッダーの数字（お気に入り数やカート点数）を初期化する
+//   3. 画面上の全ボタンにクリック時の動作（setupEventListeners）を登録する
+//   4. トップ画面・商品一覧・新作一覧の商品カードを描画する
+//   5. サーバーに問い合わせて前回ログインしていた会員を自動復元する
+//   6. URLの末尾（#homeなど）を見て、最初の画面を表示する（handleRouting）
+//   7. 今日の愛知県の気温を取得して、おすすめコーデバナーを表示する
+// ==========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     // 過去バージョン等のブラウザ側キャッシュ（manekin* キー）が残っていれば最初に完全削除します
     if (typeof purgeAllManekinLocalStorage === 'function') purgeAllManekinLocalStorage();
@@ -500,60 +513,52 @@ function highlightNavLink(navKey) {
 //   5. モーダルウィンドウの開閉ボタンや背景クリックで閉じる処理の登録
 // ==========================================================================
 function setupEventListeners() {
-    // URLの #〇〇（ハッシュ）が切り替わるたびに自動で handleRouting() を走らせます
+    // --------------------------------------------------------------------------
+    // 1. URLの変更監視（ブラウザの「戻る・進む」やリンククリック時に画面を自動切替）
+    // --------------------------------------------------------------------------
     window.addEventListener('hashchange', handleRouting);
 
-    // ヘッダーやスマホメニュー、トップバナー内にあるすべての MANEKIN AI ボタンを取得して繰り返します
+    // --------------------------------------------------------------------------
+    // 2. 試着室（MANEKIN AI）ボタンのクリック処理（未ログインならログイン画面へ誘導）
+    // --------------------------------------------------------------------------
     document.querySelectorAll('.nav-manekin-btn, #manekin-menu-btn, #mobile-manekin-btn, #banner-manekin-btn').forEach(btn => {
-        // ボタンクリック時にカスタムハンドラを実行します
         btn.addEventListener('click', (e) => {
-            // リンクの通常ジャンプ前にイベント既定動作を明示的に制御します
             e.preventDefault();
-            // 未ログイン時はログイン画面へ誘導します
             if (!AppState.currentUser) {
                 showToast('⚠️ MANEKIN機能のご利用にはログインまたは会員登録が必要です');
                 window.location.hash = '#login';
                 handleRouting('#login');
                 return;
             }
-            // ログイン済みの場合はAI試着スタジオへ移動します
             window.location.hash = '#manekin-studio';
             handleRouting('#manekin-studio');
         });
     });
 
-    // 汎用モーダルウィンドウの右上「×」ボタン要素を取得します
+    // --------------------------------------------------------------------------
+    // 3. ポップアップ画面（モーダル）の「閉じる」ボタン＆背景クリックで閉じる処理
+    // --------------------------------------------------------------------------
+    // 汎用お知らせモーダルの「×」ボタンと「OK」ボタン
     const modalCloseBtn = document.getElementById('modal-close-btn');
-    // 汎用モーダルの「OK」ボタン要素を取得します
     const modalOkBtn = document.getElementById('modal-ok-btn');
-    // 汎用モーダル全体の暗い背景ラッパー要素を取得します
     const manekinModal = document.getElementById('manekin-modal');
-
-    // 「×」ボタンが押されたら汎用モーダルを閉じます
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeManekinModal);
-    // 「OK」ボタンが押されたら汎用モーダルを閉じます
     if (modalOkBtn) modalOkBtn.addEventListener('click', closeManekinModal);
-    // モーダル本体が存在する場合に背景クリックでの閉じる動作を設定します
     if (manekinModal) {
-        // モーダル上のどこかがクリックされたときの判定処理です
         manekinModal.addEventListener('click', (e) => {
-            // 内側ボックスではなく外側の暗い背景自体が押されたときだけモーダルを閉じます
             if (e.target === manekinModal) closeManekinModal();
         });
     }
 
-    // クローゼットアイテム登録モーダルの外側ラッパー要素を取得します
+    // 手持ち服登録モーダルの背景クリックで閉じる処理
     const closetModal = document.getElementById('modal-add-closet');
-    // クローゼットモーダルが存在する場合に背景クリック処理を登録します
     if (closetModal) {
-        // モーダルクリック時の判定を行います
         closetModal.addEventListener('click', (e) => {
-            // 外側の暗い背景部分がクリックされた場合のみ登録モーダルを閉じます
             if (e.target === closetModal) closeAddClosetModal();
         });
     }
 
-    // 保有クーポンモーダル（#modal-user-coupons）の外側ラッパー要素を取得します
+    // 保有クーポン一覧モーダルの背景クリックで閉じる処理
     const userCouponsModal = document.getElementById('modal-user-coupons');
     if (userCouponsModal) {
         userCouponsModal.addEventListener('click', (e) => {
@@ -563,141 +568,121 @@ function setupEventListeners() {
         });
     }
 
-    // クローゼットアイテム新規追加フォーム（#form-add-closet）を取得します
+    // --------------------------------------------------------------------------
+    // 4. 手持ち服登録フォームの送信（写真・服の名前をサーバーへ保存）
+    // --------------------------------------------------------------------------
     const closetForm = document.getElementById('form-add-closet');
-    // フォームが存在する場合に送信イベントを設定します
     if (closetForm) {
-        // フォーム送信時にページリロードせず studio.js の handleAddClosetItem を実行します
         closetForm.addEventListener('submit', handleAddClosetItem);
     }
 
-    // スマホ用ハンバーガーメニュー（三本線）ボタンを取得します
+    // --------------------------------------------------------------------------
+    // 5. スマホ用スライドメニュー（ハンバーガーボタンで開閉、項目タップで閉じる）
+    // --------------------------------------------------------------------------
     const hamburgerBtn = document.getElementById('hamburger-btn');
-    // モバイルメニュー内の「×」閉じるボタンを取得します
     const drawerCloseBtn = document.getElementById('drawer-close-btn');
-    // モバイルメニュー表示中に背後を暗くするオーバーレイ要素を取得します
     const menuOverlay = document.getElementById('menu-overlay');
 
-    // ハンバーガーボタン押下で横からスマホメニューを開きます
     if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMobileDrawer);
-    // 閉じるボタン押下でスマホメニューを閉じます
     if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeMobileDrawer);
-    // 暗いオーバーレイ押下でもスマホメニューを閉じます
     if (menuOverlay) menuOverlay.addEventListener('click', closeMobileDrawer);
 
-    // スマホメニュー内のすべての項目リンクを取得してループします
+    // メニュー内のリンクをタップした時に自動でメニューを引っ込める
     document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        // どれか項目をタップして画面遷移したら、自動でスマホメニューを閉じます
         link.addEventListener('click', closeMobileDrawer);
     });
 
-    // 商品一覧ページのカテゴリ絞り込みボタングループ（ALL/TOPS 等）を取得します
+    // --------------------------------------------------------------------------
+    // 6. 商品一覧ページのカテゴリ絞り込み（ALL / TOPS / BOTTOMS など）
+    // --------------------------------------------------------------------------
     const filterGroup = document.getElementById('category-filter-group');
-    // カタログ絞り込みグループが存在する場合のみイベント設定を行います
     if (filterGroup) {
-        // グループ内の各フィルタボタンに対してクリック処理を設定します
         filterGroup.querySelectorAll('.filter-btn').forEach(btn => {
-            // カテゴリボタンがクリックされたときの処理です
             btn.addEventListener('click', () => {
-                // いったん全カテゴリボタンから選択状態(.active)を外します
                 filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                // 今クリックしたボタンだけに選択状態(.active)を付けます
                 btn.classList.add('active');
-                // ボタンの data-category 属性（'OUTER' など）を読み取って AppState を更新します
                 AppState.selectedCategory = btn.getAttribute('data-category');
-                // 新しいカテゴリ条件で商品カタログを再描画します
                 renderCatalogProducts();
             });
         });
     }
 
-    // 商品一覧ページの並び替えドロップダウン（おすすめ順／価格順）を取得します
+    // --------------------------------------------------------------------------
+    // 7. 商品一覧ページの並び替え（おすすめ順 / 価格が安い順など）
+    // --------------------------------------------------------------------------
     const sortSelect = document.getElementById('sort-select');
-    // 並び替えセレクトボックスが存在する場合に選択変更イベントを設定します
     if (sortSelect) {
-        // ユーザーが並び順を変更（change）したときの処理です
         sortSelect.addEventListener('change', (e) => {
-            // 選ばれた値（例: 'price-asc'）を AppState.selectedSort へ保存します
             AppState.selectedSort = e.target.value;
-            // 新しい並び順で商品カタログを再描画します
             renderCatalogProducts();
         });
     }
 
-    // ワンクリックお試し体験用「デモアカウントでログイン」ボタンを取得します
+    // --------------------------------------------------------------------------
+    // 8. 会員認証（デモログイン / 通常ログイン / 新規会員登録 / ログアウト）
+    // --------------------------------------------------------------------------
+    // ワンクリックお試しデモログインボタン
     const demoBtn = document.getElementById('demo-login-btn');
-    // クリックされたら shop.js の handleDemoLogin を呼んで即ログインします
     if (demoBtn) demoBtn.addEventListener('click', handleDemoLogin);
 
-    // 通常ログインフォームを取得します
+    // 通常ログインフォームの送信
     const loginForm = document.getElementById('login-form');
-    // 送信（submit）時に handleLogin を呼び出してバックエンド認証を行います
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
-    // 新規会員登録フォームを取得します
+    // 新規会員登録フォームの送信
     const registerForm = document.getElementById('register-form');
-    // 送信時に handleRegister を呼び出して MySQL users テーブルへ会員を作成します
     if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
-    // ログアウトボタンを取得します
+    // ログアウトボタン
     const logoutBtn = document.getElementById('logout-btn');
-    // クリック時にサーバーセッション Cookie 破棄とメモリリセットを行う handleLogout を呼びます
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
-    // 購入手続きページの「注文を確定する」ボタンを取得します
+    // --------------------------------------------------------------------------
+    // 9. お会計画面の「注文を確定する」ボタン
+    // --------------------------------------------------------------------------
     const placeOrderBtn = document.getElementById('btn-place-order');
-    // 注文確定ボタンが存在する場合にクリック処理を登録します
     if (placeOrderBtn) {
-        // クリック時に在庫確認・ポイント清算・MySQL注文保存を行う handlePlaceOrder を呼びます
         placeOrderBtn.addEventListener('click', handlePlaceOrder);
     }
 
-    // 支払い方法選択用の全ラジオボタン（クレカ／代金引換等）を取得してループします
+    // --------------------------------------------------------------------------
+    // 10. 支払い方法の選択切り替え（クレジットカード選択時のみカード入力欄を表示）
+    // --------------------------------------------------------------------------
     document.querySelectorAll('.payment-option-label input[type="radio"]').forEach(radio => {
-        // 選択が切り替わったときのUI更新イベントを設定します
         radio.addEventListener('change', () => {
-            // すべての支払い方法カード枠から選択枠線(.selected)をいったん外します
             document.querySelectorAll('.payment-option-label').forEach(lbl => lbl.classList.remove('selected'));
-            // チェックされたラジオボタンを包む親ラベルだけに .selected 枠線を付けます
             radio.closest('.payment-option-label').classList.add('selected');
 
-            // クレジットカード番号等を入力するサブフォーム要素を取得します
             const cardSubform = document.getElementById('credit-card-subform');
-            // カード入力欄が存在する場合に表示状態を切り替えます
             if (cardSubform) {
-                // 'クレジットカード' が選ばれたときだけ flex 表示し、他方法なら隠します
                 cardSubform.style.display = (radio.value === 'クレジットカード') ? 'flex' : 'none';
             }
         });
     });
 
-    // マイページ上部のタブ切り替えボタン群（プロフィール／注文履歴／お気に入り等）を取得します
+    // --------------------------------------------------------------------------
+    // 11. マイページのタブ切り替え（プロフィール / 注文履歴 / お気に入り）
+    // --------------------------------------------------------------------------
     const mypageTabBtns = document.querySelectorAll('.mypage-tab-btn');
-    // 各タブボタンへクリックイベントを設定します
     mypageTabBtns.forEach(btn => {
-        // タブボタンがクリックされたときの切り替え処理です
         btn.addEventListener('click', () => {
-            // すべてのタブボタンから .active をいったん外します
             mypageTabBtns.forEach(b => b.classList.remove('active'));
-            // クリックされたタブボタンだけに .active を付けます
             btn.classList.add('active');
-            // data-tab 属性から切り替え対象のタブ識別名（例: 'orders'）を取得します
             const targetTab = btn.getAttribute('data-tab');
-            // マイページ内の全タブ中身コンテナを取得してループします
             document.querySelectorAll('.mypage-tab-content').forEach(content => {
-                // いったんすべてのタブコンテンツを非表示にします
                 content.classList.remove('active');
             });
-            // 'tab-' + タブ識別名 のIDを持つ表示対象コンテナを取得します
             const activeContent = document.getElementById(`tab-${targetTab}`);
-            // 対象のタブ中身だけに .active を付けて表示します
             if (activeContent) activeContent.classList.add('active');
         });
     });
 }
 
-// 7. HTMLの onclick 属性等から直接呼び出せるよう主要関数を window グローバルへ公開
-// HTML側の onclick='openAddClosetModal()' 等から参照できるよう window オブジェクトに公開します
+// ==========================================================================
+// 【グローバル公開】HTMLの onclick などから直接呼べるように window へ登録
+// 【役割】各ファイルで定義した関数をブラウザ全体（window）から呼び出せるようにして、
+//         HTMLのボタン（onclick="〇〇()" など）から動かせるようにします
+// ==========================================================================
 window.openAddClosetModal = openAddClosetModal;
 // クローゼット追加モーダルを閉じる関数をグローバル公開します
 window.closeAddClosetModal = closeAddClosetModal;
