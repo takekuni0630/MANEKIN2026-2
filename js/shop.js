@@ -82,7 +82,7 @@ function lsSetJson(key, val) {
 // 【役割】スマホ版を初めて開いた人に「最初のサンプル服3点セット」をプレゼントする初期服配り係
 // 【具体的な処理内容】
 //   ・クローゼットが空っぽだと試着が楽しめないため、最初から使える
-//     帽子・トップス・ボトムスの初期サンプル服データを返します
+//     トップス・ボトムスの初期サンプル服データを返します
 // ==========================================================================
 function getDefaultMobileClosetItems() {
     return [
@@ -103,16 +103,6 @@ function getDefaultMobileClosetItems() {
             color: 'WHITE',
             season: '春・秋',
             image: 'assets/images/men/スカイオックスフォードシャツ.png',
-            isOwned: true,
-            isPurchased: false
-        },
-        {
-            id: 'c3',
-            name: '黒レザーローファー',
-            category: 'SHOES',
-            color: 'BLACK',
-            season: 'オールシーズン',
-            image: 'assets/images/men/アーバンレザースニーカー.png',
             isOwned: true,
             isPurchased: false
         }
@@ -209,6 +199,7 @@ function getApiBaseUrl() {
         return '';
     }
     // 定数 host を宣言し、値（(window.location.hostname === 'localho…）をセットします
+    // MySQLの場合(localhostと127.0.0.1はどちらもMySQL)
     const host = (window.location.hostname === 'localhost') ? 'localhost' : '127.0.0.1';
     // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
     return `http://${host}:8080`;
@@ -222,6 +213,12 @@ function getApiBaseUrl() {
 // ==========================================================================
 function isServerUserId(uid) {
     // 結果（uid !== null && uid !== undefined && /^\d+$/.tes…）を呼び出し元へ返却します
+    // /が正規表現の開始と終わり
+    // ^が文字列の先頭
+    // \dが0~9の数字一文字
+    // +は１回以上くり返す
+    // $は文字列の末尾
+    // 先頭から末尾まで、1文字以上の数字だけでできている
     return uid !== null && uid !== undefined && /^\d+$/.test(String(uid));
 }
 
