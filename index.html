@@ -2529,43 +2529,12 @@ index.html
                                     onclick="setCutoutTool('line-eraser')" title="定規を当てたように始点から終点まで一直線にまっすぐ消す">
                                     📏 直線消し (定規)
                                 </button>
-                                <button type="button" class="tool-btn" id="tool-guard" onclick="toggleGuardPlate()"
-                                    title="消したくない部分を覆って保護するガード板（シールド）を表示">
-                                    🛡️ ガード板 (保護)
-                                </button>
-                                <button type="button" class="tool-btn" id="tool-v-neck"
-                                    onclick="applyVNeckPresetCutout()" title="首元〜胸元中央を自然なチャック開きV字スリットで自動くり抜き">
-                                    ⚡ V字自動抜き
-                                </button>
-                                <button type="button" class="tool-btn" id="tool-fullzip"
-                                    onclick="applyFullZipAutoCutout()" title="前開き・フルジップジャケットの内側（裏地・インナー）を裾まで全自動でくり抜き">
-                                    ✨ 前開き全自動抜き
-                                </button>
                                 <button type="button" class="tool-btn" onclick="undoCutoutAction()" title="1手戻す">
                                     ↺ 戻す
                                 </button>
                                 <button type="button" class="tool-btn" onclick="resetCutoutCanvas()" title="元の状態に戻す">
                                     初期化
                                 </button>
-                            </div>
-
-                            <!-- ガード板コントロールバー -->
-                            <div class="cutout-guard-bar" id="cutout-guard-bar" style="display: none;">
-                                <div class="guard-bar-header">
-                                    <span class="guard-bar-title">🛡️ ガード板（緑のエリアは消しゴムから保護されます。板のドラッグ＆サイズ変更も可能）</span>
-                                    <button type="button" class="guard-close-btn" onclick="toggleGuardPlate(false)">×
-                                        板を閉じる</button>
-                                </div>
-                                <div class="guard-preset-btns">
-                                    <button type="button" class="guard-btn" onclick="setGuardPreset('center-slit')">🎯
-                                        チャック中央だけ開ける (両脇ガード)</button>
-                                    <button type="button" class="guard-btn" onclick="setGuardPreset('left')">⬅️
-                                        左側をガード</button>
-                                    <button type="button" class="guard-btn" onclick="setGuardPreset('right')">➡️
-                                        右側をガード</button>
-                                    <button type="button" class="guard-btn"
-                                        onclick="setGuardPreset('reset')">板をリセット</button>
-                                </div>
                             </div>
 
                             <div class="cutout-size-slider-box" id="cutout-size-slider-box" style="display: none;">
@@ -2578,22 +2547,6 @@ index.html
                                     <canvas id="cutout-canvas"></canvas>
                                     <!-- 直線定規ガイドプレビューCanvas -->
                                     <canvas id="cutout-guide-canvas"></canvas>
-                                    <!-- ガード板（保護シールド1） -->
-                                    <div class="guard-plate" id="guard-plate" style="display: none;">
-                                        <div class="guard-plate-label">🛡️ 保護エリア（消えません）</div>
-                                        <div class="guard-handle guard-handle-nw" data-handle="nw"></div>
-                                        <div class="guard-handle guard-handle-ne" data-handle="ne"></div>
-                                        <div class="guard-handle guard-handle-sw" data-handle="sw"></div>
-                                        <div class="guard-handle guard-handle-se" data-handle="se"></div>
-                                    </div>
-                                    <!-- ガード板（保護シールド2・中央スリット時用） -->
-                                    <div class="guard-plate" id="guard-plate-2" style="display: none;">
-                                        <div class="guard-plate-label">🛡️ 保護エリア（消えません）</div>
-                                        <div class="guard-handle guard-handle-nw" data-handle="nw"></div>
-                                        <div class="guard-handle guard-handle-ne" data-handle="ne"></div>
-                                        <div class="guard-handle guard-handle-sw" data-handle="sw"></div>
-                                        <div class="guard-handle guard-handle-se" data-handle="se"></div>
-                                    </div>
                                 </div>
                             </div>
                             <div class="cutout-footer-actions">

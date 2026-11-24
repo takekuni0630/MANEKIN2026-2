@@ -2635,7 +2635,6 @@ function closeAddClosetModal() {
 
     // 条件（cutoutPanel）が成り立つか判定し、該当する場合の処理を実行します
     if (cutoutPanel) cutoutPanel.style.display = 'none';
-    if (typeof toggleGuardPlate === 'function') toggleGuardPlate(false);
 
     // 条件（preview）が成り立つか判定し、該当する場合の処理を実行します
     if (preview) {
@@ -3727,16 +3726,6 @@ let lastLineSnapped = null;
 // エディタ開始時の元DataURL
 let cutoutInitialDataUrl = '';
 
-// ガード板（消したくない所保護シールド）の状態管理
-let isGuardPlateActive = false;
-let guardPlates = [
-    { active: false, x: 0.04, y: 0.05, w: 0.40, h: 0.90 }, // プレート1（左側）
-    { active: false, x: 0.56, y: 0.05, w: 0.40, h: 0.90 }  // プレート2（右側）
-];
-let activeGuardDragIndex = -1;
-let activeGuardHandle = null;
-let guardDragStartInfo = null;
-
 // チャック隙間くり抜きエディタを開く
 function openZipperCutoutEditor() {
     const targetUrl = currentClosetUploadDataUrl || originalClosetUploadDataUrl;
@@ -3785,11 +3774,7 @@ function openZipperCutoutEditor() {
 
         cutoutHistory = [cutoutCtx.getImageData(0, 0, w, h)];
         initCutoutCanvasEvents();
-        initGuardPlateEvents();
         setCutoutTool(currentCutoutTool);
-        if (isGuardPlateActive) {
-            syncGuardPlateDOM();
-        }
         panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
     img.src = targetUrl;
@@ -3852,117 +3837,20 @@ function updateEraserSize(val) {
     if (label) label.textContent = `${eraserBrushSize}px`;
 }
 
-// ガード板（保護シールド）の有効・無効切り替え
-function toggleGuardPlate(forceState) {
-    if (typeof forceState === 'boolean') {
-        isGuardPlateActive = forceState;
-    } else {
-        isGuardPlateActive = !isGuardPlateActive;
-    }
-    const toolBtn = document.getElementById('tool-guard');
-    const guardBar = document.getElementById('cutout-guard-bar');
-    if (toolBtn) toolBtn.classList.toggle('active', isGuardPlateActive);
-    if (guardBar) guardBar.style.display = isGuardPlateActive ? 'flex' : 'none';
-
-    if (isGuardPlateActive) {
-        if (!guardPlates[0].active && !guardPlates[1].active) {
-            setGuardPreset('center-slit');
-        } else {
-            syncGuardPlateDOM();
-        }
-        showToastNotification('🛡️ ガード板を表示しました。緑の枠内は消しゴムから保護されます');
-    } else {
-        const plate1 = document.getElementById('guard-plate');
-        const plate2 = document.getElementById('guard-plate-2');
-        if (plate1) plate1.style.display = 'none';
-        if (plate2) plate2.style.display = 'none';
-    }
-}
-
-// ガード板プリセット配置
-function setGuardPreset(type) {
-    if (!isGuardPlateActive) {
-        toggleGuardPlate(true);
-    }
-    if (type === 'center-slit') {
-        guardPlates[0] = { active: true, x: 0.04, y: 0.05, w: 0.40, h: 0.90 };
-        guardPlates[1] = { active: true, x: 0.56, y: 0.05, w: 0.40, h: 0.90 };
-        showToastNotification('🎯 チャック中央だけ開けました！隙間を大胆に消しても左右の服は保護されます');
-    } else if (type === 'left') {
-        guardPlates[0] = { active: true, x: 0.0, y: 0.0, w: 0.48, h: 1.0 };
-        guardPlates[1].active = false;
-        showToastNotification('⬅️ 左半分をガード板で保護しました');
-    } else if (type === 'right') {
-        guardPlates[0] = { active: true, x: 0.52, y: 0.0, w: 0.48, h: 1.0 };
-        guardPlates[1].active = false;
-        showToastNotification('➡️ 右半分をガード板で保護しました');
-    } else if (type === 'reset') {
-        guardPlates[0] = { active: true, x: 0.10, y: 0.15, w: 0.35, h: 0.70 };
-        guardPlates[1].active = false;
-        showToastNotification('ガード板を初期サイズに戻しました');
-    }
-    syncGuardPlateDOM();
-}
-
-// ガード板DOMの座標とスタイルを更新
-function syncGuardPlateDOM() {
-    const plate1 = document.getElementById('guard-plate');
-    const plate2 = document.getElementById('guard-plate-2');
-
-    [plate1, plate2].forEach((elem, idx) => {
-        if (!elem) return;
-        const p = guardPlates[idx];
-        if (isGuardPlateActive && p && p.active) {
-            elem.style.display = 'flex';
-            elem.style.left = `${Math.round(p.x * 100)}%`;
-            elem.style.top = `${Math.round(p.y * 100)}%`;
-            elem.style.width = `${Math.round(p.w * 100)}%`;
-            elem.style.height = `${Math.round(p.h * 100)}%`;
-        } else {
-            elem.style.display = 'none';
-        }
-    });
-}
-
-// 現在有効なガード板のピクセル矩形リストを取得
-function getActiveGuardRects() {
-    if (!isGuardPlateActive || !cutoutCanvas) return [];
-    const cw = cutoutCanvas.width;
-    const ch = cutoutCanvas.height;
-    return guardPlates.filter(p => p.active).map(p => {
-        let x = Math.max(0, Math.round(p.x * cw));
-        let y = Math.max(0, Math.round(p.y * ch));
-        let w = Math.min(cw - x, Math.round(p.w * cw));
-        let h = Math.min(ch - y, Math.round(p.h * ch));
-        return { x, y, w, h };
-    }).filter(r => r.w > 0 && r.h > 0);
-}
-
-// ガード板による保護付きの円形消去（フリーハンド用）
-function eraseProtectedCircle(cx, cy, radius) {
+// 円形消去（フリーハンド用）
+function eraseCircle(cx, cy, radius) {
     if (!cutoutCtx || !cutoutCanvas) return;
-    const rects = getActiveGuardRects();
-    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
-
     cutoutCtx.save();
     cutoutCtx.globalCompositeOperation = 'destination-out';
     cutoutCtx.beginPath();
     cutoutCtx.arc(cx, cy, radius, 0, Math.PI * 2);
     cutoutCtx.fill();
     cutoutCtx.restore();
-
-    // ガード板領域のピクセルを完全復元
-    rects.forEach((r, i) => {
-        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
-    });
 }
 
-// ガード板による保護付きの直線消去（直線定規用）
-function eraseProtectedLine(x0, y0, x1, y1, width) {
+// 直線消去（直線定規用）
+function eraseLine(x0, y0, x1, y1, width) {
     if (!cutoutCtx || !cutoutCanvas) return;
-    const rects = getActiveGuardRects();
-    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
-
     cutoutCtx.save();
     cutoutCtx.globalCompositeOperation = 'destination-out';
     cutoutCtx.lineWidth = width;
@@ -3973,11 +3861,6 @@ function eraseProtectedLine(x0, y0, x1, y1, width) {
     cutoutCtx.lineTo(x1, y1);
     cutoutCtx.stroke();
     cutoutCtx.restore();
-
-    // ガード板領域のピクセルを完全復元
-    rects.forEach((r, i) => {
-        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
-    });
 }
 
 // 定規ガイドプレビューを描画（オーバーレイCanvas）
@@ -4051,103 +3934,6 @@ function applyRulerSnap(startX, startY, curX, curY, isShiftKey = false) {
     return { x: curX, y: curY };
 }
 
-// ガード板のドラッグ＆リサイズイベント初期化
-function initGuardPlateEvents() {
-    const wrapper = document.getElementById('cutout-canvas-wrapper');
-    if (!wrapper || wrapper._guardEventsBound) return;
-    wrapper._guardEventsBound = true;
-
-    [0, 1].forEach(idx => {
-        const elem = document.getElementById(idx === 0 ? 'guard-plate' : 'guard-plate-2');
-        if (!elem) return;
-
-        function startDrag(e, handle = null) {
-            e.stopPropagation();
-            e.preventDefault();
-            activeGuardDragIndex = idx;
-            activeGuardHandle = handle;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            const p = guardPlates[idx];
-            guardDragStartInfo = {
-                clientX,
-                clientY,
-                origX: p.x,
-                origY: p.y,
-                origW: p.w,
-                origH: p.h
-            };
-            elem.classList.add('is-active');
-        }
-
-        elem.addEventListener('mousedown', (e) => {
-            const handle = e.target.getAttribute('data-handle');
-            startDrag(e, handle);
-        });
-        elem.addEventListener('touchstart', (e) => {
-            const handle = e.target.getAttribute('data-handle');
-            startDrag(e, handle);
-        }, { passive: false });
-    });
-
-    function onMove(e) {
-        if (activeGuardDragIndex < 0 || !guardDragStartInfo) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        const rect = wrapper.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-
-        const deltaX = (clientX - guardDragStartInfo.clientX) / rect.width;
-        const deltaY = (clientY - guardDragStartInfo.clientY) / rect.height;
-        const p = guardPlates[activeGuardDragIndex];
-
-        if (!activeGuardHandle) {
-            p.x = Math.max(0, Math.min(1 - p.w, guardDragStartInfo.origX + deltaX));
-            p.y = Math.max(0, Math.min(1 - p.h, guardDragStartInfo.origY + deltaY));
-        } else {
-            if (activeGuardHandle === 'se') {
-                p.w = Math.max(0.05, Math.min(1 - p.x, guardDragStartInfo.origW + deltaX));
-                p.h = Math.max(0.05, Math.min(1 - p.y, guardDragStartInfo.origH + deltaY));
-            } else if (activeGuardHandle === 'sw') {
-                const newW = Math.max(0.05, guardDragStartInfo.origW - deltaX);
-                p.x = Math.max(0, guardDragStartInfo.origX + (guardDragStartInfo.origW - newW));
-                p.w = newW;
-                p.h = Math.max(0.05, Math.min(1 - p.y, guardDragStartInfo.origH + deltaY));
-            } else if (activeGuardHandle === 'ne') {
-                p.w = Math.max(0.05, Math.min(1 - p.x, guardDragStartInfo.origW + deltaX));
-                const newH = Math.max(0.05, guardDragStartInfo.origH - deltaY);
-                p.y = Math.max(0, guardDragStartInfo.origY + (guardDragStartInfo.origH - newH));
-                p.h = newH;
-            } else if (activeGuardHandle === 'nw') {
-                const newW = Math.max(0.05, guardDragStartInfo.origW - deltaX);
-                p.x = Math.max(0, guardDragStartInfo.origX + (guardDragStartInfo.origW - newW));
-                p.w = newW;
-                const newH = Math.max(0.05, guardDragStartInfo.origH - deltaY);
-                p.y = Math.max(0, guardDragStartInfo.origY + (guardDragStartInfo.origH - newH));
-                p.h = newH;
-            }
-        }
-        syncGuardPlateDOM();
-    }
-
-    function onEnd() {
-        if (activeGuardDragIndex >= 0) {
-            const plate1 = document.getElementById('guard-plate');
-            const plate2 = document.getElementById('guard-plate-2');
-            if (plate1) plate1.classList.remove('is-active');
-            if (plate2) plate2.classList.remove('is-active');
-            activeGuardDragIndex = -1;
-            activeGuardHandle = null;
-            guardDragStartInfo = null;
-        }
-    }
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onEnd);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onEnd);
-}
-
 // キャンバスのマウス・タッチイベント登録
 function initCutoutCanvasEvents() {
     if (!cutoutCanvas) return;
@@ -4178,7 +3964,7 @@ function initCutoutCanvasEvents() {
             drawStraightGuideLine(x, y, x, y, eraserBrushSize);
         } else {
             isCutoutDrawing = true;
-            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+            eraseCircle(x, y, eraserBrushSize / 2);
         }
     });
 
@@ -4189,7 +3975,7 @@ function initCutoutCanvasEvents() {
             drawStraightGuideLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
         } else if (isCutoutDrawing && currentCutoutTool === 'eraser') {
             const { x, y } = getCanvasCoords(e);
-            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+            eraseCircle(x, y, eraserBrushSize / 2);
         }
     });
 
@@ -4198,7 +3984,7 @@ function initCutoutCanvasEvents() {
             isLineDrawing = false;
             clearStraightGuideLine();
             if (lastLineSnapped) {
-                eraseProtectedLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+                eraseLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
                 saveCutoutState();
                 showToastNotification('📏 まっすぐ直線でくり抜きました');
             }
@@ -4223,7 +4009,7 @@ function initCutoutCanvasEvents() {
             drawStraightGuideLine(x, y, x, y, eraserBrushSize);
         } else {
             isCutoutDrawing = true;
-            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+            eraseCircle(x, y, eraserBrushSize / 2);
         }
     }, { passive: false });
 
@@ -4236,7 +4022,7 @@ function initCutoutCanvasEvents() {
         } else if (isCutoutDrawing && currentCutoutTool === 'eraser') {
             e.preventDefault();
             const { x, y } = getCanvasCoords(e);
-            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+            eraseCircle(x, y, eraserBrushSize / 2);
         }
     }, { passive: false });
 
@@ -4245,7 +4031,7 @@ function initCutoutCanvasEvents() {
             isLineDrawing = false;
             clearStraightGuideLine();
             if (lastLineSnapped) {
-                eraseProtectedLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+                eraseLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
                 saveCutoutState();
                 showToastNotification('📏 まっすぐ直線でくり抜きました');
             }
@@ -4317,178 +4103,6 @@ function floodFillTransparent(startX, startY, tolerance = 42) {
     cutoutCtx.putImageData(imgData, 0, 0);
     saveCutoutState();
     showToastNotification('🪄 タップした領域を透明にくり抜きました');
-}
-
-// 首元〜胸元中央を自然なチャック開きV字スリットで自動くり抜き
-function applyVNeckPresetCutout() {
-    if (!cutoutCtx || !cutoutCanvas) return;
-    const w = cutoutCanvas.width;
-    const h = cutoutCanvas.height;
-
-    // 不透明ピクセルの分布から服の中心と上端・胸元の高さを測定
-    const imgData = cutoutCtx.getImageData(0, 0, w, h);
-    const data = imgData.data;
-    let minY = h, maxY = 0, minX = w, maxX = 0;
-    let found = false;
-    for (let y = 0; y < h; y += 4) {
-        for (let x = 0; x < w; x += 4) {
-            const idx = (y * w + x) * 4;
-            if (data[idx + 3] > 40) {
-                found = true;
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-            }
-        }
-    }
-
-    if (!found) {
-        showToastNotification('⚠️ 服の画像が検出できませんでした');
-        return;
-    }
-
-    const centerX = Math.round((minX + maxX) / 2);
-    const bodyHeight = maxY - minY;
-    // 首元（最上部から少し入った位置）〜胸元（全体の約38%の深さまでチャックが開く）
-    const topY = minY + Math.round(bodyHeight * 0.05);
-    const bottomY = minY + Math.round(bodyHeight * 0.40);
-    const halfWidthTop = Math.round((maxX - minX) * 0.12);
-
-    cutoutCtx.save();
-    cutoutCtx.globalCompositeOperation = 'destination-out';
-    cutoutCtx.beginPath();
-    cutoutCtx.moveTo(centerX - halfWidthTop, topY);
-    cutoutCtx.lineTo(centerX + halfWidthTop, topY);
-    cutoutCtx.lineTo(centerX, bottomY);
-    cutoutCtx.closePath();
-    cutoutCtx.fill();
-    cutoutCtx.restore();
-
-    saveCutoutState();
-    showToastNotification('⚡ V字チャックの隙間を自動でくり抜きました！');
-}
-
-// 前開き・フルジップジャケットの内側（裏地・インナー・前立て内）を全自動でくり抜く
-function applyFullZipAutoCutout() {
-    if (!cutoutCtx || !cutoutCanvas) return;
-    const w = cutoutCanvas.width;
-    const h = cutoutCanvas.height;
-
-    const imgData = cutoutCtx.getImageData(0, 0, w, h);
-    const data = imgData.data;
-
-    // 1. 服全体の不透明領域バウンディングボックス
-    let minY = h, maxY = 0, minX = w, maxX = 0;
-    let found = false;
-    for (let y = 0; y < h; y += 4) {
-        for (let x = 0; x < w; x += 4) {
-            const idx = (y * w + x) * 4;
-            if (data[idx + 3] > 40) {
-                found = true;
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-            }
-        }
-    }
-    if (!found) {
-        showToastNotification('⚠️ 服の画像が検出できませんでした');
-        return;
-    }
-
-    const centerX = Math.round((minX + maxX) / 2);
-    const bodyHeight = maxY - minY;
-    const bodyWidth = maxX - minX;
-
-    // 首元（上から約7%の位置）から裾（最下部から約4%上）まで
-    const topY = minY + Math.round(bodyHeight * 0.07);
-    const bottomY = maxY - Math.round(bodyHeight * 0.04);
-
-    const leftPoints = [];
-    const rightPoints = [];
-
-    for (let y = topY; y <= bottomY; y += 4) {
-        const centerIdx = (y * w + centerX) * 4;
-        const cR = data[centerIdx];
-        const cG = data[centerIdx + 1];
-        const cB = data[centerIdx + 2];
-
-        // 中心から左へ走査してエッジ検出
-        let lEdge = centerX - Math.round(bodyWidth * 0.09);
-        const maxLeftScan = Math.max(minX, centerX - Math.round(bodyWidth * 0.35));
-        for (let x = centerX - 8; x >= maxLeftScan; x--) {
-            const idx = (y * w + x) * 4;
-            if (data[idx + 3] < 30) { lEdge = x; break; }
-            const diff = Math.abs(data[idx] - cR) + Math.abs(data[idx + 1] - cG) + Math.abs(data[idx + 2] - cB);
-            if (diff > 50) {
-                lEdge = x;
-                break;
-            }
-        }
-
-        // 中心から右へ走査してエッジ検出
-        let rEdge = centerX + Math.round(bodyWidth * 0.09);
-        const maxRightScan = Math.min(maxX, centerX + Math.round(bodyWidth * 0.35));
-        for (let x = centerX + 8; x <= maxRightScan; x++) {
-            const idx = (y * w + x) * 4;
-            if (data[idx + 3] < 30) { rEdge = x; break; }
-            const diff = Math.abs(data[idx] - cR) + Math.abs(data[idx + 1] - cG) + Math.abs(data[idx + 2] - cB);
-            if (diff > 50) {
-                rEdge = x;
-                break;
-            }
-        }
-
-        leftPoints.push({ x: lEdge, y });
-        rightPoints.push({ x: rEdge, y });
-    }
-
-    if (leftPoints.length === 0 || rightPoints.length === 0) return;
-
-    // 輪郭のスムージング（ガタつきを滑らかにする）
-    function smooth(points) {
-        return points.map((pt, i) => {
-            let sumX = 0, count = 0;
-            for (let d = -3; d <= 3; d++) {
-                if (points[i + d]) {
-                    sumX += points[i + d].x;
-                    count++;
-                }
-            }
-            return { x: Math.round(sumX / count), y: pt.y };
-        });
-    }
-    const smoothL = smooth(leftPoints);
-    const smoothR = smooth(rightPoints);
-
-    // ガード板領域の退避
-    const rects = (typeof getActiveGuardRects === 'function') ? getActiveGuardRects() : [];
-    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
-
-    // くり抜きポリゴンを描画
-    cutoutCtx.save();
-    cutoutCtx.globalCompositeOperation = 'destination-out';
-    cutoutCtx.beginPath();
-    cutoutCtx.moveTo(smoothL[0].x, smoothL[0].y);
-    for (let i = 1; i < smoothL.length; i++) {
-        cutoutCtx.lineTo(smoothL[i].x, smoothL[i].y);
-    }
-    for (let i = smoothR.length - 1; i >= 0; i--) {
-        cutoutCtx.lineTo(smoothR[i].x, smoothR[i].y);
-    }
-    cutoutCtx.closePath();
-    cutoutCtx.fill();
-    cutoutCtx.restore();
-
-    // ガード板領域の復元
-    rects.forEach((r, i) => {
-        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
-    });
-
-    saveCutoutState();
-    showToastNotification('✨ 前開きチャックの内側を自動でくり抜きました！');
 }
 
 // 編集履歴を保存
