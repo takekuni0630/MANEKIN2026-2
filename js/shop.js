@@ -854,7 +854,7 @@ async function syncCartToBackend() {
                 method: 'POST',
                 // サーバーへ送るデータの形式が JSON であることを伝える Content-Type ヘッダです
                 headers: { 'Content-Type': 'application/json' },
-                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
+                // Cookie（HttpOnly の manekin_session）を API リクエストに複数のものをひとまとめにして送信する必須指定です
                 credentials: 'include',
                 // JavaScript オブジェクトを JSON 文字列へ変換して送信ボディに乗せます
                 body: JSON.stringify({
@@ -985,8 +985,9 @@ async function syncCartFromBackend(options = {}) {
         // 定数 finalCart を宣言し、値（[...serverItems]）をセットします
         const finalCart = [...serverItems];
         // 再代入可能な変数 needPushToServer を宣言し、値（false）をセットします
+        // マージした後にサーバーへ送り返す必要があるか
         let needPushToServer = false;
-
+        // 11/24ここまで行ったよ
         // 条件（mergeItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
         if (mergeItems.length > 0) {
             // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
