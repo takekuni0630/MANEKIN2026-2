@@ -2529,7 +2529,12 @@ def serve_index():
 # CSS / JS / 商品画像などの静的ファイルリクエストに対して実ファイルを配信します
 def serve_static(path):
     # 現在のフォルダから静的ファイル（send_from_directory('.', path)）を読み取ってブラウザへ配信します
-    return send_from_directory('.', path)
+    resp = make_response(send_from_directory('.', path))
+    # クロスオリジン（CORS）からの画像読み込みやCanvas利用を許可するヘッダーを付与します
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    resp.headers['Access-Control-Allow-Headers'] = '*'
+    return resp
 
 # テーブル確認後に起動案内をコンソール表示し、ポート 8080 で Flask Webサーバーを立ち上げるメイン関数です
 def main():

@@ -2614,16 +2614,17 @@ function openAddClosetModal() {
 
 // 登録済みの手持ち服を編集（くり抜き・情報更新）するモーダルを開きます
 function openEditClosetModal(itemId) {
-    const item = AppState.myCloset.find(c => String(c.id) === String(itemId));
+    // IDの型（数値／文字列）の違いを吸収して確実に該当アイテムを検索します
+    const item = AppState.myCloset.find(c => String(c.id) === String(itemId) || (Number(c.id) && Number(c.id) === Number(itemId)));
     if (!item) {
         showToastNotification('⚠️ 指定された服が見つかりませんでした');
-        return;
+        return null;
     }
 
     editingClosetItemId = item.id;
 
     const modal = document.getElementById('modal-add-closet');
-    if (!modal) return;
+    if (!modal) return null;
 
     modal.classList.add('open');
     modal.classList.add('active');
@@ -2652,7 +2653,7 @@ function openEditClosetModal(itemId) {
     const seasonSelect = document.getElementById('closet-item-season');
     if (seasonSelect && item.season) seasonSelect.value = item.season;
 
-    // 画像データのセット
+    // 画像データのセット（前回の古い画像が残らないよう厳密に更新）
     originalClosetUploadDataUrl = item.image;
     currentClosetUploadDataUrl = item.image;
     isCurrentUploadTransparent = true;
@@ -2671,15 +2672,18 @@ function openEditClosetModal(itemId) {
     if (cutoutPanel) cutoutPanel.style.display = 'none';
 
     showToastNotification(`「${item.name}」の編集画面を開きました。「✂️ チャック・襟の隙間くり抜き」で自由に加工できます`);
+    return item;
 }
 
 // 登録済みの服の「チャック・襟元の隙間くり抜き」を直接開くショートカット
 function openEditClosetCutout(itemId) {
-    openEditClosetModal(itemId);
-    // モーダルオープン直後にチャックくり抜きエディタを直接起動してスクロール
+    const item = openEditClosetModal(itemId);
+    if (!item) return;
+
+    // モーダルオープン直後に、対象アイテムの正確な画像を引数に渡してチャックくり抜きエディタを直接起動
     setTimeout(() => {
-        openZipperCutoutEditor();
-    }, 150);
+        openZipperCutoutEditor(item.image);
+    }, 120);
 }
 
 // 手持ち服登録・編集モーダルを閉じてフォーム入力と画像をリセットします
@@ -3818,9 +3822,65 @@ let lastLineSnapped = null;
 // エディタ開始時の元DataURL
 let cutoutInitialDataUrl = '';
 
+// URL（相対パスやBase64）から画像を安全かつ確実に読み込み、HTMLImageElement を返すヘルパー
+async function loadSafeImageElement(srcUrl) {
+    if (!srcUrl) throw new Error('画像URLが空です');
+
+    // すでに data: URL の場合はそのままロード（同一メモリのためCanvas汚染なし）
+    if (srcUrl.startsWith('data:')) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error('DataURL画像の読み込みに失敗しました'));
+            img.src = srcUrl;
+        });
+    }
+
+    // 日本語ファイル名やスペースを含むパスを安全にURLエンコード
+    const encodedUrl = encodeURI(srcUrl);
+
+    // 相対パスや通常URLの場合、CORSエラーとCanvas汚染を回避するために fetch して DataURL（Blob）への変換を最優先
+    try {
+        const res = await fetch(encodedUrl);
+        if (res.ok) {
+            const blob = await res.blob();
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+    } catch (fetchErr) {
+        console.warn('fetchによる画像取得をスキップ、直接Imageロードに切り替えます:', fetchErr);
+    }
+
+    // fetchがスキップされた場合のフォールバック: まず anonymous（CORS許可モード）で試行
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            // anonymousが拒否された場合、最終フォールバックとして通常モードで描画
+            const directImg = new Image();
+            directImg.onload = () => resolve(directImg);
+            directImg.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
+            directImg.src = encodedUrl;
+        };
+        img.src = encodedUrl;
+    });
+}
+
 // チャック隙間くり抜きエディタを開く
-function openZipperCutoutEditor() {
-    const targetUrl = currentClosetUploadDataUrl || originalClosetUploadDataUrl;
+async function openZipperCutoutEditor(overrideUrl) {
+    // 引数でURLが渡された場合はそれを最優先し、無ければ現在のアップロード画像を使用
+    const targetUrl = overrideUrl || currentClosetUploadDataUrl || originalClosetUploadDataUrl;
     if (!targetUrl) {
         showToastNotification('先に服の写真を選択してください');
         return;
@@ -3840,11 +3900,14 @@ function openZipperCutoutEditor() {
     }
     cutoutInitialDataUrl = targetUrl;
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-        let w = img.width;
-        let h = img.height;
+    const hint = document.getElementById('cutout-status-hint');
+    if (hint) hint.textContent = '⏳ 服の画像を読み込み中...';
+
+    try {
+        const img = await loadSafeImageElement(targetUrl);
+        let w = img.width || 400;
+        let h = img.height || 400;
+
         // 作業しやすい適度な解像度（最大800px）に調整
         if (w > 800 || h > 800) {
             if (w > h) {
@@ -3861,15 +3924,27 @@ function openZipperCutoutEditor() {
             guideCanvas.width = w;
             guideCanvas.height = h;
         }
+
         cutoutCtx.clearRect(0, 0, w, h);
         cutoutCtx.drawImage(img, 0, 0, w, h);
 
-        cutoutHistory = [cutoutCtx.getImageData(0, 0, w, h)];
+        // 履歴の初期化（ブラウザのCORS制約でgetImageDataが例外を出しても描画自体は成功させる安全策）
+        try {
+            cutoutHistory = [cutoutCtx.getImageData(0, 0, w, h)];
+        } catch (secErr) {
+            console.warn('Canvas getImageData restriction:', secErr);
+            cutoutHistory = [];
+        }
+
         initCutoutCanvasEvents();
-        setCutoutTool(currentCutoutTool);
+        setCutoutTool(currentCutoutTool || 'eraser');
+        if (hint) hint.textContent = 'ドラッグまたはなぞって隙間を消せます';
         panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    };
-    img.src = targetUrl;
+    } catch (err) {
+        console.error('くり抜きエディタの画像読み込みエラー:', err);
+        showToastNotification('⚠️ 服の写真の読み込みに失敗しました');
+        if (hint) hint.textContent = '⚠️ 画像の読み込みに失敗しました。もう一度お試しください。';
+    }
 }
 
 // チャック隙間くり抜きエディタを閉じる（反映またはキャンセル）
@@ -3883,9 +3958,27 @@ function closeZipperCutoutEditor(applyChanges = false) {
             currentClosetUploadDataUrl = dataUrl;
             isCurrentUploadTransparent = true;
             updateClosetPreviewUI(dataUrl, true);
-            showToastNotification('✨ チャック・隙間を透過しました！試着室でトップスが見える状態です');
+
+            // 登録済みの服の編集中の場合、即座に手持ち服データと試着室マネキンにも反映
+            if (editingClosetItemId) {
+                const target = AppState.myCloset.find(c => String(c.id) === String(editingClosetItemId));
+                if (target) {
+                    target.image = dataUrl;
+                    // マネキンが現在この服を着ていればステージも即座に再描画
+                    const slotKey = getSlotKeyByCategory(target.category);
+                    if (AppState.wearingOutfit && AppState.wearingOutfit[slotKey] && String(AppState.wearingOutfit[slotKey].id) === String(target.id)) {
+                        AppState.wearingOutfit[slotKey].image = dataUrl;
+                        renderMannequinStage();
+                    }
+                    renderStudioClosetList();
+                    renderPaneClosetGrid();
+                }
+            }
+
+            showToastNotification('✨ チャック・隙間を透過しました！「変更を保存する」で確定できます');
         } catch (e) {
             console.error('Canvas書き出しエラー:', e);
+            showToastNotification('⚠️ 画像の書き出しに失敗しました');
         }
     }
 }
