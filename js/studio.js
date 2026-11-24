@@ -3910,7 +3910,7 @@ function setCutoutTool(tool) {
 
     if (hint) {
         if (tool === 'line-eraser') {
-            hint.textContent = '📏 定規モード: 始点から終点までドラッグすると、一直線にまっすぐ消せます（垂直線に自動スナップ）';
+            hint.textContent = '📏 定規モード: 始点から終点までドラッグすると、狙った角度で一直線にまっすぐ消せます（Shiftキーで垂直・水平固定）';
         } else {
             hint.textContent = '💡 マウスや指でなぞった部分を透明に消します（消しゴムサイズ調整可）';
         }
@@ -4003,22 +4003,21 @@ function clearStraightGuideLine() {
     cutoutGuideCtx.clearRect(0, 0, cutoutGuideCanvas.width, cutoutGuideCanvas.height);
 }
 
-// 直線スナップ計算（垂直・水平をまっすぐ補助）
+// 直線計算（ドラッグした任意の角度で一直線に定規引き。勝手な縦横吸着は行わず自由な斜め線に対応、Shiftキー押下時のみ垂直・水平固定）
 function applyRulerSnap(startX, startY, curX, curY, isShiftKey = false) {
-    const dx = curX - startX;
-    const dy = curY - startY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < 6) return { x: curX, y: curY };
+    if (!isShiftKey) {
+        // 勝手な縦・横への強制吸着は行わず、ユーザーが狙った角度の直線をそのまま維持
+        return { x: curX, y: curY };
+    }
 
-    // 垂直線スナップ（チャックの縦線に最適）
-    if (isShiftKey || Math.abs(dx) <= 15 || (Math.abs(dy) > 20 && Math.abs(dx / dy) < 0.22)) {
-        return { x: startX, y: curY };
+    // Shiftキーが押されている場合のみ垂直または水平に固定
+    const dx = Math.abs(curX - startX);
+    const dy = Math.abs(curY - startY);
+    if (dy >= dx) {
+        return { x: startX, y: curY }; // 垂直線
+    } else {
+        return { x: curX, y: startY }; // 水平線
     }
-    // 水平線スナップ
-    if (isShiftKey || Math.abs(dy) <= 15 || (Math.abs(dx) > 20 && Math.abs(dy / dx) < 0.22)) {
-        return { x: curX, y: startY };
-    }
-    return { x: curX, y: curY };
 }
 
 // キャンバスのマウス・タッチイベント登録
