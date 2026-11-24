@@ -352,6 +352,7 @@ function getDefaultFittingOffsets() {
 // ==========================================================================
 async function applyAccountSession(user, options = {}) {
     // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
+    // 前の人の情報(古いやつ)だけ消す
     purgeAllManekinLocalStorage();
 
     // デバウンス待ち中の試着変更があれば先に MySQL へ確定送信してから後続処理へ進みます
@@ -445,15 +446,19 @@ async function applyAccountSession(user, options = {}) {
     }
 
     // ログインユーザーの複数データを MySQL バックエンドから並列（同時）に読み込んで完了を待ちます
+    // ログインした後にサーバー（MySQL）から自分の最新データをまとめて一斉にとってくる処理
     try {
+        // カート・注文履歴・お気に入り商品・クローゼット・コーデ・スタジオ状態・クーポンを一つずつ順番待ちせず同時に取りに行く仕組み
         await Promise.all([
             // 関連処理 syncCartFromBackend() を呼び出して処理・画面を更新します
+            // さっき退避しておいたGEST時代(未ログイン時)のカートの中身を渡して、ログイン後のカートに合体させている
             syncCartFromBackend({ mergeItems: guestCartSnapshot }),
             // 関連処理 syncOrdersFromBackend() を呼び出して処理・画面を更新します
             syncOrdersFromBackend(),
             // 関連処理 syncFavoritesFromBackend() を呼び出して処理・画面を更新します
             syncFavoritesFromBackend(),
             // 関連モジュール側に関数が定義されている場合のみ、その同期・補助処理を呼び出します
+            // 関数がまだ読み込まれていない場合でも、エラーにならないように何もしない完了状態(Promise.resolve)を返す
             (typeof syncClosetFromBackend === 'function') ? syncClosetFromBackend() : Promise.resolve(),
             // 関連モジュール側に関数が定義されている場合のみ、その同期・補助処理を呼び出します
             (typeof syncOutfitsFromBackend === 'function') ? syncOutfitsFromBackend() : Promise.resolve(),
@@ -462,6 +467,7 @@ async function applyAccountSession(user, options = {}) {
             // ユーザーが所持するクーポン一覧を取得して画面に反映します
             fetchUserCoupons()
         ]);
+        // どれかの通信や同期でエラーが出ても警告文だけで済ませる
     } catch (syncErr) {
         console.warn('ログイン後のMySQL並列同期エラー:', syncErr);
     }
@@ -489,6 +495,10 @@ function createProductCardHTML(product) {
     const formattedPrice = "¥" + product.price.toLocaleString();
 
     // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
+    // src=〇〇..画像URL  alt=〇〇..画像が表示できない時の画像の説明文
+    // loading = "lazy"..遅延読み込みを行う  onerror="〇〇"..画像の読み込みに失敗したときに代替画像が表示
+
+    // stopPropagation.. イベントを止める(商品詳細に飛ぶイベントを防ぎお気に入りに登録するボタンを子要素として指定する)
     return `
         <article class="product-card" data-id="${product.id}">
             <div class="product-img-wrapper" onclick="navigateToDetail(${product.id})">
@@ -615,12 +625,14 @@ function renderCatalogProducts() {
         // 値が 'name-asc' だった場合の専用処理ルートです
         case 'name-asc':
             // 選択中の並び順指定（安い順／高い順／名前順／新着順）に沿って商品配列 items を並べ替えます
+            //  あいうえお順
             items.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
             // 現在の case / ループ処理をここで抜けます
             break;
         // どの case にも該当しなかった場合の既定（デフォルト）処理です
         default:
             // 選択中の並び順指定（安い順／高い順／名前順／新着順）に沿って商品配列 items を並べ替えます
+            // idの若いやつ順
             items.sort((a, b) => a.id - b.id);
             // 現在の case / ループ処理をここで抜けます
             break;
@@ -688,9 +700,6 @@ function renderItemDetail(productId) {
         breadcrumbName.textContent = product.name;
     }
 
-    // アプリ全体状態 AppState.selectedSize を最新値（product.sizes[1] || "M"）に更新します
-    AppState.selectedSize = product.sizes[1] || "M";
-
     // 定数 isFav を宣言し、値（AppState.favorites.includes(product.id…）をセットします
     const isFav = Array.isArray(AppState.favorites) && AppState.favorites.some(f => Number(f) === Number(product.id));
     // 定数 formattedPrice を宣言し、値（"¥" + product.price.toLocaleString()）をセットします
@@ -698,21 +707,13 @@ function renderItemDetail(productId) {
     // 定数 initialImgUrl を宣言し、値（product.image）をセットします
     const initialImgUrl = product.image;
 
-    // 配列の各アイテムを順番に加工・HTMLカード化して新しい配列に変換します
-    const sizeChipsHTML = product.sizes.map((size, idx) => {
-        // 定数 isSelected を宣言し、値（(size === AppState.selectedSize)）をセットします
-        const isSelected = (size === AppState.selectedSize);
-        // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
-        return `
-            <button type="button" 
-                    class="size-chip ${isSelected ? 'selected' : ''}" 
-                    data-size="${size}" 
-                    onclick="handleSizeSelect(this, '${size}')">
-                ${size}
-            </button>
-        `;
-        // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
-    }).join('');
+    // 商品ごとに取り扱っているサイズ一覧（product.sizes）から表示用バッジ HTML を生成します
+    const availableSizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ['FREE'];
+    const sizeChipsHTML = availableSizes.map(size => `
+        <span class="size-chip size-badge" title="取扱サイズ: ${size}">
+            ${size}
+        </span>
+    `).join('');
 
     // テンプレートリテラルで組み立てた HTML を要素 detailLayout 内に書き込んで画面を更新します
     detailLayout.innerHTML = `
@@ -733,9 +734,7 @@ function renderItemDetail(productId) {
 
             <div class="detail-options">
                 <div class="option-group">
-                    <p class="option-group-title">
-                        SIZE: <span class="current-selected-label" id="label-selected-size">${AppState.selectedSize}</span>
-                    </p>
+                    <p class="option-group-title">取扱サイズ展開:</p>
                     <div class="size-chips" id="detail-size-chips">${sizeChipsHTML}</div>
                 </div>
             </div>
@@ -771,36 +770,10 @@ function renderItemDetail(productId) {
 }
 
 // ==========================================================================
-// 【関数】handleSizeSelect(chipEl, sizeName)
-// 【役割】商品詳細画面でお客さんがサイズ（S/M/Lなど）を選んだときに見た目を変えるサイズ案内係
-// 【具体的な処理内容】
-//   ・クリックされたサイズボタンをアクティブ（黒色）にし、選んだサイズを記憶します
-// ==========================================================================
-function handleSizeSelect(chipEl, sizeName) {
-    // 定数 parent を宣言し、値（chipEl.parentElement）をセットします
-    const parent = chipEl.parentElement;
-    // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
-    parent.querySelectorAll('.size-chip').forEach(s => s.classList.remove('selected'));
-    // 要素に CSS クラスを付与して見た目・表示状態を変更します（chipEl.classList.add('selected');）
-    chipEl.classList.add('selected');
-
-    // アプリ全体状態 AppState.selectedSize を最新値（sizeName）に更新します
-    AppState.selectedSize = sizeName;
-
-    // HTML 要素 #label-selected-size を取得して変数 labelSize に格納します
-    const labelSize = document.getElementById('label-selected-size');
-    // 条件（labelSize）が成り立つか判定し、該当する場合の処理を実行します
-    if (labelSize) labelSize.textContent = sizeName;
-
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`サイズ: ${sizeName} を選択しました`);
-}
-
-
-// ==========================================================================
 //  3. ショッピングカート管理（シーケンス保護 ＋ MySQL cart_items 同期）
 // ==========================================================================
 // 複数回のカート保存 API 通信が順番を追い越さないよう直列に繋ぐための待機用 Promise です
+// 続けてカートに保存するとエラーが起こる可能性があるから一回保存されるごとに終了している
 let _cartSyncPromise = Promise.resolve();
 // ユーザーごとの最新カート操作順番を記録し、古い通信応答による先祖返りを防ぐ連番管理マップです
 const _cartSyncSeqByUser = {};
@@ -1083,7 +1056,7 @@ function updateCartBadge() {
 // 【関数】handleAddToCartFromDetail(productId)
 // 【役割】商品詳細画面で「ショッピングバッグに追加」が押されたときにカゴに入れるお買い物係
 // 【具体的な処理内容】
-//   ・選んだサイズと商品をカートに追加（すでにあれば数量を+1）し、
+//   ・商品をカートに追加（すでにあれば数量を+1）し、
 //     サーバーに保存して完了通知メッセージを出します
 // ==========================================================================
 async function handleAddToCartFromDetail(productId) {
@@ -1099,11 +1072,13 @@ async function handleAddToCartFromDetail(productId) {
     const currentImg = product.image;
     // 定数 defaultColor を宣言し、値（(product.colors && product.colors[0]) || 'DEFAULT'）をセットします
     const defaultColor = (product.colors && product.colors[0]) || 'DEFAULT';
+    // 取扱サイズ展開の文字列表記（例: 'S/M/L' または 'FREE'）を取得します
+    const productSize = (Array.isArray(product.sizes) && product.sizes.length > 0) ? product.sizes.join('/') : 'FREE';
 
     // 定数 existingIndex を宣言し、値（AppState.cart.findIndex(）をセットします
     const existingIndex = AppState.cart.findIndex(
         // 変数・配列項目 item の値を更新・計算します
-        item => item.id === product.id && item.size === AppState.selectedSize
+        item => item.id === product.id
     );
 
     // 条件（existingIndex > -1）が成り立つか判定し、該当する場合の処理を実行します
@@ -1122,8 +1097,8 @@ async function handleAddToCartFromDetail(productId) {
             category: product.category || 'TOPS',
             // カラー名
             color: defaultColor,
-            // 選択サイズ
-            size: AppState.selectedSize,
+            // 取扱サイズ
+            size: productSize,
             // 単価・価格（円）
             price: product.price,
             // 数量
@@ -1152,13 +1127,13 @@ async function handleAddToCartFromDetail(productId) {
             return false;
         }
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToast(`「${product.name} (${AppState.selectedSize})」をバッグに追加しMySQLに保存しました`);
+        showToast(`「${product.name}」をバッグに追加しMySQLに保存しました`);
         // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
         return true;
     }
 
     // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    showToast(`「${product.name} (${AppState.selectedSize})」をバッグに追加しました（ログインでMySQLに保存）`);
+    showToast(`「${product.name}」をバッグに追加しました（ログインでMySQLに保存）`);
     // 処理結果の基準値として true を呼び出し元へ返して関数を終了します
     return true;
 }

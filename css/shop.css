@@ -1176,6 +1176,22 @@
     color: var(--color-white);
 }
 
+/* 取扱サイズ一覧用の静的バッジスタイル（選択ボタンではなく情報表示バッジとして扱います） */
+.size-chip.size-badge {
+    cursor: default;
+    user-select: none;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border-color: #e2e8f0;
+    color: var(--color-dark);
+}
+
+/* 静的バッジにマウスを乗せてもホバー強調しないようにします */
+.size-chip.size-badge:hover {
+    border-color: #e2e8f0;
+    background-color: #f8f9fa;
+}
+
 /* 商品詳細画面パーツに対するスタイル定義を開始します（対象: .detail-actions） */
 .detail-actions {
     /* Flexbox を有効にし、子要素を横並び・縦並びや中央揃えで配置しやすくします */
