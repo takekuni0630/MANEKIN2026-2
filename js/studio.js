@@ -371,6 +371,9 @@ function renderPaneClosetGrid() {
                         <button class="btn-wear-toggle ${isWearing ? 'is-active' : ''}" onclick="toggleWearItem('${item.id}', true)">
                             ${isWearing ? '試着を外す' : 'マネキンに着せる'}
                         </button>
+                        <button class="btn-closet-edit" onclick="openEditClosetCutout('${item.id}')" title="チャック・襟元の隙間をくり抜く / 情報を編集">
+                            ✂️ くり抜き
+                        </button>
                         <button class="btn-closet-del" onclick="deleteClosetItem('${item.id}')" title="削除">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
@@ -424,7 +427,8 @@ function renderStudioClosetList() {
         // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
             <div class="studio-item-card ${isWearing ? 'is-active' : ''}" draggable="true" ondragstart="handleCardDragStart(event, '${item.id}', true)" onclick="toggleWearItem('${item.id}', true)" title="${isWearing ? 'クリックして脱がす' : 'クリックまたはドラッグしてマネキンに試着'}">
-            <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';" >
+                <button type="button" class="btn-studio-item-cutout" onclick="event.stopPropagation(); openEditClosetCutout('${item.id}')" title="チャック・襟元の隙間をくり抜く / 編集">✂️</button>
+                <img src="${item.image}" alt="${item.name}" class="studio-item-card-img" onerror="this.onerror=null;this.src='${fallback}';" >
                 <div class="studio-item-card-info">
                     <div class="studio-card-cat-row">
                         <span class="studio-card-cat">${getCategoryNameJP(item.category)}</span>
@@ -2576,11 +2580,22 @@ async function addCurrentBrandItemsToCart() {
 }
 
 
+// 現在編集中のクローゼットアイテムID（新規登録時はnull）
+let editingClosetItemId = null;
+
 // ==========================================================================
-//  6. 手持ち服登録モーダル・AI背景透過（@imgly）＆ Canvas＋MobileNet形状診断
+//  6. 手持ち服登録・編集モーダル・AI背景透過（@imgly）＆ Canvas＋MobileNet形状診断
 // ==========================================================================
-// 「手持ちの服を登録する」モーダルを開き、アップロード一時変数を初期化します
+// 「手持ちの服を登録する」モーダル（新規追加モード）を開き、アップロード一時変数を初期化します
 function openAddClosetModal() {
+    editingClosetItemId = null;
+    const title = document.getElementById('modal-add-closet-title');
+    if (title) title.textContent = '手持ちの服を登録する';
+    const subtext = document.querySelector('#modal-add-closet .modal-subtext');
+    if (subtext) subtext.textContent = '登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。';
+    const submitBtn = document.getElementById('btn-closet-submit');
+    if (submitBtn) submitBtn.textContent = 'クローゼットに登録する';
+
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
     // 条件（modal）が成り立つか判定し、該当する場合の処理を実行します
@@ -2597,8 +2612,77 @@ function openAddClosetModal() {
     }
 }
 
+// 登録済みの手持ち服を編集（くり抜き・情報更新）するモーダルを開きます
+function openEditClosetModal(itemId) {
+    const item = AppState.myCloset.find(c => String(c.id) === String(itemId));
+    if (!item) {
+        showToastNotification('⚠️ 指定された服が見つかりませんでした');
+        return;
+    }
 
-// 手持ち服登録モーダルを閉じてフォーム入力と画像をリセットします
+    editingClosetItemId = item.id;
+
+    const modal = document.getElementById('modal-add-closet');
+    if (!modal) return;
+
+    modal.classList.add('open');
+    modal.classList.add('active');
+    modal.onclick = function (e) {
+        if (e.target === modal) closeAddClosetModal();
+    };
+
+    // タイトルと保存ボタンの文言を「編集」用に更新
+    const title = document.getElementById('modal-add-closet-title');
+    if (title) title.textContent = '手持ちの服を編集する';
+    const subtext = document.querySelector('#modal-add-closet .modal-subtext');
+    if (subtext) subtext.textContent = '登録済みの服の画像やチャック隙間のくり抜き、服の情報を更新できます。';
+    const submitBtn = document.getElementById('btn-closet-submit');
+    if (submitBtn) submitBtn.textContent = '変更を保存する';
+
+    // 既存の服データをフォームとプレビューに反映
+    const nameInput = document.getElementById('closet-item-name');
+    if (nameInput) nameInput.value = item.name || '';
+
+    const catRadio = document.querySelector(`input[name="closet_category"][value="${item.category}"]`);
+    if (catRadio) catRadio.checked = true;
+
+    const colorSelect = document.getElementById('closet-item-color');
+    if (colorSelect && item.color) colorSelect.value = item.color;
+
+    const seasonSelect = document.getElementById('closet-item-season');
+    if (seasonSelect && item.season) seasonSelect.value = item.season;
+
+    // 画像データのセット
+    originalClosetUploadDataUrl = item.image;
+    currentClosetUploadDataUrl = item.image;
+    isCurrentUploadTransparent = true;
+
+    // プレビュー表示更新
+    updateClosetPreviewUI(item.image, true);
+
+    // AI透過・くり抜きアクションバーを表示（即座にくり抜きツールを使えるようにする）
+    const actionBtns = document.getElementById('ai-action-btns');
+    if (actionBtns) {
+        actionBtns.style.display = 'flex';
+    }
+
+    // チャックくり抜きエディタがもし開いていたら一旦閉じる
+    const cutoutPanel = document.getElementById('zipper-cutout-panel');
+    if (cutoutPanel) cutoutPanel.style.display = 'none';
+
+    showToastNotification(`「${item.name}」の編集画面を開きました。「✂️ チャック・襟の隙間くり抜き」で自由に加工できます`);
+}
+
+// 登録済みの服の「チャック・襟元の隙間くり抜き」を直接開くショートカット
+function openEditClosetCutout(itemId) {
+    openEditClosetModal(itemId);
+    // モーダルオープン直後にチャックくり抜きエディタを直接起動してスクロール
+    setTimeout(() => {
+        openZipperCutoutEditor();
+    }, 150);
+}
+
+// 手持ち服登録・編集モーダルを閉じてフォーム入力と画像をリセットします
 function closeAddClosetModal() {
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
@@ -2609,6 +2693,14 @@ function closeAddClosetModal() {
         // 要素から CSS クラスを外して強調や表示を戻します（modal.classList.remove('active');）
         modal.classList.remove('active');
     }
+
+    editingClosetItemId = null;
+    const title = document.getElementById('modal-add-closet-title');
+    if (title) title.textContent = '手持ちの服を登録する';
+    const subtext = document.querySelector('#modal-add-closet .modal-subtext');
+    if (subtext) subtext.textContent = '登録した服は、マネキン試着スタジオでいつでもブランド商品と組み合わせられます。';
+    const submitBtn = document.getElementById('btn-closet-submit');
+    if (submitBtn) submitBtn.textContent = 'クローゼットに登録する';
     // 変数・配列項目 currentClosetUploadDataUrl の値を更新・計算します
     currentClosetUploadDataUrl = '';
     // 変数・配列項目 originalClosetUploadDataUrl の値を更新・計算します
@@ -4251,10 +4343,14 @@ async function handleAddClosetItem(e) {
 
     // 変数・配列項目 _closetMutationSeq の値を更新・計算します
     _closetMutationSeq++;
+
+    const isEdit = !!editingClosetItemId;
+    const targetItemId = isEdit ? editingClosetItemId : ('c-' + userId + '-' + Date.now());
+
     // 定数 newItem を宣言し、値（{）をセットします
     const newItem = {
         // レコード・商品・コーデを識別する ID プロパティをセットします
-        id: 'c-' + userId + '-' + Date.now(),
+        id: targetItemId,
         // MySQL でどの会員アカウントのデータか区別するための user_id をセットします
         user_id: userId,
         // 商品名またはアイテム名称
@@ -4272,11 +4368,31 @@ async function handleAddClosetItem(e) {
     };
 
     if (typeof isMobileLocalStorageMode === 'function' && isMobileLocalStorageMode()) {
-        AppState.myCloset.unshift(newItem);
+        if (isEdit) {
+            const idx = AppState.myCloset.findIndex(c => String(c.id) === String(targetItemId));
+            if (idx !== -1) {
+                AppState.myCloset[idx] = { ...AppState.myCloset[idx], ...newItem };
+            } else {
+                AppState.myCloset.unshift(newItem);
+            }
+            if (AppState.currentOutfit) {
+                Object.keys(AppState.currentOutfit).forEach(k => {
+                    if (AppState.currentOutfit[k] && String(AppState.currentOutfit[k].id) === String(targetItemId)) {
+                        AppState.currentOutfit[k].image = newItem.image;
+                        AppState.currentOutfit[k].name = newItem.name;
+                    }
+                });
+            }
+        } else {
+            AppState.myCloset.unshift(newItem);
+        }
         if (typeof lsSetJson === 'function') {
             lsSetJson('manekin_ls_closet_' + userId, AppState.myCloset);
         }
-        showToastNotification(`「${name}」をマイクローゼットに登録しました！`);
+        const successMsg = isEdit
+            ? `「${name}」の変更（くり抜き等）を保存しました！`
+            : `「${name}」をマイクローゼットに登録しました！`;
+        showToastNotification(successMsg);
         closeAddClosetModal();
         renderManekinStudio(AppState.studioActiveTab);
         if (submitBtn) {
@@ -4335,16 +4451,41 @@ async function handleAddClosetItem(e) {
         // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
         if (!AppState.currentUser || String(AppState.currentUser.id) !== String(userId)) return;
 
-        // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入して即画面反映します
-        AppState.myCloset.unshift(newItem);
+        // データの更新または新規追加
+        if (isEdit) {
+            const idx = AppState.myCloset.findIndex(c => String(c.id) === String(targetItemId));
+            if (idx !== -1) {
+                AppState.myCloset[idx] = { ...AppState.myCloset[idx], ...newItem };
+            } else {
+                AppState.myCloset.unshift(newItem);
+            }
+            // 着用中アイテムの画像も即時更新
+            if (AppState.currentOutfit) {
+                Object.keys(AppState.currentOutfit).forEach(k => {
+                    if (AppState.currentOutfit[k] && String(AppState.currentOutfit[k].id) === String(targetItemId)) {
+                        AppState.currentOutfit[k].image = newItem.image;
+                        AppState.currentOutfit[k].name = newItem.name;
+                    }
+                });
+            }
+        } else {
+            AppState.myCloset.unshift(newItem);
+        }
+
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
         console.log('✨ [MySQL] マイクローゼットにアイテムを保存しました:', data);
-        // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-        showToastNotification(`「${name}」をマイクローゼット(MySQL)に登録しました！`);
+        const successMsg = isEdit
+            ? `「${name}」の変更（くり抜き等）を保存しました！`
+            : `「${name}」をマイクローゼット(MySQL)に登録しました！`;
+        showToastNotification(successMsg);
         // 関連処理 closeAddClosetModal() を呼び出して処理・画面を更新します
         closeAddClosetModal();
         // 関連処理 renderManekinStudio() を呼び出して処理・画面を更新します
         renderManekinStudio(AppState.studioActiveTab);
+        // 着用中コーデの最新状態をバックエンド同期
+        if (typeof syncStudioStateToBackend === 'function') {
+            syncStudioStateToBackend({ immediate: true });
+        }
         // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
     } catch (err) {
         // 開発者ツール(F12)のコンソールへデバッグ／エラーログを記録します
