@@ -1,13 +1,7 @@
 // ==========================================================================
-//  MANEKIN FASHION - AIバーチャル試着スタジオ機能 (js/studio.js)
-//  【このファイル全体で何をしているの？】
-//  ・マネキン試着室ステージ制御（5部位の重ね合わせ表示、ドラッグ＆ドロップ着せ替え）
-//  ・服の位置・サイズ微調整（スライダーで上下・左右の位置や大きさをミリ単位で調整）
-//  ・手持ち服の登録機能（写真アップロード、AIによる背景自動透明化切り抜き、形状判定）
-//  ・コーディネート保存＆復元（気に入った服の組み合わせに名前を付けて保存）
-//  ・AIスタイリング診断（着ている服の色バランスや季節に合わせたアドバイス自動生成）
-//  ・気象庁公式データ連携（愛知・名古屋の本日の気温・天気に連動したおすすめコーデ提案）
-//  ・試着状態のMySQL自動保存（ページを移動しても着ていた服や微調整を元通り復元）
+//  js/studio.js - MANEKIN AI 試着スタジオ総合エンジン
+//  仮想試着マネキン制御、手持ち服のブラウザ完結AI背景透過＆形状自動認識、
+//  位置・サイズ微調整、AIコーデ診断、保存ルックブック、MySQL状態同期を担当します。
 // ==========================================================================
 
 // ==========================================================================
@@ -92,6 +86,22 @@ const PRESET_CLOSET_PRESETS = {
         season: '春秋',
         // 画像ファイルパスまたは DataURL
         image: 'assets/images/men/リラックスダブルブレストテーラードジャケット.png'
+    },
+    // チャックが少し開いていて首元・胸元からインナーが見えるハーフジップジャケットのプリセットです
+    'zipper_jacket': {
+        name: 'ハーフジップ ナイロンジャケット (チャック開き)',
+        category: 'OUTER',
+        color: 'BLACK',
+        season: '春秋',
+        image: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22420%22%20viewBox%3D%220%200%20400%20420%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22jGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2327272a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%2318181b%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22colGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%233f3f46%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%2327272a%22%2F%3E%3C%2FlinearGradient%3E%3Cfilter%20id%3D%22shd%22%20x%3D%22-10%25%22%20y%3D%22-10%25%22%20width%3D%22120%25%22%20height%3D%22120%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%224%22%20stdDeviation%3D%224%22%20flood-opacity%3D%220.25%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M120%2070%20L30%20180%20L65%20205%20L125%20150%20Z%22%20fill%3D%22url(%23jGrad)%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M280%2070%20L370%20180%20L335%20205%20L275%20150%20Z%22%20fill%3D%22url(%23jGrad)%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M120%2070%20C105%20130%2095%20210%2095%20280%20L105%20360%20L295%20360%20L305%20280%20C305%20210%20295%20130%20280%2070%20L235%2060%20L218%2068%20L200%20180%20L182%2068%20L165%2060%20Z%22%20fill%3D%22url(%23jGrad)%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%222.5%22%20filter%3D%22url(%23shd)%22%2F%3E%3Cpolygon%20points%3D%22160%2C58%20185%2C68%20155%2C115%20135%2C70%22%20fill%3D%22url(%23colGrad)%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%222%22%2F%3E%3Cpolygon%20points%3D%22240%2C58%20215%2C68%20245%2C115%20265%2C70%22%20fill%3D%22url(%23colGrad)%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%22200%22%20y1%3D%22180%22%20x2%3D%22200%22%20y2%3D%22360%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%223%2C2%22%2F%3E%3Cline%20x1%3D%22200%22%20y1%3D%22180%22%20x2%3D%22200%22%20y2%3D%22360%22%20stroke%3D%22%2352525b%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M183%2070%20L199%20180%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%222%2C2%22%2F%3E%3Cpath%20d%3D%22M217%2070%20L201%20180%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%222%2C2%22%2F%3E%3Crect%20x%3D%22195%22%20y%3D%22175%22%20width%3D%2210%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23e4e4e7%22%20stroke%3D%22%233f3f46%22%20stroke-width%3D%221.5%22%2F%3E%3Cpath%20d%3D%22M197%20187%20L197%20205%20L203%20205%20L203%20187%20Z%22%20fill%3D%22%23a1a1aa%22%20stroke%3D%22%233f3f46%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%22200%22%20cy%3D%22201%22%20r%3D%221.5%22%20fill%3D%22%233f3f46%22%2F%3E%3Crect%20x%3D%22105%22%20y%3D%22348%22%20width%3D%22190%22%20height%3D%2215%22%20rx%3D%223%22%20fill%3D%22%2327272a%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpolygon%20points%3D%2230%2C180%2040%2C172%2070%2C198%2062%2C207%22%20fill%3D%22%2327272a%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%221.5%22%2F%3E%3Cpolygon%20points%3D%22370%2C180%20360%2C172%20330%2C198%20338%2C207%22%20fill%3D%22%2327272a%22%20stroke%3D%22%2309090b%22%20stroke-width%3D%221.5%22%2F%3E%3Cline%20x1%3D%22125%22%20y1%3D%22190%22%20x2%3D%22165%22%20y2%3D%22190%22%20stroke%3D%22%2352525b%22%20stroke-width%3D%222.5%22%2F%3E%3Crect%20x%3D%22125%22%20y%3D%22196%22%20width%3D%2235%22%20height%3D%224%22%20fill%3D%22%233b82f6%22%20rx%3D%221%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22395%22%20text-anchor%3D%22middle%22%20fill%3D%22%2371717a%22%20font-size%3D%2211%22%20font-family%3D%22sans-serif%22%20letter-spacing%3D%222%22%20font-weight%3D%22700%22%3EHALF-ZIP%20JACKET%3C%2Ftext%3E%3C%2Fsvg%3E'
+    },
+    // チャックが全開に開いていてインナーが全体から見えるチェックパディングジャケットです
+    'check_puff_jacket': {
+        name: 'チェックパディングジャケット (チャック全開)',
+        category: 'OUTER',
+        color: 'BROWN',
+        season: '秋冬',
+        image: 'assets/images/men/チェックパディングジャケット_チャック開き.png'
     }
 };
 
@@ -103,21 +113,8 @@ let originalClosetUploadDataUrl = '';
 // 現在選択中の画像に背景透過処理が完了しているかを示すフラグです
 let isCurrentUploadTransparent = false;
 
-// ==========================================================================
 
-
-// ==========================================================================
-//  第1章：定数・初期状態・スタジオメインタブ切り替え
-//  【このセクションの役割】
-//  ・手持ち服サンプルのプリセット辞書定義
-//  ・スタジオ上部メインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み）の切り替え
-//  ・スタジオ画面全体のヘッダー会員情報や件数バッジの最新描画
-// ==========================================================================
-// 【関数】switchStudioTab(tabKey)
-// 【役割】画面の上のタブ（クローゼット、お気に入り、保存済み等）を押したときに、表示する内容をパチッと切り替えるタブ係
-// 【具体的な処理内容】
-//   ・選ばれたタブに応じて、表示するパネルやボタンの表示・非表示を切り替えます
-// ==========================================================================
+// MANEKIN AIスタジオ上部のメインタブ（ホーム / クローゼット / お気に入り / コーデ作成 / 保存済み / プロフィール）を切り替えます
 function switchStudioTab(tabKey) {
     // メディアクエリの画面設計（992px以下）の時だけ、独立したお気に入り画面を開かず、コーデ作成画面内の「お気に入り商品」列へ誘導します
     if (tabKey === 'favorites' && window.innerWidth <= 992) {
@@ -155,12 +152,8 @@ function switchStudioTab(tabKey) {
     renderManekinStudio(tabKey);
 }
 
-// ==========================================================================
-// 【関数】renderManekinStudio(activeTab = 'create')
-// 【役割】試着スタジオ画面を開いたときに、今着ている服や手持ちの服をすべて綺麗に並べて見せるスタジオの総まとめ係
-// 【具体的な処理内容】
-//   ・ログイン中の会員名やポイントを表示し、指定されたタブ（初期値はコーデ作成）の内容を描画します
-// ==========================================================================
+
+// スタジオ画面全体のヘッダー会員情報・件数バッジ・各タブの最新描画を統括して更新します
 function renderManekinStudio(activeTab = 'create') {
     // HTML 要素 #studio-user-name を取得して変数 userNameElem に格納します
     const userNameElem = document.getElementById('studio-user-name');
@@ -250,6 +243,9 @@ function renderManekinStudio(activeTab = 'create') {
         if (profRank) profRank.textContent = 'GUEST';
     }
 
+    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
+    syncGenderToggleUI();
+
     // 値（activeTab)）に応じて処理ケースを分岐する switch 文を開始します
     switch (activeTab) {
         // 値が 'home' だった場合の専用処理ルートです
@@ -317,12 +313,8 @@ const BRAND_SIZE_SCALES = {
     'XL': 112
 };
 
-// ==========================================================================
-// 【関数】renderPaneClosetGrid()
-// 【役割】「マイクローゼット」タブを開いたときに、持っている服をカードにしてずらりと並べる手持ち服の展示係
-// 【具体的な処理内容】
-//   ・自分が登録した手持ち服や購入した服のカードをグリッド状に並べて表示します
-// ==========================================================================
+
+// スタジオ「マイクローゼット」タブ内に所有している服カード一覧を描画します
 function renderPaneClosetGrid() {
     // HTML 要素 #closet-items-grid を取得して変数 grid に格納します
     const grid = document.getElementById('closet-items-grid');
@@ -390,21 +382,8 @@ function renderPaneClosetGrid() {
     }).join('');
 }
 
-// ==========================================================================
 
-
-// ==========================================================================
-//  第2章：左右ラック棚リスト（手持ち服・ショップ商品・お気に入り商品）
-//  【このセクションの役割】
-//  ・左側カラム「手持ちの服一覧」の描画（クリック着用＆ドラッグ対応）
-//  ・右側カラム「ブランド商品一覧」の描画（カテゴリ絞り込み・お気に入り連動）
-//  ・「お気に入り商品」タブのハート登録済み商品カード一覧の描画
-// ==========================================================================
-// 【関数】renderStudioClosetList()
-// 【役割】試着室の左側の棚に、自分が持っている服を並べていつでも着替えられるようにする左棚の並べ係
-// 【具体的な処理内容】
-//   ・ドラッグ＆ドロップまたはクリックでマネキンに着せられる手持ち服のリストを表示します
-// ==========================================================================
+// 3列試着画面の左カラム「1. 手持ちの服」一覧カードを描画します（クリック着用＆ドラッグ対応）
 function renderStudioClosetList() {
     // HTML 要素 #studio-closet-list を取得して変数 list に格納します
     const list = document.getElementById('studio-closet-list');
@@ -461,12 +440,8 @@ function renderStudioClosetList() {
     }).join('');
 }
 
-// ==========================================================================
-// 【関数】handlePaneClosetFilter(cat)
-// 【役割】マイクローゼットで「トップス」や「靴」などのボタンを押したときに、その種類の服だけにしぼりこむ仕分け係
-// 【具体的な処理内容】
-//   ・選ばれたカテゴリの服だけを抽出してマイクローゼット画面を再描画します
-// ==========================================================================
+
+// マイクローゼットタブのカテゴリ絞り込みボタン押下時の再描画処理です
 function handlePaneClosetFilter(cat) {
     // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
@@ -479,12 +454,8 @@ function handlePaneClosetFilter(cat) {
     renderPaneClosetGrid();
 }
 
-// ==========================================================================
-// 【関数】handleStudioClosetFilter(cat)
-// 【役割】試着室の左側の棚で「Tシャツだけ見たい」と選んだときに、その服だけにしぼる棚の整理係
-// 【具体的な処理内容】
-//   ・選ばれたカテゴリの手持ち服だけを左カラムに表示します
-// ==========================================================================
+
+// 3列スタジオ左カラムのカテゴリチップ絞り込み時の再描画処理です
 function handleStudioClosetFilter(cat) {
     // アプリ全体状態 AppState.studioClosetFilter を最新値（cat）に更新します
     AppState.studioClosetFilter = cat;
@@ -497,12 +468,8 @@ function handleStudioClosetFilter(cat) {
     renderStudioClosetList();
 }
 
-// ==========================================================================
-// 【関数】renderStudioBrandList()
-// 【役割】試着室の右側の棚に、お店で売っているブランドの服をずらりと並べる右棚の並べ係
-// 【具体的な処理内容】
-//   ・マネキンに試着できるショップの販売商品を一覧表示します
-// ==========================================================================
+
+// 3列試着画面の右カラム「3. ブランド商品」リスト（お気に入りフィルタ・カテゴリ絞込反映）を描画します
 function renderStudioBrandList() {
     // HTML 要素 #studio-brand-list を取得して変数 list に格納します
     const list = document.getElementById('studio-brand-list');
@@ -511,11 +478,13 @@ function renderStudioBrandList() {
 
     // 定数 filter を宣言し、値（AppState.studioBrandFilter || 'ALL'）をセットします
     const filter = AppState.studioBrandFilter || 'ALL';
+    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
+    const gender = AppState.studioGender || 'MEN';
 
     // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? Ap…）をセットします
     const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
-    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して allFavProducts に入れます
+    const allFavProducts = SAMPLE_PRODUCTS.filter(p => favIds.includes(p.id));
 
     // HTML 要素 #mob-brand-fav-cnt を取得して変数 mobBrandFavCnt に格納します
     const mobBrandFavCnt = document.getElementById('mob-brand-fav-cnt');
@@ -587,12 +556,8 @@ function renderStudioBrandList() {
     }).join('');
 }
 
-// ==========================================================================
-// 【関数】handleStudioBrandFilter(cat)
-// 【役割】試着室の右側の棚で「ボトムスだけ見たい」と選んだときに、その服だけにしぼる棚の整理係
-// 【具体的な処理内容】
-//   ・選ばれたカテゴリの販売商品だけを右カラムに表示します
-// ==========================================================================
+
+// 右カラムブランド商品一覧のカテゴリ絞り込みチップ切替処理です
 function handleStudioBrandFilter(cat) {
     // アプリ全体状態 AppState.studioBrandFilter を最新値（cat）に更新します
     AppState.studioBrandFilter = cat;
@@ -605,22 +570,25 @@ function handleStudioBrandFilter(cat) {
     renderStudioBrandList();
 }
 
-// ==========================================================================
-// 【関数】renderStudioFavoritesGrid()
-// 【役割】「お気に入り」タブを開いたときに、ハートマークを付けた大好きな服を並べて見せるお気に入り展示係
-// 【具体的な処理内容】
-//   ・ショップでお気に入り登録した商品カードを一覧表示し、そこから直接試着できるようにします
-// ==========================================================================
+
+// 右カラムの「お気に入り商品のみ表示」トグルボタン状態を切り替えます
+function toggleBrandFavFilter(chk) {
+    // アプリ全体状態 AppState.studioBrandFavOnly を最新値（chk.checked）に更新します
+    AppState.studioBrandFavOnly = chk.checked;
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
+    renderStudioBrandList();
+}
+
+
+// スタジオ「お気に入り商品」タブにハート登録済み商品カード一覧を描画します
 function renderStudioFavoritesGrid() {
     // HTML 要素 #studio-fav-grid を取得して変数 grid に格納します
     const grid = document.getElementById('studio-fav-grid');
     // 条件（!grid）が成り立つか判定し、該当する場合の処理を実行します
     if (!grid) return;
 
-    // 定数 favIds を宣言し、値（Array.isArray(AppState.favorites) ? AppState.favorites : []）をセットします
-    const favIds = Array.isArray(AppState.favorites) ? AppState.favorites : [];
-    // 全商品マスター SAMPLE_PRODUCTS からお気に入り登録された商品を抽出
-    const favProducts = SAMPLE_PRODUCTS.filter(p => favIds.some(f => Number(f) === Number(p.id)));
+    // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して favProducts に入れます
+    const favProducts = SAMPLE_PRODUCTS.filter(p => AppState.favorites.includes(p.id));
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
     if (favProducts.length === 0) {
@@ -643,17 +611,10 @@ function renderStudioFavoritesGrid() {
         const isWearing = isItemWearing(product);
         // 変数値を埋め込んだテンプレートリテラル文字列（HTMLカードやテキスト）を生成して呼び出し元へ返します
         return `
-            <article class="product-card" data-id="${product.id}">
+            <article class="product-card" data - id="${product.id}" >
                 <div class="product-img-wrapper" onclick="toggleWearItem(${product.id}, false); switchStudioTab('create');">
                     <img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.src='assets/images/men/スカイオックスフォードシャツ.png'">
                     <span class="badge-new" style="background: var(--color-black);">試着する</span>
-                    <button class="fav-btn is-favorite" 
-                            onclick="event.stopPropagation(); handleToggleFavorite(${product.id})" 
-                            aria-label="お気に入りを解除">
-                        <svg viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </button>
                 </div>
                 <div class="product-info">
                     <span class="product-category">${product.category}</span>
@@ -664,17 +625,16 @@ function renderStudioFavoritesGrid() {
                     </button>
                 </div>
             </article>
-        `;
+            `;
         // 上で配列ごとに生成した HTML 文字列を 1 つの連続した HTML テキストに連結します
     }).join('');
 }
 
+
 // ==========================================================================
-// 【関数】isItemWearing(item)
-// 【役割】その服を「今マネキンが着ているかどうか」をパッと見て確かめる着衣チェック係
-// 【具体的な処理内容】
-//   ・マネキンの帽子・トップス・ボトムス等のスロットを調べ、同じ服を着ていればtrueを返します
+//  3. マネキン試着・着脱・ドラッグ＆ドロップ・クイックピッカー操作
 // ==========================================================================
+// 渡されたアイテムが現在マネキンの対応部位スロットに着用されているか真偽値で判定します
 function isItemWearing(item) {
     // 定数 outfit を宣言し、値（AppState.currentOutfit）をセットします
     const outfit = AppState.currentOutfit;
@@ -694,13 +654,8 @@ function isItemWearing(item) {
     return false;
 }
 
-// ==========================================================================
-// 【関数】toggleWearItem(itemId, isOwned)
-// 【役割】服をクリックしたときに、着ていなければ着せ、すでに着ていればパッと脱がせるワンクリック着せ替え係
-// 【具体的な処理内容】
-//   ・まだ着ていなければマネキンに着せ、すでに着ていれば脱がせて、
-//     画面を再描画しサーバーに保存します
-// ==========================================================================
+
+// アイテムカード押下時に「着ていなければマネキンに着用 / 着用中なら脱ぐ」を切り替え、AI診断＆MySQL同期します
 function toggleWearItem(itemId, isOwned) {
     // 再代入可能な変数 targetItem を宣言し、値（null）をセットします
     let targetItem = null;
@@ -768,12 +723,8 @@ function toggleWearItem(itemId, isOwned) {
     updateAIStylingComment();
 }
 
-// ==========================================================================
-// 【関数】getSlotKeyByCategory(category)
-// 【役割】服の種類（トップス、靴、帽子など）を見て、マネキンのどこに着せるべきかを教えてくれる場所案内係
-// 【具体的な処理内容】
-//   ・大文字のカテゴリ名を小文字の部位スロットキーに直して返します
-// ==========================================================================
+
+// カテゴリ文字列('OUTER'/'TOPS'等)をマネキンスロット名('outer'/'tops'等)へ小文字正規化します
 function getSlotKeyByCategory(category) {
     // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
@@ -792,12 +743,8 @@ function getSlotKeyByCategory(category) {
     }
 }
 
-// ==========================================================================
-// 【関数】unwearSlot(slotKey)
-// 【役割】マネキンの指定した場所（帽子やトップスなど）の服をシュッと脱がせる脱がせ係
-// 【具体的な処理内容】
-//   ・その部位の服を空（null）にして、マネキンを再描画しサーバーへ保存します
-// ==========================================================================
+
+// 指定した部位スロット('hat'〜'shoes')の服だけをマネキンから脱がせて MySQL 同期します
 function unwearSlot(slotKey) {
     // 条件（AppState.currentOutfit[slotKey]）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentOutfit[slotKey]) {
@@ -821,12 +768,8 @@ function unwearSlot(slotKey) {
     }
 }
 
-// ==========================================================================
-// 【関数】resetMannequinOutfit(silent = false)
-// 【役割】マネキンが着ている服をぜんぶ脱がせて、最初の下着姿に戻す全身すっぴん戻し係
-// 【具体的な処理内容】
-//   ・5部位すべての服を空にし、マネキンを初期状態に戻します
-// ==========================================================================
+
+// マネキンの全5部位を一度に空に戻します（UI更新あり）
 function resetMannequinOutfit(silent = false) {
     // アプリ全体状態 AppState.currentOutfit を最新値（{）に更新します
     AppState.currentOutfit = {
@@ -859,23 +802,15 @@ function resetMannequinOutfit(silent = false) {
     updateAIStylingComment();
 }
 
-// ==========================================================================
-// 【関数】clearMannequin()
-// 【役割】「全身クリア」ボタンが押されたときに、「本当にぜんぶ脱がせていいですか？」と確認して脱がせるクリア係
-// 【具体的な処理内容】
-//   ・マネキンの服をすべて脱がせて、「マネキンをクリアしました」と通知します
-// ==========================================================================
+
+// ツールバー「全身クリア」ボタン押下時にマネキンの服をすべてリセットして通知します
 function clearMannequin() {
     // 関連処理 resetMannequinOutfit() を呼び出して処理・画面を更新します
     resetMannequinOutfit(false);
 }
 
-// ==========================================================================
-// 【関数】getCategoryFallbackImage(category)
-// 【役割】服の写真がうまく読み込めなかったときに、代わりにきれいなイラストを出してくれるお助け画像係
-// 【具体的な処理内容】
-//   ・画像のリンク切れが起きた際に、カテゴリに応じた標準の服画像を表示して画面崩れを防ぎます
-// ==========================================================================
+
+// 画像読み込み失敗(onerror)時にカテゴリに応じた代用ブランド画像パスを返します
 function getCategoryFallbackImage(category) {
     // 値（category)）に応じて処理ケースを分岐する switch 文を開始します
     switch (category) {
@@ -904,12 +839,8 @@ function getCategoryFallbackImage(category) {
     }
 }
 
-// ==========================================================================
-// 【関数】migrateOldBrokenAssets()
-// 【役割】古い服の画像リンクが切れていたときに、新しい正しい画像の場所に直してあげる修理係
-// 【具体的な処理内容】
-//   ・ファイル名が変わった古い画像URLを最新の画像URLへ置き換えます
-// ==========================================================================
+
+// 古いデータに含まれる旧ファイル名画像を現行フォルダの実在画像パスへメモリ補正します
 function migrateOldBrokenAssets() {
     // ブラウザ旧ストレージに残っていた manekin* データを完全消去して MySQL 単一運用を保ちます
     if (typeof purgeAllManekinLocalStorage === 'function') {
@@ -1006,22 +937,8 @@ function migrateOldBrokenAssets() {
     }
 }
 
-// ==========================================================================
 
-
-// ==========================================================================
-//  第3章：マネキン試着室ステージ・重なり順描画・ドラッグ＆ドロップ着せ替え
-//  【このセクションの役割】
-//  ・5部位（下着・ボトムス・トップス・アウター・帽子）の正しいレイヤー重ね合わせ表示
-//  ・服カードをマネキンステージへドラッグ＆ドロップした時の着せ替え処理
-//  ・ステージ下部の部位クイックスロットバー、未着用時の簡易服選びピッカー
-// ==========================================================================
-// 【関数】renderMannequinStage()
-// 【役割】真ん中のマネキンに、下着・トップス・アウターを正しい重ね順で綺麗に着せて見せるスタイリスト係
-// 【具体的な処理内容】
-//   ・マネキンの素体画像の上に、現在着ている服の画像を正しい重なり順
-//     （下着→ボトムス→トップス→アウター→帽子）で重ねて表示します
-// ==========================================================================
+// 中央「2. 試着室」の5部位画像レイヤー・着用中クイックスロットバー・ブランド品合計価格ボタンを再描画します
 function renderMannequinStage() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -1137,13 +1054,8 @@ function renderMannequinStage() {
     }
 }
 
-// ==========================================================================
-// 【関数】handleStageSlotClick(slotKey)
-// 【役割】マネキンの足元にある「帽子」「服」「靴」の枠を押したときに、服を脱がせたり選んだりする受付係
-// 【具体的な処理内容】
-//   ・服を着ていれば「サイズ微調整パネル」を開き、
-//     着ていなければ「簡易着せ替えピッカー」を開きます
-// ==========================================================================
+
+// 着用中スロットチップ押下時の処理：着ていれば調整パネル対象切替、未着用ならクイックピッカーを開きます
 function handleStageSlotClick(slotKey) {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -1161,13 +1073,8 @@ function handleStageSlotClick(slotKey) {
     }
 }
 
-// ==========================================================================
-// 【関数】openStageQuickPicker(slotKey)
-// 【役割】マネキンの部位を押したときに「どれに着替える？」と候補がポンと飛び出す着せ替え窓口係
-// 【具体的な処理内容】
-//   ・その部位に着せられる手持ち服と販売商品を一覧表示し、
-//     選んですぐに着せ替えられます
-// ==========================================================================
+
+// 未着用部位を選んだとき、手持ち服やブランド服からすぐ着せられる簡易選択リストを表示します
 function openStageQuickPicker(slotKey) {
     // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
@@ -1199,7 +1106,7 @@ function openStageQuickPicker(slotKey) {
     // 定数 myItems を宣言し、値（AppState.myCloset.filter(c => c.catego…）をセットします
     const myItems = AppState.myCloset.filter(c => c.category === catInfo.cat);
     // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して brandItems に入れます
-    const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat);
+    const brandItems = SAMPLE_PRODUCTS.filter(p => p.category === catInfo.cat && (!p.gender || p.gender === AppState.studioGender));
 
     // 再代入可能な変数 html を宣言し、値（''）をセットします
     let html = '';
@@ -1248,12 +1155,8 @@ function openStageQuickPicker(slotKey) {
     handleStudioBrandFilter(catInfo.cat);
 }
 
-// ==========================================================================
-// 【関数】closeStageQuickPicker()
-// 【役割】飛び出した着せ替え候補の窓を、用が済んだらスッと閉じるお片付け係
-// 【具体的な処理内容】
-//   ・開いていたポップアップを画面から消去します
-// ==========================================================================
+
+// 簡易部位選択ポップアップ要素を DOM から取り除きます
 function closeStageQuickPicker() {
     // HTML 要素 #stage-quick-picker を取得して変数 picker に格納します
     const picker = document.getElementById('stage-quick-picker');
@@ -1261,12 +1164,8 @@ function closeStageQuickPicker() {
     if (picker) picker.style.display = 'none';
 }
 
-// ==========================================================================
-// 【関数】handleCardDragStart(event, itemId, isOwned)
-// 【役割】服をつまんでマネキンに持っていこうとした瞬間に、「この服を運びます！」と準備する運搬係
-// 【具体的な処理内容】
-//   ・つかんだ服のIDや手持ち服フラグをドラッグデータ（dataTransfer）に記憶させます
-// ==========================================================================
+
+// 左右リストの服カードをドラッグ開始したとき、アイテム識別情報を dataTransfer に格納します
 function handleCardDragStart(event, itemId, isOwned) {
     // ドラッグ中のアイテム種類とIDを文字列データとしてブラウザの転送領域へ格納します
     event.dataTransfer.setData('text/plain', JSON.stringify({ itemId, isOwned }));
@@ -1274,12 +1173,8 @@ function handleCardDragStart(event, itemId, isOwned) {
     event.dataTransfer.effectAllowed = 'copy';
 }
 
-// ==========================================================================
-// 【関数】handleStageDragOver(event)
-// 【役割】つまんだ服がマネキンの上に来たときに、「ここに離せば着せられますよ」と枠を光らせて教える案内係
-// 【具体的な処理内容】
-//   ・ドロップ可能であることをブラウザに伝え、ステージに青い枠線を付けて目立たせます
-// ==========================================================================
+
+// マネキンステージ上にドラッグカーソルが乗ったとき、ドロップ許可スタイルを付けます
 function handleStageDragOver(event) {
     // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
@@ -1291,12 +1186,8 @@ function handleStageDragOver(event) {
     if (box) box.classList.add('is-dragover');
 }
 
-// ==========================================================================
-// 【関数】handleStageDragLeave(event)
-// 【役割】つまんだ服がマネキンの外へ離れたときに、光っていた枠を元に戻すお見送り係
-// 【具体的な処理内容】
-//   ・ステージの枠線の強調表示を元に戻します
-// ==========================================================================
+
+// ドラッグがマネキンステージ領域から離れたとき、ハイライト枠を消します
 function handleStageDragLeave(event) {
     // HTML 要素 #mannequin-stage-box を取得して変数 box に格納します
     const box = document.getElementById('mannequin-stage-box');
@@ -1304,12 +1195,8 @@ function handleStageDragLeave(event) {
     if (box) box.classList.remove('is-dragover');
 }
 
-// ==========================================================================
-// 【関数】handleStageDrop(event)
-// 【役割】マネキンの上で指やマウスをパッと離した瞬間に、その服をマネキンに着せてあげるドロップ着せ替え係
-// 【具体的な処理内容】
-//   ・ドラッグしていた服をマネキンに着用させ、画面を更新してサーバーに保存します
-// ==========================================================================
+
+// マネキンステージへ服カードがドロップされたとき、その服をマネキンへ着せ替えます
 function handleStageDrop(event) {
     // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
     event.preventDefault();
@@ -1334,23 +1221,11 @@ function handleStageDrop(event) {
     }
 }
 
-// ==========================================================================
-
 
 // ==========================================================================
-//  第4章：服の位置・サイズ微調整パネル（スライダー操作・規格サイズ変更）
-//  【このセクションの役割】
-//  ・ツールバー「服の位置・サイズ微調整」パネルの開閉と部位タブ切り替え
-//  ・手持ち服の上下位置(Y軸)・左右位置(X軸)・拡大率(70%〜140%)のミリ単位調整
-//  ・販売商品の規格サイズ（XS〜XL）スライダー変更
-//  ・CSS transform へのリアルタイム反映と初期値リセット処理
+//  4. フィット感・位置(X/Y)・XS〜XLサイズ・自由拡大率のリアルタイム微調整
 // ==========================================================================
-// 【関数】applyFittingOffsets()
-// 【役割】スライダーを動かしたときに、服を上や下、大きく小さく画面のマネキンに合わせて動かす位置合わせ係
-// 【具体的な処理内容】
-//   ・CSSの `transform: translate(...) scale(...)` を使って、
-//     服画像をミリ単位・パーセント単位で動かします
-// ==========================================================================
+// 部位別の X/Y オフセット・ブランドサイズ換算スケール・自由拡大率を CSS transform として各服画像に即時適用します
 function applyFittingOffsets() {
     // 定数 offsets を宣言し、値（AppState.fittingOffsets || {}）をセットします
     const offsets = AppState.fittingOffsets || {};
@@ -1399,12 +1274,8 @@ function applyFittingOffsets() {
     });
 }
 
-// ==========================================================================
-// 【関数】toggleFittingAdjustPanel()
-// 【役割】「服の位置や大きさを調整する」ボタンを押したときに、操作スライダーを出し入れするパネル開閉係
-// 【具体的な処理内容】
-//   ・調整パネルの表示／非表示を切り替えます
-// ==========================================================================
+
+// ツールバー「位置・サイズ微調整」パネルの表示／非表示を切り替えます
 function toggleFittingAdjustPanel() {
     // HTML 要素 #fitting-adjust-panel を取得して変数 panel に格納します
     const panel = document.getElementById('fitting-adjust-panel');
@@ -1427,12 +1298,8 @@ function toggleFittingAdjustPanel() {
     }
 }
 
-// ==========================================================================
-// 【関数】switchAdjustSlot(slotKey)
-// 【役割】「今は帽子の位置」「次はパンツの位置」と、今いじりたい服を選び分ける調整ターゲット選び係
-// 【具体的な処理内容】
-//   ・選ばれた部位のタブをアクティブにし、その服の現在の位置・サイズ数値をスライダーに反映します
-// ==========================================================================
+
+// 調整パネル内の部位タブ(帽子/アウター/トップス/ボトムス/靴)を切り替えます
 function switchAdjustSlot(slotKey) {
     // アプリ全体状態 AppState.activeAdjustSlot を最新値（slotKey）に更新します
     AppState.activeAdjustSlot = slotKey;
@@ -1445,13 +1312,8 @@ function switchAdjustSlot(slotKey) {
     syncAdjustPanelUI();
 }
 
-// ==========================================================================
-// 【関数】syncAdjustPanelUI()
-// 【役割】選んだ服に合わせて、スライダーのつまみの位置を今の数字にピタッと合わせるスライダー合わせ係
-// 【具体的な処理内容】
-//   ・「販売商品（XS〜XL規格サイズ）」か「手持ち服（自由拡大率）」かに応じて、
-//     適切な調整バーを表示します
-// ==========================================================================
+
+// 現在選択中の部位が「販売商品(XS〜XL)」か「手持ち服(%自由拡大)」かに合わせて調整スライダーと数値を同期表示します
 function syncAdjustPanelUI() {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1528,10 +1390,6 @@ function syncAdjustPanelUI() {
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = `${getCategoryNameJP(slotKey.toUpperCase())}（未着用）`;
         // 条件（descElem）が成り立つか判定し、該当する場合の処理を実行します
-        // if(descElem)はもしステージ上に服が存在していたら
-        // descElem.textContent = .... その表示エリアを書き換える
-        // isFreeScaleSlot ? A : B 条件？が正しいとき(A):違うとき(B)に書き換える
-
         if (descElem) descElem.textContent = isFreeScaleSlot ? '自由サイズ調整（70%〜140%）' : '試着すると調整可能';
 
         // 条件（sliderY）が成り立つか判定し、該当する場合の処理を実行します
@@ -1589,9 +1447,9 @@ function syncAdjustPanelUI() {
         // 条件（badgeElem）が成り立つか判定し、該当する場合の処理を実行します
         if (badgeElem) {
             // 変数・配列項目 badgeElem.className の値を更新・計算します
-            badgeElem.className = (item.isOwned !== false) ? 'adjust-item-tag closet' : 'adjust-item-tag brand';
-            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（すべてのジャンルでマイクローゼットに統一）
-            badgeElem.textContent = (item.isOwned !== false) ? '👕 マイクローゼット' : '🏷️ 販売商品';
+            badgeElem.className = 'adjust-item-tag closet';
+            // 文字要素 badgeElem の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+            badgeElem.textContent = slotKey === 'hat' ? '🧢 帽子' : '👟 靴';
         }
         // 条件（nameElem）が成り立つか判定し、該当する場合の処理を実行します
         if (nameElem) nameElem.textContent = item.name;
@@ -1691,12 +1549,8 @@ function syncAdjustPanelUI() {
     }
 }
 
-// ==========================================================================
-// 【関数】handleBrandSizeInput(val)
-// 【役割】服のサイズスライダー（S〜XL）を動かしたときに、服の大きさをギュッと変えるサイズ変更係
-// 【具体的な処理内容】
-//   ・選ばれたサイズ規格に合わせてマネキン上の服の大きさを拡大・縮小し、自動保存します
-// ==========================================================================
+
+// ブランド商品の規格サイズスライダー(0〜4)またはタグ押下時に XS〜XL サイズ設定を更新し、MySQL保存します
 function handleBrandSizeInput(val) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1763,12 +1617,8 @@ function handleBrandSizeInput(val) {
     syncStudioStateToBackend({ immediate: false });
 }
 
-// ==========================================================================
-// 【関数】stepBrandSize(delta)
-// 【役割】サイズの横にある「＋」「－」ボタンを押したときに、サイズを1段階ずつ大きく小さくするサイズ刻み係
-// 【具体的な処理内容】
-//   ・サイズを1段階大きく（S→M）または小さく（L→M）変更します
-// ==========================================================================
+
+// ブランドサイズの「＋／－」ボタンで 1 段階サイズを上下させます
 function stepBrandSize(delta) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1791,12 +1641,8 @@ function stepBrandSize(delta) {
     handleBrandSizeInput(baseIdx + delta);
 }
 
-// ==========================================================================
-// 【関数】handleAdjustInput(prop, val)
-// 【役割】服の上下・左右・拡大スライダーを動かしたときに、服の位置をミリ単位で動かす位置スライダー係
-// 【具体的な処理内容】
-//   ・スライダーの数値を服画像にリアルタイム反映し、位置を微調整します
-// ==========================================================================
+
+// 上下Y・左右X・自由拡大率%スライダーが動いたとき、即座にマネキン表示へ反映して MySQL 自動保存を予約します
 function handleAdjustInput(prop, val) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1844,12 +1690,8 @@ function handleAdjustInput(prop, val) {
     syncStudioStateToBackend({ immediate: false });
 }
 
-// ==========================================================================
-// 【関数】stepAdjust(prop, delta)
-// 【役割】位置スライダーの横にある「＋」「－」ボタンを押したときに、ちょっとずつ服をずらす微動ボタン係
-// 【具体的な処理内容】
-//   ・位置やサイズを1ステップずつ細かく刻んで変更します
-// ==========================================================================
+
+// X/Y/拡大率の micro 微調整ボタン（▲▼◀▶＋－）押下時に値を指定刻みで変更します
 function stepAdjust(prop, delta) {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1878,12 +1720,8 @@ function stepAdjust(prop, delta) {
     if (slider) slider.value = nextVal;
 }
 
-// ==========================================================================
-// 【関数】resetFittingOffsets()
-// 【役割】「リセット」ボタンを押したときに、動かした服の位置をピタッと最初の真ん中に戻す位置戻し係
-// 【具体的な処理内容】
-//   ・現在選んでいる部位の位置ズレや拡大率を初期値（0, 100%）に戻します
-// ==========================================================================
+
+// 現在調整中の部位（位置・拡大・サイズ）を初期値へリセットします
 function resetFittingOffsets() {
     // 定数 slotKey を宣言し、値（AppState.activeAdjustSlot || 'outer'）をセットします
     const slotKey = AppState.activeAdjustSlot || 'outer';
@@ -1918,12 +1756,45 @@ function resetFittingOffsets() {
     showToastNotification(`「${getCategoryNameJP(slotKey.toUpperCase())}」の位置とサイズをリセットしました`);
 }
 
-// ==========================================================================
-// 【関数】switchMobileStudioView(viewKey)
-// 【役割】スマホで使っているときに、「マネキン」「手持ちの服」「ショップの服」の画面をパッと切り替えるスマホ画面切り替え係
-// 【具体的な処理内容】
-//   ・画面幅が狭いスマホで、マネキン画面・左棚・右棚を切り替えて表示します
-// ==========================================================================
+
+// ツールバーの MEN / WOMEN マネキン性別ボタンの表示(.active)を AppState.studioGender に揃えます
+function syncGenderToggleUI() {
+    // 定数 gender を宣言し、値（AppState.studioGender || 'MEN'）をセットします
+    const gender = AppState.studioGender || 'MEN';
+    // HTML 要素 #btn-gender-men を取得して変数 btnMen に格納します
+    const btnMen = document.getElementById('btn-gender-men');
+    // HTML 要素 #btn-gender-women を取得して変数 btnWomen に格納します
+    const btnWomen = document.getElementById('btn-gender-women');
+    // 条件（btnMen）が成り立つか判定し、該当する場合の処理を実行します
+    if (btnMen) btnMen.classList.toggle('active', gender === 'MEN');
+    // 条件（btnWomen）が成り立つか判定し、該当する場合の処理を実行します
+    if (btnWomen) btnWomen.classList.toggle('active', gender === 'WOMEN');
+}
+
+
+// マネキン性別モデルを 'MEN' または 'WOMEN' へ切り替え、着用ステージ更新＆MySQL保存します
+function setMannequinGender(gender) {
+    // アプリ全体状態 AppState.studioGender を最新値（gender）に更新します
+    AppState.studioGender = gender;
+    // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
+    syncGenderToggleUI();
+    // メモリ上の最新変更をバックエンド API 経由で MySQL へ同期保存します
+    syncStudioStateToBackend({ immediate: true });
+
+    // 関連処理 renderStudioBrandList() を呼び出して処理・画面を更新します
+    renderStudioBrandList();
+
+    // マネキン性別変更に合わせて TODAY'S AI STYLING の提案内容も更新します
+    if (typeof updateTodaySeasonalStyling === 'function') {
+        updateTodaySeasonalStyling();
+    }
+
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+    showToastNotification(`マネキンモデルを「${gender}」に切り替えました`);
+}
+
+
+// スマホ表示幅のとき「マネキン試着室／手持ちの服／ブランド商品」の3列切り替えタブを制御します
 function switchMobileStudioView(viewKey) {
     // アプリ全体状態 AppState.studioMobileView を最新値（viewKey）に更新します
     AppState.studioMobileView = viewKey;
@@ -1949,20 +1820,12 @@ function switchMobileStudioView(viewKey) {
     if (colBrand) colBrand.classList.toggle('mobile-active', viewKey === 'brand');
 }
 
-// ==========================================================================
-
 
 // ==========================================================================
-//  第5章：AIスタイリングアドバイス生成・カラー構成診断
-//  【このセクションの役割】
-//  ・マネキンが着ている服の組み合わせから、カラーバランス比率を自動算出
-//  ・着ている服のテイストや季節に合わせて「AIスタイリングアドバイス」を動的生成
+//  5. AIスタイリング自動診断・保存済みコーデ（Lookbook）＆一括カート追加
 // ==========================================================================
-// 【関数】analyzeOutfitColorComposition(outfit)
-// 【役割】マネキンが着ている服全体を見て、「黒が60%、白が40%のモノトーンですね」と色の組み合わせを調べるカラー診断係
-// 【具体的な処理内容】
-//   ・着ている服の色を抽出して、全体の色バランスを算出します
-// ==========================================================================
+
+// コーディネート内の各部位の面積比重からカラー構成比率（ベース/アソート/アクセント）および配色理論をAI解析します
 function analyzeOutfitColorComposition(outfit) {
     if (!outfit) return { breakdown: [], schemeType: '--', schemeComment: '', tags: [] };
 
@@ -2067,13 +1930,7 @@ function analyzeOutfitColorComposition(outfit) {
     };
 }
 
-// ==========================================================================
-// 【関数】updateAIStylingComment()
-// 【役割】今の服の組み合わせを見て、「清潔感があって素敵ですね！」と褒めてアドバイスをくれるAIスタイリスト係
-// 【具体的な処理内容】
-//   ・着ている服の種類や色の組み合わせ、季節をAIが総合診断し、
-//     褒め言葉やアドバイスコメントを表示します
-// ==========================================================================
+// 現在着せている服の組み合わせ（アウター・色構成・部位充実度）を解析し、AIスコア・アドバイス文・カラー構成ドットを更新します
 function updateAIStylingComment() {
     // 定数 outfit を宣言し、値（AppState.currentOutfit || {}）をセットします
     const outfit = AppState.currentOutfit || {};
@@ -2251,12 +2108,8 @@ function updateAIStylingComment() {
     if (scoreStarsElem) scoreStarsElem.textContent = '';
 }
 
-// ==========================================================================
-// 【関数】applyPresetName(name)
-// 【役割】「休日のカフェコーデ」など、おすすめの名前を押したときに名前入力欄にパッと文字を入れる名前入力お助け係
-// 【具体的な処理内容】
-//   ・「春の爽やかデニムコーデ」などのプリセット名を保存名入力欄に自動セットします
-// ==========================================================================
+
+// コーデ保存用の人気シーンチップ押下時にそのタイトル名をテキスト入力欄へ入力します
 function applyPresetName(name) {
     // HTML 要素 #outfit-name-input を取得して変数 input に格納します
     const input = document.getElementById('outfit-name-input');
@@ -2268,22 +2121,8 @@ function applyPresetName(name) {
 // 再代入可能な変数 _outfitsMutationSeq を宣言し、値（0）をセットします
 let _outfitsMutationSeq = 0;
 
-// ==========================================================================
 
-
-// ==========================================================================
-//  第6章：コーディネート保存・復元・削除（保存済みコーデ一覧）
-//  【このセクションの役割】
-//  ・現在着ているコーディネートに名前を付けて MySQL (saved_outfits) へ保存
-//  ・保存済みコーディネート一覧の描画と、ワンクリックでのマネキン一括着せ替え
-//  ・試着中の自社ブランド商品を一括でショッピングカートへ追加する機能
-// ==========================================================================
-// 【関数】handleSaveOutfit(e)
-// 【役割】「このコーデを保存する」ボタンを押したときに、今着ている服のセットを大切に保存箱へしまう保存係
-// 【具体的な処理内容】
-//   ・現在着ている服の組み合わせに名前を付けて、サーバー（MySQL）の
-//     保存済みコーデ一覧に登録します
-// ==========================================================================
+// 現在マネキンに着せているコーデに名前とAIコメントを添えて MySQL saved_outfits へ保存します
 async function handleSaveOutfit(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -2402,13 +2241,8 @@ async function handleSaveOutfit(e) {
     }
 }
 
-// ==========================================================================
-// 【関数】renderSavedOutfitsGrid()
-// 【役割】「保存済み」タブを開いたときに、過去に作ったお気に入りの着こなし一覧をカードで並べるコレクション係
-// 【具体的な処理内容】
-//   ・以前保存したコーディネートカードを一覧表示し、ワンクリックで
-//     マネキンに着せ替えられるようにします
-// ==========================================================================
+
+// 「保存したコーデ（ルックブック）」タブ内にカード形式で保存コーデ一覧と「このコーデを再現」「削除」を描画します
 function renderSavedOutfitsGrid() {
     // HTML 要素 #saved-outfits-grid を取得して変数 grid に格納します
     const grid = document.getElementById('saved-outfits-grid');
@@ -2474,12 +2308,8 @@ function renderSavedOutfitsGrid() {
     }).join('');
 }
 
-// ==========================================================================
-// 【関数】restoreOutfit(outfitId)
-// 【役割】保存したコーデカードの「これを着る」を押したときに、マネキンに一瞬でその服一式を着せてあげる一発お着替え係
-// 【具体的な処理内容】
-//   ・保存されていた5部位の服を一括でマネキンに丸ごと着せ替えます
-// ==========================================================================
+
+// 保存済みコーデカードからクリックで当時の服5部位を一括再試着させ、試着タブへ切り替えます
 function restoreOutfit(outfitId) {
     // 定数 target を宣言し、値（AppState.savedOutfits.find(o => o.id =…）をセットします
     const target = AppState.savedOutfits.find(o => o.id === outfitId);
@@ -2497,12 +2327,8 @@ function restoreOutfit(outfitId) {
     switchStudioTab('create');
 }
 
-// ==========================================================================
-// 【関数】deleteSavedOutfit(outfitId)
-// 【役割】保存したコーデカードの「削除」ボタンを押したときに、もういらないコーデをきれいに消すゴミ箱係
-// 【具体的な処理内容】
-//   ・そのコーディネートをサーバー（MySQL）から削除します
-// ==========================================================================
+
+// 指定した保存済みコーデを削除します（スマホ版はlocalStorage、PC版はMySQL）
 async function deleteSavedOutfit(outfitId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -2569,12 +2395,8 @@ async function deleteSavedOutfit(outfitId) {
     }
 }
 
-// ==========================================================================
-// 【関数】syncOutfitsFromBackend()
-// 【役割】ページを開いたときに、以前保存したお気に入りコーデをデータベースから取ってきて並べるコーデ呼び出し係
-// 【具体的な処理内容】
-//   ・ログイン会員が保存したコーデをデータベースから読み込んで画面に反映します
-// ==========================================================================
+
+// ログイン会員の保存済みコーディネート一覧を取得します（スマホ版はlocalStorage、PC版はMySQL）
 async function syncOutfitsFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
@@ -2660,12 +2482,8 @@ async function syncOutfitsFromBackend() {
     }
 }
 
-// ==========================================================================
-// 【関数】addCurrentBrandItemsToCart()
-// 【役割】「着ている服をまとめてカゴへ」ボタンを押したときに、マネキンが着ているお店の服を一気に買い物カゴに入れるまとめ買い係
-// 【具体的な処理内容】
-//   ・マネキンが着ている服のうち、ショップの販売商品を一括でショッピングカートへ追加します
-// ==========================================================================
+
+// 現在マネキンで試着中のブランド販売商品をまとめてショッピングカートに追加し、MySQL同期します
 async function addCurrentBrandItemsToCart() {
     // 条件（!AppState.cart || !Array.isArray(AppState.cart)）が成り立つか判定し、該当する場合の処理を実行します
     if (!AppState.cart || !Array.isArray(AppState.cart)) {
@@ -2757,22 +2575,11 @@ async function addCurrentBrandItemsToCart() {
     showToastNotification(`試着中のブランドアイテム（${brandItems.length}点）をカートに追加しMySQLへ保存しました！`);
 }
 
-// ==========================================================================
-
 
 // ==========================================================================
-//  第7章：手持ち服登録モーダル・AI背景自動切り抜き・AI形状認識
-//  【このセクションの役割】
-//  ・写真アップロード用の手持ち服登録ウィンドウの開閉
-//  ・TensorFlow.js による写真の背景自動透明化切り抜き
-//  ・MobileNet によるシルエット縦横比・服種別の自動形状診断
-//  ・登録データの入力チェックと、MySQL (closet_items) への保存・削除
+//  6. 手持ち服登録モーダル・AI背景透過（@imgly）＆ Canvas＋MobileNet形状診断
 // ==========================================================================
-// 【関数】openAddClosetModal()
-// 【役割】「自分の服を登録する」ボタンを押したときに、写真を選べる小窓をフワッと開く受付窓口係
-// 【具体的な処理内容】
-//   ・写真アップロードや服の名前入力を行う登録ウィンドウを画面に表示します
-// ==========================================================================
+// 「手持ちの服を登録する」モーダルを開き、アップロード一時変数を初期化します
 function openAddClosetModal() {
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
@@ -2790,12 +2597,8 @@ function openAddClosetModal() {
     }
 }
 
-// ==========================================================================
-// 【関数】closeAddClosetModal()
-// 【役割】写真を選べる小窓の「×」が押されたときに、小窓を閉じるお片付け係
-// 【具体的な処理内容】
-//   ・登録ウィンドウを非表示にし、プレビュー画像をリセットします
-// ==========================================================================
+
+// 手持ち服登録モーダルを閉じてフォーム入力と画像をリセットします
 function closeAddClosetModal() {
     // HTML 要素 #modal-add-closet を取得して変数 modal に格納します
     const modal = document.getElementById('modal-add-closet');
@@ -2827,6 +2630,12 @@ function closeAddClosetModal() {
     const actionBtns = document.getElementById('ai-action-btns');
     // HTML 要素 #ai-processing-overlay を取得して変数 overlay に格納します
     const overlay = document.getElementById('ai-processing-overlay');
+    // チャック隙間くり抜きエディタパネルを取得します
+    const cutoutPanel = document.getElementById('zipper-cutout-panel');
+
+    // 条件（cutoutPanel）が成り立つか判定し、該当する場合の処理を実行します
+    if (cutoutPanel) cutoutPanel.style.display = 'none';
+    if (typeof toggleGuardPlate === 'function') toggleGuardPlate(false);
 
     // 条件（preview）が成り立つか判定し、該当する場合の処理を実行します
     if (preview) {
@@ -2850,12 +2659,8 @@ function closeAddClosetModal() {
     if (form) form.reset();
 }
 
-// ==========================================================================
-// 【関数】resizeImageForAi(imageSource, maxDim = 1024)
-// 【役割】撮った写真が大きすぎて重いときに、AIが素早く調べられるちょうどいい軽さに縮小する写真サイズ調整係
-// 【具体的な処理内容】
-//   ・高画質な写真でもブラウザがフリーズしないよう、最大幅1024pxに安全にリサイズします
-// ==========================================================================
+
+// アップロードされた高解像度画像を、AI認識とDB保存に丁度いい最大辺長へ Canvas で縮小圧縮します
 function resizeImageForAi(imageSource, maxDim = 1024) {
     // 条件（typeof Image === 'undefined'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof Image === 'undefined') return Promise.resolve(imageSource);
@@ -2927,12 +2732,8 @@ function resizeImageForAi(imageSource, maxDim = 1024) {
     });
 }
 
-// ==========================================================================
-// 【関数】runAiBackgroundRemoval(imageSource)
-// 【役割】服の写真からお部屋の壁や床を一瞬で見分けて消し去り、服だけを抜き出す背景透明化AI係
-// 【具体的な処理内容】
-//   ・AIを使って服の輪郭を検出し、壁や床などの背景を透明にして服だけの画像を作ります
-// ==========================================================================
+
+// ブラウザAI（@imgly/background-removal）を優先使用（失敗時はCanvasエッジ自動透過フォールバック）して服の背景を透明化します
 async function runAiBackgroundRemoval(imageSource) {
     // 再代入可能な変数 removeBgFunc を宣言し、値（window.imglyRemoveBackground）をセットします
     let removeBgFunc = window.imglyRemoveBackground;
@@ -3025,12 +2826,8 @@ async function runAiBackgroundRemoval(imageSource) {
     }
 }
 
-// ==========================================================================
-// 【関数】updateClosetPreviewUI(imgUrl, isTransparent = false)
-// 【役割】選んだ写真や切り抜いた写真を、小窓の中のプレビュー画面にパッと映し出すプレビュー係
-// 【具体的な処理内容】
-//   ・切り抜かれた服の画像をプレビュー枠に表示します
-// ==========================================================================
+
+// プレビュー領域にアップロード画像（透過済/元画像）と「AI透過済」「やり直し」ボタン状態を反映します
 function updateClosetPreviewUI(imgUrl, isTransparent = false) {
     // HTML 要素 #closet-img-preview を取得して変数 preview に格納します
     const preview = document.getElementById('closet-img-preview');
@@ -3088,12 +2885,8 @@ let currentAiAnalysisResult = null;
 // 再代入可能な変数 _mobilenetModelPromise を宣言し、値（null）をセットします
 let _mobilenetModelPromise = null;
 
-// ==========================================================================
-// 【関数】getMobileNetModel()
-// 【役割】写真を見て「これはTシャツかな？ジーンズかな？」と考えるAIの頭脳（学習モデル）を準備するAI呼び出し係
-// 【具体的な処理内容】
-//   ・ブラウザ上で画像分類AIモデル（MobileNet）を1度だけロードしてキャッシュします
-// ==========================================================================
+
+// TensorFlow.js の MobileNet 画像分類モデルを初回だけロードしてキャッシュ返却するシングルトン関数です
 function getMobileNetModel() {
     // 条件（!window.mobilenet）が成り立つか判定し、該当する場合の処理を実行します
     if (!window.mobilenet) return Promise.resolve(null);
@@ -3111,12 +2904,8 @@ function getMobileNetModel() {
     return _mobilenetModelPromise;
 }
 
-// ==========================================================================
-// 【関数】updateAiDiagnosisUI(result, isAnalyzing = false)
-// 【役割】「今AIが写真を調べています…」「Tシャツと判明しました！」と画面に状況をわかりやすく教えるAI実況係
-// 【具体的な処理内容】
-//   ・「解析中...」や「トップスと判定されました」などのメッセージを表示します
-// ==========================================================================
+
+// モーダル内の AI 形状診断ボックスを「解析中 / 認識成功 / 要確認エラー」の見た目に書き換えます
 function updateAiDiagnosisUI(result, isAnalyzing = false) {
     // HTML 要素 #ai-diagnosis-card を取得して変数 card に格納します
     const card = document.getElementById('ai-diagnosis-card');
@@ -3221,12 +3010,8 @@ function updateAiDiagnosisUI(result, isAnalyzing = false) {
     }
 }
 
-// ==========================================================================
-// 【関数】analyzeClothingItemShape(source)
-// 【役割】写真の服が縦長か横長かを見て、「これはズボンっぽい！」「これは帽子っぽい！」と形で見分けるシルエット判定係
-// 【具体的な処理内容】
-//   ・細長いからボトムス、正方形に近いからトップスなど、服の形状をAIで分析してカテゴリを推測します
-// ==========================================================================
+
+// アップロード画像から背景除去後のシルエット縦横比・股下有無・幅分布 ＋ MobileNet推論で服種別と不正画像(顔/風景等)を判定します
 async function analyzeClothingItemShape(source) {
     // 非同期完了を await で待てる Promise オブジェクトを作成して返します
     return new Promise((resolve) => {
@@ -3811,12 +3596,8 @@ async function analyzeClothingItemShape(source) {
     });
 }
 
-// ==========================================================================
-// 【関数】processClosetImageWithAi(source)
-// 【役割】写真を選んだ瞬間に「背景消し」と「服の種類調べ」を立て続けにやってくれるAIフル回転係
-// 【具体的な処理内容】
-//   ・写真を受け取り、①背景除去 → ②プレビュー表示 → ③カテゴリ自動判定 を順番に行います
-// ==========================================================================
+
+// 写真選択後の背景透過パイプライン：AI切抜→プレビュー反映→形状認識による自動カテゴリセットを順次実行します
 async function processClosetImageWithAi(source) {
     // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
     try {
@@ -3866,12 +3647,8 @@ async function processClosetImageWithAi(source) {
     }
 }
 
-// ==========================================================================
-// 【関数】selectPresetImage(presetKey, presetName)
-// 【役割】「白Tシャツ」や「黒パーカー」などのサンプル写真を押したときに、その写真をセットするサンプル写真係
-// 【具体的な処理内容】
-//   ・サンプルの服写真を選んだときに、自動で名前やカテゴリを入力欄にセットします
-// ==========================================================================
+
+// サンプルプリセットチップ（黒キャップ・白スニーカー等）が選ばれたときにフォームへ名前・カテゴリ・画像を自動セットします
 function selectPresetImage(presetKey, presetName) {
     // 定数 preset を宣言し、値（PRESET_CLOSET_PRESETS[presetKey]）をセットします
     const preset = PRESET_CLOSET_PRESETS[presetKey];
@@ -3925,12 +3702,831 @@ function selectPresetImage(presetKey, presetName) {
     updateAiDiagnosisUI(currentAiAnalysisResult, false);
 }
 
+
 // ==========================================================================
-// 【関数】handleClosetImageSelect(e)
-// 【役割】スマホのカメラで服を撮ったりフォルダから写真を選んだときに、写真を受け取る写真受け取り係
-// 【具体的な処理内容】
-//   ・選ばれた写真ファイルを読み込み、AI背景切り抜き処理を開始します
+//  6-B. チャック・襟元の隙間くり抜き／消しゴム・定規・ガード板エディタ
 // ==========================================================================
+// エディタ用のキャンバス要素
+let cutoutCanvas = null;
+let cutoutCtx = null;
+// 定規ガイドプレビュー用Canvas
+let cutoutGuideCanvas = null;
+let cutoutGuideCtx = null;
+// 編集履歴スタック（Undo用）
+let cutoutHistory = [];
+// 現在選択中のツール（'magic-tap', 'eraser', 'line-eraser'）
+let currentCutoutTool = 'magic-tap';
+// 消しゴムブラシの直径（px）
+let eraserBrushSize = 24;
+// ドラッグ描画中フラグ
+let isCutoutDrawing = false;
+// 直線定規の始点・描画中フラグ
+let lineEraserStart = null;
+let isLineDrawing = false;
+let lastLineSnapped = null;
+// エディタ開始時の元DataURL
+let cutoutInitialDataUrl = '';
+
+// ガード板（消したくない所保護シールド）の状態管理
+let isGuardPlateActive = false;
+let guardPlates = [
+    { active: false, x: 0.04, y: 0.05, w: 0.40, h: 0.90 }, // プレート1（左側）
+    { active: false, x: 0.56, y: 0.05, w: 0.40, h: 0.90 }  // プレート2（右側）
+];
+let activeGuardDragIndex = -1;
+let activeGuardHandle = null;
+let guardDragStartInfo = null;
+
+// チャック隙間くり抜きエディタを開く
+function openZipperCutoutEditor() {
+    const targetUrl = currentClosetUploadDataUrl || originalClosetUploadDataUrl;
+    if (!targetUrl) {
+        showToastNotification('先に服の写真を選択してください');
+        return;
+    }
+    const panel = document.getElementById('zipper-cutout-panel');
+    if (!panel) return;
+    panel.style.display = 'block';
+
+    const canvas = document.getElementById('cutout-canvas');
+    cutoutCanvas = canvas;
+    cutoutCtx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const guideCanvas = document.getElementById('cutout-guide-canvas');
+    cutoutGuideCanvas = guideCanvas;
+    if (guideCanvas) {
+        cutoutGuideCtx = guideCanvas.getContext('2d');
+    }
+    cutoutInitialDataUrl = targetUrl;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        // 作業しやすい適度な解像度（最大800px）に調整
+        if (w > 800 || h > 800) {
+            if (w > h) {
+                h = Math.round((h * 800) / w);
+                w = 800;
+            } else {
+                w = Math.round((w * 800) / h);
+                h = 800;
+            }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        if (guideCanvas) {
+            guideCanvas.width = w;
+            guideCanvas.height = h;
+        }
+        cutoutCtx.clearRect(0, 0, w, h);
+        cutoutCtx.drawImage(img, 0, 0, w, h);
+
+        cutoutHistory = [cutoutCtx.getImageData(0, 0, w, h)];
+        initCutoutCanvasEvents();
+        initGuardPlateEvents();
+        setCutoutTool(currentCutoutTool);
+        if (isGuardPlateActive) {
+            syncGuardPlateDOM();
+        }
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    img.src = targetUrl;
+}
+
+// チャック隙間くり抜きエディタを閉じる（反映またはキャンセル）
+function closeZipperCutoutEditor(applyChanges = false) {
+    const panel = document.getElementById('zipper-cutout-panel');
+    if (panel) panel.style.display = 'none';
+
+    if (applyChanges && cutoutCanvas) {
+        try {
+            const dataUrl = cutoutCanvas.toDataURL('image/png');
+            currentClosetUploadDataUrl = dataUrl;
+            isCurrentUploadTransparent = true;
+            updateClosetPreviewUI(dataUrl, true);
+            showToastNotification('✨ チャック・隙間を透過しました！試着室でトップスが見える状態です');
+        } catch (e) {
+            console.error('Canvas書き出しエラー:', e);
+        }
+    }
+}
+
+// ツール切り替え（タップで色抜き / 消しゴム / 直線消し（定規））
+function setCutoutTool(tool) {
+    currentCutoutTool = tool;
+    const btnTap = document.getElementById('tool-magic-tap');
+    const btnEraser = document.getElementById('tool-eraser');
+    const btnLine = document.getElementById('tool-line-eraser');
+    const sliderBox = document.getElementById('cutout-size-slider-box');
+    const hint = document.getElementById('cutout-status-hint');
+    const wrapper = document.getElementById('cutout-canvas-wrapper');
+
+    if (btnTap) btnTap.classList.toggle('active', tool === 'magic-tap');
+    if (btnEraser) btnEraser.classList.toggle('active', tool === 'eraser');
+    if (btnLine) btnLine.classList.toggle('active', tool === 'line-eraser');
+
+    const showSlider = (tool === 'eraser' || tool === 'line-eraser');
+    if (sliderBox) sliderBox.style.display = showSlider ? 'flex' : 'none';
+
+    if (wrapper) {
+        wrapper.classList.toggle('mode-line-eraser', tool === 'line-eraser');
+    }
+
+    if (hint) {
+        if (tool === 'magic-tap') {
+            hint.textContent = '💡 チャックの隙間をタップすると、その色（インナー等）を一括で透明に抜きます';
+        } else if (tool === 'line-eraser') {
+            hint.textContent = '📏 定規モード: 始点から終点までドラッグすると、一直線にまっすぐ消せます（垂直線に自動スナップ）';
+        } else {
+            hint.textContent = '💡 マウスや指でなぞった部分を透明に消します（消しゴムサイズ調整可）';
+        }
+    }
+}
+
+// 消しゴムブラシサイズの変更
+function updateEraserSize(val) {
+    eraserBrushSize = parseInt(val, 10) || 24;
+    const label = document.getElementById('eraser-size-val');
+    if (label) label.textContent = `${eraserBrushSize}px`;
+}
+
+// ガード板（保護シールド）の有効・無効切り替え
+function toggleGuardPlate(forceState) {
+    if (typeof forceState === 'boolean') {
+        isGuardPlateActive = forceState;
+    } else {
+        isGuardPlateActive = !isGuardPlateActive;
+    }
+    const toolBtn = document.getElementById('tool-guard');
+    const guardBar = document.getElementById('cutout-guard-bar');
+    if (toolBtn) toolBtn.classList.toggle('active', isGuardPlateActive);
+    if (guardBar) guardBar.style.display = isGuardPlateActive ? 'flex' : 'none';
+
+    if (isGuardPlateActive) {
+        if (!guardPlates[0].active && !guardPlates[1].active) {
+            setGuardPreset('center-slit');
+        } else {
+            syncGuardPlateDOM();
+        }
+        showToastNotification('🛡️ ガード板を表示しました。緑の枠内は消しゴムから保護されます');
+    } else {
+        const plate1 = document.getElementById('guard-plate');
+        const plate2 = document.getElementById('guard-plate-2');
+        if (plate1) plate1.style.display = 'none';
+        if (plate2) plate2.style.display = 'none';
+    }
+}
+
+// ガード板プリセット配置
+function setGuardPreset(type) {
+    if (!isGuardPlateActive) {
+        toggleGuardPlate(true);
+    }
+    if (type === 'center-slit') {
+        guardPlates[0] = { active: true, x: 0.04, y: 0.05, w: 0.40, h: 0.90 };
+        guardPlates[1] = { active: true, x: 0.56, y: 0.05, w: 0.40, h: 0.90 };
+        showToastNotification('🎯 チャック中央だけ開けました！隙間を大胆に消しても左右の服は保護されます');
+    } else if (type === 'left') {
+        guardPlates[0] = { active: true, x: 0.0, y: 0.0, w: 0.48, h: 1.0 };
+        guardPlates[1].active = false;
+        showToastNotification('⬅️ 左半分をガード板で保護しました');
+    } else if (type === 'right') {
+        guardPlates[0] = { active: true, x: 0.52, y: 0.0, w: 0.48, h: 1.0 };
+        guardPlates[1].active = false;
+        showToastNotification('➡️ 右半分をガード板で保護しました');
+    } else if (type === 'reset') {
+        guardPlates[0] = { active: true, x: 0.10, y: 0.15, w: 0.35, h: 0.70 };
+        guardPlates[1].active = false;
+        showToastNotification('ガード板を初期サイズに戻しました');
+    }
+    syncGuardPlateDOM();
+}
+
+// ガード板DOMの座標とスタイルを更新
+function syncGuardPlateDOM() {
+    const plate1 = document.getElementById('guard-plate');
+    const plate2 = document.getElementById('guard-plate-2');
+
+    [plate1, plate2].forEach((elem, idx) => {
+        if (!elem) return;
+        const p = guardPlates[idx];
+        if (isGuardPlateActive && p && p.active) {
+            elem.style.display = 'flex';
+            elem.style.left = `${Math.round(p.x * 100)}%`;
+            elem.style.top = `${Math.round(p.y * 100)}%`;
+            elem.style.width = `${Math.round(p.w * 100)}%`;
+            elem.style.height = `${Math.round(p.h * 100)}%`;
+        } else {
+            elem.style.display = 'none';
+        }
+    });
+}
+
+// 現在有効なガード板のピクセル矩形リストを取得
+function getActiveGuardRects() {
+    if (!isGuardPlateActive || !cutoutCanvas) return [];
+    const cw = cutoutCanvas.width;
+    const ch = cutoutCanvas.height;
+    return guardPlates.filter(p => p.active).map(p => {
+        let x = Math.max(0, Math.round(p.x * cw));
+        let y = Math.max(0, Math.round(p.y * ch));
+        let w = Math.min(cw - x, Math.round(p.w * cw));
+        let h = Math.min(ch - y, Math.round(p.h * ch));
+        return { x, y, w, h };
+    }).filter(r => r.w > 0 && r.h > 0);
+}
+
+// ガード板による保護付きの円形消去（フリーハンド用）
+function eraseProtectedCircle(cx, cy, radius) {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const rects = getActiveGuardRects();
+    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
+
+    cutoutCtx.save();
+    cutoutCtx.globalCompositeOperation = 'destination-out';
+    cutoutCtx.beginPath();
+    cutoutCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+    cutoutCtx.fill();
+    cutoutCtx.restore();
+
+    // ガード板領域のピクセルを完全復元
+    rects.forEach((r, i) => {
+        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
+    });
+}
+
+// ガード板による保護付きの直線消去（直線定規用）
+function eraseProtectedLine(x0, y0, x1, y1, width) {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const rects = getActiveGuardRects();
+    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
+
+    cutoutCtx.save();
+    cutoutCtx.globalCompositeOperation = 'destination-out';
+    cutoutCtx.lineWidth = width;
+    cutoutCtx.lineCap = 'round';
+    cutoutCtx.lineJoin = 'round';
+    cutoutCtx.beginPath();
+    cutoutCtx.moveTo(x0, y0);
+    cutoutCtx.lineTo(x1, y1);
+    cutoutCtx.stroke();
+    cutoutCtx.restore();
+
+    // ガード板領域のピクセルを完全復元
+    rects.forEach((r, i) => {
+        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
+    });
+}
+
+// 定規ガイドプレビューを描画（オーバーレイCanvas）
+function drawStraightGuideLine(x0, y0, x1, y1, width) {
+    if (!cutoutGuideCtx || !cutoutGuideCanvas) return;
+    cutoutGuideCtx.clearRect(0, 0, cutoutGuideCanvas.width, cutoutGuideCanvas.height);
+
+    cutoutGuideCtx.save();
+    // 半透明の赤い消去幅帯（実際に消える範囲）
+    cutoutGuideCtx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
+    cutoutGuideCtx.lineWidth = width;
+    cutoutGuideCtx.lineCap = 'round';
+    cutoutGuideCtx.beginPath();
+    cutoutGuideCtx.moveTo(x0, y0);
+    cutoutGuideCtx.lineTo(x1, y1);
+    cutoutGuideCtx.stroke();
+
+    // 赤い点線の定規中心線
+    cutoutGuideCtx.strokeStyle = '#ef4444';
+    cutoutGuideCtx.lineWidth = 2;
+    cutoutGuideCtx.setLineDash([6, 4]);
+    cutoutGuideCtx.beginPath();
+    cutoutGuideCtx.moveTo(x0, y0);
+    cutoutGuideCtx.lineTo(x1, y1);
+    cutoutGuideCtx.stroke();
+
+    // 始点と終点のマーカー
+    cutoutGuideCtx.setLineDash([]);
+    cutoutGuideCtx.fillStyle = '#ef4444';
+    cutoutGuideCtx.beginPath();
+    cutoutGuideCtx.arc(x0, y0, 4, 0, Math.PI * 2);
+    cutoutGuideCtx.arc(x1, y1, 4, 0, Math.PI * 2);
+    cutoutGuideCtx.fill();
+
+    // 定規の幅バッジ表示
+    const midX = (x0 + x1) / 2;
+    const midY = (y0 + y1) / 2;
+    cutoutGuideCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    cutoutGuideCtx.beginPath();
+    cutoutGuideCtx.roundRect(midX - 30, midY - 11, 60, 20, 4);
+    cutoutGuideCtx.fill();
+    cutoutGuideCtx.fillStyle = '#ffffff';
+    cutoutGuideCtx.font = '11px sans-serif';
+    cutoutGuideCtx.textAlign = 'center';
+    cutoutGuideCtx.textBaseline = 'middle';
+    cutoutGuideCtx.fillText(`📏 ${width}px`, midX, midY);
+
+    cutoutGuideCtx.restore();
+}
+
+function clearStraightGuideLine() {
+    if (!cutoutGuideCtx || !cutoutGuideCanvas) return;
+    cutoutGuideCtx.clearRect(0, 0, cutoutGuideCanvas.width, cutoutGuideCanvas.height);
+}
+
+// 直線スナップ計算（垂直・水平をまっすぐ補助）
+function applyRulerSnap(startX, startY, curX, curY, isShiftKey = false) {
+    const dx = curX - startX;
+    const dy = curY - startY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 6) return { x: curX, y: curY };
+
+    // 垂直線スナップ（チャックの縦線に最適）
+    if (isShiftKey || Math.abs(dx) <= 15 || (Math.abs(dy) > 20 && Math.abs(dx / dy) < 0.22)) {
+        return { x: startX, y: curY };
+    }
+    // 水平線スナップ
+    if (isShiftKey || Math.abs(dy) <= 15 || (Math.abs(dx) > 20 && Math.abs(dy / dx) < 0.22)) {
+        return { x: curX, y: startY };
+    }
+    return { x: curX, y: curY };
+}
+
+// ガード板のドラッグ＆リサイズイベント初期化
+function initGuardPlateEvents() {
+    const wrapper = document.getElementById('cutout-canvas-wrapper');
+    if (!wrapper || wrapper._guardEventsBound) return;
+    wrapper._guardEventsBound = true;
+
+    [0, 1].forEach(idx => {
+        const elem = document.getElementById(idx === 0 ? 'guard-plate' : 'guard-plate-2');
+        if (!elem) return;
+
+        function startDrag(e, handle = null) {
+            e.stopPropagation();
+            e.preventDefault();
+            activeGuardDragIndex = idx;
+            activeGuardHandle = handle;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const p = guardPlates[idx];
+            guardDragStartInfo = {
+                clientX,
+                clientY,
+                origX: p.x,
+                origY: p.y,
+                origW: p.w,
+                origH: p.h
+            };
+            elem.classList.add('is-active');
+        }
+
+        elem.addEventListener('mousedown', (e) => {
+            const handle = e.target.getAttribute('data-handle');
+            startDrag(e, handle);
+        });
+        elem.addEventListener('touchstart', (e) => {
+            const handle = e.target.getAttribute('data-handle');
+            startDrag(e, handle);
+        }, { passive: false });
+    });
+
+    function onMove(e) {
+        if (activeGuardDragIndex < 0 || !guardDragStartInfo) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const rect = wrapper.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+
+        const deltaX = (clientX - guardDragStartInfo.clientX) / rect.width;
+        const deltaY = (clientY - guardDragStartInfo.clientY) / rect.height;
+        const p = guardPlates[activeGuardDragIndex];
+
+        if (!activeGuardHandle) {
+            p.x = Math.max(0, Math.min(1 - p.w, guardDragStartInfo.origX + deltaX));
+            p.y = Math.max(0, Math.min(1 - p.h, guardDragStartInfo.origY + deltaY));
+        } else {
+            if (activeGuardHandle === 'se') {
+                p.w = Math.max(0.05, Math.min(1 - p.x, guardDragStartInfo.origW + deltaX));
+                p.h = Math.max(0.05, Math.min(1 - p.y, guardDragStartInfo.origH + deltaY));
+            } else if (activeGuardHandle === 'sw') {
+                const newW = Math.max(0.05, guardDragStartInfo.origW - deltaX);
+                p.x = Math.max(0, guardDragStartInfo.origX + (guardDragStartInfo.origW - newW));
+                p.w = newW;
+                p.h = Math.max(0.05, Math.min(1 - p.y, guardDragStartInfo.origH + deltaY));
+            } else if (activeGuardHandle === 'ne') {
+                p.w = Math.max(0.05, Math.min(1 - p.x, guardDragStartInfo.origW + deltaX));
+                const newH = Math.max(0.05, guardDragStartInfo.origH - deltaY);
+                p.y = Math.max(0, guardDragStartInfo.origY + (guardDragStartInfo.origH - newH));
+                p.h = newH;
+            } else if (activeGuardHandle === 'nw') {
+                const newW = Math.max(0.05, guardDragStartInfo.origW - deltaX);
+                p.x = Math.max(0, guardDragStartInfo.origX + (guardDragStartInfo.origW - newW));
+                p.w = newW;
+                const newH = Math.max(0.05, guardDragStartInfo.origH - deltaY);
+                p.y = Math.max(0, guardDragStartInfo.origY + (guardDragStartInfo.origH - newH));
+                p.h = newH;
+            }
+        }
+        syncGuardPlateDOM();
+    }
+
+    function onEnd() {
+        if (activeGuardDragIndex >= 0) {
+            const plate1 = document.getElementById('guard-plate');
+            const plate2 = document.getElementById('guard-plate-2');
+            if (plate1) plate1.classList.remove('is-active');
+            if (plate2) plate2.classList.remove('is-active');
+            activeGuardDragIndex = -1;
+            activeGuardHandle = null;
+            guardDragStartInfo = null;
+        }
+    }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
+}
+
+// キャンバスのマウス・タッチイベント登録
+function initCutoutCanvasEvents() {
+    if (!cutoutCanvas) return;
+    if (cutoutCanvas._eventsBound) return;
+    cutoutCanvas._eventsBound = true;
+
+    function getCanvasCoords(e) {
+        const rect = cutoutCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const scaleX = cutoutCanvas.width / rect.width;
+        const scaleY = cutoutCanvas.height / rect.height;
+        return {
+            x: Math.round((clientX - rect.left) * scaleX),
+            y: Math.round((clientY - rect.top) * scaleY)
+        };
+    }
+
+    // マウス操作
+    cutoutCanvas.addEventListener('mousedown', (e) => {
+        const { x, y } = getCanvasCoords(e);
+        if (currentCutoutTool === 'magic-tap') {
+            floodFillTransparent(x, y);
+        } else if (currentCutoutTool === 'line-eraser') {
+            isLineDrawing = true;
+            lineEraserStart = { x, y };
+            lastLineSnapped = { x, y };
+            drawStraightGuideLine(x, y, x, y, eraserBrushSize);
+        } else {
+            isCutoutDrawing = true;
+            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+        }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (isLineDrawing && currentCutoutTool === 'line-eraser' && lineEraserStart) {
+            const { x, y } = getCanvasCoords(e);
+            lastLineSnapped = applyRulerSnap(lineEraserStart.x, lineEraserStart.y, x, y, e.shiftKey);
+            drawStraightGuideLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+        } else if (isCutoutDrawing && currentCutoutTool === 'eraser') {
+            const { x, y } = getCanvasCoords(e);
+            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        if (isLineDrawing && currentCutoutTool === 'line-eraser' && lineEraserStart) {
+            isLineDrawing = false;
+            clearStraightGuideLine();
+            if (lastLineSnapped) {
+                eraseProtectedLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+                saveCutoutState();
+                showToastNotification('📏 まっすぐ直線でくり抜きました');
+            }
+            lineEraserStart = null;
+            lastLineSnapped = null;
+        } else if (isCutoutDrawing) {
+            isCutoutDrawing = false;
+            saveCutoutState();
+        }
+    });
+
+    // タッチ操作（スマートフォン / タブレット）
+    cutoutCanvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const { x, y } = getCanvasCoords(e);
+        if (currentCutoutTool === 'magic-tap') {
+            floodFillTransparent(x, y);
+        } else if (currentCutoutTool === 'line-eraser') {
+            isLineDrawing = true;
+            lineEraserStart = { x, y };
+            lastLineSnapped = { x, y };
+            drawStraightGuideLine(x, y, x, y, eraserBrushSize);
+        } else {
+            isCutoutDrawing = true;
+            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+        }
+    }, { passive: false });
+
+    cutoutCanvas.addEventListener('touchmove', (e) => {
+        if (isLineDrawing && currentCutoutTool === 'line-eraser' && lineEraserStart) {
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            lastLineSnapped = applyRulerSnap(lineEraserStart.x, lineEraserStart.y, x, y, false);
+            drawStraightGuideLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+        } else if (isCutoutDrawing && currentCutoutTool === 'eraser') {
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            eraseProtectedCircle(x, y, eraserBrushSize / 2);
+        }
+    }, { passive: false });
+
+    cutoutCanvas.addEventListener('touchend', (e) => {
+        if (isLineDrawing && currentCutoutTool === 'line-eraser' && lineEraserStart) {
+            isLineDrawing = false;
+            clearStraightGuideLine();
+            if (lastLineSnapped) {
+                eraseProtectedLine(lineEraserStart.x, lineEraserStart.y, lastLineSnapped.x, lastLineSnapped.y, eraserBrushSize);
+                saveCutoutState();
+                showToastNotification('📏 まっすぐ直線でくり抜きました');
+            }
+            lineEraserStart = null;
+            lastLineSnapped = null;
+        } else if (isCutoutDrawing) {
+            isCutoutDrawing = false;
+            saveCutoutState();
+        }
+    });
+}
+
+// タップ位置の同系色連結領域を一括で透明化（Flood Fill）
+function floodFillTransparent(startX, startY, tolerance = 42) {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const w = cutoutCanvas.width;
+    const h = cutoutCanvas.height;
+    if (startX < 0 || startX >= w || startY < 0 || startY >= h) return;
+
+    const imgData = cutoutCtx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+    const startIndex = (startY * w + startX) * 4;
+    const startR = data[startIndex];
+    const startG = data[startIndex + 1];
+    const startB = data[startIndex + 2];
+    const startA = data[startIndex + 3];
+
+    // すでに透明なら何もしない
+    if (startA < 15) return;
+
+    const queue = [[startX, startY]];
+    const visited = new Uint8Array(w * h);
+    visited[startY * w + startX] = 1;
+
+    function colorMatch(pos) {
+        const idx = pos * 4;
+        const a = data[idx + 3];
+        if (a < 15) return false;
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+        const diff = Math.abs(r - startR) + Math.abs(g - startG) + Math.abs(b - startB);
+        return diff <= tolerance * 3;
+    }
+
+    let modified = 0;
+    while (queue.length > 0 && modified < 400000) {
+        const [cx, cy] = queue.pop();
+        const idx = (cy * w + cx) * 4;
+        data[idx + 3] = 0; // 完全透明化
+        modified++;
+
+        const neighbors = [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]];
+        for (let i = 0; i < 4; i++) {
+            const nx = neighbors[i][0];
+            const ny = neighbors[i][1];
+            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                const nPos = ny * w + nx;
+                if (!visited[nPos]) {
+                    visited[nPos] = 1;
+                    if (colorMatch(nPos)) {
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+        }
+    }
+
+    cutoutCtx.putImageData(imgData, 0, 0);
+    saveCutoutState();
+    showToastNotification('🪄 タップした領域を透明にくり抜きました');
+}
+
+// 首元〜胸元中央を自然なチャック開きV字スリットで自動くり抜き
+function applyVNeckPresetCutout() {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const w = cutoutCanvas.width;
+    const h = cutoutCanvas.height;
+
+    // 不透明ピクセルの分布から服の中心と上端・胸元の高さを測定
+    const imgData = cutoutCtx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+    let minY = h, maxY = 0, minX = w, maxX = 0;
+    let found = false;
+    for (let y = 0; y < h; y += 4) {
+        for (let x = 0; x < w; x += 4) {
+            const idx = (y * w + x) * 4;
+            if (data[idx + 3] > 40) {
+                found = true;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+            }
+        }
+    }
+
+    if (!found) {
+        showToastNotification('⚠️ 服の画像が検出できませんでした');
+        return;
+    }
+
+    const centerX = Math.round((minX + maxX) / 2);
+    const bodyHeight = maxY - minY;
+    // 首元（最上部から少し入った位置）〜胸元（全体の約38%の深さまでチャックが開く）
+    const topY = minY + Math.round(bodyHeight * 0.05);
+    const bottomY = minY + Math.round(bodyHeight * 0.40);
+    const halfWidthTop = Math.round((maxX - minX) * 0.12);
+
+    cutoutCtx.save();
+    cutoutCtx.globalCompositeOperation = 'destination-out';
+    cutoutCtx.beginPath();
+    cutoutCtx.moveTo(centerX - halfWidthTop, topY);
+    cutoutCtx.lineTo(centerX + halfWidthTop, topY);
+    cutoutCtx.lineTo(centerX, bottomY);
+    cutoutCtx.closePath();
+    cutoutCtx.fill();
+    cutoutCtx.restore();
+
+    saveCutoutState();
+    showToastNotification('⚡ V字チャックの隙間を自動でくり抜きました！');
+}
+
+// 前開き・フルジップジャケットの内側（裏地・インナー・前立て内）を全自動でくり抜く
+function applyFullZipAutoCutout() {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const w = cutoutCanvas.width;
+    const h = cutoutCanvas.height;
+
+    const imgData = cutoutCtx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    // 1. 服全体の不透明領域バウンディングボックス
+    let minY = h, maxY = 0, minX = w, maxX = 0;
+    let found = false;
+    for (let y = 0; y < h; y += 4) {
+        for (let x = 0; x < w; x += 4) {
+            const idx = (y * w + x) * 4;
+            if (data[idx + 3] > 40) {
+                found = true;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+            }
+        }
+    }
+    if (!found) {
+        showToastNotification('⚠️ 服の画像が検出できませんでした');
+        return;
+    }
+
+    const centerX = Math.round((minX + maxX) / 2);
+    const bodyHeight = maxY - minY;
+    const bodyWidth = maxX - minX;
+
+    // 首元（上から約7%の位置）から裾（最下部から約4%上）まで
+    const topY = minY + Math.round(bodyHeight * 0.07);
+    const bottomY = maxY - Math.round(bodyHeight * 0.04);
+
+    const leftPoints = [];
+    const rightPoints = [];
+
+    for (let y = topY; y <= bottomY; y += 4) {
+        const centerIdx = (y * w + centerX) * 4;
+        const cR = data[centerIdx];
+        const cG = data[centerIdx + 1];
+        const cB = data[centerIdx + 2];
+
+        // 中心から左へ走査してエッジ検出
+        let lEdge = centerX - Math.round(bodyWidth * 0.09);
+        const maxLeftScan = Math.max(minX, centerX - Math.round(bodyWidth * 0.35));
+        for (let x = centerX - 8; x >= maxLeftScan; x--) {
+            const idx = (y * w + x) * 4;
+            if (data[idx + 3] < 30) { lEdge = x; break; }
+            const diff = Math.abs(data[idx] - cR) + Math.abs(data[idx + 1] - cG) + Math.abs(data[idx + 2] - cB);
+            if (diff > 50) {
+                lEdge = x;
+                break;
+            }
+        }
+
+        // 中心から右へ走査してエッジ検出
+        let rEdge = centerX + Math.round(bodyWidth * 0.09);
+        const maxRightScan = Math.min(maxX, centerX + Math.round(bodyWidth * 0.35));
+        for (let x = centerX + 8; x <= maxRightScan; x++) {
+            const idx = (y * w + x) * 4;
+            if (data[idx + 3] < 30) { rEdge = x; break; }
+            const diff = Math.abs(data[idx] - cR) + Math.abs(data[idx + 1] - cG) + Math.abs(data[idx + 2] - cB);
+            if (diff > 50) {
+                rEdge = x;
+                break;
+            }
+        }
+
+        leftPoints.push({ x: lEdge, y });
+        rightPoints.push({ x: rEdge, y });
+    }
+
+    if (leftPoints.length === 0 || rightPoints.length === 0) return;
+
+    // 輪郭のスムージング（ガタつきを滑らかにする）
+    function smooth(points) {
+        return points.map((pt, i) => {
+            let sumX = 0, count = 0;
+            for (let d = -3; d <= 3; d++) {
+                if (points[i + d]) {
+                    sumX += points[i + d].x;
+                    count++;
+                }
+            }
+            return { x: Math.round(sumX / count), y: pt.y };
+        });
+    }
+    const smoothL = smooth(leftPoints);
+    const smoothR = smooth(rightPoints);
+
+    // ガード板領域の退避
+    const rects = (typeof getActiveGuardRects === 'function') ? getActiveGuardRects() : [];
+    const savedBlocks = rects.map(r => cutoutCtx.getImageData(r.x, r.y, r.w, r.h));
+
+    // くり抜きポリゴンを描画
+    cutoutCtx.save();
+    cutoutCtx.globalCompositeOperation = 'destination-out';
+    cutoutCtx.beginPath();
+    cutoutCtx.moveTo(smoothL[0].x, smoothL[0].y);
+    for (let i = 1; i < smoothL.length; i++) {
+        cutoutCtx.lineTo(smoothL[i].x, smoothL[i].y);
+    }
+    for (let i = smoothR.length - 1; i >= 0; i--) {
+        cutoutCtx.lineTo(smoothR[i].x, smoothR[i].y);
+    }
+    cutoutCtx.closePath();
+    cutoutCtx.fill();
+    cutoutCtx.restore();
+
+    // ガード板領域の復元
+    rects.forEach((r, i) => {
+        cutoutCtx.putImageData(savedBlocks[i], r.x, r.y);
+    });
+
+    saveCutoutState();
+    showToastNotification('✨ 前開きチャックの内側を自動でくり抜きました！');
+}
+
+// 編集履歴を保存
+function saveCutoutState() {
+    if (!cutoutCtx || !cutoutCanvas) return;
+    const snap = cutoutCtx.getImageData(0, 0, cutoutCanvas.width, cutoutCanvas.height);
+    cutoutHistory.push(snap);
+    if (cutoutHistory.length > 20) cutoutHistory.shift();
+}
+
+// 1手戻す (Undo)
+function undoCutoutAction() {
+    if (cutoutHistory.length <= 1) {
+        showToastNotification('これ以上戻せません');
+        return;
+    }
+    cutoutHistory.pop();
+    const prev = cutoutHistory[cutoutHistory.length - 1];
+    cutoutCtx.putImageData(prev, 0, 0);
+    showToastNotification('1手戻しました');
+}
+
+// 初期状態に戻す
+function resetCutoutCanvas() {
+    if (!cutoutInitialDataUrl) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        cutoutCtx.clearRect(0, 0, cutoutCanvas.width, cutoutCanvas.height);
+        cutoutCtx.drawImage(img, 0, 0, cutoutCanvas.width, cutoutCanvas.height);
+        cutoutHistory = [cutoutCtx.getImageData(0, 0, cutoutCanvas.width, cutoutCanvas.height)];
+        showToastNotification('初期状態にリセットしました');
+    };
+    img.src = cutoutInitialDataUrl;
+}
+
+
+// ファイル入力欄(<input type='file'>)で選ばれた写真を FileReader で読み込み、AI背景削除・形状分析を開始します
 function handleClosetImageSelect(e) {
     // 定数 file を宣言し、値（e.target.files[0]）をセットします
     const file = e.target.files[0];
@@ -3976,12 +4572,8 @@ function handleClosetImageSelect(e) {
     reader.readAsDataURL(file);
 }
 
-// ==========================================================================
-// 【関数】triggerManualBgRemoval()
-// 【役割】「もう一度AIで背景を消す」ボタンを押したときに、切り抜きAIをもう一回やり直す再チャレンジ係
-// 【具体的な処理内容】
-//   ・背景の切り抜きを最初から再実行します
-// ==========================================================================
+
+// 「もう一度 AI で背景を切り抜く」手動やり直しボタンが押されたときの再処理関数です
 async function triggerManualBgRemoval() {
     // 定数 target を宣言し、値（originalClosetUploadDataUrl || current…）をセットします
     const target = originalClosetUploadDataUrl || currentClosetUploadDataUrl;
@@ -3996,12 +4588,8 @@ async function triggerManualBgRemoval() {
     await processClosetImageWithAi(target);
 }
 
-// ==========================================================================
-// 【関数】restoreOriginalUploadImage()
-// 【役割】「やっぱり元の写真に戻す」ボタンを押したときに、切り抜く前の最初の写真に戻す元写真もどし係
-// 【具体的な処理内容】
-//   ・AIで切り抜く前の元写真にプレビューを戻します
-// ==========================================================================
+
+// 背景透過前の元の写真へワンクリックで切り替えるボタン処理です
 async function restoreOriginalUploadImage() {
     // 条件（!originalClosetUploadDataUrl）が成り立つか判定し、該当する場合の処理を実行します
     if (!originalClosetUploadDataUrl) return;
@@ -4029,23 +4617,15 @@ async function restoreOriginalUploadImage() {
 // 再代入可能な変数 _closetMutationSeq を宣言し、値（0）をセットします
 let _closetMutationSeq = 0;
 
-// ==========================================================================
-// 【関数】bumpClosetMutationSeq()
-// 【役割】服の登録や削除が順番どおり狂わずに動くように、番号札をカチッと1枚進める番号札係
-// 【具体的な処理内容】
-//   ・登録や削除の通信が前後して狂わないよう管理番号を増やします
-// ==========================================================================
+
+// クローゼットの登録・削除時に最新操作を保証する連番ミューテーションカウンタを進めます
 function bumpClosetMutationSeq() {
     // 変数・配列項目 _closetMutationSeq の値を更新・計算します
     _closetMutationSeq++;
 }
 
-// ==========================================================================
-// 【関数】handleAddClosetItem(e)
-// 【役割】「クローゼットに登録する」ボタンを押したときに、切り抜いた服の写真を自分の手持ち服として保存する手持ち服登録係
-// 【具体的な処理内容】
-//   ・服の名前・カテゴリ・切り抜き画像をサーバー（MySQL）へ送信して保存し、試着室に追加します
-// ==========================================================================
+
+// 「クローゼットに登録する」送信時処理：入力チェック・POST /api/closet/add 保存・UI再描画・モーダル閉鎖を行います
 async function handleAddClosetItem(e) {
     // 条件（e）が成り立つか判定し、該当する場合の処理を実行します
     if (e) e.preventDefault();
@@ -4239,12 +4819,8 @@ async function handleAddClosetItem(e) {
     }
 }
 
-// ==========================================================================
-// 【関数】deleteClosetItem(itemId)
-// 【役割】手持ち服カードの「ゴミ箱」ボタンを押したときに、もう着ない服をクローゼットから消すお別れ係
-// 【具体的な処理内容】
-//   ・その服をクローゼットから削除し、マネキンが着ていれば自動で脱がせます
-// ==========================================================================
+
+// マイクローゼットから指定アイテムを MySQL（DELETE /api/closet/delete/...）と着用中スロット両方から削除します
 async function deleteClosetItem(itemId) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -4336,12 +4912,8 @@ async function deleteClosetItem(itemId) {
     }
 }
 
-// ==========================================================================
-// 【関数】syncClosetFromBackend()
-// 【役割】ログインしたときに、その人が過去に登録した手持ち服を全部データベースから取ってくる手持ち服お届け係
-// 【具体的な処理内容】
-//   ・データベースに登録されている自分の服を読み込んで、左カラムやクローゼット画面に並べます
-// ==========================================================================
+
+// ログイン会員の登録服＆購入済み服を MySQL（GET /api/closet/...）から取得してスタジオへ反映します
 async function syncClosetFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !AppState.currentUser.id) {
@@ -4485,21 +5057,7 @@ let _todayStylingWeatherCache = {
     fetchedAt: 0
 };
 
-// ==========================================================================
-
-
-// ==========================================================================
-//  第8章：気象庁（JMA）オープンデータ連携・気温連動AIスタイリング提案
-//  【このセクションの役割】
-//  ・気象庁公式の最新天気予報・アメダスから、愛知（名古屋）のリアルタイム気温・天気を取得
-//  ・現在の日時・気温・季節に連動した「TODAY'S AI STYLING」バナーの動的生成
-//  ・月別のおすすめコーディネート一式をワンクリックでマネキンに着せ替える機能
-// ==========================================================================
-// 【関数】calculateEstimatedTemperature(date = new Date())
-// 【役割】今の月と時間帯から、「今の愛知県はおよそ何度くらいかな？」と予想して計算する気温予想係
-// 【具体的な処理内容】
-//   ・気象庁との通信が取れないときの予備として、季節と昼夜に応じた現実的な気温を計算します
-// ==========================================================================
+// 現在日時（月・時間帯）から愛知（名古屋）のリアルな推定気温を算出するフォールバック関数
 function calculateEstimatedTemperature(date = new Date()) {
     const month = date.getMonth() + 1; // 1〜12月
     const hour = date.getHours();       // 0〜23時
@@ -4526,12 +5084,7 @@ function calculateEstimatedTemperature(date = new Date()) {
     return base.night;
 }
 
-// ==========================================================================
-// 【関数】fetchCurrentTemperature()
-// 【役割】気象庁のホームページにアクセスして、愛知県のリアルタイムな今の気温とお天気を取ってくるお天気ニュース係
-// 【具体的な処理内容】
-//   ・気象庁の最新天気予報・アメダスから、最低気温・最高気温・天気を自動取得します
-// ==========================================================================
+// 気象庁（JMA）公式予報・アメダスから愛知県（名古屋）の最低気温・最高気温・現在気温・天候を取得する非同期関数
 async function fetchCurrentTemperature() {
     const now = Date.now();
     // 5分以内のキャッシュがあれば再利用
@@ -4656,12 +5209,7 @@ async function fetchCurrentTemperature() {
     return result;
 }
 
-// ==========================================================================
-// 【関数】getCurrentSeasonInfo(date = new Date())
-// 【役割】今日の日付を見て、「今は春・夏・秋・冬のどれかな？」を判定する季節カレンダー係
-// 【具体的な処理内容】
-//   ・3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬として季節ラベルを返します
-// ==========================================================================
+// 現在の日時から季節情報（春・夏・秋・冬）と季節ラベルを判定
 function getCurrentSeasonInfo(date = new Date()) {
     const month = date.getMonth() + 1; // 1〜12月
     if (month >= 3 && month <= 5) {
@@ -4675,329 +5223,144 @@ function getCurrentSeasonInfo(date = new Date()) {
     }
 }
 
-// ==========================================================================
-//  月別（1月〜12月）・ブランド商品おすすめコーデデータ（すべて SAMPLE_PRODUCTS から選定）
-// ==========================================================================
-const MONTHLY_STYLING_PLANS = {
-    1: {
-        monthName: '1月',
-        seasonName: '厳冬期',
-        themeTitle: '真冬の寒さを乗り切るウォームレイヤード',
+// 季節ごとのAI提案コーデデータ（MEN / WOMEN それぞれのアイテム・タイトル・説明文）
+const SEASONAL_STYLING_PLANS = {
+    spring: {
         MEN: {
-            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
-            topsId: 6,   // チャコール ブーク ニット (¥5,500)
-            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
-            leadText: '真冬の厳しい寒さに備え、防寒性とストリート感を兼ね備えた「バッファローチェックボアジップジャケット」に保温性の高いブークニットと機能的な2WAYナイロンカーゴパンツを合わせました。'
+            title: (temp, w) => `気温${temp}℃・爽やかな春風に映える「スカイオックスフォードシャツ」スタイル`,
+            desc: (temp) => `過ごしやすい気温${temp}℃の春風に合わせて、清潔感溢れる「スカイ オックス フォードシャツ」を主役に。手持ちの軽快なスラックスと白スニーカーを合わせることで、好印象な大人のスマートカジュアルが完成します。`,
+            outfit: {
+                outerId: null,
+                topsId: 7, // スカイ オックス フォードシャツ
+                bottomsId: 9, // ストレートレープセミフレアスラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
         },
         WOMEN: {
-            outerId: 14, // グリッドパフジャケット (¥12,800)
-            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
-            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
-            leadText: '凍える真冬の気候を暖かく包み込むボリューム感のある「グリッドパフジャケット」に、ふわふわなシャギーニットセーターとリラックスしたスウェットパンツを組み合わせた快適な防寒スタイルです。'
+            title: (temp, w) => `気温${temp}℃・春風に揺れる「シアーヘンリーネック × ライトデニム」`,
+            desc: (temp) => `軽やかな気温${temp}℃の春にぴったりな「ドット柄シアーヘンリーネッククロップドTシャツ」に、手持ちのライトデニムを合わせて、爽やかで抜け感のある春の旬コーデに。`,
+            outfit: {
+                outerId: null,
+                topsId: 108, // ドット柄シアーヘンリーネッククロップドTシャツ
+                bottomsId: 110, // ライトインディゴデニム
+                shoesName: 'キャンバススニーカー'
+            }
         }
     },
-    2: {
-        monthName: '2月',
-        seasonName: '晩冬・早春',
-        themeTitle: '春の気配を感じるシックなウィンタースタイル',
+    summer: {
         MEN: {
-            outerId: 3,  // シングルブレストフェイクレザージャケット (¥12,000)
-            topsId: 8,   // アーバン ワイン ニット (¥5,800)
-            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
-            leadText: 'まだ冷え込む2月もスタイリッシュに。上質な光沢感の「シングルブレストフェイクレザージャケット」に深みのあるワインニットと美しいセミフレアスラックスを効かせた洗練コーデです。'
+            title: (temp, w) => `気温${temp}℃・夏の暑さを涼しく乗り切る「軽快アンクルスラックス」コーデ`,
+            desc: (temp) => `気温${temp}℃の夏日でも涼しく快適に。「スマートアンクルテーパードイージースラックス」ですっきりとした足元を演出し、シンプルながら洗練された都会的サマーカジュアルに。`,
+            outfit: {
+                outerId: null,
+                topsId: 7, // スカイオックスフォードシャツ
+                bottomsId: 11, // スマートアンクルテーパードイージースラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
         },
         WOMEN: {
-            outerId: 13, // フリースジャケット (¥7,500)
-            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
-            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
-            leadText: '軽くて暖かい「フリースジャケット」に肉厚なルーズクルーネックスウェットとシルエットの美しいインディゴデニムを合わせた抜け感のある旬カジュアルです。'
+            title: (temp, w) => `気温${temp}℃・真夏のストリートカジュアル「クロップドT × バギーデニム」`,
+            desc: (temp) => `気温${temp}℃の暑い日も涼しげにキマる「クロップドTシャツ」にワイドなデニムを合わせて、開放感とトレンド感を両立したアクティブな夏コーデ。`,
+            outfit: {
+                outerId: null,
+                topsId: 108,
+                bottomsId: 111, // バギーデニム
+                shoesName: 'サンダル/スニーカー'
+            }
         }
     },
-    3: {
-        monthName: '3月',
-        seasonName: '早春',
-        themeTitle: '季節の変わり目を快適に繋ぐ春アウタースタイル',
+    autumn: {
         MEN: {
-            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
-            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
-            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
-            leadText: '朝晩と日中の気温差が大きい3月に重宝する「オーバードレープ ダブルトレンチコート」に、着脱しやすいジップフーディとスラックスをレイヤードした大人の春スタイルです。'
+            title: (temp, w) => `気温${temp}℃・深まる秋の寒暖差に映える「手持ち黒ボトムス × ダブルトレンチコート」`,
+            desc: (temp) => `肌寒さを感じる気温${temp}℃に最適。ブランド人気No.1の「オーバードレープ ダブルトレンチコート」にチャコールニットを重ね着。手持ちの黒ボトムスと合わせるだけで、こなれ感のある都会的な秋冬スマートカジュアルが完成します。`,
+            outfit: {
+                outerId: 1, // オーバードレープ ダブルトレンチコート
+                topsId: 6,  // チャコール ブーク ニット
+                bottomsId: 9, // ストレートレープセミフレアスラックス
+                shoesName: 'クラシック 白レザースニーカー'
+            }
         },
         WOMEN: {
-            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
-            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
-            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
-            leadText: '春の訪れを感じさせる軽快な「ボックスシルエットショートトレンチコート」に、スウェットと爽やかなライトインディゴデニムを合わせたスプリングスタイルです。'
+            title: (temp, w) => `気温${temp}℃・秋めく街に映える「フリースジャケット × ワイドデニム」`,
+            desc: (temp) => `気温${temp}℃の秋の風に寄り添う、ふんわり暖かい「フリースジャケット」にインディゴデニムを合わせた王道カジュアル。手持ちのスニーカーと合わせて親しみやすいスタイルに。`,
+            outfit: {
+                outerId: 101, // フリースジャケット
+                topsId: 106,  // ヘビーウェイトルーズクルーネックスウェット
+                bottomsId: 109, // ハイウエストワイドドレープタックトラウザー(インディゴデニム)
+                shoesName: '白レザースニーカー'
+            }
         }
     },
-    4: {
-        monthName: '4月',
-        seasonName: '春本番',
-        themeTitle: '新生活や春の外出を彩るスマートカジュアル',
+    winter: {
         MEN: {
-            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
-            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
-            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
-            leadText: '心地よい春風が吹く4月に最適な、端正な「リラックス ダブル ブレスト テーラードジャケット」と清潔感溢れるオックスフォードシャツ、アンクルスラックスの好印象コーデです。'
+            title: (temp, w) => `気温${temp}℃・真冬の冷え込みもおしゃれに包む「暖かボアジャケット × ニット」`,
+            desc: (temp) => `冷え込む気温${temp}℃の冬を乗り切る、保温性抜群の「バッファローチェックボアジップジャケット」とニットのレイヤード。手持ちのパンツと合わせるだけで季節感あふれるトレンド防寒スタイルに。`,
+            outfit: {
+                outerId: 4, // バッファローチェックボアジップジャケット
+                topsId: 6, // チャコール ブーク ニット
+                bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ
+                shoesName: 'ボリュームソールスニーカー'
+            }
         },
         WOMEN: {
-            outerId: 15, // ボックスシルエットショートトレンチコート (¥8,500)
-            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
-            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
-            leadText: '暖かな春の陽気にぴったりな「ボックスシルエットショートトレンチコート」にフルジップパーカーをインした、こなれ感漂う大人カジュアルです。'
-        }
-    },
-    5: {
-        monthName: '5月',
-        seasonName: '初夏・新緑',
-        themeTitle: '爽やかな初夏の風を楽しむ軽快シャツスタイル',
-        MEN: {
-            outerId: null,
-            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
-            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
-            leadText: 'アウターなしで心地よく過ごせる5月。爽快なスカイブルーの「スカイ オックス フォードシャツ」を主役に、ドレープの美しいセミフレアスラックスを合わせました。'
-        },
-        WOMEN: {
-            outerId: null,
-            topsId: 19,  // ヴィンテージウォッシュフルジップパーカー (¥5,800)
-            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
-            leadText: '日差しが心地よい初夏に、存在感ある「カモフラージュスーパーワイドバギーデニムパンツ」とヴィンテージパーカーを合わせたストリートライクな着こなしです。'
-        }
-    },
-    6: {
-        monthName: '6月',
-        seasonName: '梅雨・初夏',
-        themeTitle: '雨の日も快適に過ごすリラックスストリート',
-        MEN: {
-            outerId: null,
-            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
-            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
-            leadText: '湿気や朝晩の冷え込み・冷房対策にちょうどいい「アーバン グレイ ジップフーディ」に、足元を濡らしにくいアンクル丈スラックスを組み合わせました。'
-        },
-        WOMEN: {
-            outerId: null,
-            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
-            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
-            leadText: 'ほんのり透け感のある「ドット柄シアーヘンリーネッククロップドTシャツ」でジメジメした梅雨時も涼やかに。涼感とトレンド感を両立させたコーデです。'
-        }
-    },
-    7: {
-        monthName: '7月',
-        seasonName: '盛夏',
-        themeTitle: '夏の暑さを爽やかに乗り切るサマースタイル',
-        MEN: {
-            outerId: null,
-            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
-            bottomsId: 11, // スマートアンクルテーパードイージースラックス (¥5,200)
-            leadText: '吸湿性と通気性に優れた薄手の「スカイ オックス フォードシャツ」を腕まくりして着こなす、暑い夏でも清潔感をキープできる都会派サマースタイルです。'
-        },
-        WOMEN: {
-            outerId: null,
-            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
-            bottomsId: 23, // カモフラージュスーパーワイドバギーデニムパンツ (¥7,500)
-            leadText: 'トレンドの「ドット柄シアーヘンリーネッククロップドTシャツ」にワイドなバギーデニムを合わせ、真夏の太陽に映えるアクティブなストリート感を出しました。'
-        }
-    },
-    8: {
-        monthName: '8月',
-        seasonName: '真夏',
-        themeTitle: '猛暑日も涼しく快適なサマーホリデースタイル',
-        MEN: {
-            outerId: null,
-            topsId: 7,   // スカイ オックス フォードシャツ (¥4,800)
-            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
-            leadText: '真夏の暑さでもサラリとした肌触りの「スカイ オックス フォードシャツ」に、軽量な「2WAYデタッチャブルナイロンカーゴパンツ」を合わせた機能的リゾートコーデです。'
-        },
-        WOMEN: {
-            outerId: null,
-            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
-            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
-            leadText: '通気性抜群のシアーTシャツに、柔らかく開放的な「タックイージーワイドスウェットパンツ」をセレクトした真夏の休日リラックススタイルです。'
-        }
-    },
-    9: {
-        monthName: '9月',
-        seasonName: '初秋',
-        themeTitle: '秋の気配を取り入れるスイッチコーディネート',
-        MEN: {
-            outerId: null,
-            topsId: 5,   // アーバン グレイ ジップフーディ (¥2,500)
-            bottomsId: 12, // ビッグポケットパラシュートカーゴパンツ (¥6,000)
-            leadText: '少しずつ秋風を感じる9月。重厚感のある「ビッグポケットパラシュートカーゴパンツ」にジップフーディを合わせた、季節の変わり目に最適なコーデです。'
-        },
-        WOMEN: {
-            outerId: 16, // レザージャケット (¥9,200)
-            topsId: 20,  // ドット柄シアーヘンリーネッククロップドTシャツ (¥3,900)
-            bottomsId: 22, // ハイウエストワイドドレープタックトラウザー(ライトインディゴデニム) (¥6,800)
-            leadText: '涼感のあるシアーTシャツの上にさっと「レザージャケット」を羽織り、秋の先取りトレンドを表現したスマートコーデです。'
-        }
-    },
-    10: {
-        monthName: '10月',
-        seasonName: '秋晴れ・中秋',
-        themeTitle: '深まる秋を楽しむ大人のテーラード＆ニット',
-        MEN: {
-            outerId: 2,  // リラックス ダブル ブレスト テーラードジャケット (¥8,000)
-            topsId: 8,   // アーバン ワイン ニット (¥5,800)
-            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
-            leadText: '心地よい秋晴れが続く10月に、差し色の「アーバン ワイン ニット」と端正な「リラックス ダブル テーラードジャケット」を合わせた洗練のドレスカジュアルです。'
-        },
-        WOMEN: {
-            outerId: 16, // レザージャケット (¥9,200)
-            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
-            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
-            leadText: '秋の定番「レザージャケット」に肉厚なクルーネックスウェットと濃紺インディゴデニムを合わせ、シックで温かみのある大人の装いに仕上げました。'
-        }
-    },
-    11: {
-        monthName: '11月',
-        seasonName: '深秋・晩秋',
-        themeTitle: '晩秋の冷え込みに映えるブランド人気No.1スタイル',
-        MEN: {
-            outerId: 1,  // オーバードレープ ダブルトレンチコート (¥8,800)
-            topsId: 8,   // アーバン ワイン ニット (¥5,800)
-            bottomsId: 9, // ストレートレープセミフレアスラックス (¥5,800)
-            leadText: '深まる秋の気候に合わせて、MANEKIN人気No.1の「オーバードレープ ダブルトレンチコート」に深みのあるワインニットと美しい落ち感のスラックスをセレクトしました。'
-        },
-        WOMEN: {
-            outerId: 13, // フリースジャケット (¥7,500)
-            topsId: 17,  // シャギーニットオーバーサイズクルーネックセーター (¥5,900)
-            bottomsId: 21, // ハイウエストワイドドレープタックトラウザー(インディゴデニム) (¥6,800)
-            leadText: '11月の冷たい風に寄り添うふんわり暖かい「フリースジャケット」に、トレンドのシャギーニットとシルエットの美しいインディゴデニムを合わせた親しみやすい旬スタイルです。'
-        }
-    },
-    12: {
-        monthName: '12月',
-        seasonName: '初冬・冬本番',
-        themeTitle: 'ホリデーシーズンを暖かく包むウィンタールック',
-        MEN: {
-            outerId: 4,  // バッファローチェックボアジップジャケット (¥10,000)
-            topsId: 6,   // チャコール ブーク ニット (¥5,500)
-            bottomsId: 10, // 2WAYデタッチャブルナイロンカーゴパンツ (¥6,800)
-            leadText: '寒さが本格化する12月に、存在感のあるチェック柄「バッファローチェックボアジップジャケット」と防寒ニットを合わせた暖かく華やかな冬スタイルです。'
-        },
-        WOMEN: {
-            outerId: 14, // グリッドパフジャケット (¥12,800)
-            topsId: 18,  // ヘビーウェイトルーズクルーネックスウェット (¥4,800)
-            bottomsId: 24, // タックイージーワイドスウェットパンツ (¥5,200)
-            leadText: '真冬の冷気もしっかりシャットアウトする「グリッドパフジャケット」にスウェットを合わせた、冬の外出をアクティブに楽しむスタイルです。'
+            title: (temp, w) => `気温${temp}℃・真冬の寒さを防ぐ「グリッドパフジャケット × シャギーニット」`,
+            desc: (temp) => `凍えるような気温${temp}℃でも抜群の暖かさを誇る「グリッドパフジャケット」とふわふわのシャギーニット。手持ちのスウェットパンツと合わせた旬の冬コーデ。`,
+            outfit: {
+                outerId: 102, // グリッドパフジャケット
+                topsId: 105, // シャギーニットオーバーサイズクルーネックセーター
+                bottomsId: 112, // タックイージーワイドスウェットパンツ
+                shoesName: 'スニーカー'
+            }
         }
     }
 };
 
-// ユーザーが手動選択したスタイリング提案の月（null の場合は現在の月を自動適用）
-let _selectedStylingMonth = null;
-
-// ==========================================================================
-// 【関数】getMonthlyStylingPlan(month = null, gender = 'MEN')
-// 【役割】「1月は暖かいダウン」「7月は涼しい半袖」など、月ごとのおすすめ服装プランをまとめているスタイリスト手帳係
-// 【具体的な処理内容】
-//   ・季節の気温にぴったりなおすすめブランド服の組み合わせプランを返します
-// ==========================================================================
-function getMonthlyStylingPlan(month = null, gender = 'MEN') {
-    const currentRealMonth = new Date().getMonth() + 1;
-    const m = (typeof month === 'number' && month >= 1 && month <= 12)
-        ? month
-        : (_selectedStylingMonth || currentRealMonth);
-    const g = (gender === 'WOMEN') ? 'WOMEN' : 'MEN';
-    const monthData = MONTHLY_STYLING_PLANS[m] || MONTHLY_STYLING_PLANS[11];
-    const plan = monthData[g] || monthData.MEN;
-
-    // 実在の SAMPLE_PRODUCTS から商品オブジェクトを取得
-    const outerProd = plan.outerId ? SAMPLE_PRODUCTS.find(p => p.id === plan.outerId) : null;
-    const topsProd = plan.topsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.topsId) : null;
-    const bottomsProd = plan.bottomsId ? SAMPLE_PRODUCTS.find(p => p.id === plan.bottomsId) : null;
-
-    return {
-        month: m,
-        monthName: monthData.monthName,
-        seasonName: monthData.seasonName,
-        themeTitle: monthData.themeTitle,
-        plan,
-        isCurrentMonth: (m === currentRealMonth),
-        prods: {
-            outer: outerProd,
-            tops: topsProd,
-            bottoms: bottomsProd
-        }
-    };
-}
-
-// ==========================================================================
-// 【関数】onSelectStylingMonth(monthVal)
-// 【役割】AI提案バナーで別の月を選んだときに、その月の気候にぴったりの服の提案にパッと切り替える月別コーデ係
-// 【具体的な処理内容】
-//   ・選ばれた月のおすすめコーデ提案にバナーの表示を切り替えます
-// ==========================================================================
-function onSelectStylingMonth(monthVal) {
-    const parsed = parseInt(monthVal, 10);
-    if (!isNaN(parsed) && parsed >= 1 && parsed <= 12) {
-        _selectedStylingMonth = parsed;
-    } else {
-        _selectedStylingMonth = null;
-    }
-    // バナー再描画を実行
-    updateTodaySeasonalStyling();
-}
-window.onSelectStylingMonth = onSelectStylingMonth;
-
-// ==========================================================================
-// 【関数】renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, ...)
-// 【役割】トップのバナーに「今日の名古屋の天気」「気温」「おすすめの服」を綺麗に飾るお天気看板係
-// 【具体的な処理内容】
-//   ・気象庁の気温・天気、季節のアドバイス、おすすめアイテムをバナーに綺麗に表示します
-// ==========================================================================
+// バナー描画用内部ヘルパー
 function renderTodayStylingBanner(temp, weatherText, seasonInfo, gender, month, date, locationName = '愛知・名古屋', tempMin = null, tempMax = null, provider = '気象庁(JMA)') {
     const badgeElem = document.getElementById('today-styling-badge');
     const titleElem = document.getElementById('today-styling-title');
     const descElem = document.getElementById('today-styling-desc');
     const btnElem = document.getElementById('btn-apply-today-styling');
-    const selectElem = document.getElementById('today-styling-month-select');
     if (!titleElem || !descElem) return;
 
-    // 月別（1月〜12月）のおすすめブランド商品プランを取得
-    const targetMonth = _selectedStylingMonth || month;
-    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
-    const { monthName, themeTitle, plan, prods, isCurrentMonth } = stylingData;
-
-    // 月選択セレクターの選択状態を同期
-    if (selectElem && selectElem.value !== String(targetMonth)) {
-        selectElem.value = String(targetMonth);
-    }
+    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
+    const plan = planGroup[gender] || planGroup.MEN;
 
     const hasMinMax = (tempMin !== null && tempMax !== null);
     const minMaxLabel = hasMinMax ? `最低${tempMin}℃ / 最高${tempMax}℃ (現在${temp}℃)` : `気温${temp}℃`;
 
     if (badgeElem) {
-        const monthBadgeLabel = isCurrentMonth ? `今月（${monthName}）のおすすめ` : `${monthName}のおすすめ`;
-        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${monthBadgeLabel}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
+        badgeElem.innerHTML = `TODAY'S AI STYLING ・ <span>${seasonInfo.name}（${month}月${date}日 ${locationName} ${minMaxLabel} / ${weatherText} 【${provider}】）</span>`;
     }
+    const rawTitle = plan.title(tempMin !== null ? tempMin : temp, weatherText);
+    const cleanTitle = rawTitle.replace(/^気温\d+℃・/, '');
+    const titlePrefix = hasMinMax ? `【${locationName} 最低${tempMin}℃ / 最高${tempMax}℃】` : `【${locationName} 気温${temp}℃】`;
+    titleElem.textContent = `${titlePrefix}${cleanTitle}`;
 
-    // 見出しタイトル：月ごとのおすすめとして商品名を明示
-    const mainItemTitle = prods.outer ? `「${prods.outer.name}」×「${prods.tops.name}」` : `「${prods.tops.name}」スタイル`;
-    const headingMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
-    titleElem.textContent = `【${headingMonthLabel}のおすすめ】${themeTitle}・${mainItemTitle}`;
-
-    // 「今月（○月）は商品の中からこのコーデがおすすめ！」の月全体としての情報を表示（日ごとの気温・寒暖差情報は除外）
-    descElem.textContent = `今月（${monthName}）はブランド商品の中からこのコーデがおすすめ！${plan.leadText}`;
+    // 最低気温と朝晩の寒暖差に合わせたアドバイス文
+    let adviceText = '';
+    if (hasMinMax) {
+        const diff = tempMax - tempMin;
+        if (diff >= 7) {
+            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】寒暖差が${diff}℃と大きいため、朝晩の冷え込みに備えて羽織れるアウターが快適です。`;
+        } else {
+            adviceText = `【気象庁予報：最低${tempMin}℃ / 最高${tempMax}℃】肌寒さを防ぎ快適に過ごせるコーデです。`;
+        }
+    }
+    descElem.textContent = adviceText ? `${adviceText} ${plan.desc(tempMin !== null ? tempMin : temp)}` : plan.desc(temp);
 
     if (btnElem) {
-        btnElem.textContent = `${headingMonthLabel}のおすすめ商品コーデを試着する`;
+        btnElem.textContent = `最低${tempMin !== null ? tempMin : temp}℃対応の${seasonInfo.name}おすすめを試着する`;
     }
 }
 
-// ==========================================================================
-// 【関数】updateTodaySeasonalStyling()
-// 【役割】今日のお天気と気温を調べて、マネキン画面の上におすすめの着こなしを分かりやすく表示するお天気スタイリスト係
-// 【具体的な処理内容】
-//   ・気象庁から名古屋の最新気温を取得し、バナーを自動更新します
-// ==========================================================================
+// TODAY'S AI STYLING バナーの気温と提案テキストを更新（気象庁JMAの愛知・名古屋最低気温と連動）
 async function updateTodaySeasonalStyling() {
     const now = new Date();
     const month = now.getMonth() + 1;
     const date = now.getDate();
     const seasonInfo = getCurrentSeasonInfo(now);
-    const gender = 'MEN';
+    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
 
     // 1. まず即座に愛知の推定気温で仮描画（待たずに即時表示）
     const initialTemp = calculateEstimatedTemperature(now);
@@ -5025,21 +5388,13 @@ async function updateTodaySeasonalStyling() {
     }
 }
 
-// ==========================================================================
-// 【関数】applyTodaySeasonalPresetLook()
-// 【役割】「このおすすめコーデを一括で試着する」ボタンを押したときに、マネキンに提案コーデを一瞬で着せるお天気試着係
-// 【具体的な処理内容】
-//   ・今月おすすめの季節コーディネート一式を、ワンクリックでマネキンに着せ替えます
-// ==========================================================================
+// 季節・現在日時に合わせたおすすめコーデを一括でマネキンに着せ替えます
 function applyTodaySeasonalPresetLook() {
     const now = new Date();
-    const month = now.getMonth() + 1;
-    const gender = 'MEN';
-
-    // 選択中の月（または現在の月）のブランド商品（SAMPLE_PRODUCTS）を取得
-    const targetMonth = _selectedStylingMonth || month;
-    const stylingData = getMonthlyStylingPlan(targetMonth, gender);
-    const { monthName, prods, isCurrentMonth } = stylingData;
+    const seasonInfo = getCurrentSeasonInfo(now);
+    const gender = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
+    const planGroup = SEASONAL_STYLING_PLANS[seasonInfo.key] || SEASONAL_STYLING_PLANS.autumn;
+    const plan = planGroup[gender] || planGroup.MEN;
 
     const newOutfit = {
         hat: null,
@@ -5049,62 +5404,94 @@ function applyTodaySeasonalPresetLook() {
         shoes: null
     };
 
-    // アウター（商品カタログから選定）
-    if (prods.outer) {
-        newOutfit.outer = {
-            id: prods.outer.id,
-            name: prods.outer.name,
-            category: prods.outer.category,
-            color: (prods.outer.colors && prods.outer.colors[0]) || 'STANDARD',
-            price: prods.outer.price,
-            image: prods.outer.image,
-            isOwned: false
-        };
+    // アウター
+    if (plan.outfit.outerId) {
+        const outerProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.outerId);
+        if (outerProd) {
+            newOutfit.outer = {
+                id: outerProd.id,
+                name: outerProd.name,
+                category: outerProd.category,
+                color: outerProd.color || 'STANDARD',
+                price: outerProd.price,
+                image: outerProd.image,
+                isOwned: false
+            };
+        }
     }
 
-    // トップス（商品カタログから選定）
-    if (prods.tops) {
-        newOutfit.tops = {
-            id: prods.tops.id,
-            name: prods.tops.name,
-            category: prods.tops.category,
-            color: (prods.tops.colors && prods.tops.colors[0]) || 'STANDARD',
-            price: prods.tops.price,
-            image: prods.tops.image,
-            isOwned: false
-        };
+    // トップス
+    if (plan.outfit.topsId) {
+        const topsProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.topsId);
+        if (topsProd) {
+            newOutfit.tops = {
+                id: topsProd.id,
+                name: topsProd.name,
+                category: topsProd.category,
+                color: topsProd.color || 'STANDARD',
+                price: topsProd.price,
+                image: topsProd.image,
+                isOwned: false
+            };
+        }
     }
 
-    // ボトムス（商品カタログから選定）
-    if (prods.bottoms) {
+    // ボトムス（手持ち服があればそれを優先、なければ商品）
+    const ownedBottom = AppState.myCloset.find(c => c.category === 'BOTTOMS');
+    if (ownedBottom) {
         newOutfit.bottoms = {
-            id: prods.bottoms.id,
-            name: prods.bottoms.name,
-            category: prods.bottoms.category,
-            color: (prods.bottoms.colors && prods.bottoms.colors[0]) || 'STANDARD',
-            price: prods.bottoms.price,
-            image: prods.bottoms.image,
-            isOwned: false
+            id: ownedBottom.id,
+            name: ownedBottom.name,
+            category: ownedBottom.category,
+            color: ownedBottom.color,
+            isOwned: true,
+            image: ownedBottom.image
         };
+    } else if (plan.outfit.bottomsId) {
+        const botProd = SAMPLE_PRODUCTS.find(p => p.id === plan.outfit.bottomsId);
+        if (botProd) {
+            newOutfit.bottoms = {
+                id: botProd.id,
+                name: botProd.name,
+                category: botProd.category,
+                color: botProd.color || 'STANDARD',
+                price: botProd.price,
+                image: botProd.image,
+                isOwned: false
+            };
+        }
     }
 
-    // シューズは商品カタログ外のためセットせず未着用のままにします（newOutfit.shoes = null）
+    // シューズ
+    const ownedShoes = AppState.myCloset.find(c => c.category === 'SHOES');
+    if (ownedShoes) {
+        newOutfit.shoes = {
+            id: ownedShoes.id,
+            name: ownedShoes.name,
+            category: ownedShoes.category,
+            color: ownedShoes.color,
+            isOwned: true,
+            image: ownedShoes.image
+        };
+    } else {
+        newOutfit.shoes = {
+            id: 'c_shoes_fallback',
+            name: plan.outfit.shoesName || 'クラシック 白レザースニーカー',
+            category: 'SHOES',
+            color: 'WHITE',
+            isOwned: true,
+            image: getCategoryFallbackImage('SHOES')
+        };
+    }
 
     AppState.currentOutfit = newOutfit;
     syncStudioStateToBackend({ immediate: true });
-
-    const mainName = prods.outer ? prods.outer.name : (prods.tops ? prods.tops.name : '');
-    const toastMonthLabel = isCurrentMonth ? `今月（${monthName}）` : `${monthName}`;
-    showToastNotification(`【${toastMonthLabel}おすすめ】ブランド商品「${mainName}」等の全身コーデをマネキンにセットしました！`);
+    const minText = (_todayStylingWeatherCache.tempMin !== null) ? ` 最低${_todayStylingWeatherCache.tempMin}℃対応` : '';
+    showToastNotification(`【気象庁 名古屋${minText}】${seasonInfo.name}のおすすめコーデをマネキンにセットしました`);
     switchStudioTab('create');
 }
 
-// ==========================================================================
-// 【関数】applyPresetLook(lookKey)
-// 【役割】決まったコーディネートをマネキンに着せるための着せ替えお手伝い係
-// 【具体的な処理内容】
-//   ・指定されたコーデをマネキンに着用させます
-// ==========================================================================
+// 既存互換用ラッパー
 function applyPresetLook(lookKey) {
     applyTodaySeasonalPresetLook();
 }
@@ -5117,21 +5504,8 @@ let _studioStateSyncSeq = 0;
 // 再代入可能な変数 _lastStudioSyncErrorToastAt を宣言し、値（0）をセットします
 let _lastStudioSyncErrorToastAt = 0;
 
-// ==========================================================================
 
-
-// ==========================================================================
-//  第9章：マネキン試着状態のMySQL自動保存（デバウンス同期）
-//  【このセクションの役割】
-//  ・試着や位置微調整の連続操作をまとめるデバウンス付き(400ms後)自動保存
-//  ・ページ移動やログアウト直前の即時保留送信（flushPendingStudioStateSync）
-//  ・ログイン時・スタジオ遷移時に前回試着していた服と微調整値を元通り復元
-// ==========================================================================
-// 【関数】sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot)
-// 【役割】今着ている服や位置調整のデータを、データベース（MySQL）へメッセージとして送る通信メッセンジャー係
-// 【具体的な処理内容】
-//   ・ページを閉じたり移動しても試着中の服が消えないよう、データベースに保存します
-// ==========================================================================
+// 現在のマネキン着用状態・位置調整・性別設定を MySQL（POST /api/studio-state/save）へ送信します（keepalive対応）
 async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot) {
     // 条件（typeof isServerUserId === 'function' && !isServerUse…）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof isServerUserId === 'function' && !isServerUserId(targetUserId)) {
@@ -5198,12 +5572,8 @@ async function sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnaps
     }
 }
 
-// ==========================================================================
-// 【関数】flushPendingStudioStateSync()
-// 【役割】あとで保存しようと待っていたデータを、「今すぐ確実に保存して！」と即座に送らせる緊急保存係
-// 【具体的な処理内容】
-//   ・ログアウトや画面移動の直前に、未保存の着せ替えデータを確実にMySQLへ保存完了させます
-// ==========================================================================
+
+// 遅延保存(デバウンス)待ちのスタジオ変更が残っていればタイマーを即解除して先に MySQL 送信を完了させます
 function flushPendingStudioStateSync() {
     // 条件（!_studioStateSyncTimer）が成り立つか判定し、該当する場合の処理を実行します
     if (!_studioStateSyncTimer) return Promise.resolve(false);
@@ -5223,18 +5593,14 @@ function flushPendingStudioStateSync() {
     const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
     const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
-    // 定数 genderSnapshot を宣言し、値（'MEN'）をセットします
-    const genderSnapshot = 'MEN';
+    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
+    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
     // 結果（sendStudioStateRequest(targetUserId, outfitSnaps…）を呼び出し元へ返却します
     return sendStudioStateRequest(targetUserId, outfitSnapshot, offsetsSnapshot, genderSnapshot);
 }
 
-// ==========================================================================
-// 【関数】syncStudioStateToBackend(options = {})
-// 【役割】服を着替えたりサイズを変えたりしたあと、操作がひと段落するのを待ってからそっと自動保存するおまかせセーブ係
-// 【具体的な処理内容】
-//   ・スライダーを動かしている途中で通信がパンクしないよう、操作が止まってからサーバーへ保存します
-// ==========================================================================
+
+// 試着や位置微調整の連続操作をまとめるデバウンス付き(220ms後)MySQL自動保存スケジューラです
 function syncStudioStateToBackend(options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -5258,8 +5624,8 @@ function syncStudioStateToBackend(options = {}) {
     const outfitSnapshot = JSON.parse(JSON.stringify(AppState.currentOutfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null }));
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して offsetsSnapshot に保存します
     const offsetsSnapshot = JSON.parse(JSON.stringify(AppState.fittingOffsets || getDefaultFittingOffsets()));
-    // 定数 genderSnapshot を宣言し、値（'MEN'）をセットします
-    const genderSnapshot = 'MEN';
+    // 定数 genderSnapshot を宣言し、値（(AppState.studioGender === 'WOMEN') ? …）をセットします
+    const genderSnapshot = (AppState.studioGender === 'WOMEN') ? 'WOMEN' : 'MEN';
     // 定数 seq を宣言し、値（++_studioStateSyncSeq）をセットします
     const seq = ++_studioStateSyncSeq;
 
@@ -5291,12 +5657,8 @@ function syncStudioStateToBackend(options = {}) {
     });
 }
 
-// ==========================================================================
-// 【関数】syncStudioStateFromBackend()
-// 【役割】スタジオを開いたときに、前回着ていた服やサイズを思い出してマネキンに着せ直す前回の状態ふっかつ係
-// 【具体的な処理内容】
-//   ・サーバーから前回のマネキン状態を読み込み、着ていた服や位置の微調整をそのまま元通りに再現します
-// ==========================================================================
+
+// ログイン後・スタジオ遷移時に MySQL（GET /api/studio-state/...）から前回の試着服と微調整値を復元します
 async function syncStudioStateFromBackend() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || (typeof isServerUserId === 'function' && !isServerUserId(AppState.currentUser.id))) {
@@ -5311,10 +5673,13 @@ async function syncStudioStateFromBackend() {
         if (saved && typeof saved === 'object') {
             AppState.currentOutfit = saved.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             AppState.fittingOffsets = saved.fitting_offsets || getDefaultFittingOffsets();
+            AppState.studioGender = (saved.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
         } else {
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             AppState.fittingOffsets = getDefaultFittingOffsets();
+            AppState.studioGender = 'MEN';
         }
+        syncGenderToggleUI();
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
@@ -5355,14 +5720,20 @@ async function syncStudioStateFromBackend() {
             AppState.currentOutfit = data.studio_state.current_outfit || { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             // アプリ全体状態 AppState.fittingOffsets を最新値（data.studio_state.fitting_offsets || g…）に更新します
             AppState.fittingOffsets = data.studio_state.fitting_offsets || getDefaultFittingOffsets();
+            // アプリ全体状態 AppState.studioGender を最新値（(data.studio_state.studio_gender === '…）に更新します
+            AppState.studioGender = (data.studio_state.studio_gender === 'WOMEN') ? 'WOMEN' : 'MEN';
             // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // アプリ全体状態 AppState.currentOutfit を最新値（{ hat: null, outer: null, tops: null, …）に更新します
             AppState.currentOutfit = { hat: null, outer: null, tops: null, bottoms: null, shoes: null };
             // アプリ全体状態 AppState.fittingOffsets を最新値（getDefaultFittingOffsets()）に更新します
             AppState.fittingOffsets = getDefaultFittingOffsets();
+            // アプリ全体状態 AppState.studioGender を最新値（'MEN'）に更新します
+            AppState.studioGender = 'MEN';
         }
 
+        // 関連処理 syncGenderToggleUI() を呼び出して処理・画面を更新します
+        syncGenderToggleUI();
         // 条件（typeof renderMannequinStage === 'function'）が成り立つか判定し、該当する場合の処理を実行します
         if (typeof renderMannequinStage === 'function') renderMannequinStage();
         // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
@@ -5378,21 +5749,30 @@ async function syncStudioStateFromBackend() {
     }
 }
 
-// ==========================================================================
+
+// 身長・体型・好みのテイスト設定をメモリ反映してスタジオプロフィール完了通知を出します
+function handleSaveBodyProfile(e) {
+    // フォーム送信やボタン押下に伴うページリロード等のブラウザ標準動作をキャンセルします
+    e.preventDefault();
+    // HTML 要素 #body-height を取得して変数 height に格納します
+    const height = document.getElementById('body-height')?.value || 172;
+    // HTML 要素 #body-type を取得して変数 type に格納します
+    const type = document.getElementById('body-type')?.value || 'REGULAR';
+    // HTML 要素 #style-taste を取得して変数 taste に格納します
+    const taste = document.getElementById('style-taste')?.value || 'MINIMAL';
+
+    // アプリ全体状態 AppState.userBodyProfile を最新値（{ height, bodyType: type, styleTaste: …）に更新します
+    AppState.userBodyProfile = { height, bodyType: type, styleTaste: taste };
+
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+    showToastNotification('体型および好みの設定を反映しました');
+}
 
 
 // ==========================================================================
-//  第10章：補助ヘルパー（カテゴリ名日本語変換・カラーHEX変換・トースト通知）
-//  【このセクションの役割】
-//  ・英語カテゴリ名（'HAT'〜'SHOES'）から日本語表示名への変換
-//  ・カラー名から画面表示用のカラーコード（#000000等）への変換
-//  ・スタジオ画面用のトースト通知メッセージ表示
+//  8. 日本語カテゴリ／カラーHEX変換・通知用補助ヘルパー関数
 // ==========================================================================
-// 【関数】getCategoryNameJP(cat)
-// 【役割】英語の「TOPS」「SHOES」を、わかりやすい日本語の「トップス」「シューズ」に直す翻訳係
-// 【具体的な処理内容】
-//   ・画面に分かりやすく表示するための翻訳ヘルパー関数です
-// ==========================================================================
+// 英語カテゴリ('HAT'〜'SHOES')を見やすい日本語表示名へ変換する補助関数です
 function getCategoryNameJP(cat) {
     // 値（cat)）に応じて処理ケースを分岐する switch 文を開始します
     switch (cat) {
@@ -5411,12 +5791,8 @@ function getCategoryNameJP(cat) {
     }
 }
 
-// ==========================================================================
-// 【関数】getColorHex(colorName)
-// 【役割】「BLACK」「RED」などの色の名前を、画面で塗れるカラー番号（#000000など）に直す色番号調べ係
-// 【具体的な処理内容】
-//   ・カラーパレットのドットや色見本を描画するための色コードを返します
-// ==========================================================================
+
+// カラー名('BLACK'/'WHITE'/'NAVY'等)からAIカラーパレットドット用の16進カラーコードを返します
 function getColorHex(colorName) {
     // 値（colorName)）に応じて処理ケースを分岐する switch 文を開始します
     switch (colorName) {
@@ -5441,12 +5817,8 @@ function getColorHex(colorName) {
     }
 }
 
-// ==========================================================================
-// 【関数】showToastNotification(message)
-// 【役割】画面のすみに「コーデを保存しました」などの小さなメッセージをフワッと出してすぐ消すお知らせ係
-// 【具体的な処理内容】
-//   ・画面右下に操作結果メッセージを通知します
-// ==========================================================================
+
+// toast.js の showToast があればそちらを使い、無ければコンソール代替する通知ラッパーです
 function showToastNotification(message) {
     // 条件（typeof showToast === 'function'）が成り立つか判定し、該当する場合の処理を実行します
     if (typeof showToast === 'function') {
@@ -5466,6 +5838,8 @@ window.syncStudioStateToBackend = syncStudioStateToBackend;
 window.syncStudioStateFromBackend = syncStudioStateFromBackend;
 // デバウンス待ち中の試着変更があれば先に MySQL へ確定送信してから後続処理へ進みます
 window.flushPendingStudioStateSync = flushPendingStudioStateSync;
+// 変数・配列項目 window.syncGenderToggleUI の値を更新・計算します
+window.syncGenderToggleUI = syncGenderToggleUI;
 // 変数・配列項目 window.bumpClosetMutationSeq の値を更新・計算します
 window.bumpClosetMutationSeq = bumpClosetMutationSeq;
 window.updateTodaySeasonalStyling = updateTodaySeasonalStyling;

@@ -26,8 +26,8 @@ echo.
 REM このバッチファイル自身が置かれているフォルダ（%~dp0）へドライブごと移動します
 cd /d "%~dp0"
 
-REM Python を使って Web サーバー本体（app.py）を起動します（Ctrl+C までここで待機します）
-python app.py
+REM Python を使って Web サーバー本体（python/app.py）を起動します（Ctrl+C までここで待機します）
+python python/app.py
 
 REM もし直前の python 実行がエラー終了（終了コードが 0 以外）だった場合の後処理を開始します
 if %ERRORLEVEL% NEQ 0 (
