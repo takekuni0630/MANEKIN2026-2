@@ -2234,27 +2234,6 @@ index.html
                                 <p class="ai-comment-text" id="ai-comment-text">
                                     左側の「手持ちの服」または右側の「お気に入り商品」をクリックすると、マネキンが試着しAIスタイリストがリアルタイムでコーディネート診断を行います。
                                 </p>
-                                <!-- AIカラー構成診断ボックス（ベース/アソート/アクセント比率・配色調和タイプ判定） -->
-                                <div class="ai-color-diagnosis-box" id="ai-color-diagnosis-box"
-                                    style="margin-top: 12px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 8px; border-left: 3px solid #f59e0b; display: none;">
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px;">
-                                        <span
-                                            style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
-                                            <span>🎨</span> AIカラー構成診断
-                                        </span>
-                                        <span id="ai-color-scheme-type"
-                                            style="font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: rgba(251,191,36,0.18); color: #fde68a; font-weight: 600;">--</span>
-                                    </div>
-                                    <!-- カラー比率バー -->
-                                    <div id="ai-color-ratio-bar"
-                                        style="height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 8px; background: rgba(255,255,255,0.1);">
-                                    </div>
-                                    <!-- カラー内訳リスト -->
-                                    <div id="ai-color-breakdown-list"
-                                        style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.73rem; color: #e2e8f0;">
-                                    </div>
-                                </div>
                             </div>
                             <!-- 【ai-meta-bar】画面のレイアウトや配置を整えるブロック要素（<div class="ai-meta-bar">）を開始します -->
                             <div class="ai-meta-bar">
@@ -2266,14 +2245,6 @@ index.html
                                     <span class="ai-tag">#ベーシック</span>
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-tag #通年着回し）です -->
                                     <span class="ai-tag">#通年着回し</span>
-                                </div>
-                                <!-- 【ai-palette-wrap】画面のレイアウトや配置を整えるブロック要素（<div id="ai-palette-wrap" class="ai-palette-wrap">）を開始します -->
-                                <div class="ai-palette-wrap" id="ai-palette-wrap">
-                                    <!-- インライン装飾／グルーピング用の <span> 要素（.palette-label カラー構成:）です -->
-                                    <span class="palette-label">カラー構成:</span>
-                                    <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#palette-dots）です -->
-                                    <div class="palette-dots" id="palette-dots">
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2874,13 +2845,13 @@ index.html
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
-    <script src="js/products-data.js?v=20261124_fix_cutout_edit_v2"></script>
+    <script src="js/products-data.js?v=20261124_remove_color_diag_v1"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261124_fix_cutout_edit_v2"></script>
+    <script src="js/shop.js?v=20261124_remove_color_diag_v1"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261124_fix_cutout_edit_v2"></script>
+    <script src="js/studio.js?v=20261124_remove_color_diag_v1"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261124_fix_cutout_edit_v2"></script>
+    <script src="js/app.js?v=20261124_remove_color_diag_v1"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
