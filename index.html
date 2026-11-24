@@ -32,8 +32,8 @@ index.html
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
         rel="stylesheet">
-    <!-- メインのスタイルシート「css/style.css?v=20261116_all_favs_v5」を読み込み、全CSSをサイトへ適用します -->
-    <link rel="stylesheet" href="css/style.css?v=20261116_all_favs_v5">
+    <!-- メインのスタイルシート「css/style.css?v=20261124_block_explanations_v1」を読み込み、全CSSをサイトへ適用します -->
+    <link rel="stylesheet" href="css/style.css?v=20261124_block_explanations_v1">
     <!-- ここまで <head>（裏方設定・CSS読込エリア）の終了です -->
 </head>
 
@@ -45,7 +45,7 @@ index.html
     <!-- ================================================================== -->
     <!-- 画面上部に常時固定されるサイト共通ヘッダーバー（#site-header）です -->
     <header class="site-header" id="site-header">
-        <!-- デザイン・配置用のブロック要素（<div class="header-container">）を開始します -->
+        <!-- 【header-container】ヘッダー内のロゴ・ナビメニュー・操作ボタンを横並びで整列させるコンテナ枠（<div class="header-container">）を開始します -->
         <div class="header-container">
             <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（MANEKIN FASHION トップへ） -->
             <!-- bland-logo → ヘッダーの一番左に表示されるロゴみたいなやつ -->
@@ -103,7 +103,7 @@ index.html
             </nav>
 
 
-            <!-- デザイン・配置用のブロック要素（<div class="header-tools">）を開始します -->
+            <!-- 【header-tools】ヘッダー右側の機能アイコン群（検索・お気に入り・カート・会員メニュー）をまとめるブロック（<div class="header-tools">）を開始します -->
             <div class="header-tools">
                 <!-- クリックで画面ハッシュを「#checkout」へ切り替える SPA リンクです（<a href="#checkout" class="tool-…） -->
                 <a href="#checkout" class="tool-icon-btn cart-icon-btn" id="header-cart-btn"
@@ -178,11 +178,11 @@ index.html
     <!-- ================================================================== -->
 
     <!-- ↓　ハンバーガーメニューの中身のこと -->
-    <!-- 特定機能・領域のブロック要素（<div id="mobile-menu-drawer" class="mobile-menu-drawer">）を開始します -->
+    <!-- 【mobile-menu-drawer】スマホ表示時に画面左からスライドして現れる引き出し式メニュー枠（<div id="mobile-menu-drawer" class="mobile-menu-drawer">）を開始します -->
     <div class="mobile-menu-drawer" id="mobile-menu-drawer">
-        <!-- デザイン・配置用のブロック要素（<div class="drawer-content">）を開始します -->
+        <!-- 【drawer-content】スマホメニュー内のリンク一覧や閉じるボタンを包む中身コンテンツ領域ブロック（<div class="drawer-content">）を開始します -->
         <div class="drawer-content">
-            <!-- デザイン・配置用のブロック要素（<div class="drawer-header">）を開始します -->
+            <!-- 【drawer-header】スマホメニューの最上部（閉じるボタンやロゴ）を配置するヘッダーブロック（<div class="drawer-header">）を開始します -->
             <div class="drawer-header">
                 <!-- インライン装飾／グルーピング用の <span> 要素（.drawer-logo MANEKIN FASHION）です -->
                 <span class="drawer-logo">MANEKIN FASHION</span>
@@ -212,7 +212,7 @@ index.html
                 <li><a href="#mypage" class="mobile-nav-link" id="mobile-mypage-link" data-mobile-nav="mypage">MYPAGE
                         (マイページ)</a></li>
             </ul>
-            <!-- デザイン・配置用のブロック要素（<div class="drawer-footer">）を開始します -->
+            <!-- 【drawer-footer】スマホメニューの最下部（ログインや会員情報へのショートカット）を配置するフッターブロック（<div class="drawer-footer">）を開始します -->
             <div class="drawer-footer">
                 <!-- 段落テキスト（.drawer-footer-text: 研ぎ澄まされたシンプルを日常に。 2026 SS COLLECT…）を表示します -->
                 <p class="drawer-footer-text">研ぎ澄まされたシンプルを日常に。<br>2026 SS COLLECTION</p>
@@ -221,7 +221,7 @@ index.html
             </div>
         </div>
     </div>
-    <!-- 特定機能・領域のブロック要素（<div id="menu-overlay" class="menu-overlay">）を開始します -->
+    <!-- 【menu-overlay】スマホメニューが開いているときに画面の奥を薄暗く覆う背景オーバーレイ枠（<div id="menu-overlay" class="menu-overlay">）を開始します -->
     <div class="menu-overlay" id="menu-overlay"></div>
 
 
@@ -238,14 +238,14 @@ index.html
         <section class="page-view active" id="view-home">
             <!-- ページの1セクション領域（.hero-section）を開始します -->
             <section class="hero-section">
-                <!-- デザイン・配置用のブロック要素（<div class="hero-image-wrap">）を開始します -->
+                <!-- 【hero-image-wrap】ヒーロー用の大きな写真画像を綺麗にトリミング・配置する画像ラッパー枠（<div class="hero-image-wrap">）を開始します -->
                 <div class="hero-image-wrap">
                     <!-- 画像ファイルを表示する img 要素（#hero-image / src=assets/images/hero.jpg）です -->
                     <img src="assets/images/hero.jpg" alt="MANEKIN FASHION 2026 コレクション" class="hero-image">
-                    <!-- デザイン・配置用のブロック要素（<div class="hero-overlay">）を開始します -->
+                    <!-- 【hero-overlay】写真の上に半透明の黒を重ねて文字をくっきり読みやすくする明暗フィルター枠（<div class="hero-overlay">）を開始します -->
                     <div class="hero-overlay"></div>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="hero-content">）を開始します -->
+                <!-- 【hero-content】ヒーロー写真の中央に載せるキャッチコピーと「商品一覧を見る」ボタンのブロック（<div class="hero-content">）を開始します -->
                 <div class="hero-content">
                     <!-- 段落テキスト（.hero-subheading: 2026 SPRING / SUMMER COLLECTION）を表示します -->
                     <p class="hero-subheading">2026 SPRING / SUMMER COLLECTION</p>
@@ -256,7 +256,7 @@ index.html
                     <p class="hero-description"><span class="keep-phrase">誰にでも自然と馴染み、</span><span
                             class="keep-phrase">着る人の個性を引き立てる。</span><span class="keep-phrase">時代を超えて愛される、</span><span
                             class="keep-phrase">上質なベーシックウェアを展開します。</span></p>
-                    <!-- デザイン・配置用のブロック要素（<div class="hero-buttons">）を開始します -->
+                    <!-- 【hero-buttons】画面のレイアウトや配置を整えるブロック要素（<div class="hero-buttons">）を開始します -->
                     <div class="hero-buttons">
                         <!-- クリックで画面ハッシュを「#items」へ切り替える SPA リンクです（COLLECTION ALL） -->
                         <a href="#items" class="btn btn-primary">COLLECTION ALL</a>
@@ -268,19 +268,19 @@ index.html
 
             <!-- ページの1セクション領域（.concept-section container）を開始します -->
             <section class="concept-section container">
-                <!-- デザイン・配置用のブロック要素（<div class="section-header text-center">）を開始します -->
+                <!-- 【section-header】各セクションの大見出しタイトルと英語サブタイトルを配置するヘッダー枠（<div class="section-header text-center">）を開始します -->
                 <div class="section-header text-center">
                     <!-- 段落テキスト（.section-en-title: BRAND CONCEPT）を表示します -->
                     <p class="section-en-title">BRAND CONCEPT</p>
                     <!-- セクションの見出し（<h2>: MANEKIN FASHION <span）を表示します -->
                     <h2 class="section-jp-title"><span class="keep-phrase">MANEKIN FASHION</span> <span
                             class="keep-phrase">について</span></h2>
-                    <!-- デザイン・配置用のブロック要素（<div class="section-divider">）を開始します -->
+                    <!-- 【section-divider】画面のレイアウトや配置を整えるブロック要素（<div class="section-divider">）を開始します -->
                     <div class="section-divider"></div>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="concept-grid">）を開始します -->
+                <!-- 【concept-grid】3つのコンセプトカード（シンプル、モダン、試着体験）を3列に並べるグリッド枠（<div class="concept-grid">）を開始します -->
                 <div class="concept-grid">
-                    <!-- デザイン・配置用のブロック要素（<div class="concept-card">）を開始します -->
+                    <!-- 【concept-card】コンセプトの1項目（アイコン・見出し・説明文）をまとめたカード枠（<div class="concept-card">）を開始します -->
                     <div class="concept-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.concept-number 01）です -->
                         <span class="concept-number">01</span>
@@ -289,7 +289,7 @@ index.html
                         <!-- 段落テキスト（.concept-text: 装飾を削ぎ落としたモノトーン基調の洗練されたカッティング。どんな…）を表示します -->
                         <p class="concept-text">装飾を削ぎ落としたモノトーン基調の洗練されたカッティング。どんなシチュエーションにも美しく溶け込みます。</p>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="concept-card">）を開始します -->
+                    <!-- 【concept-card】コンセプトの1項目（アイコン・見出し・説明文）をまとめたカード枠（<div class="concept-card">）を開始します -->
                     <div class="concept-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.concept-number 02）です -->
                         <span class="concept-number">02</span>
@@ -298,7 +298,7 @@ index.html
                         <!-- 段落テキスト（.concept-text: マネキンのように均整の取れたシルエットを、現代の日本人体型に合わ…）を表示します -->
                         <p class="concept-text">マネキンのように均整の取れたシルエットを、現代の日本人体型に合わせて綿密にミリ単位で設計しています。</p>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="concept-card">）を開始します -->
+                    <!-- 【concept-card】コンセプトの1項目（アイコン・見出し・説明文）をまとめたカード枠（<div class="concept-card">）を開始します -->
                     <div class="concept-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.concept-number 03）です -->
                         <span class="concept-number">03</span>
@@ -312,9 +312,9 @@ index.html
 
             <!-- ページの1セクション領域（.featured-section container）を開始します -->
             <section class="featured-section container">
-                <!-- デザイン・配置用のブロック要素（<div class="section-header">）を開始します -->
+                <!-- 【section-header】各セクションの大見出しタイトルと英語サブタイトルを配置するヘッダー枠（<div class="section-header">）を開始します -->
                 <div class="section-header">
-                    <!-- デザイン・配置用のブロック要素（<div class="section-title-wrap">）を開始します -->
+                    <!-- 【section-title-wrap】見出しテキストを中央揃え・レイアウトするためのラッパー枠（<div class="section-title-wrap">）を開始します -->
                     <div class="section-title-wrap">
                         <!-- 段落テキスト（.section-en-title: RECOMMENDED）を表示します -->
                         <p class="section-en-title">RECOMMENDED</p>
@@ -332,9 +332,9 @@ index.html
 
             <!-- ページの1セクション領域（.banner-section container）を開始します -->
             <section class="banner-section container">
-                <!-- 特定機能・領域のブロック要素（<div id="teaser-banner" class="manekin-teaser-banner">）を開始します -->
+                <!-- 【teaser-banner】画面のレイアウトや配置を整えるブロック要素（<div id="teaser-banner" class="manekin-teaser-banner">）を開始します -->
                 <div class="manekin-teaser-banner" id="teaser-banner">
-                    <!-- デザイン・配置用のブロック要素（<div class="teaser-content">）を開始します -->
+                    <!-- 【teaser-content】画面のレイアウトや配置を整えるブロック要素（<div class="teaser-content">）を開始します -->
                     <div class="teaser-content">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.teaser-tag NEW FEATURE - 会員限定 <span）です -->
                         <span class="teaser-tag"><span class="keep-phrase">NEW FEATURE - 会員限定</span> <span
@@ -359,9 +359,9 @@ index.html
 
             <!-- ページの1セクション領域（.new-arrivals-section container）を開始します -->
             <section class="new-arrivals-section container">
-                <!-- デザイン・配置用のブロック要素（<div class="section-header">）を開始します -->
+                <!-- 【section-header】各セクションの大見出しタイトルと英語サブタイトルを配置するヘッダー枠（<div class="section-header">）を開始します -->
                 <div class="section-header">
-                    <!-- デザイン・配置用のブロック要素（<div class="section-title-wrap">）を開始します -->
+                    <!-- 【section-title-wrap】見出しテキストを中央揃え・レイアウトするためのラッパー枠（<div class="section-title-wrap">）を開始します -->
                     <div class="section-title-wrap">
                         <!-- 段落テキスト（.section-en-title: NEW ARRIVALS）を表示します -->
                         <p class="section-en-title">NEW ARRIVALS</p>
@@ -383,9 +383,9 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-items」のセクションです -->
         <section class="page-view" id="view-items">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- 特定機能・領域のブロック要素（<div id="catalog-breadcrumb" class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div id="catalog-breadcrumb" class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb" id="catalog-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > ALL COLLECTION） -->
                     <!-- &gt;　→　>の記号が表示される -->
@@ -394,7 +394,7 @@ index.html
                     <!-- 切り替わり自体はshop.jsで行ってる -->
                     <a href="#home">HOME</a> &gt; <span id="catalog-breadcrumb-current">ALL COLLECTION</span>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="page-header">）を開始します -->
+                <!-- 【page-header】画面のレイアウトや配置を整えるブロック要素（<div class="page-header">）を開始します -->
                 <div class="page-header">
                     <!-- セクションの見出し（<h1>: ALL COLLECTION）を表示します -->
                     <h1 class="page-title" id="catalog-page-title">ALL COLLECTION</h1>
@@ -402,9 +402,9 @@ index.html
                     <p class="page-subtitle" id="catalog-page-subtitle">すべての最新アイテム一覧（全24アイテム）</p>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="catalog-controls">）を開始します -->
+                <!-- 【catalog-controls】画面のレイアウトや配置を整えるブロック要素（<div class="catalog-controls">）を開始します -->
                 <div class="catalog-controls">
-                    <!-- 特定機能・領域のブロック要素（<div id="category-filter-group" class="filter-group">）を開始します -->
+                    <!-- 【filter-group】「カテゴリ」「価格」「性別」など、1つの絞り込み項目とその選択肢をまとめる枠（<div id="category-filter-group" class="filter-group">）を開始します -->
                     <div class="filter-group" id="category-filter-group">
                         <!-- カテゴリ「ALL」で商品を絞り込むフィルタボタンです -->
                         <button class="filter-btn active" data-category="ALL">ALL (すべて)</button>
@@ -416,7 +416,7 @@ index.html
                         <button class="filter-btn" data-category="OUTER">OUTER (アウター)</button>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="sort-group">）を開始します -->
+                    <!-- 【sort-group】画面のレイアウトや配置を整えるブロック要素（<div class="sort-group">）を開始します -->
                     <div class="sort-group">
                         <!-- 対応する入力欄（for=sort-select）の見出しラベル「並び替え:」です -->
                         <label for="sort-select" class="sort-label">並び替え:</label>
@@ -446,14 +446,14 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-new-items」のセクションです -->
         <section class="page-view" id="view-new-items">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > NEW ITEM） -->
                     <a href="#home">HOME</a> &gt; <span>NEW ITEM</span>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="page-header">）を開始します -->
+                <!-- 【page-header】画面のレイアウトや配置を整えるブロック要素（<div class="page-header">）を開始します -->
                 <div class="page-header">
                     <!-- セクションの見出し（<h1>: NEW ARRIVALS）を表示します -->
                     <h1 class="page-title">NEW ARRIVALS</h1>
@@ -473,9 +473,9 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-item-detail」のセクションです -->
         <section class="page-view" id="view-item-detail">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > ITEM > <span） -->
                     <a href="#home">HOME</a> &gt; <a href="#items">ITEM</a> &gt; <span
@@ -494,14 +494,14 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-favorites」のセクションです -->
         <section class="page-view" id="view-favorites">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > FAVORITE） -->
                     <a href="#home">HOME</a> &gt; <span>FAVORITE</span>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="page-header">）を開始します -->
+                <!-- 【page-header】画面のレイアウトや配置を整えるブロック要素（<div class="page-header">）を開始します -->
                 <div class="page-header">
                     <!-- セクションの見出し（<h1>: FAVORITE ITEMS）を表示します -->
                     <h1 class="page-title">FAVORITE ITEMS</h1>
@@ -521,14 +521,14 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-checkout」のセクションです -->
         <section class="page-view" id="view-checkout">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > CHECKOUT (ご購入手続き)） -->
                     <a href="#home">HOME</a> &gt; <span>CHECKOUT (ご購入手続き)</span>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="page-header text-center">）を開始します -->
+                <!-- 【page-header】画面のレイアウトや配置を整えるブロック要素（<div class="page-header text-center">）を開始します -->
                 <div class="page-header text-center">
                     <!-- セクションの見出し（<h1>: SHOPPING BAG & CHECKOUT）を表示します -->
                     <h1 class="page-title">SHOPPING BAG & CHECKOUT</h1>
@@ -536,27 +536,27 @@ index.html
                     <p class="page-subtitle">ご注文内容のご確認とお届け先・お支払い情報の入力</p>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="checkout-stepper">）を開始します -->
+                <!-- 【checkout-stepper】「1 カート → 2 お届け先・決済 → 3 完了」の注文進み具合を視覚的に示すステップバー枠（<div class="checkout-stepper">）を開始します -->
                 <div class="checkout-stepper">
-                    <!-- デザイン・配置用のブロック要素（<div class="step-item active">）を開始します -->
+                    <!-- 【step-item】進捗バーの1ステップ（アイコン・ステップ番号・ラベル）を表すブロック（<div class="step-item active">）を開始します -->
                     <div class="step-item active">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.step-num 1）です -->
                         <span class="step-num">1</span>
                         <!-- インライン装飾／グルーピング用の <span> 要素（.step-text 注文商品）です -->
                         <span class="step-text">注文商品</span>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="step-line active">）を開始します -->
+                    <!-- 【step-line】ステップとステップの間をつなぐ進行ライン枠（<div class="step-line active">）を開始します -->
                     <div class="step-line active"></div>
-                    <!-- デザイン・配置用のブロック要素（<div class="step-item active">）を開始します -->
+                    <!-- 【step-item】進捗バーの1ステップ（アイコン・ステップ番号・ラベル）を表すブロック（<div class="step-item active">）を開始します -->
                     <div class="step-item active">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.step-num 2）です -->
                         <span class="step-num">2</span>
                         <!-- インライン装飾／グルーピング用の <span> 要素（.step-text お届け先・決済）です -->
                         <span class="step-text">お届け先・決済</span>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="step-line">）を開始します -->
+                    <!-- 【step-line】ステップとステップの間をつなぐ進行ライン枠（<div class="step-line">）を開始します -->
                     <div class="step-line"></div>
-                    <!-- デザイン・配置用のブロック要素（<div class="step-item">）を開始します -->
+                    <!-- 【step-item】進捗バーの1ステップ（アイコン・ステップ番号・ラベル）を表すブロック（<div class="step-item">）を開始します -->
                     <div class="step-item">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.step-num 3）です -->
                         <span class="step-num">3</span>
@@ -567,9 +567,9 @@ index.html
 
                 <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#checkout-layout-main）です -->
                 <div class="checkout-layout" id="checkout-layout-main">
-                    <!-- デザイン・配置用のブロック要素（<div class="checkout-form-column">）を開始します -->
+                    <!-- 【checkout-form-column】お届け先住所やクーポン・ポイントの入力欄をまとめる左側入力カラム枠（<div class="checkout-form-column">）を開始します -->
                     <div class="checkout-form-column">
-                        <!-- デザイン・配置用のブロック要素（<div class="checkout-section-card">）を開始します -->
+                        <!-- 【checkout-section-card】「お届け先情報」「クーポンの適用」「ポイント利用」などの1つの手続き単位をまとめる白いカード枠（<div class="checkout-section-card">）を開始します -->
                         <div class="checkout-section-card">
                             <!-- セクションの見出し（<h2>: checkout-section-title）を表示します -->
                             <h2 class="checkout-section-title">
@@ -581,7 +581,7 @@ index.html
                             </div>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="checkout-section-card">）を開始します -->
+                        <!-- 【checkout-section-card】「お届け先情報」「クーポンの適用」「ポイント利用」などの1つの手続き単位をまとめる白いカード枠（<div class="checkout-section-card">）を開始します -->
                         <div class="checkout-section-card">
                             <!-- セクションの見出し（<h2>: checkout-section-title）を表示します -->
                             <h2 class="checkout-section-title">
@@ -591,9 +591,9 @@ index.html
                             <!-- 入力内容をまとめて送信するフォーム（#checkout-form / submit=JSリスナー）です -->
                             <!-- novalidateは入力の形式を無視した状態や未入力などの状態で送信できる状態 -->
                             <form id="checkout-form" class="checkout-form" novalidate>
-                                <!-- デザイン・配置用のブロック要素（<div class="form-row">）を開始します -->
+                                <!-- 【form-row】入力欄を横並び（郵便番号と都道府県など）で綺麗に2分割・3分割して配置する行ブロック（<div class="form-row">）を開始します -->
                                 <div class="form-row">
-                                    <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                                     <div class="form-group flex-1">
                                         <!-- 対応する入力欄（for=order-name）の見出しラベル「お名前（氏名） <span」です -->
                                         <label for="order-name" class="form-label">お名前（氏名） <span
@@ -604,7 +604,7 @@ index.html
                                         <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#order-name-error: 初期値 ''）です -->
                                         <span class="form-error" id="order-name-error"></span>
                                     </div>
-                                    <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                                     <div class="form-group flex-1">
                                         <!-- 対応する入力欄（for=order-phone）の見出しラベル「電話番号 <span」です -->
                                         <label for="order-phone" class="form-label">電話番号 <span>
@@ -617,7 +617,7 @@ index.html
                                     </div>
                                 </div>
 
-                                <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                                <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                                 <div class="form-group">
                                     <!-- 対応する入力欄（for=order-email）の見出しラベル「メールアドレス（注文確認メール送付先） <span」です -->
                                     <label for="order-email" class="form-label">メールアドレス（注文確認メール送付先） <span
@@ -629,9 +629,9 @@ index.html
                                     <span class="form-error" id="order-email-error"></span>
                                 </div>
 
-                                <!-- デザイン・配置用のブロック要素（<div class="form-row">）を開始します -->
+                                <!-- 【form-row】入力欄を横並び（郵便番号と都道府県など）で綺麗に2分割・3分割して配置する行ブロック（<div class="form-row">）を開始します -->
                                 <div class="form-row">
-                                    <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                                     <div class="form-group flex-1">
                                         <!-- 対応する入力欄（for=order-postal）の見出しラベル「郵便番号 <span」です -->
                                         <label for="order-postal" class="form-label">郵便番号 <span>
@@ -640,7 +640,7 @@ index.html
                                         <input type="text" id="order-postal" class="form-input"
                                             placeholder="例: 150-0001" required>
                                     </div>
-                                    <!-- デザイン・配置用のブロック要素（<div class="form-group flex-2">）を開始します -->
+                                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-2">）を開始します -->
                                     <div class="form-group flex-2">
                                         <!-- 対応する入力欄（for=order-address）の見出しラベル「ご住所（都道府県・市区町村・番地） <span」です -->
                                         <label for="order-address" class="form-label">ご住所（都道府県・市区町村・番地） <span
@@ -653,7 +653,7 @@ index.html
                                     </div>
                                 </div>
 
-                                <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                                <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                                 <div class="form-group">
                                     <!-- 対応する入力欄（for=order-delivery-time）の見出しラベル「配送希望時間帯」です -->
                                     <label for="order-delivery-time" class="form-label">配送希望時間帯</label>
@@ -722,28 +722,28 @@ index.html
                                     </p>
                                 </div>
 
-                                <!-- 特定機能・領域のブロック要素（<div id="checkout-point-card" class="checkout-point-card">）を開始します -->
+                                <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div id="checkout-point-card" class="checkout-point-card">）を開始します -->
                                 <div class="checkout-point-card" id="checkout-point-card">
-                                    <!-- デザイン・配置用のブロック要素（<div class="checkout-point-header">）を開始します -->
+                                    <!-- 【checkout-point-header】画面のレイアウトや配置を整えるブロック要素（<div class="checkout-point-header">）を開始します -->
                                     <div class="checkout-point-header">
-                                        <!-- デザイン・配置用のブロック要素（<div class="checkout-point-title">）を開始します -->
+                                        <!-- 【checkout-point-title】画面のレイアウトや配置を整えるブロック要素（<div class="checkout-point-title">）を開始します -->
                                         <div class="checkout-point-title">
                                             <!-- インライン装飾／グルーピング用の <span> 要素（.point-sparkle ✨ ポイントの利用）です -->
                                             <span class="point-sparkle">✨</span> ポイントの利用
                                             <!-- インライン装飾／グルーピング用の <span> 要素（.point-rate-tag 1pt ＝ 1円分）です -->
                                             <span class="point-rate-tag">1pt ＝ 1円分</span>
                                         </div>
-                                        <!-- デザイン・配置用のブロック要素（<div class="checkout-point-balance-badge">）を開始します -->
+                                        <!-- 【checkout-point-balance-badge】画面のレイアウトや配置を整えるブロック要素（<div class="checkout-point-balance-badge">）を開始します -->
                                         <div class="checkout-point-balance-badge">
                                             保有ポイント: <strong id="checkout-user-points">0</strong> pt
                                         </div>
                                     </div>
-                                    <!-- デザイン・配置用のブロック要素（<div class="checkout-point-body">）を開始します -->
+                                    <!-- 【checkout-point-body】画面のレイアウトや配置を整えるブロック要素（<div class="checkout-point-body">）を開始します -->
                                     <div class="checkout-point-body">
-                                        <!-- デザイン・配置用のブロック要素（<div class="point-input-row">）を開始します -->
+                                        <!-- 【point-input-row】画面のレイアウトや配置を整えるブロック要素（<div class="point-input-row">）を開始します -->
                                         <div class="point-input-row"
                                             style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                            <!-- デザイン・配置用のブロック要素（<div class="point-input-group">）を開始します -->
+                                            <!-- 【point-input-group】画面のレイアウトや配置を整えるブロック要素（<div class="point-input-group">）を開始します -->
                                             <div class="point-input-group"
                                                 style="position: relative; width: 145px; max-width: 145px; flex: 0 0 145px;">
                                                 <!-- ユーザー入力欄（type=number / #checkout-use-points / 0）です -->
@@ -778,11 +778,11 @@ index.html
                                 </div>
 
 
-                                <!-- デザイン・配置用のブロック要素（<div class="payment-method-box">）を開始します -->
+                                <!-- 【payment-method-box】画面のレイアウトや配置を整えるブロック要素（<div class="payment-method-box">）を開始します -->
                                 <div class="payment-method-box">
                                     <!-- セクションの見出し（<h3>: お支払い方法の選択 *）を表示します -->
                                     <h3 class="payment-box-title">お支払い方法の選択 <span class="required">*</span></h3>
-                                    <!-- デザイン・配置用のブロック要素（<div class="payment-options-grid">）を開始します -->
+                                    <!-- 【payment-options-grid】画面のレイアウトや配置を整えるブロック要素（<div class="payment-options-grid">）を開始します -->
                                     <div class="payment-options-grid">
                                         <!-- 対応する入力欄（for=payment-option-label selected）の見出しラベル「」です -->
                                         <label class="payment-option-label selected">
@@ -822,25 +822,25 @@ index.html
                                         </label>
                                     </div>
 
-                                    <!-- 特定機能・領域のブロック要素（<div id="credit-card-subform" class="credit-card-inputs">）を開始します -->
+                                    <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div id="credit-card-subform" class="credit-card-inputs">）を開始します -->
                                     <div class="credit-card-inputs" id="credit-card-subform">
-                                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                                         <div class="form-group">
                                             <!-- 対応する入力欄（for=form-label）の見出しラベル「カード番号」です -->
                                             <label class="form-label">カード番号</label>
                                             <!-- ユーザー入力欄（type=text / # / 例: 4123 4567 8901 2345）です -->
                                             <input type="text" class="form-input" placeholder="例: 4123 4567 8901 2345">
                                         </div>
-                                        <!-- デザイン・配置用のブロック要素（<div class="form-row">）を開始します -->
+                                        <!-- 【form-row】入力欄を横並び（郵便番号と都道府県など）で綺麗に2分割・3分割して配置する行ブロック（<div class="form-row">）を開始します -->
                                         <div class="form-row">
-                                            <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                                            <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                                             <div class="form-group flex-1">
                                                 <!-- 対応する入力欄（for=form-label）の見出しラベル「有効期限 (月/年)」です -->
                                                 <label class="form-label">有効期限 (月/年)</label>
                                                 <!-- ユーザー入力欄（type=text / # / 例: 08/29）です -->
                                                 <input type="text" class="form-input" placeholder="例: 08/29">
                                             </div>
-                                            <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                                            <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                                             <div class="form-group flex-1">
                                                 <!-- 対応する入力欄（for=form-label）の見出しラベル「セキュリティコード」です -->
                                                 <label class="form-label">セキュリティコード</label>
@@ -855,15 +855,15 @@ index.html
                     </div>
 
 
-                    <!-- デザイン・配置用のブロック要素（<div class="checkout-summary-column">）を開始します -->
+                    <!-- 【checkout-summary-column】カゴの中身の商品リストと最終お支払い合計金額を計算・表示する右側サマリー枠（<div class="checkout-summary-column">）を開始します -->
                     <div class="checkout-summary-column">
-                        <!-- デザイン・配置用のブロック要素（<div class="checkout-summary-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="checkout-summary-card">）を開始します -->
                         <div class="checkout-summary-card">
                             <!-- セクションの見出し（<h3>: ご請求内容）を表示します -->
                             <h3 class="summary-card-title">ご請求内容</h3>
-                            <!-- デザイン・配置用のブロック要素（<div class="summary-rows">）を開始します -->
+                            <!-- 【summary-rows】画面のレイアウトや配置を整えるブロック要素（<div class="summary-rows">）を開始します -->
                             <div class="summary-rows">
-                                <!-- デザイン・配置用のブロック要素（<div class="summary-row">）を開始します -->
+                                <!-- 【summary-row】「小計」や「消費税」「送料」など、金額計算の1行（項目名と金額）を表す行ブロック（<div class="summary-row">）を開始します -->
                                 <div class="summary-row">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（. 商品合計）です -->
                                     <span>商品合計</span>
@@ -876,7 +876,7 @@ index.html
                                     <span id="checkout-coupon-discount-label">クーポン割引 (10% OFF)</span>
                                     <span id="checkout-coupon-discount">-¥0</span>
                                 </div>
-                                <!-- 特定機能・領域のブロック要素（<div id="checkout-point-discount-row" class="summary-row checkout-point-discount-row">）を開始します -->
+                                <!-- 【summary-row】「小計」や「消費税」「送料」など、金額計算の1行（項目名と金額）を表す行ブロック（<div id="checkout-point-discount-row" class="summary-row checkout-point-discount-row">）を開始します -->
                                 <div class="summary-row checkout-point-discount-row" id="checkout-point-discount-row"
                                     style="display: none; color: #dc2626;">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（. ポイント利用割引）です -->
@@ -884,23 +884,23 @@ index.html
                                     <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#checkout-point-discount: 初期値 '-¥0'）です -->
                                     <span id="checkout-point-discount">-¥0</span>
                                 </div>
-                                <!-- デザイン・配置用のブロック要素（<div class="summary-row">）を開始します -->
+                                <!-- 【summary-row】「小計」や「消費税」「送料」など、金額計算の1行（項目名と金額）を表す行ブロック（<div class="summary-row">）を開始します -->
                                 <div class="summary-row">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.text-muted 配送料 (5,000円以上で無料)）です -->
                                     <span>配送料 <small class="text-muted">(5,000円以上で無料)</small></span>
                                     <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#checkout-shipping: 初期値 '¥550'）です -->
                                     <span id="checkout-shipping">¥550</span>
                                 </div>
-                                <!-- デザイン・配置用のブロック要素（<div class="summary-row">）を開始します -->
+                                <!-- 【summary-row】「小計」や「消費税」「送料」など、金額計算の1行（項目名と金額）を表す行ブロック（<div class="summary-row">）を開始します -->
                                 <div class="summary-row">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（. 消費税 (10% 内税)）です -->
                                     <span>消費税 (10% 内税)</span>
                                     <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#checkout-tax: 初期値 '¥0'）です -->
                                     <span id="checkout-tax">¥0</span>
                                 </div>
-                                <!-- デザイン・配置用のブロック要素（<div class="summary-divider">）を開始します -->
+                                <!-- 【summary-divider】画面のレイアウトや配置を整えるブロック要素（<div class="summary-divider">）を開始します -->
                                 <div class="summary-divider"></div>
-                                <!-- デザイン・配置用のブロック要素（<div class="summary-row total-row">）を開始します -->
+                                <!-- 【summary-row】「小計」や「消費税」「送料」など、金額計算の1行（項目名と金額）を表す行ブロック（<div class="summary-row total-row">）を開始します -->
                                 <div class="summary-row total-row">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.total-label お支払い合計 (税込)）です -->
                                     <!-- 税抜き金額が知りたきゃ、商品合計から消費税を引け -->
@@ -910,9 +910,9 @@ index.html
                                 </div>
                             </div>
 
-                            <!-- デザイン・配置用のブロック要素（<div class="checkout-earned-points-card">）を開始します -->
+                            <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="checkout-earned-points-card">）を開始します -->
                             <div class="checkout-earned-points-card">
-                                <!-- デザイン・配置用のブロック要素（<div class="earned-points-header">）を開始します -->
+                                <!-- 【earned-points-header】画面のレイアウトや配置を整えるブロック要素（<div class="earned-points-header">）を開始します -->
                                 <div class="earned-points-header">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.earned-points-label ✨ 獲得予定ポイント）です -->
                                     <span class="earned-points-label">✨ 今回獲得予定のポイント</span>
@@ -948,11 +948,11 @@ index.html
                 </div>
 
 
-                <!-- 特定機能・領域のブロック要素（<div id="order-completed-view" class="order-completed-view">）を開始します -->
+                <!-- 【order-completed-view】画面のレイアウトや配置を整えるブロック要素（<div id="order-completed-view" class="order-completed-view">）を開始します -->
                 <div class="order-completed-view" id="order-completed-view" style="display: none;">
-                    <!-- デザイン・配置用のブロック要素（<div class="completed-card text-center">）を開始します -->
+                    <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="completed-card text-center">）を開始します -->
                     <div class="completed-card text-center">
-                        <!-- デザイン・配置用のブロック要素（<div class="completed-check-icon">）を開始します -->
+                        <!-- 【completed-check-icon】画面のレイアウトや配置を整えるブロック要素（<div class="completed-check-icon">）を開始します -->
                         <div class="completed-check-icon">
                             <!-- 拡大してもぼやけないベクター形式の SVG アイコン（24x24）を描画します -->
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -967,30 +967,30 @@ index.html
                         <!-- 段落テキスト（.completed-subtitle: MANEKIN FASHION をご利用いただき、誠にありがとう…）を表示します -->
                         <p class="completed-subtitle">MANEKIN FASHION をご利用いただき、誠にありがとうございます。</p>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="completed-details-box">）を開始します -->
+                        <!-- 【completed-details-box】画面のレイアウトや配置を整えるブロック要素（<div class="completed-details-box">）を開始します -->
                         <div class="completed-details-box">
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 注文管理番号:）です -->
                                 <span class="comp-label">注文管理番号:</span>
                                 <!-- 重要テキストを太字で強調表示（ORD-20261028-XXXX）します -->
                                 <strong class="comp-value" id="comp-order-no">ORD-20261028-XXXX</strong>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label ご注文日時:）です -->
                                 <span class="comp-label">ご注文日時:</span>
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#comp-order-date: 初期値 '2026/10/28'）です -->
                                 <span class="comp-value" id="comp-order-date">2026/10/28</span>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label お届け先:）です -->
                                 <span class="comp-label">お届け先:</span>
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#comp-order-address: 初期値 '東京都渋谷区'）です -->
                                 <span class="comp-value" id="comp-order-address">東京都渋谷区</span>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label お支払い合計:）です -->
                                 <span class="comp-label">お支払い合計:</span>
@@ -1007,21 +1007,21 @@ index.html
                                 <span class="comp-label">ご利用ポイント:</span>
                                 <strong class="comp-value text-success" id="comp-used-points">-0 pt</strong>
                             </div>
-                            <!-- 特定機能・領域のブロック要素（<div id="comp-point-row" class="comp-row">）を開始します -->
+                            <!-- 【comp-point-row】画面のレイアウトや配置を整えるブロック要素（<div id="comp-point-row" class="comp-row">）を開始します -->
                             <div class="comp-row" id="comp-point-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 今回獲得ポイント:）です -->
                                 <span class="comp-label">今回獲得ポイント:</span>
                                 <!-- 重要テキストを太字で強調表示（+0 pt）します -->
                                 <strong class="comp-value text-success" id="comp-earned-points">+0 pt</strong>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label 現在の保有ポイント:）です -->
                                 <span class="comp-label">現在の保有ポイント:</span>
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#comp-balance-points: 初期値 '1,000 pt'）です -->
                                 <span class="comp-value" id="comp-balance-points">1,000 pt</span>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="comp-row">）を開始します -->
+                            <!-- 【comp-row】画面のレイアウトや配置を整えるブロック要素（<div class="comp-row">）を開始します -->
                             <div class="comp-row">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.comp-label データベース連携:）です -->
                                 <span class="comp-label">データベース連携:</span>
@@ -1030,11 +1030,11 @@ index.html
                             </div>
                         </div>
 
-                        <!-- 特定機能・領域のブロック要素（<div id="completed-closet-banner" class="completed-closet-banner">）を開始します -->
+                        <!-- 【completed-closet-banner】画面のレイアウトや配置を整えるブロック要素（<div id="completed-closet-banner" class="completed-closet-banner">）を開始します -->
                         <div class="completed-closet-banner" id="completed-closet-banner">
-                            <!-- デザイン・配置用のブロック要素（<div class="closet-banner-icon">）を開始します -->
+                            <!-- 【closet-banner-icon】画面のレイアウトや配置を整えるブロック要素（<div class="closet-banner-icon">）を開始します -->
                             <div class="closet-banner-icon">👗</div>
-                            <!-- デザイン・配置用のブロック要素（<div class="closet-banner-text">）を開始します -->
+                            <!-- 【closet-banner-text】画面のレイアウトや配置を整えるブロック要素（<div class="closet-banner-text">）を開始します -->
                             <div class="closet-banner-text">
                                 <!-- 重要テキストを太字で強調表示（ご購入商品をマイクローゼットに自動保存しました！）します -->
                                 <strong>ご購入商品をマイクローゼットに自動保存しました！</strong>
@@ -1044,7 +1044,7 @@ index.html
                             </div>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="completed-actions">）を開始します -->
+                        <!-- 【completed-actions】画面のレイアウトや配置を整えるブロック要素（<div class="completed-actions">）を開始します -->
                         <div class="completed-actions">
                             <!-- クリックで画面ハッシュを「#manekin」へ切り替える SPA リンクです（✨） -->
                             <a href="#manekin" class="btn btn-primary" onclick="window.location.hash='#manekin'">✨
@@ -1066,11 +1066,11 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-login」のセクションです -->
         <section class="page-view" id="view-login">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="auth-card">）を開始します -->
+                <!-- 【auth-card】メールアドレスやパスワードの入力欄、ログインボタンを包む白い認証カード枠（<div class="auth-card">）を開始します -->
                 <div class="auth-card">
-                    <!-- デザイン・配置用のブロック要素（<div class="auth-header">）を開始します -->
+                    <!-- 【auth-header】「ログイン」や「新規会員登録」のタイトルと案内メッセージを配置するカード上部ブロック（<div class="auth-header">）を開始します -->
                     <div class="auth-header">
                         <!-- セクションの見出し（<h1>: LOGIN）を表示します -->
                         <h1 class="auth-title">LOGIN</h1>
@@ -1078,7 +1078,7 @@ index.html
                         <p class="auth-subtitle">会員ログイン</p>
                     </div>
 
-                    <!-- 特定機能・領域のブロック要素（<div id="login-checkout-notice" class="auth-checkout-alert">）を開始します -->
+                    <!-- 【login-checkout-notice】画面のレイアウトや配置を整えるブロック要素（<div id="login-checkout-notice" class="auth-checkout-alert">）を開始します -->
                     <div id="login-checkout-notice" class="auth-checkout-alert"
                         style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: left;">
                         <!-- レイアウト用のブロックグループ <div> を開始します -->
@@ -1096,7 +1096,7 @@ index.html
 
                     <!-- 入力内容をまとめて送信するフォーム（#login-form / submit=JSリスナー）です -->
                     <form id="login-form" class="auth-form" novalidate>
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=login-email）の見出しラベル「メールアドレス *」です -->
                             <!-- label for とはフォームのラベル（説明文）と入力欄を関連付けるためのHTML属性 -->
@@ -1108,7 +1108,7 @@ index.html
                             <span class="form-error" id="login-email-error"></span>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=login-password）の見出しラベル「パスワード *」です -->
                             <label for="login-password" class="form-label">パスワード <span class="required">*</span></label>
@@ -1128,7 +1128,7 @@ index.html
                         </button>
                     </form>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="auth-footer">）を開始します -->
+                    <!-- 【auth-footer】「パスワードを忘れた方」や「新規登録はこちら」の切り替えリンクを並べるカード下部ブロック（<div class="auth-footer">）を開始します -->
                     <div class="auth-footer">
                         <!-- 段落テキスト（.auth-switch-text: アカウントをお持ちでないですか？）を表示します -->
                         <p class="auth-switch-text">アカウントをお持ちでないですか？</p>
@@ -1145,11 +1145,11 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-register」のセクションです -->
         <section class="page-view" id="view-register">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="auth-card">）を開始します -->
+                <!-- 【auth-card】メールアドレスやパスワードの入力欄、ログインボタンを包む白い認証カード枠（<div class="auth-card">）を開始します -->
                 <div class="auth-card">
-                    <!-- デザイン・配置用のブロック要素（<div class="auth-header">）を開始します -->
+                    <!-- 【auth-header】「ログイン」や「新規会員登録」のタイトルと案内メッセージを配置するカード上部ブロック（<div class="auth-header">）を開始します -->
                     <div class="auth-header">
                         <!-- セクションの見出し（<h1>: REGISTER）を表示します -->
                         <h1 class="auth-title">REGISTER</h1>
@@ -1157,15 +1157,15 @@ index.html
                         <p class="auth-subtitle">新規会員登録</p>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="auth-point-banner">）を開始します -->
+                    <!-- 【auth-point-banner】画面のレイアウトや配置を整えるブロック要素（<div class="auth-point-banner">）を開始します -->
                     <div class="auth-point-banner">
-                        <!-- デザイン・配置用のブロック要素（<div class="auth-point-badge">）を開始します -->
+                        <!-- 【auth-point-badge】画面のレイアウトや配置を整えるブロック要素（<div class="auth-point-badge">）を開始します -->
                         <div class="auth-point-badge">WELCOME COUPON</div>
-                        <!-- デザイン・配置用のブロック要素（<div class="auth-point-content">）を開始します -->
+                        <!-- 【auth-point-content】画面のレイアウトや配置を整えるブロック要素（<div class="auth-point-content">）を開始します -->
                         <div class="auth-point-content">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.auth-point-icon 🎫）です -->
                             <span class="auth-point-icon">🎫</span>
-                            <!-- デザイン・配置用のブロック要素（<div class="auth-point-text">）を開始します -->
+                            <!-- 【auth-point-text】画面のレイアウトや配置を整えるブロック要素（<div class="auth-point-text">）を開始します -->
                             <div class="auth-point-text">
                                 <!-- 重要テキストを太字で強調表示します -->
                                 <strong>新規会員登録で今すぐ使える【初回限定】1割引 (10% OFF) クーポン進呈！</strong>
@@ -1175,7 +1175,7 @@ index.html
                         </div>
                     </div>
 
-                    <!-- 特定機能・領域のブロック要素（<div id="reg-checkout-notice" class="auth-checkout-alert">）を開始します -->
+                    <!-- 【reg-checkout-notice】画面のレイアウトや配置を整えるブロック要素（<div id="reg-checkout-notice" class="auth-checkout-alert">）を開始します -->
                     <div id="reg-checkout-notice" class="auth-checkout-alert"
                         style="display: none; background: #fff8e6; border: 1px solid #ffd591; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: left;">
                         <!-- レイアウト用のブロックグループ <div> を開始します -->
@@ -1193,7 +1193,7 @@ index.html
 
                     <!-- 入力内容をまとめて送信するフォーム（#register-form / submit=JSリスナー）です -->
                     <form id="register-form" class="auth-form" novalidate>
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=reg-name）の見出しラベル「氏名 *」です -->
                             <label for="reg-name" class="form-label">氏名 <span class="required">*</span></label>
@@ -1203,7 +1203,7 @@ index.html
                             <span class="form-error" id="reg-name-error"></span>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=reg-email）の見出しラベル「メールアドレス *」です -->
                             <label for="reg-email" class="form-label">メールアドレス <span class="required">*</span></label>
@@ -1214,7 +1214,7 @@ index.html
                             <span class="form-error" id="reg-email-error"></span>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                         <div class="form-group">
                             <!-- 対応する入力欄（for=reg-password）の見出しラベル「パスワード *」です -->
                             <label for="reg-password" class="form-label">パスワード <span class="required">*</span></label>
@@ -1225,7 +1225,7 @@ index.html
                             <span class="form-error" id="reg-password-error"></span>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="form-checkbox-group">）を開始します -->
+                        <!-- 【form-checkbox-group】画面のレイアウトや配置を整えるブロック要素（<div class="form-checkbox-group">）を開始します -->
                         <div class="form-checkbox-group">
                             <!-- ON/OFF を切り替えるチェックボックス（#reg-agree）です -->
                             <input type="checkbox" id="reg-agree" class="form-checkbox" required checked>
@@ -1237,7 +1237,7 @@ index.html
                         <button type="submit" class="btn btn-primary btn-block">会員登録を完了する</button>
                     </form>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="auth-footer">）を開始します -->
+                    <!-- 【auth-footer】「パスワードを忘れた方」や「新規登録はこちら」の切り替えリンクを並べるカード下部ブロック（<div class="auth-footer">）を開始します -->
                     <div class="auth-footer">
                         <!-- 段落テキスト（.auth-switch-text: すでにアカウントをお持ちですか？）を表示します -->
                         <p class="auth-switch-text">すでにアカウントをお持ちですか？</p>
@@ -1254,26 +1254,26 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-mypage」のセクションです -->
         <section class="page-view" id="view-mypage">
-            <!-- デザイン・配置用のブロック要素（<div class="container page-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container page-container">）を開始します -->
             <div class="container page-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > MYPAGE） -->
                     <a href="#home">HOME</a> &gt; <span>MYPAGE</span>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="mypage-header-card">）を開始します -->
+                <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="mypage-header-card">）を開始します -->
                 <div class="mypage-header-card">
-                    <!-- デザイン・配置用のブロック要素（<div class="user-profile-info">）を開始します -->
+                    <!-- 【user-profile-info】画面のレイアウトや配置を整えるブロック要素（<div class="user-profile-info">）を開始します -->
                     <div class="user-profile-info">
-                        <!-- デザイン・配置用のブロック要素（<div class="user-avatar-circle">）を開始します -->
+                        <!-- 【user-avatar-circle】画面のレイアウトや配置を整えるブロック要素（<div class="user-avatar-circle">）を開始します -->
                         <div class="user-avatar-circle">
                             <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#mypage-avatar-initial: 初期値 'G'）です -->
                             <span id="mypage-avatar-initial">G</span>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="user-text-details">）を開始します -->
+                        <!-- 【user-text-details】画面のレイアウトや配置を整えるブロック要素（<div class="user-text-details">）を開始します -->
                         <div class="user-text-details">
-                            <!-- デザイン・配置用のブロック要素（<div class="user-title-row">）を開始します -->
+                            <!-- 【user-title-row】画面のレイアウトや配置を整えるブロック要素（<div class="user-title-row">）を開始します -->
                             <div class="user-title-row">
                                 <!-- セクションの見出し（<h1>: ゲスト 様）を表示します -->
                                 <h1 class="user-display-name" id="mypage-user-name">ゲスト 様</h1>
@@ -1284,7 +1284,7 @@ index.html
                             <p class="user-display-email" id="mypage-user-email">ログインしていません</p>
                         </div>
                     </div>
-                    <!-- 特定機能・領域のブロック要素（<div id="mypage-actions-wrapper" class="mypage-actions">）を開始します -->
+                    <!-- 【mypage-actions-wrapper】画面のレイアウトや配置を整えるブロック要素（<div id="mypage-actions-wrapper" class="mypage-actions">）を開始します -->
                     <div class="mypage-actions" id="mypage-actions-wrapper">
                         <!-- クリックで画面ハッシュを「#login」へ切り替える SPA リンクです（ログイン） -->
                         <a href="#login" class="btn btn-primary btn-sm" id="mypage-action-btn"
@@ -1292,9 +1292,9 @@ index.html
                     </div>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="mypage-stats-grid">）を開始します -->
+                <!-- 【mypage-stats-grid】画面のレイアウトや配置を整えるブロック要素（<div class="mypage-stats-grid">）を開始します -->
                 <div class="mypage-stats-grid">
-                    <!-- デザイン・配置用のブロック要素（<div class="stat-card">）を開始します -->
+                    <!-- 【stat-card】「保有ポイント: 500pt」「保有クーポン: 2枚」などの数字を大きく見せるステータスカード枠（<div class="stat-card">）を開始します -->
                     <div class="stat-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.stat-label 保有ポイント）です -->
                         <span class="stat-label">保有ポイント</span>
@@ -1309,14 +1309,14 @@ index.html
                                 👆)</span></span>
                         <span class="stat-value" id="mypage-coupon-count">0 <span class="stat-unit">枚</span></span>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="stat-card">）を開始します -->
+                    <!-- 【stat-card】「保有ポイント: 500pt」「保有クーポン: 2枚」などの数字を大きく見せるステータスカード枠（<div class="stat-card">）を開始します -->
                     <div class="stat-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.stat-label お気に入りアイテム）です -->
                         <span class="stat-label">お気に入りアイテム</span>
                         <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#mypage-fav-count: 初期値 '0 点'）です -->
                         <span class="stat-value" id="mypage-fav-count">0 <span class="stat-unit">点</span></span>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="stat-card">）を開始します -->
+                    <!-- 【stat-card】「保有ポイント: 500pt」「保有クーポン: 2枚」などの数字を大きく見せるステータスカード枠（<div class="stat-card">）を開始します -->
                     <div class="stat-card">
                         <!-- インライン装飾／グルーピング用の <span> 要素（.stat-label ご注文回数）です -->
                         <span class="stat-label">ご注文回数</span>
@@ -1325,7 +1325,7 @@ index.html
                     </div>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="mypage-tabs">）を開始します -->
+                <!-- 【mypage-tabs】画面のレイアウトや配置を整えるブロック要素（<div class="mypage-tabs">）を開始します -->
                 <div class="mypage-tabs">
                     <!-- クリック操作用ボタン「購入履歴 (MySQL連携)」です -->
                     <button class="mypage-tab-btn active" data-tab="orders">購入履歴 (MySQL連携)</button>
@@ -1335,9 +1335,9 @@ index.html
                     <button class="mypage-tab-btn" data-tab="python-features">Python & MySQL連携機能</button>
                 </div>
 
-                <!-- 特定機能・領域のブロック要素（<div id="tab-orders" class="mypage-tab-content active">）を開始します -->
+                <!-- 【tab-orders】画面のレイアウトや配置を整えるブロック要素（<div id="tab-orders" class="mypage-tab-content active">）を開始します -->
                 <div class="mypage-tab-content active" id="tab-orders">
-                    <!-- デザイン・配置用のブロック要素（<div class="orders-section-header">）を開始します -->
+                    <!-- 【orders-section-header】画面のレイアウトや配置を整えるブロック要素（<div class="orders-section-header">）を開始します -->
                     <div class="orders-section-header"
                         style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
                         <!-- レイアウト用のブロックグループ <div> を開始します -->
@@ -1373,7 +1373,7 @@ index.html
                             </button>
                         </div>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="orders-table-wrapper">）を開始します -->
+                    <!-- 【orders-table-wrapper】画面のレイアウトや配置を整えるブロック要素（<div class="orders-table-wrapper">）を開始します -->
                     <div class="orders-table-wrapper">
                         <!-- データを一覧表形式で表示するテーブル要素（.orders-table）です -->
                         <table class="orders-table">
@@ -1416,18 +1416,18 @@ index.html
                     </div>
                 </div>
 
-                <!-- 特定機能・領域のブロック要素（<div id="tab-python-features" class="mypage-tab-content">）を開始します -->
+                <!-- 【tab-python-features】画面のレイアウトや配置を整えるブロック要素（<div id="tab-python-features" class="mypage-tab-content">）を開始します -->
                 <div class="mypage-tab-content" id="tab-python-features">
-                    <!-- デザイン・配置用のブロック要素（<div class="python-features-card">）を開始します -->
+                    <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="python-features-card">）を開始します -->
                     <div class="python-features-card">
                         <!-- セクションの見出し（<h3>: 【稼働中】Python & MySQL バックエンド連携機能）を表示します -->
                         <h3 class="python-card-title">【稼働中】Python & MySQL バックエンド連携機能</h3>
                         <!-- 段落テキスト（.python-card-desc: MANEKIN FASHIONでは、MySQLデータベースとPy…）を表示します -->
                         <p class="python-card-desc">MANEKIN FASHIONでは、MySQLデータベースとPython
                             API（Flask）により以下の機能がシームレスに連動しています。</p>
-                        <!-- デザイン・配置用のブロック要素（<div class="python-roadmap-list">）を開始します -->
+                        <!-- 【ロードマップ項目】開発計画や機能追加の進捗を案内する項目枠（<div class="python-roadmap-list">）を開始します -->
                         <div class="python-roadmap-list">
-                            <!-- デザイン・配置用のブロック要素（<div class="roadmap-item">）を開始します -->
+                            <!-- 【ロードマップ項目】開発計画や機能追加の進捗を案内する項目枠（<div class="roadmap-item">）を開始します -->
                             <div class="roadmap-item">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.roadmap-badge Active DB）です -->
                                 <span class="roadmap-badge">Active DB</span>
@@ -1436,7 +1436,7 @@ index.html
                                 <!-- 段落テキスト（.p: チェックアウト画面で確定したご注文は、MySQLの `order…）を表示します -->
                                 <p>チェックアウト画面で確定したご注文は、MySQLの `orders` および `order_items` テーブルへ安全に永続保存されます。</p>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="roadmap-item">）を開始します -->
+                            <!-- 【ロードマップ項目】開発計画や機能追加の進捗を案内する項目枠（<div class="roadmap-item">）を開始します -->
                             <div class="roadmap-item">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.roadmap-badge Feature 01）です -->
                                 <span class="roadmap-badge">Feature 01</span>
@@ -1445,7 +1445,7 @@ index.html
                                 <!-- 段落テキスト（.p: ご自身の体型比率を反映した3Dマネキンを生成し、全アイテムの着用…）を表示します -->
                                 <p>ご自身の体型比率を反映した全アイテムの着用シルエットを事前に確認できる機能です。</p>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="roadmap-item">）を開始します -->
+                            <!-- 【ロードマップ項目】開発計画や機能追加の進捗を案内する項目枠（<div class="roadmap-item">）を開始します -->
                             <div class="roadmap-item">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.roadmap-badge Feature 02）です -->
                                 <span class="roadmap-badge">Feature 02</span>
@@ -1454,7 +1454,7 @@ index.html
                                 <!-- 段落テキスト（.p: 写真一枚で手持ちの服をデジタルクローゼット化。ブランドアイテムと…）を表示します -->
                                 <p>写真一枚で手持ちの服をデジタルクローゼット化。ブランドアイテムとの組み合わせシミュレーションが可能です。</p>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="roadmap-item">）を開始します -->
+                            <!-- 【ロードマップ項目】開発計画や機能追加の進捗を案内する項目枠（<div class="roadmap-item">）を開始します -->
                             <div class="roadmap-item">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.roadmap-badge Feature 03）です -->
                                 <span class="roadmap-badge">Feature 03</span>
@@ -1475,19 +1475,19 @@ index.html
         <!-- ────────────────────────────────────────────────────────────────── -->
         <!-- SPA ルーティングで切り替え表示されるページビュー画面「#view-manekin-studio」のセクションです -->
         <section class="page-view" id="view-manekin-studio">
-            <!-- デザイン・配置用のブロック要素（<div class="container studio-container">）を開始します -->
+            <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container studio-container">）を開始します -->
             <div class="container studio-container">
-                <!-- デザイン・配置用のブロック要素（<div class="page-breadcrumb">）を開始します -->
+                <!-- 【page-breadcrumb】「HOME > SHOP > 商品名」のように今いる階層をナビゲートするパンくずリスト枠（<div class="page-breadcrumb">）を開始します -->
                 <div class="page-breadcrumb">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（HOME > MANEKIN STUDIO） -->
                     <a href="#home">HOME</a> &gt; <span>MANEKIN STUDIO</span>
                 </div>
 
-                <!-- デザイン・配置用のブロック要素（<div class="studio-header-card">）を開始します -->
+                <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="studio-header-card">）を開始します -->
                 <div class="studio-header-card">
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-header-text">）を開始します -->
+                    <!-- 【studio-header-text】画面のレイアウトや配置を整えるブロック要素（<div class="studio-header-text">）を開始します -->
                     <div class="studio-header-text">
-                        <!-- デザイン・配置用のブロック要素（<div class="studio-title-badge">）を開始します -->
+                        <!-- 【studio-title-badge】画面のレイアウトや配置を整えるブロック要素（<div class="studio-title-badge">）を開始します -->
                         <div class="studio-title-badge">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.badge-sparkle ✨ AI POWERED）です -->
                             <span class="badge-sparkle">✨ AI POWERED</span>
@@ -1499,13 +1499,13 @@ index.html
                         <!-- 段落テキスト（.studio-subtitle: 手持ちの服とブランドアイテムをバーチャル試着。AIスタイリストが…）を表示します -->
                         <p class="studio-subtitle">手持ちの服とブランドアイテムをバーチャル試着。AIスタイリストがあなただけの最適なコーデを評価します。</p>
                     </div>
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-header-user">）を開始します -->
+                    <!-- 【studio-header-user】画面のレイアウトや配置を整えるブロック要素（<div class="studio-header-user">）を開始します -->
                     <div class="studio-header-user">
-                        <!-- デザイン・配置用のブロック要素（<div class="user-chip">）を開始します -->
+                        <!-- 【user-chip】画面のレイアウトや配置を整えるブロック要素（<div class="user-chip">）を開始します -->
                         <div class="user-chip">
                             <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#studio-avatar-char: 初期値 'G'）です -->
                             <span class="user-chip-avatar" id="studio-avatar-char">G</span>
-                            <!-- デザイン・配置用のブロック要素（<div class="user-chip-info">）を開始します -->
+                            <!-- 【user-chip-info】画面のレイアウトや配置を整えるブロック要素（<div class="user-chip-info">）を開始します -->
                             <div class="user-chip-info">
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#studio-user-name: 初期値 'ゲスト 様'）です -->
                                 <span class="user-chip-name" id="studio-user-name">ゲスト 様</span>
@@ -1592,11 +1592,11 @@ index.html
                     <!-- ここまでナビゲーションブロック </nav> の終了です -->
                 </nav>
 
-                <!-- 特定機能・領域のブロック要素（<div id="studio-pane-home" class="studio-pane">）を開始します -->
+                <!-- 【studio-pane-home】画面のレイアウトや配置を整えるブロック要素（<div id="studio-pane-home" class="studio-pane">）を開始します -->
                 <div class="studio-pane" id="studio-pane-home">
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-stats-grid">）を開始します -->
+                    <!-- 【studio-stats-grid】画面のレイアウトや配置を整えるブロック要素（<div class="studio-stats-grid">）を開始します -->
                     <div class="studio-stats-grid">
-                        <!-- デザイン・配置用のブロック要素（<div class="studio-stat-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="studio-stat-card">）を開始します -->
                         <div class="studio-stat-card">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.stat-icon-wrap 👕）です -->
                             <span class="stat-icon-wrap">👕</span>
@@ -1608,7 +1608,7 @@ index.html
                                 <span class="stat-card-val" id="home-stat-closet">0 <small>点</small></span>
                             </div>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="studio-stat-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="studio-stat-card">）を開始します -->
                         <div class="studio-stat-card">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.stat-icon-wrap ✨）です -->
                             <span class="stat-icon-wrap">✨</span>
@@ -1620,7 +1620,7 @@ index.html
                                 <span class="stat-card-val" id="home-stat-saved">0 <small>組</small></span>
                             </div>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="studio-stat-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="studio-stat-card">）を開始します -->
                         <div class="studio-stat-card">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.stat-icon-wrap ♥）です -->
                             <span class="stat-icon-wrap">♥</span>
@@ -1634,9 +1634,9 @@ index.html
                         </div>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-recommend-banner">）を開始します -->
+                    <!-- 【studio-recommend-banner】画面のレイアウトや配置を整えるブロック要素（<div class="studio-recommend-banner">）を開始します -->
                     <div class="studio-recommend-banner">
-                        <!-- デザイン・配置用のブロック要素（<div class="banner-badge">）を開始します -->
+                        <!-- 【banner-badge】画面のレイアウトや配置を整えるブロック要素（<div class="banner-badge">）を開始します -->
                         <div class="banner-badge" id="today-styling-badge">TODAY'S AI STYLING</div>
                         <!-- セクションの見出し（<h3>: 気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチ…）を表示します -->
                         <h3 class="banner-title" id="today-styling-title">気温20℃・秋晴れに映える「手持ち黒ボトムス × ダブルトレンチコート」</h3>
@@ -1644,7 +1644,7 @@ index.html
                         <p class="banner-desc" id="today-styling-desc">
                             あなたのマイクローゼット「黒ワイドボトムス」と「白スニーカー」に、ブランド人気No.1の「オーバードレープ
                             ダブルトレンチコート」を羽織るだけで、こなれ感のある都会的なスマートカジュアルが完成します。</p>
-                        <!-- デザイン・配置用のブロック要素（<div class="banner-actions">）を開始します -->
+                        <!-- 【banner-actions】画面のレイアウトや配置を整えるブロック要素（<div class="banner-actions">）を開始します -->
                         <div class="banner-actions">
                             <!-- 押すと関数 applyPresetLook('trench_daily') を実行する操作ボタン「<button class="btn btn-primary"」です -->
                             <button class="btn btn-primary" id="btn-apply-today-styling"
@@ -1654,29 +1654,29 @@ index.html
                         </div>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-quick-cards">）を開始します -->
+                    <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="studio-quick-cards">）を開始します -->
                     <div class="studio-quick-cards">
-                        <!-- デザイン・配置用のブロック要素（<div class="quick-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card">）を開始します -->
                         <div class="quick-card" onclick="openAddClosetModal()">
-                            <!-- デザイン・配置用のブロック要素（<div class="quick-card-icon">）を開始します -->
+                            <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card-icon">）を開始します -->
                             <div class="quick-card-icon">➕</div>
                             <!-- セクションの見出し（<h4>: 手持ちの服を新しく登録）を表示します -->
                             <h4>手持ちの服を新しく登録</h4>
                             <!-- 段落テキスト（.p: 写真やメモを追加して、クローゼットをデジタル化しましょう。）を表示します -->
                             <p>写真やメモを追加して、クローゼットをデジタル化しましょう。</p>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="quick-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card">）を開始します -->
                         <div class="quick-card" onclick="switchStudioTab('create')">
-                            <!-- デザイン・配置用のブロック要素（<div class="quick-card-icon">）を開始します -->
+                            <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card-icon">）を開始します -->
                             <div class="quick-card-icon">🪞</div>
                             <!-- セクションの見出し（<h4>: マネキン試着スタジオを開く）を表示します -->
                             <h4>マネキン試着スタジオを開く</h4>
                             <!-- 段落テキスト（.p: 3カラムのシミュレーターで、手持ち服とブランド服を着せ替え試着。）を表示します -->
                             <p>3カラムのシミュレーターで、手持ち服とブランド服を着せ替え試着。</p>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="quick-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card">）を開始します -->
                         <div class="quick-card" onclick="switchStudioTab('saved')">
-                            <!-- デザイン・配置用のブロック要素（<div class="quick-card-icon">）を開始します -->
+                            <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="quick-card-icon">）を開始します -->
                             <div class="quick-card-icon">📖</div>
                             <!-- セクションの見出し（<h4>: 保存したコーデ（ルックブック））を表示します -->
                             <h4>保存したコーデ（ルックブック）</h4>
@@ -1687,18 +1687,18 @@ index.html
                 </div>
 
 
-                <!-- 特定機能・領域のブロック要素（<div id="studio-pane-closet" class="studio-pane">）を開始します -->
+                <!-- 【studio-pane-closet】画面のレイアウトや配置を整えるブロック要素（<div id="studio-pane-closet" class="studio-pane">）を開始します -->
                 <div class="studio-pane" id="studio-pane-closet">
-                    <!-- デザイン・配置用のブロック要素（<div class="pane-action-bar">）を開始します -->
+                    <!-- 【pane-action-bar】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-bar">）を開始します -->
                     <div class="pane-action-bar">
-                        <!-- デザイン・配置用のブロック要素（<div class="pane-action-left">）を開始します -->
+                        <!-- 【pane-action-left】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-left">）を開始します -->
                         <div class="pane-action-left">
                             <!-- セクションの見出し（<h2>: マイクローゼット （手持ち服一覧））を表示します -->
                             <h2 class="pane-title">マイクローゼット <small class="text-muted">（手持ち服一覧）</small></h2>
                             <!-- 段落テキスト（.pane-desc: 所有している服を登録しておくと、コーデ作成スタジオでブランド商品…）を表示します -->
                             <p class="pane-desc">所有している服を登録しておくと、コーデ作成スタジオでブランド商品と自由に組み合わせられます。</p>
                         </div>
-                        <!-- デザイン・配置用のブロック要素（<div class="pane-action-right">）を開始します -->
+                        <!-- 【pane-action-right】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-right">）を開始します -->
                         <div class="pane-action-right">
                             <!-- 押すと関数 openAddClosetModal() を実行する操作ボタン「ボタン」です -->
                             <button class="btn btn-primary" onclick="openAddClosetModal()">
@@ -1708,7 +1708,7 @@ index.html
                         </div>
                     </div>
 
-                    <!-- 特定機能・領域のブロック要素（<div id="pane-closet-filter-bar" class="closet-filter-bar">）を開始します -->
+                    <!-- 【pane-closet-filter-bar】画面のレイアウトや配置を整えるブロック要素（<div id="pane-closet-filter-bar" class="closet-filter-bar">）を開始します -->
                     <div class="closet-filter-bar" id="pane-closet-filter-bar">
                         <!-- 押すと関数 handlePaneClosetFilter('ALL') を実行する操作ボタン「ALL」です -->
                         <button class="filter-pill active" data-cat="ALL" onclick="handlePaneClosetFilter('ALL')">ALL
@@ -1736,11 +1736,11 @@ index.html
                 </div>
 
 
-                <!-- 特定機能・領域のブロック要素（<div id="studio-pane-favorites" class="studio-pane">）を開始します -->
+                <!-- 【studio-pane-favorites】画面のレイアウトや配置を整えるブロック要素（<div id="studio-pane-favorites" class="studio-pane">）を開始します -->
                 <div class="studio-pane" id="studio-pane-favorites">
-                    <!-- デザイン・配置用のブロック要素（<div class="pane-action-bar">）を開始します -->
+                    <!-- 【pane-action-bar】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-bar">）を開始します -->
                     <div class="pane-action-bar">
-                        <!-- デザイン・配置用のブロック要素（<div class="pane-action-left">）を開始します -->
+                        <!-- 【pane-action-left】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-left">）を開始します -->
                         <div class="pane-action-left">
                             <!-- セクションの見出し（<h2>: お気に入りブランドアイテム）を表示します -->
                             <h2 class="pane-title">お気に入りブランドアイテム</h2>
@@ -1754,9 +1754,9 @@ index.html
                 </div>
 
 
-                <!-- 特定機能・領域のブロック要素（<div id="studio-pane-create" class="studio-pane active">）を開始します -->
+                <!-- 【studio-pane-create】画面のレイアウトや配置を整えるブロック要素（<div id="studio-pane-create" class="studio-pane active">）を開始します -->
                 <div class="studio-pane active" id="studio-pane-create">
-                    <!-- 特定機能・領域のブロック要素（<div id="studio-mobile-tabs" class="studio-mobile-tabs">）を開始します -->
+                    <!-- 【studio-mobile-tabs】画面のレイアウトや配置を整えるブロック要素（<div id="studio-mobile-tabs" class="studio-mobile-tabs">）を開始します -->
                     <div class="studio-mobile-tabs" id="studio-mobile-tabs">
                         <!-- 押すと関数 switchMobileStudioView('mannequin') を実行する操作ボタン「<button class="mobile-tab-btn ac…」です -->
                         <button class="mobile-tab-btn active" data-mobile-view="mannequin"
@@ -1773,11 +1773,11 @@ index.html
 
                     <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#studio-workspace-grid）です -->
                     <div class="studio-workspace-grid" id="studio-workspace-grid">
-                        <!-- 特定機能・領域のブロック要素（<div id="col-studio-closet" class="studio-col studio-col-left">）を開始します -->
+                        <!-- 【col-studio-closet】画面のレイアウトや配置を整えるブロック要素（<div id="col-studio-closet" class="studio-col studio-col-left">）を開始します -->
                         <div class="studio-col studio-col-left" id="col-studio-closet">
-                            <!-- デザイン・配置用のブロック要素（<div class="col-header">）を開始します -->
+                            <!-- 【col-header】各カラムの最上部にカラム名（「マイクローゼット」「試着室」「ショップアイテム」）を表示する見出しバー枠（<div class="col-header">）を開始します -->
                             <div class="col-header">
-                                <!-- デザイン・配置用のブロック要素（<div class="col-title-wrap">）を開始します -->
+                                <!-- 【col-title-wrap】カラムタイトルと服の件数バッジを横並びに配置するラッパー枠（<div class="col-title-wrap">）を開始します -->
                                 <div class="col-title-wrap">
                                     <!-- セクションの見出し（<h3>: 1. 手持ちの服）を表示します -->
                                     <h3 class="col-title">1. 手持ちの服</h3>
@@ -1788,7 +1788,7 @@ index.html
                                 <button class="btn btn-outline-xs" onclick="openAddClosetModal()">+ 登録</button>
                             </div>
 
-                            <!-- 特定機能・領域のブロック要素（<div id="col-closet-filter" class="mini-filter-bar">）を開始します -->
+                            <!-- 【col-closet-filter】画面のレイアウトや配置を整えるブロック要素（<div id="col-closet-filter" class="mini-filter-bar">）を開始します -->
                             <div class="mini-filter-bar" id="col-closet-filter">
                                 <!-- 押すと関数 handleStudioClosetFilter('ALL') を実行する操作ボタン「<button class="mini-chip active"…」です -->
                                 <button class="mini-chip active" data-cat="ALL"
@@ -1815,17 +1815,17 @@ index.html
                             </div>
                         </div>
 
-                        <!-- 特定機能・領域のブロック要素（<div id="col-studio-mannequin" class="studio-col studio-col-center mobile-active">）を開始します -->
+                        <!-- 【col-studio-mannequin】画面のレイアウトや配置を整えるブロック要素（<div id="col-studio-mannequin" class="studio-col studio-col-center mobile-active">）を開始します -->
                         <div class="studio-col studio-col-center mobile-active" id="col-studio-mannequin">
-                            <!-- デザイン・配置用のブロック要素（<div class="mannequin-toolbar">）を開始します -->
+                            <!-- 【mannequin-toolbar】画面のレイアウトや配置を整えるブロック要素（<div class="mannequin-toolbar">）を開始します -->
                             <div class="mannequin-toolbar"
                                 style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
-                                <!-- デザイン・配置用のブロック要素（<div class="toolbar-left">）を開始します -->
+                                <!-- 【toolbar-left】画面のレイアウトや配置を整えるブロック要素（<div class="toolbar-left">）を開始します -->
                                 <div class="toolbar-left" style="width: 100%;">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.stage-tag 2. 試着室）です -->
                                     <span class="stage-tag">2. 試着室</span>
                                 </div>
-                                <!-- デザイン・配置用のブロック要素（<div class="toolbar-right">）を開始します -->
+                                <!-- 【toolbar-right】画面のレイアウトや配置を整えるブロック要素（<div class="toolbar-right">）を開始します -->
                                 <div class="toolbar-right"
                                     style="display: flex; align-items: center; justify-content: flex-start; gap: 6px; flex-wrap: wrap; width: 100%;">
                                     <!-- 押すと関数 toggleFittingAdjustPanel() を実行する操作ボタン「<button class="btn-toolbar-adjus…」です -->
@@ -1841,7 +1841,7 @@ index.html
                                         </svg>
                                         位置・サイズ微調整
                                     </button>
-                                    <!-- デザイン・配置用のブロック要素（<div class="gender-toggle-wrap">）を開始します -->
+                                    <!-- 【gender-toggle-wrap】画面のレイアウトや配置を整えるブロック要素（<div class="gender-toggle-wrap">）を開始します -->
                                     <div class="gender-toggle-wrap">
                                         <!-- 押すと関数 setMannequinGender('MEN') を実行する操作ボタン「<button class="btn-gender active…」です -->
                                         <button class="btn-gender active" id="btn-gender-men"
@@ -1867,11 +1867,11 @@ index.html
                                 </div>
                             </div>
 
-                            <!-- 特定機能・領域のブロック要素（<div id="mannequin-stage-box" class="mannequin-stage-box">）を開始します -->
+                            <!-- 【mannequin-stage-box】画面のレイアウトや配置を整えるブロック要素（<div id="mannequin-stage-box" class="mannequin-stage-box">）を開始します -->
                             <div class="mannequin-stage-box" id="mannequin-stage-box"
                                 ondragover="handleStageDragOver(event)" ondragleave="handleStageDragLeave(event)"
                                 ondrop="handleStageDrop(event)">
-                                <!-- 特定機能・領域のブロック要素（<div id="mannequin-model-wrap" class="mannequin-model-wrap">）を開始します -->
+                                <!-- 【mannequin-model-wrap】画面のレイアウトや配置を整えるブロック要素（<div id="mannequin-model-wrap" class="mannequin-model-wrap">）を開始します -->
                                 <div class="mannequin-model-wrap" id="mannequin-model-wrap">
                                     <!-- 試着マネキンのシルバーメッキ支柱＆台座を描く SVG ベクター図形（幅300x高さ640座標系）です -->
                                     <svg class="mannequin-base-silhouette" viewBox="0 0 300 640" fill="none"
@@ -1931,44 +1931,44 @@ index.html
                                         </g>
                                     </svg>
 
-                                    <!-- 特定機能・領域のブロック要素（<div id="layer-shoes" class="layer-slot layer-shoes">）を開始します -->
+                                    <!-- 【layer-shoes】画面のレイアウトや配置を整えるブロック要素（<div id="layer-shoes" class="layer-slot layer-shoes">）を開始します -->
                                     <div class="layer-slot layer-shoes" id="layer-shoes">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-shoes）です -->
                                         <div class="layer-content" id="layer-content-shoes"></div>
                                     </div>
-                                    <!-- 特定機能・領域のブロック要素（<div id="layer-bottoms" class="layer-slot layer-bottoms">）を開始します -->
+                                    <!-- 【layer-bottoms】画面のレイアウトや配置を整えるブロック要素（<div id="layer-bottoms" class="layer-slot layer-bottoms">）を開始します -->
                                     <div class="layer-slot layer-bottoms" id="layer-bottoms">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-bottoms）です -->
                                         <div class="layer-content" id="layer-content-bottoms"></div>
                                     </div>
-                                    <!-- 特定機能・領域のブロック要素（<div id="layer-tops" class="layer-slot layer-tops">）を開始します -->
+                                    <!-- 【layer-tops】画面のレイアウトや配置を整えるブロック要素（<div id="layer-tops" class="layer-slot layer-tops">）を開始します -->
                                     <div class="layer-slot layer-tops" id="layer-tops">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-tops）です -->
                                         <div class="layer-content" id="layer-content-tops"></div>
                                     </div>
-                                    <!-- 特定機能・領域のブロック要素（<div id="layer-outer" class="layer-slot layer-outer">）を開始します -->
+                                    <!-- 【layer-outer】画面のレイアウトや配置を整えるブロック要素（<div id="layer-outer" class="layer-slot layer-outer">）を開始します -->
                                     <div class="layer-slot layer-outer" id="layer-outer">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-outer）です -->
                                         <div class="layer-content" id="layer-content-outer"></div>
                                     </div>
-                                    <!-- 特定機能・領域のブロック要素（<div id="layer-hat" class="layer-slot layer-hat">）を開始します -->
+                                    <!-- 【layer-hat】画面のレイアウトや配置を整えるブロック要素（<div id="layer-hat" class="layer-slot layer-hat">）を開始します -->
                                     <div class="layer-slot layer-hat" id="layer-hat">
                                         <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#layer-content-hat）です -->
                                         <div class="layer-content" id="layer-content-hat"></div>
                                     </div>
                                 </div>
-                                <!-- 特定機能・領域のブロック要素（<div id="fitting-adjust-panel" class="fitting-adjust-panel">）を開始します -->
+                                <!-- 【fitting-adjust-panel】着ている服の上下位置(Y軸)・左右位置(X軸)・拡大縮小率をスライダーでミリ単位で動かす微調整パネル枠（<div id="fitting-adjust-panel" class="fitting-adjust-panel">）を開始します -->
                                 <div class="fitting-adjust-panel" id="fitting-adjust-panel" style="display: none;">
-                                    <!-- デザイン・配置用のブロック要素（<div class="adjust-panel-header">）を開始します -->
+                                    <!-- 【adjust-panel-header】画面のレイアウトや配置を整えるブロック要素（<div class="adjust-panel-header">）を開始します -->
                                     <div class="adjust-panel-header">
-                                        <!-- デザイン・配置用のブロック要素（<div class="adjust-header-title">）を開始します -->
+                                        <!-- 【adjust-header-title】画面のレイアウトや配置を整えるブロック要素（<div class="adjust-header-title">）を開始します -->
                                         <div class="adjust-header-title">
                                             <!-- インライン装飾／グルーピング用の <span> 要素（.adjust-icon 📐）です -->
                                             <span class="adjust-icon">📐</span>
                                             <!-- インライン装飾／グルーピング用の <span> 要素（.adjust-title-text 服の位置・サイズ微調整）です -->
                                             <span class="adjust-title-text">服の位置・サイズ微調整</span>
                                         </div>
-                                        <!-- デザイン・配置用のブロック要素（<div class="adjust-header-btns">）を開始します -->
+                                        <!-- 【adjust-header-btns】画面のレイアウトや配置を整えるブロック要素（<div class="adjust-header-btns">）を開始します -->
                                         <div class="adjust-header-btns">
                                             <!-- 押すと関数 resetFittingOffsets() を実行する操作ボタン「<button type="button" class="btn…」です -->
                                             <button type="button" class="btn-adjust-reset"
@@ -1979,7 +1979,7 @@ index.html
                                         </div>
                                     </div>
 
-                                    <!-- 特定機能・領域のブロック要素（<div id="adjust-slot-tabs" class="adjust-slot-tabs">）を開始します -->
+                                    <!-- 【adjust-slot-tabs】画面のレイアウトや配置を整えるブロック要素（<div id="adjust-slot-tabs" class="adjust-slot-tabs">）を開始します -->
                                     <div class="adjust-slot-tabs" id="adjust-slot-tabs">
                                         <!-- 押すと関数 switchAdjustSlot('hat') を実行する操作ボタン「<button type="button" class="adj…」です -->
                                         <button type="button" class="adjust-tab-btn" data-adjust-slot="hat"
@@ -1998,9 +1998,9 @@ index.html
                                             onclick="switchAdjustSlot('shoes')">靴</button>
                                     </div>
 
-                                    <!-- 特定機能・領域のブロック要素（<div id="adjust-item-status" class="adjust-item-status">）を開始します -->
+                                    <!-- 【adjust-item-status】画面のレイアウトや配置を整えるブロック要素（<div id="adjust-item-status" class="adjust-item-status">）を開始します -->
                                     <div class="adjust-item-status" id="adjust-item-status">
-                                        <!-- デザイン・配置用のブロック要素（<div class="adjust-item-meta-left">）を開始します -->
+                                        <!-- 【adjust-item-meta-left】画面のレイアウトや配置を整えるブロック要素（<div class="adjust-item-meta-left">）を開始します -->
                                         <div class="adjust-item-meta-left">
                                             <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#adjust-item-badge: 初期値 '販売商品'）です -->
                                             <span class="adjust-item-tag brand" id="adjust-item-badge">販売商品</span>
@@ -2011,18 +2011,18 @@ index.html
                                         <span class="adjust-item-type-desc" id="adjust-item-type-desc">XS〜XL規格サイズ</span>
                                     </div>
 
-                                    <!-- デザイン・配置用のブロック要素（<div class="adjust-sliders-body">）を開始します -->
+                                    <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="adjust-sliders-body">）を開始します -->
                                     <div class="adjust-sliders-body">
-                                        <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
+                                        <!-- 【adjust-slider-row】1つの調整項目（上下、左右、サイズ）のスライダーと＋/－微動ボタンを横並びにする行ブロック（<div class="adjust-slider-row">）を開始します -->
                                         <div class="adjust-slider-row">
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.slider-name 上下位置 (Y)）です -->
                                                 <span class="slider-name">上下位置 (Y)</span>
                                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#val-adjust-y: 初期値 '0px'）です -->
                                                 <span class="slider-val" id="val-adjust-y">0px</span>
                                             </div>
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-input-wrap">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-input-wrap">）を開始します -->
                                             <div class="slider-input-wrap">
                                                 <!-- 押すと関数 stepAdjust('y', -2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
@@ -2037,16 +2037,16 @@ index.html
                                             </div>
                                         </div>
 
-                                        <!-- デザイン・配置用のブロック要素（<div class="adjust-slider-row">）を開始します -->
+                                        <!-- 【adjust-slider-row】1つの調整項目（上下、左右、サイズ）のスライダーと＋/－微動ボタンを横並びにする行ブロック（<div class="adjust-slider-row">）を開始します -->
                                         <div class="adjust-slider-row">
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.slider-name 左右位置 (X)）です -->
                                                 <span class="slider-name">左右位置 (X)</span>
                                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#val-adjust-x: 初期値 '0px'）です -->
                                                 <span class="slider-val" id="val-adjust-x">0px</span>
                                             </div>
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-input-wrap">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-input-wrap">）を開始します -->
                                             <div class="slider-input-wrap">
                                                 <!-- 押すと関数 stepAdjust('x', -2) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
@@ -2061,10 +2061,10 @@ index.html
                                             </div>
                                         </div>
 
-                                        <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-brand" class="adjust-slider-row adjust-slider-row-brand">）を開始します -->
+                                        <!-- 【adjust-slider-row】1つの調整項目（上下、左右、サイズ）のスライダーと＋/－微動ボタンを横並びにする行ブロック（<div id="adjust-row-scale-brand" class="adjust-slider-row adjust-slider-row-brand">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-brand"
                                             id="adjust-row-scale-brand">
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.slider-name 商品サイズ）です -->
                                                 <span class="slider-name">商品サイズ</span>
@@ -2072,18 +2072,18 @@ index.html
                                                 <span class="slider-val brand-size-badge"
                                                     id="val-adjust-brand-size">M</span>
                                             </div>
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-input-wrap slider-brand-wrap">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-input-wrap slider-brand-wrap">）を開始します -->
                                             <div class="slider-input-wrap slider-brand-wrap">
                                                 <!-- 押すと関数 stepBrandSize(-1) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step" id="btn-brand-size-minus"
                                                     onclick="stepBrandSize(-1)" title="1サイズ小さく">－</button>
-                                                <!-- デザイン・配置用のブロック要素（<div class="brand-slider-container">）を開始します -->
+                                                <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="brand-slider-container">）を開始します -->
                                                 <div class="brand-slider-container">
                                                     <!-- 左右にドラッグして数値を連続調整できるスライダー（#slider-adjust-brand-size / handleBrandSizeInput(this.value)）です -->
                                                     <input type="range" class="adjust-range adjust-range-brand"
                                                         id="slider-adjust-brand-size" min="0" max="4" value="2" step="1"
                                                         oninput="handleBrandSizeInput(this.value)">
-                                                    <!-- 特定機能・領域のブロック要素（<div id="brand-size-ticks" class="brand-size-ticks">）を開始します -->
+                                                    <!-- 【brand-size-ticks】画面のレイアウトや配置を整えるブロック要素（<div id="brand-size-ticks" class="brand-size-ticks">）を開始します -->
                                                     <div class="brand-size-ticks" id="brand-size-ticks">
                                                         <!-- インライン装飾／グルーピング用の <span> 要素（.brand-size-tick <span class="brand-size-tick" da…）です -->
                                                         <span class="brand-size-tick" data-size-idx="0"
@@ -2108,17 +2108,17 @@ index.html
                                             </div>
                                         </div>
 
-                                        <!-- 特定機能・領域のブロック要素（<div id="adjust-row-scale-free" class="adjust-slider-row adjust-slider-row-free">）を開始します -->
+                                        <!-- 【adjust-slider-row】1つの調整項目（上下、左右、サイズ）のスライダーと＋/－微動ボタンを横並びにする行ブロック（<div id="adjust-row-scale-free" class="adjust-slider-row adjust-slider-row-free">）を開始します -->
                                         <div class="adjust-slider-row adjust-slider-row-free" id="adjust-row-scale-free"
                                             style="display: none;">
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-meta">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-meta">）を開始します -->
                                             <div class="slider-meta">
                                                 <!-- インライン装飾／グルーピング用の <span> 要素（.slider-name 見た目サイズ）です -->
                                                 <span class="slider-name">見た目サイズ</span>
                                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#val-adjust-scale: 初期値 '100%'）です -->
                                                 <span class="slider-val" id="val-adjust-scale">100%</span>
                                             </div>
-                                            <!-- デザイン・配置用のブロック要素（<div class="slider-input-wrap">）を開始します -->
+                                            <!-- 【スライダー操作枠】数値や位置を調整するスライダー入力枠（<div class="slider-input-wrap">）を開始します -->
                                             <div class="slider-input-wrap">
                                                 <!-- 押すと関数 stepAdjust('scale', -3) を実行する操作ボタン「<button type="button" class="btn…」です -->
                                                 <button type="button" class="btn-step"
@@ -2134,7 +2134,7 @@ index.html
                                         </div>
                                     </div>
 
-                                    <!-- デザイン・配置用のブロック要素（<div class="adjust-panel-footer">）を開始します -->
+                                    <!-- 【adjust-panel-footer】画面のレイアウトや配置を整えるブロック要素（<div class="adjust-panel-footer">）を開始します -->
                                     <div class="adjust-panel-footer">
                                         <!-- インライン装飾／グルーピング用の <span> 要素（.adjust-hint 💡 スライダーやボタンでリアルタイムに位置を合わせられます（自動…）です -->
                                         <span class="adjust-hint">💡 スライダーやボタンでリアルタイムに位置を合わせられます（自動保存）</span>
@@ -2148,7 +2148,7 @@ index.html
 
                             <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#stage-brand-summary）です -->
                             <div class="stage-brand-summary" id="stage-brand-summary">
-                                <!-- デザイン・配置用のブロック要素（<div class="brand-sum-info">）を開始します -->
+                                <!-- 【brand-sum-info】画面のレイアウトや配置を整えるブロック要素（<div class="brand-sum-info">）を開始します -->
                                 <div class="brand-sum-info">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.sum-label 着用中ブランド品:）です -->
                                     <span class="sum-label">着用中ブランド品:</span>
@@ -2166,11 +2166,11 @@ index.html
                             </div>
                         </div>
 
-                        <!-- 特定機能・領域のブロック要素（<div id="col-studio-brand" class="studio-col studio-col-right">）を開始します -->
+                        <!-- 【col-studio-brand】画面のレイアウトや配置を整えるブロック要素（<div id="col-studio-brand" class="studio-col studio-col-right">）を開始します -->
                         <div class="studio-col studio-col-right" id="col-studio-brand">
-                            <!-- デザイン・配置用のブロック要素（<div class="col-header">）を開始します -->
+                            <!-- 【col-header】各カラムの最上部にカラム名（「マイクローゼット」「試着室」「ショップアイテム」）を表示する見出しバー枠（<div class="col-header">）を開始します -->
                             <div class="col-header">
-                                <!-- デザイン・配置用のブロック要素（<div class="col-title-wrap">）を開始します -->
+                                <!-- 【col-title-wrap】カラムタイトルと服の件数バッジを横並びに配置するラッパー枠（<div class="col-title-wrap">）を開始します -->
                                 <div class="col-title-wrap">
                                     <!-- セクションの見出し（<h3>: 3. ブランド商品 / お気に入り商品）を表示します -->
                                     <h3 class="col-title"><span class="desktop-brand-title">3. ブランド商品</span><span
@@ -2182,7 +2182,7 @@ index.html
                                 <a href="#items" class="btn btn-outline-xs" title="商品一覧でお気に入り商品を探す">+ 探す</a>
                             </div>
 
-                            <!-- 特定機能・領域のブロック要素（<div id="col-brand-filter" class="mini-filter-bar">）を開始します -->
+                            <!-- 【col-brand-filter】画面のレイアウトや配置を整えるブロック要素（<div id="col-brand-filter" class="mini-filter-bar">）を開始します -->
                             <div class="mini-filter-bar" id="col-brand-filter">
                                 <!-- 押すと関数 handleStudioBrandFilter('ALL') を実行する操作ボタン「<button class="mini-chip active"…」です -->
                                 <button class="mini-chip active" data-brand-cat="ALL"
@@ -2205,13 +2205,13 @@ index.html
                     </div>
 
 
-                    <!-- デザイン・配置用のブロック要素（<div class="studio-bottom-panel">）を開始します -->
+                    <!-- 【studio-bottom-panel】画面のレイアウトや配置を整えるブロック要素（<div class="studio-bottom-panel">）を開始します -->
                     <div class="studio-bottom-panel">
-                        <!-- デザイン・配置用のブロック要素（<div class="ai-comment-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="ai-comment-card">）を開始します -->
                         <div class="ai-comment-card">
-                            <!-- デザイン・配置用のブロック要素（<div class="ai-comment-header">）を開始します -->
+                            <!-- 【ai-comment-header】画面のレイアウトや配置を整えるブロック要素（<div class="ai-comment-header">）を開始します -->
                             <div class="ai-comment-header">
-                                <!-- デザイン・配置用のブロック要素（<div class="ai-header-left">）を開始します -->
+                                <!-- 【ai-header-left】画面のレイアウトや配置を整えるブロック要素（<div class="ai-header-left">）を開始します -->
                                 <div class="ai-header-left">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-sparkle-dot ）です -->
                                     <span class="ai-sparkle-dot"></span>
@@ -2220,7 +2220,7 @@ index.html
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-engine-tag MANEKIN-AI v2.6）です -->
                                     <span class="ai-engine-tag">MANEKIN-AI v2.6</span>
                                 </div>
-                                <!-- デザイン・配置用のブロック要素（<div class="ai-header-right">）を開始します -->
+                                <!-- 【ai-header-right】画面のレイアウトや配置を整えるブロック要素（<div class="ai-header-right">）を開始します -->
                                 <div class="ai-header-right">
                                     <!-- 文字列を 1 行に保ち折り返しを防ぐスパン（カラー調和度:）です -->
                                     <span class="ai-score-label text-nowrap">カラー調和度:</span>
@@ -2228,7 +2228,7 @@ index.html
                                     <span class="ai-score-val text-nowrap" id="ai-score-val">95点</span>
                                 </div>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="ai-comment-body">）を開始します -->
+                            <!-- 【ai-comment-body】画面のレイアウトや配置を整えるブロック要素（<div class="ai-comment-body">）を開始します -->
                             <div class="ai-comment-body">
                                 <!-- 段落テキスト（.ai-comment-text: ai-comment-text）を表示します -->
                                 <p class="ai-comment-text" id="ai-comment-text">
@@ -2256,7 +2256,7 @@ index.html
                                     </div>
                                 </div>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="ai-meta-bar">）を開始します -->
+                            <!-- 【ai-meta-bar】画面のレイアウトや配置を整えるブロック要素（<div class="ai-meta-bar">）を開始します -->
                             <div class="ai-meta-bar">
                                 <!-- レイアウト容器または JS が HTML カードを動的挿入するコンテナ枠（#ai-tags-wrap）です -->
                                 <div class="ai-tags-wrap" id="ai-tags-wrap">
@@ -2267,7 +2267,7 @@ index.html
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.ai-tag #通年着回し）です -->
                                     <span class="ai-tag">#通年着回し</span>
                                 </div>
-                                <!-- 特定機能・領域のブロック要素（<div id="ai-palette-wrap" class="ai-palette-wrap">）を開始します -->
+                                <!-- 【ai-palette-wrap】画面のレイアウトや配置を整えるブロック要素（<div id="ai-palette-wrap" class="ai-palette-wrap">）を開始します -->
                                 <div class="ai-palette-wrap" id="ai-palette-wrap">
                                     <!-- インライン装飾／グルーピング用の <span> 要素（.palette-label カラー構成:）です -->
                                     <span class="palette-label">カラー構成:</span>
@@ -2278,14 +2278,14 @@ index.html
                             </div>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="outfit-save-card">）を開始します -->
+                        <!-- 【カード型表示枠】関連する情報や画像・ボタンを1つにまとめたカードブロック（<div class="outfit-save-card">）を開始します -->
                         <div class="outfit-save-card">
                             <!-- セクションの見出し（<h4>: コーディネートを保存）を表示します -->
                             <h4 class="save-card-title">コーディネートを保存</h4>
                             <!-- 段落テキスト（.save-card-desc: 作成した組み合わせに名前を付けて保存しておくと、「保存したコーデ…）を表示します -->
                             <p class="save-card-desc">作成した組み合わせに名前を付けて保存しておくと、「保存したコーデ」一覧からいつでも再確認・復元できます。</p>
 
-                            <!-- デザイン・配置用のブロック要素（<div class="preset-name-chips">）を開始します -->
+                            <!-- 【preset-name-chips】画面のレイアウトや配置を整えるブロック要素（<div class="preset-name-chips">）を開始します -->
                             <div class="preset-name-chips">
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.preset-chip 通学・デイリー）です -->
                                 <span class="preset-chip" onclick="applyPresetName('通学・デイリーコーデ')">通学・デイリー</span>
@@ -2301,7 +2301,7 @@ index.html
 
                             <!-- 入力内容をまとめて送信するフォーム（#save-outfit-form / submit=handleSaveOutfit(event)）です -->
                             <form class="save-outfit-form" id="save-outfit-form" onsubmit="handleSaveOutfit(event)">
-                                <!-- デザイン・配置用のブロック要素（<div class="save-input-group">）を開始します -->
+                                <!-- 【save-input-group】画面のレイアウトや配置を整えるブロック要素（<div class="save-input-group">）を開始します -->
                                 <div class="save-input-group">
                                     <!-- ユーザー入力欄（type=text / #outfit-name-input / 例: 秋の通学カジュアルコーデ）です -->
                                     <input type="text" id="outfit-name-input" class="form-input outfit-name-input"
@@ -2324,11 +2324,11 @@ index.html
                 </div>
 
 
-                <!-- 特定機能・領域のブロック要素（<div id="studio-pane-saved" class="studio-pane">）を開始します -->
+                <!-- 【studio-pane-saved】画面のレイアウトや配置を整えるブロック要素（<div id="studio-pane-saved" class="studio-pane">）を開始します -->
                 <div class="studio-pane" id="studio-pane-saved">
-                    <!-- デザイン・配置用のブロック要素（<div class="pane-action-bar">）を開始します -->
+                    <!-- 【pane-action-bar】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-bar">）を開始します -->
                     <div class="pane-action-bar">
-                        <!-- デザイン・配置用のブロック要素（<div class="pane-action-left">）を開始します -->
+                        <!-- 【pane-action-left】画面のレイアウトや配置を整えるブロック要素（<div class="pane-action-left">）を開始します -->
                         <div class="pane-action-left">
                             <!-- セクションの見出し（<h2>: 保存したコーディネート （ルックブック））を表示します -->
                             <h2 class="pane-title">保存したコーディネート <small class="text-muted">（ルックブック）</small></h2>
@@ -2352,13 +2352,13 @@ index.html
     <!--  4. ポップアップモーダル群（手持ち服登録 / 保有クーポン / 完了・AI案内モーダル） -->
     <!-- ================================================================== -->
     <!-- 保有クーポン詳細一覧モーダル (#modal-user-coupons) -->
-    <!-- 特定機能・領域のブロック要素（<div id="modal-user-coupons" class="modal-backdrop">）を開始します -->
+    <!-- 【modal-backdrop】ポップアップが開いたときに画面の奥を薄暗くブロックする半透明の背景オーバーレイ枠（<div id="modal-user-coupons" class="modal-backdrop">）を開始します -->
     <div class="modal-backdrop" id="modal-user-coupons" role="dialog" aria-modal="true"
         aria-labelledby="modal-coupons-title">
-        <!-- デザイン・配置用のブロック要素（<div class="modal-dialog modal-dialog-coupon">）を開始します -->
+        <!-- 【modal-dialog】画面の中央に浮かび上がる白いポップアップウィンドウ本体ブロック（<div class="modal-dialog modal-dialog-coupon">）を開始します -->
         <div class="modal-dialog modal-dialog-coupon"
             style="max-width: 520px; width: 92%; padding: 24px; border-radius: 12px;">
-            <!-- デザイン・配置用のブロック要素（<div class="modal-header">）を開始します -->
+            <!-- 【modal-header】ポップアップのタイトルと右上の「×（閉じる）」ボタンを配置するヘッダー枠（<div class="modal-header">）を開始します -->
             <div class="modal-header"
                 style="border-bottom: 1px solid #f0f0f0; padding-bottom: 12px; margin-bottom: 16px;">
                 <!-- インライン装飾／グルーピング用の <span> 要素（.modal-badge MY COUPONS）です -->
@@ -2369,7 +2369,7 @@ index.html
                 <button class="modal-close-btn" onclick="closeMyPageCouponsModal()" aria-label="閉じる"
                     style="background: none; border: none; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</button>
             </div>
-            <!-- デザイン・配置用のブロック要素（<div class="modal-body">）を開始します -->
+            <!-- 【modal-body】ポップアップ内の入力フォームやリスト一覧がスクロールできる本体コンテンツ枠（<div class="modal-body">）を開始します -->
             <div class="modal-body">
                 <!-- セクションの見出し領域を表示します -->
                 <div style="text-align: center; margin-bottom: 16px;">
@@ -2384,7 +2384,7 @@ index.html
                     style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
                     <!-- JavaScript（openMyPageCouponsModal）により動的にカードが挿入されます -->
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="modal-actions">）を開始します -->
+                <!-- 【modal-actions】「保存する」「キャンセル」「登録する」などの決定ボタンを並べるフッター操作枠（<div class="modal-actions">）を開始します -->
                 <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: center;">
                     <!-- 押すと関数 closeMyPageCouponsModal() を実行する操作ボタン「閉じる」です -->
                     <button type="button" class="btn btn-secondary" onclick="closeMyPageCouponsModal()"
@@ -2394,19 +2394,19 @@ index.html
         </div>
     </div>
 
-    <!-- 特定機能・領域のブロック要素（<div id="modal-add-closet" class="modal-backdrop">）を開始します -->
+    <!-- 【modal-backdrop】ポップアップが開いたときに画面の奥を薄暗くブロックする半透明の背景オーバーレイ枠（<div id="modal-add-closet" class="modal-backdrop">）を開始します -->
     <div class="modal-backdrop" id="modal-add-closet" role="dialog" aria-modal="true"
         aria-labelledby="modal-add-closet-title">
-        <!-- デザイン・配置用のブロック要素（<div class="modal-dialog modal-dialog-closet">）を開始します -->
+        <!-- 【modal-dialog】画面の中央に浮かび上がる白いポップアップウィンドウ本体ブロック（<div class="modal-dialog modal-dialog-closet">）を開始します -->
         <div class="modal-dialog modal-dialog-closet">
-            <!-- デザイン・配置用のブロック要素（<div class="modal-header">）を開始します -->
+            <!-- 【modal-header】ポップアップのタイトルと右上の「×（閉じる）」ボタンを配置するヘッダー枠（<div class="modal-header">）を開始します -->
             <div class="modal-header">
                 <!-- インライン装飾／グルーピング用の <span> 要素（.modal-badge MY CLOSET）です -->
                 <span class="modal-badge">MY CLOSET</span>
                 <!-- 押すと関数 closeAddClosetModal() を実行する操作ボタン「×」です -->
                 <button class="modal-close-btn" onclick="closeAddClosetModal()" aria-label="閉じる">&times;</button>
             </div>
-            <!-- デザイン・配置用のブロック要素（<div class="modal-body">）を開始します -->
+            <!-- 【modal-body】ポップアップ内の入力フォームやリスト一覧がスクロールできる本体コンテンツ枠（<div class="modal-body">）を開始します -->
             <div class="modal-body">
                 <!-- セクションの見出し（<h2>: 手持ちの服を登録する）を表示します -->
                 <h2 class="modal-title" id="modal-add-closet-title">手持ちの服を登録する</h2>
@@ -2415,17 +2415,17 @@ index.html
 
                 <!-- 入力内容をまとめて送信するフォーム（#form-add-closet / submit=JSリスナー）です -->
                 <form id="form-add-closet" novalidate>
-                    <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                     <div class="form-group">
                         <!-- 対応する入力欄（for=form-label）の見出しラベル「服の写真（画像） *」です -->
                         <label class="form-label">服の写真（画像） <span class="required">*</span></label>
-                        <!-- 特定機能・領域のブロック要素（<div id="closet-upload-box" class="closet-upload-box">）を開始します -->
+                        <!-- 【closet-upload-box】画面のレイアウトや配置を整えるブロック要素（<div id="closet-upload-box" class="closet-upload-box">）を開始します -->
                         <div class="closet-upload-box" id="closet-upload-box"
                             onclick="document.getElementById('closet-file-input').click()">
                             <!-- パソコン・スマホから画像ファイルを選択するアップロード欄（#closet-file-input）です -->
                             <input type="file" id="closet-file-input" accept="image/*" style="display: none;"
                                 onchange="handleClosetImageSelect(event)">
-                            <!-- 特定機能・領域のブロック要素（<div id="closet-img-preview" class="upload-preview">）を開始します -->
+                            <!-- 【closet-img-preview】画面のレイアウトや配置を整えるブロック要素（<div id="closet-img-preview" class="upload-preview">）を開始します -->
                             <div class="upload-preview" id="closet-img-preview" style="display: none;">
                                 <!-- 画像ファイルを表示する img 要素（#closet-preview-img / src=）です -->
                                 <img src="" alt="プレビュー" id="closet-preview-img">
@@ -2437,7 +2437,7 @@ index.html
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.upload-change-text タップして写真を変更）です -->
                                 <span class="upload-change-text">タップして写真を変更</span>
                             </div>
-                            <!-- 特定機能・領域のブロック要素（<div id="closet-img-placeholder" class="upload-placeholder">）を開始します -->
+                            <!-- 【closet-img-placeholder】画面のレイアウトや配置を整えるブロック要素（<div id="closet-img-placeholder" class="upload-placeholder">）を開始します -->
                             <div class="upload-placeholder" id="closet-img-placeholder">
                                 <!-- 拡大してもぼやけないベクター形式の SVG アイコン（upload-icon）を描画します -->
                                 <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2455,18 +2455,18 @@ index.html
                                 <span class="upload-sub-text">または、以下のクイック写真から選ぶこともできます</span>
                             </div>
 
-                            <!-- 特定機能・領域のブロック要素（<div id="ai-processing-overlay" class="ai-processing-overlay">）を開始します -->
+                            <!-- 【ai-processing-overlay】画面のレイアウトや配置を整えるブロック要素（<div id="ai-processing-overlay" class="ai-processing-overlay">）を開始します -->
                             <div class="ai-processing-overlay" id="ai-processing-overlay" style="display: none;"
                                 onclick="event.stopPropagation()">
-                                <!-- デザイン・配置用のブロック要素（<div class="ai-spinner">）を開始します -->
+                                <!-- 【ai-spinner】画面のレイアウトや配置を整えるブロック要素（<div class="ai-spinner">）を開始します -->
                                 <div class="ai-spinner"></div>
                                 <!-- インライン装飾／グルーピング用の <span> 要素（.ai-status-title 🪄 AIが服の背景を透過中...）です -->
                                 <span class="ai-status-title">🪄 AIが服の背景を透過中...</span>
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#ai-status-subtitle: 初期値 '服の輪郭を解析しています'）です -->
                                 <span class="ai-status-subtitle" id="ai-status-subtitle">服の輪郭を解析しています</span>
-                                <!-- デザイン・配置用のブロック要素（<div class="ai-progress-track">）を開始します -->
+                                <!-- 【ai-progress-track】画面のレイアウトや配置を整えるブロック要素（<div class="ai-progress-track">）を開始します -->
                                 <div class="ai-progress-track">
-                                    <!-- 特定機能・領域のブロック要素（<div id="ai-progress-fill" class="ai-progress-fill">）を開始します -->
+                                    <!-- 【ai-progress-fill】画面のレイアウトや配置を整えるブロック要素（<div id="ai-progress-fill" class="ai-progress-fill">）を開始します -->
                                     <div class="ai-progress-fill" id="ai-progress-fill"></div>
                                 </div>
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#ai-progress-percent: 初期値 '0%'）です -->
@@ -2476,7 +2476,7 @@ index.html
                             </div>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="ai-cutout-toolbar">）を開始します -->
+                        <!-- 【ai-cutout-toolbar】「✨ AIで背景を自動透過する」チェックや「🪄 背景を透過」「↺ 元写真に戻す」ボタンを並べるAI操作バー枠（<div class="ai-cutout-toolbar">）を開始します -->
                         <div class="ai-cutout-toolbar">
                             <!-- 対応する入力欄（for=ai-toggle-label）の見出しラベル「」です -->
                             <label class="ai-toggle-label" title="写真選択時に自動で背景を透明にします（完全無料・ブラウザ完結型AI）">
@@ -2486,7 +2486,7 @@ index.html
                                 <span class="ai-toggle-text">✨ <strong>AIで背景を自動透過する</strong> <span
                                         class="ai-free-badge">無料・端末内AI</span></span>
                             </label>
-                            <!-- 特定機能・領域のブロック要素（<div id="ai-action-btns" class="ai-action-btns">）を開始します -->
+                            <!-- 【ai-action-btns】画面のレイアウトや配置を整えるブロック要素（<div id="ai-action-btns" class="ai-action-btns">）を開始します -->
                             <div class="ai-action-btns" id="ai-action-btns" style="display: none;">
                                 <!-- 押すと関数 triggerManualBgRemoval() を実行する操作ボタン「<button type="button" class="btn…」です -->
                                 <button type="button" class="btn-ai-action" id="btn-re-remove-bg"
@@ -2506,17 +2506,26 @@ index.html
                             </div>
                         </div>
 
-                        <!-- チャック隙間・襟元くり抜きエディタパネル -->
+                        <!-- ========================================================== -->
+                        <!--  チャック隙間・襟元くり抜きエディタパネル（手動で服の隙間を透明にするブロック） -->
+                        <!-- ========================================================== -->
+                        <!-- 【zipper-cutout-panel】チャックの隙間や襟元を手動でなぞって透明化しインナーが見えるようにする「チャック・襟元の隙間くり抜きツール」枠（<div id="zipper-cutout-panel" class="zipper-cutout-panel">）を開始します -->
                         <div id="zipper-cutout-panel" class="zipper-cutout-panel" style="display: none;">
+                            <!-- エディタ上部のヘッダーバー（タイトルと完了ボタン）を表すブロック要素です -->
                             <div class="cutout-panel-header">
+                                <!-- インライン装飾／タイトル用の <span> 要素（✂️ チャック・襟元の隙間くり抜きツール）です -->
                                 <span class="cutout-title">✂️ チャック・襟元の隙間くり抜きツール</span>
+                                <!-- 押すと編集を確定して閉じる操作ボタン（closeZipperCutoutEditor(true)）です -->
                                 <button type="button" class="btn-cutout-done"
                                     onclick="closeZipperCutoutEditor(true)">完了（反映する）</button>
                             </div>
+                            <!-- 使い方をわかりやすく教える案内テキスト（段落 <p>）です -->
                             <p class="cutout-guide-text">
                                 💡 チャックの隙間や襟元を透明にすると、試着室でインナー（トップス）が隙間からのぞいて見えます！
                             </p>
+                            <!-- 消しゴムや定規などのツール切り替えボタンを並べるツールバーを表すブロック要素です -->
                             <div class="cutout-tools-bar">
+                                <!-- ツールボタンを横一列に並べる行ブロック要素（消しゴム／直線消し定規）です -->
                                 <div class="cutout-tools-row">
                                     <button type="button" class="tool-btn active" id="tool-eraser"
                                         onclick="setCutoutTool('eraser')" title="なぞった部分を透明に消す">
@@ -2527,6 +2536,7 @@ index.html
                                         📏 直線消し (定規)
                                     </button>
                                 </div>
+                                <!-- 操作補助ボタンを横一列に並べる行ブロック要素（1手戻す／初期化）です -->
                                 <div class="cutout-tools-row">
                                     <button type="button" class="tool-btn" onclick="undoCutoutAction()" title="1手戻す">
                                         ↺ 戻す
@@ -2537,18 +2547,23 @@ index.html
                                 </div>
                             </div>
 
+                            <!-- 消しゴムの太さ（半径）を調整するスライダー操作ブロック要素です -->
                             <div class="cutout-size-slider-box" id="cutout-size-slider-box">
                                 <label>消しゴムサイズ: <span id="eraser-size-val">24px</span></label>
                                 <input type="range" id="eraser-size-range" min="6" max="70" value="24"
                                     oninput="updateEraserSize(this.value)">
                             </div>
+                            <!-- 服の画像を直接なぞって消すためのキャンバス表示エリアを表すブロック要素です -->
                             <div class="cutout-canvas-container">
+                                <!-- 描画用キャンバスとガイド用キャンバスを重ねて配置するラッパーブロック要素です -->
                                 <div class="cutout-canvas-wrapper" id="cutout-canvas-wrapper">
+                                    <!-- ユーザーがなぞって透明化を描き込むメイン Canvas 要素です -->
                                     <canvas id="cutout-canvas"></canvas>
-                                    <!-- 直線定規ガイドプレビューCanvas -->
+                                    <!-- 直線定規の引き心地を画面にプレビュー表示するガイド用 Canvas 要素です -->
                                     <canvas id="cutout-guide-canvas"></canvas>
                                 </div>
                             </div>
+                            <!-- パネル下部の操作エリア（ステータス案内とキャンセル閉じるボタン）を表すブロック要素です -->
                             <div class="cutout-footer-actions">
                                 <span class="cutout-status-hint" id="cutout-status-hint">ドラッグまたはなぞって隙間を消せます</span>
                                 <button type="button" class="btn-cutout-cancel"
@@ -2556,9 +2571,9 @@ index.html
                             </div>
                         </div>
 
-                        <!-- 特定機能・領域のブロック要素（<div id="ai-diagnosis-card" class="ai-diagnosis-card">）を開始します -->
+                        <!-- 【ai-diagnosis-card】AIが写真の形やシルエットを分析して服のカテゴリ（シャツ、ズボン等）を自動判定して知らせる診断カード枠（<div id="ai-diagnosis-card" class="ai-diagnosis-card">）を開始します -->
                         <div class="ai-diagnosis-card" id="ai-diagnosis-card" style="display: none;">
-                            <!-- デザイン・配置用のブロック要素（<div class="ai-diagnosis-header">）を開始します -->
+                            <!-- 【ai-diagnosis-header】画面のレイアウトや配置を整えるブロック要素（<div class="ai-diagnosis-header">）を開始します -->
                             <div class="ai-diagnosis-header">
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#ai-diag-badge: 初期値 ''）です -->
                                 <span class="ai-diagnosis-badge" id="ai-diag-badge">
@@ -2570,7 +2585,7 @@ index.html
                                 <!-- JavaScript で値や文言を動的に書き換えるインライン表示枠（#ai-diag-confidence: 初期値 ''）です -->
                                 <span class="ai-diag-confidence" id="ai-diag-confidence"></span>
                             </div>
-                            <!-- デザイン・配置用のブロック要素（<div class="ai-diagnosis-body">）を開始します -->
+                            <!-- 【ai-diagnosis-body】画面のレイアウトや配置を整えるブロック要素（<div class="ai-diagnosis-body">）を開始します -->
                             <div class="ai-diagnosis-body">
                                 <!-- 段落テキスト（.ai-diag-title: ai-diag-title）を表示します -->
                                 <p class="ai-diag-title" id="ai-diag-title"></p>
@@ -2579,7 +2594,7 @@ index.html
                             </div>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="preset-img-selector">）を開始します -->
+                        <!-- 【preset-img-selector】画面のレイアウトや配置を整えるブロック要素（<div class="preset-img-selector">）を開始します -->
                         <div class="preset-img-selector">
                             <!-- インライン装飾／グルーピング用の <span> 要素（.preset-label クイック写真:）です -->
                             <span class="preset-label">クイック写真:</span>
@@ -2614,7 +2629,7 @@ index.html
                         </div>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                     <div class="form-group">
                         <!-- 対応する入力欄（for=closet-item-name）の見出しラベル「服の名前・ブランド <span」です -->
                         <label class="form-label" for="closet-item-name">服の名前・ブランド <span
@@ -2624,11 +2639,11 @@ index.html
                             required>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="form-group">）を開始します -->
+                    <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group">）を開始します -->
                     <div class="form-group">
                         <!-- 対応する入力欄（for=form-label）の見出しラベル「カテゴリ *」です -->
                         <label class="form-label">カテゴリ <span class="required">*</span></label>
-                        <!-- デザイン・配置用のブロック要素（<div class="category-radio-grid">）を開始します -->
+                        <!-- 【category-radio-grid】画面のレイアウトや配置を整えるブロック要素（<div class="category-radio-grid">）を開始します -->
                         <div class="category-radio-grid">
                             <!-- 対応する入力欄（for=cat-radio-label）の見出しラベル「」です -->
                             <label class="cat-radio-label">
@@ -2668,9 +2683,9 @@ index.html
                         </div>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="form-row">）を開始します -->
+                    <!-- 【form-row】入力欄を横並び（郵便番号と都道府県など）で綺麗に2分割・3分割して配置する行ブロック（<div class="form-row">）を開始します -->
                     <div class="form-row">
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                         <div class="form-group flex-1">
                             <!-- 対応する入力欄（for=closet-item-color）の見出しラベル「メインの色 <span」です -->
                             <label class="form-label" for="closet-item-color">メインの色 <span
@@ -2698,7 +2713,7 @@ index.html
                             </select>
                         </div>
 
-                        <!-- デザイン・配置用のブロック要素（<div class="form-group flex-1">）を開始します -->
+                        <!-- 【form-group】入力項目の「見出しラベル」と「テキスト入力ボックス」を1セットにする入力フォーム枠（<div class="form-group flex-1">）を開始します -->
                         <div class="form-group flex-1">
                             <!-- 対応する入力欄（for=closet-item-season）の見出しラベル「着用季節 <span」です -->
                             <label class="form-label" for="closet-item-season">着用季節 <span
@@ -2723,7 +2738,7 @@ index.html
                         </div>
                     </div>
 
-                    <!-- デザイン・配置用のブロック要素（<div class="modal-actions">）を開始します -->
+                    <!-- 【modal-actions】「保存する」「キャンセル」「登録する」などの決定ボタンを並べるフッター操作枠（<div class="modal-actions">）を開始します -->
                     <div class="modal-actions">
                         <!-- 押すと関数 closeAddClosetModal() を実行する操作ボタン「キャンセル」です -->
                         <button type="button" class="btn btn-secondary" onclick="closeAddClosetModal()">キャンセル</button>
@@ -2744,11 +2759,11 @@ index.html
 
     <!-- 全画面のいちばん下に表示される共通フッター領域（ブランド説明・ナビリンク・コピーライト）です -->
     <footer class="site-footer">
-        <!-- デザイン・配置用のブロック要素（<div class="container footer-container">）を開始します -->
+        <!-- 【container】ページ全体の横幅が広がりすぎないように最大幅を制限して中央揃えにするコンテナ枠（<div class="container footer-container">）を開始します -->
         <div class="container footer-container">
-            <!-- デザイン・配置用のブロック要素（<div class="footer-top">）を開始します -->
+            <!-- 【footer-top】画面のレイアウトや配置を整えるブロック要素（<div class="footer-top">）を開始します -->
             <div class="footer-top">
-                <!-- デザイン・配置用のブロック要素（<div class="footer-brand-column">）を開始します -->
+                <!-- 【footer-brand-column】ブランドロゴ、コンセプトメッセージ、SNSリンクを配置するフッター左側カラム枠（<div class="footer-brand-column">）を開始します -->
                 <div class="footer-brand-column">
                     <!-- クリックで画面ハッシュを「#home」へ切り替える SPA リンクです（MANEKIN FASHION） -->
                     <a href="#home" class="footer-logo">MANEKIN FASHION</a>
@@ -2761,7 +2776,7 @@ index.html
                             class="keep-phrase">モダンアパレルECストアです。</span>
                     </p>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="footer-links-column">）を開始します -->
+                <!-- 【footer-links-column】フッター内のリンク一覧をカテゴリごとに縦に並べるリンク列ブロック（<div class="footer-links-column">）を開始します -->
                 <div class="footer-links-column">
                     <!-- セクションの見出し（<h4>: NAVIGATION）を表示します -->
                     <h4 class="footer-col-title">NAVIGATION</h4>
@@ -2781,7 +2796,7 @@ index.html
                         <li><a href="#manekin-studio"><span class="text-nowrap">MANEKIN (AI機能)</span></a></li>
                     </ul>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="footer-links-column">）を開始します -->
+                <!-- 【footer-links-column】フッター内のリンク一覧をカテゴリごとに縦に並べるリンク列ブロック（<div class="footer-links-column">）を開始します -->
                 <div class="footer-links-column">
                     <!-- セクションの見出し（<h4>: MEMBERSHIP）を表示します -->
                     <h4 class="footer-col-title">MEMBERSHIP</h4>
@@ -2797,7 +2812,7 @@ index.html
                         <li><a href="#register"><span class="text-nowrap">新規会員登録</span></a></li>
                     </ul>
                 </div>
-                <!-- デザイン・配置用のブロック要素（<div class="footer-links-column">）を開始します -->
+                <!-- 【footer-links-column】フッター内のリンク一覧をカテゴリごとに縦に並べるリンク列ブロック（<div class="footer-links-column">）を開始します -->
                 <div class="footer-links-column">
                     <!-- セクションの見出し（<h4>: HELP & INFO）を表示します -->
                     <h4 class="footer-col-title">HELP & INFO</h4>
@@ -2818,7 +2833,7 @@ index.html
                 </div>
             </div>
 
-            <!-- デザイン・配置用のブロック要素（<div class="footer-bottom">）を開始します -->
+            <!-- 【footer-bottom】最下部のコピーライト（© 2026 MANEKIN FASHION）と免責事項を配置する最下行ブロック（<div class="footer-bottom">）を開始します -->
             <div class="footer-bottom">
                 <!-- 段落テキスト（.copyright: © 2026 MANEKIN FASHION Co., Ltd.…）を表示します -->
                 <p class="copyright">&copy; 2026 MANEKIN FASHION Co., Ltd. All Rights Reserved.</p>
@@ -2859,13 +2874,13 @@ index.html
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
     <!-- 最初に全24着の商品マスター配列（SAMPLE_PRODUCTS）を読み込みます -->
-    <script src="js/products-data.js?v=20261117_weather_aichi_v2"></script>
+    <script src="js/products-data.js?v=20261124_block_explanations_v1"></script>
     <!-- 2番目にEC機能・会員認証・MySQL同期ロジック（shop.js）を読み込みます -->
-    <script src="js/shop.js?v=20261118_modal_coupons_fix"></script>
+    <script src="js/shop.js?v=20261124_block_explanations_v1"></script>
     <!-- 3番目にAI試着マネキンスタジオ機能（studio.js）を読み込みます -->
-    <script src="js/studio.js?v=20261118_jma_temp_min"></script>
+    <script src="js/studio.js?v=20261124_block_explanations_v1"></script>
     <!-- 最後にアプリ起動初期化と画面ルーター（app.js）を読み込みます -->
-    <script src="js/app.js?v=20261118_clean_notice"></script>
+    <script src="js/app.js?v=20261124_block_explanations_v1"></script>
     <!-- ここまで画面表示本体 </body> の終了です -->
 </body>
 
