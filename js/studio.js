@@ -3713,8 +3713,8 @@ let cutoutGuideCanvas = null;
 let cutoutGuideCtx = null;
 // 編集履歴スタック（Undo用）
 let cutoutHistory = [];
-// 現在選択中のツール（'magic-tap', 'eraser', 'line-eraser'）
-let currentCutoutTool = 'magic-tap';
+// 現在選択中のツール（'eraser', 'line-eraser'）
+let currentCutoutTool = 'eraser';
 // 消しゴムブラシの直径（px）
 let eraserBrushSize = 24;
 // ドラッグ描画中フラグ
@@ -3798,31 +3798,26 @@ function closeZipperCutoutEditor(applyChanges = false) {
     }
 }
 
-// ツール切り替え（タップで色抜き / 消しゴム / 直線消し（定規））
+// ツール切り替え（消しゴム / 直線消し（定規））
 function setCutoutTool(tool) {
     currentCutoutTool = tool;
-    const btnTap = document.getElementById('tool-magic-tap');
     const btnEraser = document.getElementById('tool-eraser');
     const btnLine = document.getElementById('tool-line-eraser');
     const sliderBox = document.getElementById('cutout-size-slider-box');
     const hint = document.getElementById('cutout-status-hint');
     const wrapper = document.getElementById('cutout-canvas-wrapper');
 
-    if (btnTap) btnTap.classList.toggle('active', tool === 'magic-tap');
     if (btnEraser) btnEraser.classList.toggle('active', tool === 'eraser');
     if (btnLine) btnLine.classList.toggle('active', tool === 'line-eraser');
 
-    const showSlider = (tool === 'eraser' || tool === 'line-eraser');
-    if (sliderBox) sliderBox.style.display = showSlider ? 'flex' : 'none';
+    if (sliderBox) sliderBox.style.display = 'flex';
 
     if (wrapper) {
         wrapper.classList.toggle('mode-line-eraser', tool === 'line-eraser');
     }
 
     if (hint) {
-        if (tool === 'magic-tap') {
-            hint.textContent = '💡 チャックの隙間をタップすると、その色（インナー等）を一括で透明に抜きます';
-        } else if (tool === 'line-eraser') {
+        if (tool === 'line-eraser') {
             hint.textContent = '📏 定規モード: 始点から終点までドラッグすると、一直線にまっすぐ消せます（垂直線に自動スナップ）';
         } else {
             hint.textContent = '💡 マウスや指でなぞった部分を透明に消します（消しゴムサイズ調整可）';
@@ -3955,9 +3950,7 @@ function initCutoutCanvasEvents() {
     // マウス操作
     cutoutCanvas.addEventListener('mousedown', (e) => {
         const { x, y } = getCanvasCoords(e);
-        if (currentCutoutTool === 'magic-tap') {
-            floodFillTransparent(x, y);
-        } else if (currentCutoutTool === 'line-eraser') {
+        if (currentCutoutTool === 'line-eraser') {
             isLineDrawing = true;
             lineEraserStart = { x, y };
             lastLineSnapped = { x, y };
@@ -4000,9 +3993,7 @@ function initCutoutCanvasEvents() {
     cutoutCanvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const { x, y } = getCanvasCoords(e);
-        if (currentCutoutTool === 'magic-tap') {
-            floodFillTransparent(x, y);
-        } else if (currentCutoutTool === 'line-eraser') {
+        if (currentCutoutTool === 'line-eraser') {
             isLineDrawing = true;
             lineEraserStart = { x, y };
             lastLineSnapped = { x, y };
@@ -4042,67 +4033,6 @@ function initCutoutCanvasEvents() {
             saveCutoutState();
         }
     });
-}
-
-// タップ位置の同系色連結領域を一括で透明化（Flood Fill）
-function floodFillTransparent(startX, startY, tolerance = 42) {
-    if (!cutoutCtx || !cutoutCanvas) return;
-    const w = cutoutCanvas.width;
-    const h = cutoutCanvas.height;
-    if (startX < 0 || startX >= w || startY < 0 || startY >= h) return;
-
-    const imgData = cutoutCtx.getImageData(0, 0, w, h);
-    const data = imgData.data;
-    const startIndex = (startY * w + startX) * 4;
-    const startR = data[startIndex];
-    const startG = data[startIndex + 1];
-    const startB = data[startIndex + 2];
-    const startA = data[startIndex + 3];
-
-    // すでに透明なら何もしない
-    if (startA < 15) return;
-
-    const queue = [[startX, startY]];
-    const visited = new Uint8Array(w * h);
-    visited[startY * w + startX] = 1;
-
-    function colorMatch(pos) {
-        const idx = pos * 4;
-        const a = data[idx + 3];
-        if (a < 15) return false;
-        const r = data[idx];
-        const g = data[idx + 1];
-        const b = data[idx + 2];
-        const diff = Math.abs(r - startR) + Math.abs(g - startG) + Math.abs(b - startB);
-        return diff <= tolerance * 3;
-    }
-
-    let modified = 0;
-    while (queue.length > 0 && modified < 400000) {
-        const [cx, cy] = queue.pop();
-        const idx = (cy * w + cx) * 4;
-        data[idx + 3] = 0; // 完全透明化
-        modified++;
-
-        const neighbors = [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]];
-        for (let i = 0; i < 4; i++) {
-            const nx = neighbors[i][0];
-            const ny = neighbors[i][1];
-            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                const nPos = ny * w + nx;
-                if (!visited[nPos]) {
-                    visited[nPos] = 1;
-                    if (colorMatch(nPos)) {
-                        queue.push([nx, ny]);
-                    }
-                }
-            }
-        }
-    }
-
-    cutoutCtx.putImageData(imgData, 0, 0);
-    saveCutoutState();
-    showToastNotification('🪄 タップした領域を透明にくり抜きました');
 }
 
 // 編集履歴を保存

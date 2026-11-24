@@ -2517,27 +2517,27 @@ index.html
                                 💡 チャックの隙間や襟元を透明にすると、試着室でインナー（トップス）が隙間からのぞいて見えます！
                             </p>
                             <div class="cutout-tools-bar">
-                                <button type="button" class="tool-btn active" id="tool-magic-tap"
-                                    onclick="setCutoutTool('magic-tap')" title="チャックの隙間をタップして一括で透明化">
-                                    🪄 タップ色抜き
-                                </button>
-                                <button type="button" class="tool-btn" id="tool-eraser"
-                                    onclick="setCutoutTool('eraser')" title="なぞった部分を透明に消す">
-                                    🧹 消しゴム
-                                </button>
-                                <button type="button" class="tool-btn" id="tool-line-eraser"
-                                    onclick="setCutoutTool('line-eraser')" title="定規を当てたように始点から終点まで一直線にまっすぐ消す">
-                                    📏 直線消し (定規)
-                                </button>
-                                <button type="button" class="tool-btn" onclick="undoCutoutAction()" title="1手戻す">
-                                    ↺ 戻す
-                                </button>
-                                <button type="button" class="tool-btn" onclick="resetCutoutCanvas()" title="元の状態に戻す">
-                                    初期化
-                                </button>
+                                <div class="cutout-tools-row">
+                                    <button type="button" class="tool-btn active" id="tool-eraser"
+                                        onclick="setCutoutTool('eraser')" title="なぞった部分を透明に消す">
+                                        🧹 消しゴム
+                                    </button>
+                                    <button type="button" class="tool-btn" id="tool-line-eraser"
+                                        onclick="setCutoutTool('line-eraser')" title="定規を当てたように始点から終点まで一直線にまっすぐ消す">
+                                        📏 直線消し (定規)
+                                    </button>
+                                </div>
+                                <div class="cutout-tools-row">
+                                    <button type="button" class="tool-btn" onclick="undoCutoutAction()" title="1手戻す">
+                                        ↺ 戻す
+                                    </button>
+                                    <button type="button" class="tool-btn" onclick="resetCutoutCanvas()" title="元の状態に戻す">
+                                        初期化
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="cutout-size-slider-box" id="cutout-size-slider-box" style="display: none;">
+                            <div class="cutout-size-slider-box" id="cutout-size-slider-box">
                                 <label>消しゴムサイズ: <span id="eraser-size-val">24px</span></label>
                                 <input type="range" id="eraser-size-range" min="6" max="70" value="24"
                                     oninput="updateEraserSize(this.value)">
@@ -2550,7 +2550,7 @@ index.html
                                 </div>
                             </div>
                             <div class="cutout-footer-actions">
-                                <span class="cutout-status-hint" id="cutout-status-hint">タップまたはドラッグで隙間を消せます</span>
+                                <span class="cutout-status-hint" id="cutout-status-hint">ドラッグまたはなぞって隙間を消せます</span>
                                 <button type="button" class="btn-cutout-cancel"
                                     onclick="closeZipperCutoutEditor(false)">閉じる</button>
                             </div>

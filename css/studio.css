@@ -4290,9 +4290,16 @@
 
 .cutout-tools-bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 10px;
+}
+
+.cutout-tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
 }
 
 .tool-btn {
