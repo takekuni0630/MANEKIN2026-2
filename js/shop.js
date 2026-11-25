@@ -2617,7 +2617,7 @@ async function handlePlaceOrder() {
     // 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
     if (compDbStatus) {
         // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-        compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
+        compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ＆デモ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
         // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
         compDbStatus.style.background = '#dcfce7';
         // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
@@ -2663,10 +2663,10 @@ async function syncOrdersFromBackend() {
     };
     const setMobileLocalStoragePill = () => {
         if (!statusPill) return;
-        statusPill.textContent = '🟢 スマホ版 (localStorage 保存モード)';
+        statusPill.textContent = '🟢 スマホ＆デモ版 (localStorage 保存モード)';
         statusPill.style.background = '#dcfce7';
         statusPill.style.color = '#15803d';
-        statusPill.title = 'スマホ版ではPythonサーバー・MySQLを使わずlocalStorageに保存しています';
+        statusPill.title = 'スマホ＆デモ版ではPythonサーバー・MySQLを使わずlocalStorageに保存しています';
     };
     // 定数 setDisconnectedPill を宣言し、値（() => {）をセットします
     const setDisconnectedPill = () => {
@@ -2901,7 +2901,7 @@ async function handleRefreshFromMySQL() {
             (typeof syncStudioStateFromBackend === 'function') ? syncStudioStateFromBackend() : Promise.resolve()
         ]);
         renderMyPage();
-        showToast(`✨ スマホ版(localStorage)から最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
+        showToast(`✨ スマホ＆デモ版(localStorage)から最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
         return;
     }
 
