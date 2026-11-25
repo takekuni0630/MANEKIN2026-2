@@ -20,13 +20,60 @@
 //  ・前回ログインしていた会員のCookieセッション復元
 //  ・アカウント切り替え時の一時データ初期化
 // ==========================================================================
+// 【関数】isOfflineDemoUser(user)
+// 【役割】テストアカウント（簡単ログイン）かどうかを判定する係
+// 【処理内容】
+//   ・「テストアカウントで簡単ログイン」で利用している時は true を返します。
+//   ・このユーザーは MySQL データベースや Python サーバーに接続せず、
+//     ブラウザ内（localStorage / メモリ）だけで安全・高速に全機能が動作します。
+// ==========================================================================
+function isOfflineDemoUser(user = (typeof AppState !== 'undefined' ? AppState.currentUser : null)) {
+    if (user) {
+        return !!(user.isDemo || user.isLocalStorage || user.email === 'demo@manekin.jp');
+    }
+    try {
+        const raw = window.localStorage.getItem('manekin_ls_current_user');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && (parsed.isDemo || parsed.isLocalStorage || parsed.email === 'demo@manekin.jp')) {
+                return true;
+            }
+        }
+    } catch (e) { }
+    return false;
+}
+
+// 直接 localStorage を安全に取得・保存するヘルパー関数
+function lsGetJsonDirect(key, fallback) {
+    try {
+        const raw = window.localStorage.getItem(key);
+        if (raw === null || raw === undefined) return fallback;
+        return JSON.parse(raw);
+    } catch (e) {
+        return fallback;
+    }
+}
+function lsSetJsonDirect(key, val) {
+    try {
+        window.localStorage.setItem(key, JSON.stringify(val));
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// ==========================================================================
 // 【関数】isMobileLocalStorageMode()
 // 【役割】今使っているのが「パソコン版」か「スマホ版」かをサッと見分ける環境調べ係
 // 【具体的な処理内容】
-//   ・画面のURLや設定を見て、スマホ向けの簡易保存（localStorage）を使うか、
-//     PC用のPython+MySQLサーバーを使うかを切り替えます
+//   ・テストアカウント（簡単ログイン）時、またはスマホ版環境のときは true（localStorageモード）を返します
+//   ・通常ログインしたPCユーザーのみ false（MySQLデータベース接続モード）を返します
 // ==========================================================================
 function isMobileLocalStorageMode() {
+    // 0. テストアカウント（簡単ログイン）時は、PCでもスマホでも常にデータベース接続不要（localStorage完結モード）！
+    if (isOfflineDemoUser()) {
+        return true;
+    }
     try {
         const ua = navigator.userAgent || '';
         // 1. 実機スマートフォン（iPhone / Android / Mobile UA）または DevTools スマホ端末エミュレーション時のみ true
@@ -230,11 +277,17 @@ function isServerUserId(uid) {
 //     ログイン中ならそのユーザー情報を取り出して画面に反映します
 // ==========================================================================
 async function restoreAuthSessionFromBackend() {
-    // スマホ版の場合は localStorage からログインセッションを復元します
+    // テストアカウントまたはスマホ版の場合は localStorage からログインセッションを復元します
     if (isMobileLocalStorageMode()) {
-        const savedUser = lsGetJson('manekin_ls_current_user', null);
+        const savedUser = lsGetJsonDirect('manekin_ls_current_user', null);
         if (savedUser && isServerUserId(savedUser.id)) {
             savedUser.isLocalStorage = true;
+            if (savedUser.email === 'demo@manekin.jp') savedUser.isDemo = true;
+            ensureMobileUserInitialized(savedUser);
+            return savedUser;
+        }
+        // テストアカウントとして保存されている場合はバックエンドに問い合わせず即座に復元
+        if (savedUser && (savedUser.isDemo || savedUser.email === 'demo@manekin.jp')) {
             ensureMobileUserInitialized(savedUser);
             return savedUser;
         }
@@ -3660,74 +3713,49 @@ window.redirectToHome = redirectToHome;
 // 【具体的な処理内容】
 //   ・メールアドレスやパスワードを入力せずに、ワンクリックでテスト用ゴールド会員としてログインします
 // ==========================================================================
+// 【関数】handleDemoLogin()
+// 【役割】「テストアカウントで簡単ログイン」ボタンが押されたときの案内係
+// 【処理内容】
+//   ・データベース（MySQL / Pythonサーバー）に接続せず、
+//     ローカル環境（localStorage）で即座にテストアカウントとしてログインします！
+//   ・PC版・スマホ版・オフライン問わず、全機能（カート・注文・お気に入り・試着室等）が
+//     データベース接続なしでサクサク快適に動作します。
+// ==========================================================================
 async function handleDemoLogin(e) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
-    // 定数 preserveGuestCart を宣言し、値（(target === 'checkout')）をセットします
     const preserveGuestCart = (target === 'checkout');
-    // 定数 apiBase を宣言し、値（getApiBaseUrl()）をセットします
-    const apiBase = getApiBaseUrl();
-    // 再代入可能な変数 demoUser を宣言し、値（null）をセットします
-    let demoUser = null;
 
-    // スマホ版の場合は localStorage でデモアカウントを発行・復元します
-    if (isMobileLocalStorageMode()) {
-        const users = lsGetJson('manekin_ls_users', []);
-        let existingDemo = users.find(u => u && u.email === 'demo@manekin.jp');
-        if (!existingDemo) {
-            existingDemo = {
-                id: 99999,
-                name: 'テスト 太郎 (DEMO)',
-                email: 'demo@manekin.jp',
-                password: 'password123',
-                rank: 'GOLD MEMBER',
-                points: 0,
-                isLocalStorage: true
-            };
-            users.push(existingDemo);
-            lsSetJson('manekin_ls_users', users);
-        } else {
-            existingDemo.isLocalStorage = true;
-        }
-        demoUser = existingDemo;
-        ensureMobileUserInitialized(demoUser);
-        lsSetJson('manekin_ls_current_user', demoUser);
+    // データベース接続を行わず、ローカルでテストアカウントを発行・復元
+    const users = lsGetJsonDirect('manekin_ls_users', []);
+    let demoUser = users.find(u => u && (u.email === 'demo@manekin.jp' || u.isDemo));
+    if (!demoUser) {
+        demoUser = {
+            id: 99999,
+            name: 'テスト 太郎 (DEMO)',
+            email: 'demo@manekin.jp',
+            password: 'password123',
+            rank: 'GOLD MEMBER',
+            points: 500,
+            isLocalStorage: true,
+            isDemo: true
+        };
+        users.push(demoUser);
+        lsSetJsonDirect('manekin_ls_users', users);
     } else {
-        // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
-        try {
-            // Flask バックエンド API（/api/auth/demo）へ非同期リクエストを送信し、応答を待ち受けます
-            const res = await fetch(`${apiBase}/api/auth/demo`, {
-                // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
-                method: 'POST',
-                // Cookie（HttpOnly の manekin_session）を API リクエストに同梱送信する必須指定です
-                credentials: 'include'
-            });
-            // サーバーから届いた HTTP レスポンスボディを JSON オブジェクトとして読み取り data に入れます
-            const data = await res.json().catch(() => ({}));
-            // HTTP 応答ステータスがエラー（4xx / 5xx）だった場合に例外として異常ルートへ飛ばします
-            if (!res.ok || !data.user || !isServerUserId(data.user.id)) {
-                // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-                showToast(data.message || '⚠️ デモアカウントでログインできませんでした（MySQL接続を確認してください）');
-                // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-                return;
-            }
-            // 変数・配列項目 demoUser の値を更新・計算します
-            demoUser = data.user;
-            // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
-        } catch (e) {
-            // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-            showToast('⚠️ Pythonサーバー(ポート8080)に接続できないためログインできません（app.pyとMySQLの起動を確認してください）');
-            // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
-            return;
-        }
+        demoUser.isLocalStorage = true;
+        demoUser.isDemo = true;
     }
+
+    ensureMobileUserInitialized(demoUser);
+    lsSetJsonDirect('manekin_ls_current_user', demoUser);
 
     // ログインした瞬間に即座にHOME画面へ切り替える
     AppState.currentUser = demoUser;
     await redirectToHome(demoUser);
 
     // ログイン成功アラートを表示
-    alert('ログインされました');
+    alert('ログインされました（テストアカウント）\n※データベース接続なしで全機能をご利用いただけます');
 
     // アラートOK直後にも確実にHOME画面表示を維持
     await redirectToHome(demoUser, { silentToast: true });
@@ -4267,6 +4295,7 @@ function closeMobileDrawer() {
 
 
 // スマホ版 localStorage 判定・操作ヘルパーをグローバルに公開します
+window.isOfflineDemoUser = isOfflineDemoUser;
 window.isMobileLocalStorageMode = isMobileLocalStorageMode;
 window.lsGetJson = lsGetJson;
 window.lsSetJson = lsSetJson;
