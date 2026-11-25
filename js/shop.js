@@ -760,14 +760,6 @@ function renderItemDetail(productId) {
     // 定数 initialImgUrl を宣言し、値（product.image）をセットします
     const initialImgUrl = product.image;
 
-    // 商品ごとに取り扱っているサイズ一覧（product.sizes）から表示用バッジ HTML を生成します
-    const availableSizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ['FREE'];
-    const sizeChipsHTML = availableSizes.map(size => `
-        <span class="size-chip size-badge" title="取扱サイズ: ${size}">
-            ${size}
-        </span>
-    `).join('');
-
     // テンプレートリテラルで組み立てた HTML を要素 detailLayout 内に書き込んで画面を更新します
     detailLayout.innerHTML = `
         <div class="detail-gallery">
@@ -783,13 +775,6 @@ function renderItemDetail(productId) {
             <div class="detail-price-box">
                 <span class="detail-price">${formattedPrice}</span>
                 <span class="detail-tax">(税込)</span>
-            </div>
-
-            <div class="detail-options">
-                <div class="option-group">
-                    <p class="option-group-title">取扱サイズ展開:</p>
-                    <div class="size-chips" id="detail-size-chips">${sizeChipsHTML}</div>
-                </div>
             </div>
 
             <div class="detail-actions">
@@ -962,7 +947,7 @@ async function syncCartFromBackend(options = {}) {
         const finalCart = Array.isArray(savedItems) ? [...savedItems] : [];
         if (mergeItems.length > 0) {
             mergeItems.forEach(item => {
-                const idx = finalCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                const idx = finalCart.findIndex(c => c.id === item.id);
                 if (idx > -1) {
                     finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
                 } else {
@@ -1008,8 +993,8 @@ async function syncCartFromBackend(options = {}) {
             const mergedCurrent = JSON.parse(JSON.stringify(AppState.cart || []));
             // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
             serverItems.forEach(item => {
-                // 定数 idx を宣言し、値（mergedCurrent.findIndex(c => c.id === …）をセットします
-                const idx = mergedCurrent.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                // 定数 idx を宣言し、値（mergedCurrent.findIndex(c => c.id === item.id)）をセットします
+                const idx = mergedCurrent.findIndex(c => c.id === item.id);
                 // 条件（idx > -1）が成り立つか判定し、該当する場合の処理を実行します
                 if (idx > -1) {
                     // 変数・配列項目 mergedCurrent[idx].quantity の値を更新・計算します
@@ -1045,9 +1030,9 @@ async function syncCartFromBackend(options = {}) {
         if (mergeItems.length > 0) {
             // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
             mergeItems.forEach(item => {
-                // 定数 idx を宣言し、値（finalCart.findIndex(c => c.id === item…）をセットします
-                // 商品ID、色、サイズが一致する商品があるかどうかfinalCartの中から探す
-                const idx = finalCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
+                // 定数 idx を宣言し、値（finalCart.findIndex(c => c.id === item.id)）をセットします
+                // 商品IDが一致する商品があるかどうかfinalCartの中から探す
+                const idx = finalCart.findIndex(c => c.id === item.id);
                 // 条件（idx > -1）が成り立つか判定し、該当する場合の処理を実行します
                 // 0個以上一致するものがある場合は、
                 if (idx > -1) {
@@ -1159,10 +1144,6 @@ async function handleAddToCartFromDetail(productId) {
             name: product.name,
             // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
             category: product.category || 'TOPS',
-            // カラー（色指定は不要のため空文字）
-            color: '',
-            // サイズ（サイズ指定は不要のため空文字）
-            size: '',
             // 単価・価格（円）
             price: product.price,
             // 数量
@@ -1406,13 +1387,14 @@ function renderCheckoutPage() {
     const completedView = document.getElementById('order-completed-view');
 
     // 条件（completedView）が成り立つか判定し、該当する場合の処理を実行します
-    // 注文確定画面を隠す
+    // 注文確定画面を隠して、
     if (completedView) completedView.style.display = 'none';
     // 条件（mainLayout）が成り立つか判定し、該当する場合の処理を実行します
-    // お届け策情報入力部分をhtmlとcssで指定したJavaScriptで動的に指定する枠に合わせて表示する
+    // 購入手続き画面を表示する
     if (mainLayout) mainLayout.style.display = 'grid';
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
+    // 注文商品一覧にカートの中身が無くて何も表示する商品が無いとき
     if (AppState.cart.length === 0) {
         // 条件（cartListEl）が成り立つか判定し、該当する場合の処理を実行します
         if (cartListEl) {
@@ -1425,19 +1407,27 @@ function renderCheckoutPage() {
             `;
         }
         // 条件（subtotalEl）が成り立つか判定し、該当する場合の処理を実行します
+        // 商品合計
         if (subtotalEl) subtotalEl.textContent = "¥0";
         // 条件（shippingEl）が成り立つか判定し、該当する場合の処理を実行します
+        // 配送料
         if (shippingEl) shippingEl.textContent = "¥0";
         // 条件（taxEl）が成り立つか判定し、該当する場合の処理を実行します
+        // 消費税
         if (taxEl) taxEl.textContent = "¥0";
         // 条件（totalEl）が成り立つか判定し、該当する場合の処理を実行します
+        // お支払合計(税込み)
         if (totalEl) totalEl.textContent = "¥0";
         // 獲得予定ポイント表示をデフォルトの 0 pt に更新します
+        // 今回獲得予定のポイント
         const earnedPointsEl = document.getElementById('checkout-earned-points');
         if (earnedPointsEl) earnedPointsEl.textContent = "0 pt";
         // HTML 要素 #btn-place-order を取得して変数 placeBtn に格納します
+        // 注文確定ボタン
         const placeBtn = document.getElementById('btn-place-order');
         // 条件（placeBtn）が成り立つか判定し、該当する場合の処理を実行します
+        // disabled = true だったら無効化にする
+        // このif文はそもそも商品が一つもないときだから押せないようにしているよ
         if (placeBtn) placeBtn.disabled = true;
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
@@ -1446,6 +1436,7 @@ function renderCheckoutPage() {
     // HTML 要素 #btn-place-order を取得して変数 placeBtn に格納します
     const placeBtn = document.getElementById('btn-place-order');
     // 条件（placeBtn）が成り立つか判定し、該当する場合の処理を実行します
+    // 注文確定ボタンを押せるようにする
     if (placeBtn) placeBtn.disabled = false;
 
     // 条件（cartListEl）が成り立つか判定し、該当する場合の処理を実行します
@@ -1456,7 +1447,6 @@ function renderCheckoutPage() {
                 <img src="${item.image}" alt="${item.name}" class="cart-item-thumb" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22800%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20600%20800%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22600%22%20height%3D%22800%22%2F%3E%3Cpath%20d%3D%22M250%20320%20L350%20320%20L370%20420%20L230%20420%20Z%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22480%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20letter-spacing%3D%222%22%3EMANEKIN%20COLLECTION%3C%2Ftext%3E%3C%2Fsvg%3E'">
                 <div class="cart-item-details">
                     <h4 class="cart-item-name">${item.name}</h4>
-                    ${(item.color || item.size) ? `<p class="cart-item-meta">${item.color ? `カラー: <strong>${item.color}</strong>` : ''}${item.color && item.size ? ' | ' : ''}${item.size ? `サイズ: <strong>${item.size}</strong>` : ''}</p>` : ''}
                     <p class="cart-item-price">¥${item.price.toLocaleString()} (税込)</p>
                 </div>
                 <div class="cart-item-controls">
