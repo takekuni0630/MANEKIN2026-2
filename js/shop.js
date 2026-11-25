@@ -987,24 +987,29 @@ async function syncCartFromBackend(options = {}) {
         // 再代入可能な変数 needPushToServer を宣言し、値（false）をセットします
         // マージした後にサーバーへ送り返す必要があるか
         let needPushToServer = false;
-        // 11/24ここまで行ったよ
+
         // 条件（mergeItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
         if (mergeItems.length > 0) {
             // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
             mergeItems.forEach(item => {
                 // 定数 idx を宣言し、値（finalCart.findIndex(c => c.id === item…）をセットします
+                // 商品ID、色、サイズが一致する商品があるかどうかfinalCartの中から探す
                 const idx = finalCart.findIndex(c => c.id === item.id && c.color === item.color && c.size === item.size);
                 // 条件（idx > -1）が成り立つか判定し、該当する場合の処理を実行します
+                // 0個以上一致するものがある場合は、
                 if (idx > -1) {
                     // 変数・配列項目 finalCart[idx].quantity の値を更新・計算します
+                    // 既存の正本の数量に追加分の数量を足します。quantity=既存の商品の数量
                     finalCart[idx].quantity = (finalCart[idx].quantity || 1) + (item.quantity || 1);
                     // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 配列の末尾に新しい要素を追加します（finalCart.push({ ...item });）
+                    // 見つからなかった場合は、カートの末尾に追加
                     finalCart.push({ ...item });
                 }
             });
             // 変数・配列項目 needPushToServer の値を更新・計算します
+            // カートに反映したのでサーバーへ送信が必要だよって判定しておく
             needPushToServer = true;
         }
 
@@ -1043,12 +1048,17 @@ function updateCartBadge() {
         AppState.cart = [];
     }
     // 定数 totalCount を宣言し、値（AppState.cart.reduce((sum, item) => su…）をセットします
+    // reduce=配列の中身を順番に足し算(まとめて)ひとまとめにする
+    // カート内の商品の個数を全部足して、合計数を出す
+    // sumが足し算で、既存の商品数または追加されるたびに1足されていく
     const totalCount = AppState.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     // HTML 要素 #header-cart-badge を取得して変数 cartBadge に格納します
     const cartBadge = document.getElementById('header-cart-badge');
     // 条件（cartBadge）が成り立つか判定し、該当する場合の処理を実行します
     if (cartBadge) {
         // 文字要素 cartBadge の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+        // isNaN = もし計算結果が数字にならない場合
+        // isNaN= not a number
         cartBadge.textContent = isNaN(totalCount) ? 0 : totalCount;
     }
 }
@@ -1067,12 +1077,11 @@ async function handleAddToCartFromDetail(productId) {
     if (!product) return false;
 
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して prevCart に保存します
+    // 今のカートの中身を丸ごとコピーしてバックアップしている = あとで処理に失敗したときなどに元の状態に戻せる状態にしておく目的(現在の配列か空配列)
     const prevCart = JSON.parse(JSON.stringify(AppState.cart || []));
 
     // 定数 currentImg を宣言し、値（product.image）をセットします
     const currentImg = product.image;
-    // 定数 defaultColor を宣言し、値（(product.colors && product.colors[0]) || 'DEFAULT'）をセットします
-    const defaultColor = (product.colors && product.colors[0]) || 'DEFAULT';
     // 取扱サイズ展開の文字列表記（例: 'S/M/L' または 'FREE'）を取得します
     const productSize = (Array.isArray(product.sizes) && product.sizes.length > 0) ? product.sizes.join('/') : 'FREE';
 
@@ -1096,8 +1105,8 @@ async function handleAddToCartFromDetail(productId) {
             name: product.name,
             // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
             category: product.category || 'TOPS',
-            // カラー名
-            color: defaultColor,
+            // カラー（商品詳細での色指定は不要のため空文字）
+            color: '',
             // 取扱サイズ
             size: productSize,
             // 単価・価格（円）

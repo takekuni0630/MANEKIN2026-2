@@ -2428,6 +2428,8 @@ let editingClosetItemId = null;
 // 「手持ちの服を登録する」モーダル（新規追加モード）を開き、アップロード一時変数を初期化します
 function openAddClosetModal() {
     editingClosetItemId = null;
+    cutoutInitialDataUrl = '';
+    isCutoutEditorOpening = false;
     const title = document.getElementById('modal-add-closet-title');
     if (title) title.textContent = '手持ちの服を登録する';
     const subtext = document.querySelector('#modal-add-closet .modal-subtext');
@@ -2538,6 +2540,8 @@ function closeAddClosetModal() {
     }
 
     editingClosetItemId = null;
+    cutoutInitialDataUrl = '';
+    isCutoutEditorOpening = false;
     const title = document.getElementById('modal-add-closet-title');
     if (title) title.textContent = '手持ちの服を登録する';
     const subtext = document.querySelector('#modal-add-closet .modal-subtext');
@@ -3700,7 +3704,7 @@ async function loadSafeImageElement(srcUrl) {
         console.warn('fetchによる画像取得をスキップ、直接Imageロードに切り替えます:', fetchErr);
     }
 
-    // fetchがスキップされた場合のフォールバック: まず anonymous（CORS許可モード）で試行
+    // fetchがスキップされた場合のフォールバック: まず anonymous（CORS許可モード）で試行し、失敗時は直接Imageロード
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
@@ -3715,6 +3719,9 @@ async function loadSafeImageElement(srcUrl) {
         img.src = encodedUrl;
     });
 }
+
+// くり抜きエディタの多重起動防止フラグ
+let isCutoutEditorOpening = false;
 
 // チャック隙間くり抜きエディタを開く
 async function openZipperCutoutEditor(overrideUrl) {
@@ -3737,10 +3744,27 @@ async function openZipperCutoutEditor(overrideUrl) {
     if (guideCanvas) {
         cutoutGuideCtx = guideCanvas.getContext('2d');
     }
-    cutoutInitialDataUrl = targetUrl;
 
     const hint = document.getElementById('cutout-status-hint');
+
+    // すでに同じ画像でキャンバス描画が完了している場合は再読み込みをスキップして操作可能状態を維持
+    if (cutoutInitialDataUrl === targetUrl && canvas && canvas.width > 0 && canvas.height > 0) {
+        if (hint) hint.textContent = 'ドラッグまたはなぞって隙間を消せます';
+        try {
+            setCutoutTool(currentCutoutTool || 'eraser');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
+        return;
+    }
+
+    // 多重起動ガード（並行で2回呼び出された場合は重複処理を防ぐ）
+    if (isCutoutEditorOpening) return;
+    isCutoutEditorOpening = true;
+
+    cutoutInitialDataUrl = targetUrl;
     if (hint) hint.textContent = '⏳ 服の画像を読み込み中...';
+
+    let isDrawnSuccessfully = false;
 
     try {
         const img = await loadSafeImageElement(targetUrl);
@@ -3766,6 +3790,10 @@ async function openZipperCutoutEditor(overrideUrl) {
 
         cutoutCtx.clearRect(0, 0, w, h);
         cutoutCtx.drawImage(img, 0, 0, w, h);
+        isDrawnSuccessfully = true;
+
+        // 画像描画が完了した時点で即座にステータスを操作可能に更新（エラー誤表示を完全防止）
+        if (hint) hint.textContent = 'ドラッグまたはなぞって隙間を消せます';
 
         // 履歴の初期化（ブラウザのCORS制約でgetImageDataが例外を出しても描画自体は成功させる安全策）
         try {
@@ -3775,14 +3803,27 @@ async function openZipperCutoutEditor(overrideUrl) {
             cutoutHistory = [];
         }
 
-        initCutoutCanvasEvents();
-        setCutoutTool(currentCutoutTool || 'eraser');
-        if (hint) hint.textContent = 'ドラッグまたはなぞって隙間を消せます';
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        try {
+            initCutoutCanvasEvents();
+            setCutoutTool(currentCutoutTool || 'eraser');
+        } catch (eventErr) {
+            console.warn('ツール初期化警告:', eventErr);
+        }
+
+        try {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
     } catch (err) {
         console.error('くり抜きエディタの画像読み込みエラー:', err);
-        showToastNotification('⚠️ 服の写真の読み込みに失敗しました');
-        if (hint) hint.textContent = '⚠️ 画像の読み込みに失敗しました。もう一度お試しください。';
+        // キャンバスへの描画がすでに成功している場合はエラー案内を出さない
+        if (!isDrawnSuccessfully) {
+            showToastNotification('⚠️ 服の写真の読み込みに失敗しました');
+            if (hint) hint.textContent = '⚠️ 画像の読み込みに失敗しました。もう一度お試しください。';
+        } else {
+            if (hint) hint.textContent = 'ドラッグまたはなぞって隙間を消せます';
+        }
+    } finally {
+        isCutoutEditorOpening = false;
     }
 }
 
@@ -3790,6 +3831,8 @@ async function openZipperCutoutEditor(overrideUrl) {
 function closeZipperCutoutEditor(applyChanges = false) {
     const panel = document.getElementById('zipper-cutout-panel');
     if (panel) panel.style.display = 'none';
+    cutoutInitialDataUrl = '';
+    isCutoutEditorOpening = false;
 
     if (applyChanges && cutoutCanvas) {
         try {
