@@ -1090,10 +1090,13 @@ async function handleAddToCartFromDetail(productId) {
     );
 
     // 条件（existingIndex > -1）が成り立つか判定し、該当する場合の処理を実行します
+    // カートに追加する商品で同じものがあった時　既に一つ存在しているので個数を増やす
     if (existingIndex > -1) {
         // 変数・配列項目 AppState.cart[existingIndex].qua… の値を更新・計算します
+        // カート内の見つかった位置がexistingIndexで既存商品の数を一つ増やす。
         AppState.cart[existingIndex].quantity += 1;
         // 上記の if 条件に当てはまらなかった場合の分岐処理です
+        // 全く新しい商品を追加しようとしているときに新しい商品の情報を追加する
     } else {
         // 配列の末尾に新しい要素を追加します（AppState.cart.push({）
         AppState.cart.push({
@@ -1122,10 +1125,13 @@ async function handleAddToCartFromDetail(productId) {
     // 条件（AppState.currentUser && isServerUserId(AppState.curr…）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
         // 定数 ok を宣言し、値（await syncCartToBackend()）をセットします
+        // その人のアカウント情報(マイクローゼット、保有ポイントなど)を復元する
         const ok = await syncCartToBackend();
         // 条件（!ok）が成り立つか判定し、該当する場合の処理を実行します
+        // もし、アカウント情報が復元できなかったら
         if (!ok) {
             // アプリ全体状態 AppState.cart を最新値（prevCart）に更新します
+            // 現在のカートの中にバックアップしたカートの情報を入れる
             AppState.cart = prevCart;
             // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
             updateCartBadge();
@@ -1187,10 +1193,13 @@ async function updateCartItemQty(index, delta) {
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して prevCart に保存します
     const prevCart = JSON.parse(JSON.stringify(AppState.cart || []));
     // 変数・配列項目 AppState.cart[index].quantity の値を更新・計算します
+    // AppState.cart[index]番目の小ン本の個数にdeltaを足す delta(+と-どっちもつかさどってる)
     AppState.cart[index].quantity += delta;
     // 条件（AppState.cart[index].quantity <= 0）が成り立つか判定し、該当する場合の処理を実行します
+    // 増減した結果個数が０以下になったかチェックして、
     if (AppState.cart[index].quantity <= 0) {
         // 配列の指定位置から要素を取り除いて削除します（AppState.cart.splice(index, 1);）
+        // index番目にある商品をAppState.cart配列から一つ削除
         AppState.cart.splice(index, 1);
     }
     // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
@@ -1228,6 +1237,7 @@ async function removeCartItem(index) {
     // 元配列・元オブジェクトへの参照切り離し（ディープコピー）を作成して prevCart に保存します
     const prevCart = JSON.parse(JSON.stringify(AppState.cart || []));
     // 配列の指定位置から要素を取り除いて削除します（AppState.cart.splice(index, 1);）
+    // カートの中身からindex番目を1つ削除する
     AppState.cart.splice(index, 1);
     // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
     updateCartBadge();
