@@ -1351,7 +1351,7 @@ function updateCheckoutStepper(step = 2) {
         if (idx < step) {
             // 条件を満たす丸に 'active' クラスを付与して光らせます（色をつけて達成状態にする）
             item.classList.add('active');
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // まだ到達していない先のステップの丸からは 'active' クラスを外して未達成状態（グレー）にします
             item.classList.remove('active');
@@ -1364,7 +1364,7 @@ function updateCheckoutStepper(step = 2) {
         if (idx < step - 1) {
             // 到達済みのラインに 'active' クラスを付与して色づけます（実線でつなぐ）
             line.classList.add('active');
-        // 上記の if 条件に当てはまらなかった場合の分岐処理です
+            // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
             // まだ到達していない先のラインからは 'active' クラスを外して未到達状態にします
             line.classList.remove('active');
@@ -1384,23 +1384,32 @@ function renderCheckoutPage() {
     updateCheckoutStepper(2);
 
     // HTML 要素 #checkout-cart-list を取得して変数 cartListEl に格納します
+    // 注文商品一覧
     const cartListEl = document.getElementById('checkout-cart-list');
     // HTML 要素 #checkout-subtotal を取得して変数 subtotalEl に格納します
+    // 商品合計
     const subtotalEl = document.getElementById('checkout-subtotal');
     // HTML 要素 #checkout-shipping を取得して変数 shippingEl に格納します
+    // 配送料
     const shippingEl = document.getElementById('checkout-shipping');
     // HTML 要素 #checkout-tax を取得して変数 taxEl に格納します
+    // 消費税
     const taxEl = document.getElementById('checkout-tax');
     // HTML 要素 #checkout-total を取得して変数 totalEl に格納します
+    // お支払合計(税込み)
     const totalEl = document.getElementById('checkout-total');
     // HTML 要素 #checkout-layout-main を取得して変数 mainLayout に格納します
+    // お届け先情報
     const mainLayout = document.getElementById('checkout-layout-main');
     // HTML 要素 #order-completed-view を取得して変数 completedView に格納します
+    // 注文確定画面
     const completedView = document.getElementById('order-completed-view');
 
     // 条件（completedView）が成り立つか判定し、該当する場合の処理を実行します
+    // 注文確定画面を隠す
     if (completedView) completedView.style.display = 'none';
     // 条件（mainLayout）が成り立つか判定し、該当する場合の処理を実行します
+    // お届け策情報入力部分をhtmlとcssで指定したJavaScriptで動的に指定する枠に合わせて表示する
     if (mainLayout) mainLayout.style.display = 'grid';
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
@@ -1423,6 +1432,9 @@ function renderCheckoutPage() {
         if (taxEl) taxEl.textContent = "¥0";
         // 条件（totalEl）が成り立つか判定し、該当する場合の処理を実行します
         if (totalEl) totalEl.textContent = "¥0";
+        // 獲得予定ポイント表示をデフォルトの 0 pt に更新します
+        const earnedPointsEl = document.getElementById('checkout-earned-points');
+        if (earnedPointsEl) earnedPointsEl.textContent = "0 pt";
         // HTML 要素 #btn-place-order を取得して変数 placeBtn に格納します
         const placeBtn = document.getElementById('btn-place-order');
         // 条件（placeBtn）が成り立つか判定し、該当する場合の処理を実行します
@@ -1865,7 +1877,8 @@ function updateCheckoutCalculations() {
     }
 
     if (earnedPointsEl) {
-        earnedPointsEl.textContent = `+${earnedPoints.toLocaleString()} pt`;
+        // お支払い合計が 0 円の時または獲得ポイントが 0 の時はデフォルトで「0 pt」を表示します
+        earnedPointsEl.textContent = (netTotal <= 0 || earnedPoints <= 0) ? "0 pt" : `+${earnedPoints.toLocaleString()} pt`;
     }
 
     if (pointMessage) {
@@ -2591,7 +2604,7 @@ async function handlePlaceOrder() {
     // 条件（compOrderTotal）が成り立つか判定し、該当する場合の処理を実行します
     if (compOrderTotal) compOrderTotal.textContent = `¥${confirmedOrder.total_amount.toLocaleString()}`;
     // 条件（compEarnedPoints）が成り立つか判定し、該当する場合の処理を実行します
-    if (compEarnedPoints) compEarnedPoints.textContent = `+${calc.earnedPoints.toLocaleString()} pt`;
+    if (compEarnedPoints) compEarnedPoints.textContent = (calc.earnedPoints > 0) ? `+${calc.earnedPoints.toLocaleString()} pt` : '0 pt';
     // 条件（compBalancePoints）が成り立つか判定し、該当する場合の処理を実行します
     if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
 
