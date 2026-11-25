@@ -1440,6 +1440,7 @@ function renderCheckoutPage() {
     if (placeBtn) placeBtn.disabled = false;
 
     // 条件（cartListEl）が成り立つか判定し、該当する場合の処理を実行します
+    // placeBtnが押せるようになっている = 注文商品一覧が存在してる(カートの中身がある時だから)
     if (cartListEl) {
         // 生成・変換した HTML 文字列を要素 cartListEl の中身として描画します
         cartListEl.innerHTML = AppState.cart.map((item, idx) => `
@@ -1462,10 +1463,14 @@ function renderCheckoutPage() {
     // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
         // HTML 要素 #order-name を取得して変数 orderName に格納します
+        // お届け先情報に入力した名前と
         const orderName = document.getElementById('order-name');
         // HTML 要素 #order-email を取得して変数 orderEmail に格納します
+        // お届け先情報に入力したメールアドレス
         const orderEmail = document.getElementById('order-email');
         // 条件（orderName && !orderName.value.trim() && AppState.cur…）が成り立つか判定し、該当する場合の処理を実行します
+        // 名前欄の自動入力が行われている　
+        // オーダーネームが存在するかつオーダーネームの中身が空っぽかつ現在ログイン中の人の名前だったら
         if (orderName && !orderName.value.trim() && AppState.currentUser.name) {
             // 入力フォーム部品 orderName の現在の入力値を更新・リセットします
             orderName.value = AppState.currentUser.name;
@@ -1481,6 +1486,7 @@ function renderCheckoutPage() {
         fetchUserCoupons();
     }
     // 関連処理 updateCheckoutCalculations() を呼び出して処理・画面を更新します
+    // ご請求内容(商品合計、配送料、消費税、お支払合計、獲得予定ポイントなどを計算して更新する)
     updateCheckoutCalculations();
 }
 
@@ -1491,23 +1497,39 @@ function renderCheckoutPage() {
 //   ・注文で獲得したポイントを足し、利用したポイントを引いて、
 //     現在の正しいポイント残高を算出します
 // ==========================================================================
+// 注文履歴から獲得ポイントの合計 ー 使ったポイントの合計を計算し、マイナスにならないように現在残っているポイントを返す関数です
 function calculateNetPointsFromOrders(ordersList) {
+    // 渡されたオーダーリストが配列ならそれを使いそうでなければ、アプリ全体の注文履歴(AppState.orderHistory)を使用する
     const list = Array.isArray(ordersList) ? ordersList : (AppState.orderHistory || []);
+    // 注文履歴が0件ならポイントは0なのでリターンも0で終了
     if (!list || list.length === 0) return 0;
+    // これまで獲得した合計ポイントを入れる箱
     let totalEarned = 0;
+    // これまで使用した合計ポイントを入れる箱
     let totalUsed = 0;
+    // 注文履歴を一件ずつ(oとして)順番に取り出してチェックします
     list.forEach(o => {
+        // もしその注文データが空ならスキップして次の朱蒙データに飛ぶよ
         if (!o) return;
+        // その注文の合計金額{(total_amount)、なければsubtotal(商品合計) それもなければ0(終了)}を数字として取り出します
         const totalAmt = Number(o.total_amount || o.subtotal || 0);
+        // その注文でもらった獲得ポイント(earned_points、なければ0)を数字として取り出す
         let earned = Number(o.earned_points || 0);
+        // もし獲得ポイントが記録されておらず、0以下かつ注文金額が0円より大きければif文はいる
         if (earned <= 0 && totalAmt > 0) {
+            // 注文金額の1％を計算し、最低でも1ポイントになるように獲得ポイントを保管する
             earned = Math.max(1, Math.floor(totalAmt * 0.01));
+            // 今計算した獲得ポイントをその注文データ自身にも書き込んで保存する
             o.earned_points = earned;
         }
+        // その注文で使ったポイント(used_points)をマイナスにならないように0以上の数字として取り出します
         const used = Math.max(0, Number(o.used_points || 0));
+        // この注文での獲得ポイント(earned)をtotalEarned(獲得合計)に足します
         totalEarned += earned;
+        // この注文で使ったポイント(used)をtotalUsed(利用合計)に足します
         totalUsed += used;
     });
+    // 獲得合計 ー 利用合計を計算しマイナスにならないように0以上の値にして結果を返します
     return Math.max(0, totalEarned - totalUsed);
 }
 
@@ -1527,12 +1549,17 @@ function getUserPoints() {
     }
     // 注文履歴がある場合は、購入で加算されたポイント合計（−利用分）を確実に反映します
     if (Array.isArray(AppState.orderHistory) && AppState.orderHistory.length > 0) {
+        // 獲得ポイント合計と使用ポイント合計の差を注文履歴(Appstate.orderHistory)から計算して出して、netFromOrdersに入れる
+        // 現在使用することができる残りのポイント
         const netFromOrders = calculateNetPointsFromOrders(AppState.orderHistory);
+        // 現在使用可な残りのポイントが0より大きいかつログインユーザーのポイントが数値で扱われていてその数値が現在使用可な残りポイントより小さいときに
         if (netFromOrders > 0 && Number(AppState.currentUser.points) < netFromOrders) {
+            // 現在の保有ポイントを現在使用可の残りのポイントにする
             AppState.currentUser.points = netFromOrders;
         }
     }
     // 結果（AppState.currentUser.points）を呼び出し元へ返却します
+    // 初期値の0か現在使用が可能な保有ポイントを返します。
     return Number(AppState.currentUser.points) || 0;
 }
 
