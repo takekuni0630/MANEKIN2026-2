@@ -1336,23 +1336,37 @@ async function removeCartItem(index) {
 //     ステップバーの丸い数字を青く光らせます
 // ==========================================================================
 function updateCheckoutStepper(step = 2) {
+    // 画面の中から進捗バー全体の親要素（.checkout-stepper）を取得して変数 stepper に格納します
     const stepper = document.querySelector('.checkout-stepper');
+    // 進捗バーが画面内に見つからない場合はエラー防止のため処理をここで終了します
     if (!stepper) return;
+    // 進捗バー内の丸い各ステップ番号要素（.step-item）をすべて取得します（①注文商品、②お届け先・決済、③注文確定）
     const items = stepper.querySelectorAll('.step-item');
+    // ステップ同士をつなぐ進行ライン要素（.step-line）をすべて取得します
     const lines = stepper.querySelectorAll('.step-line');
 
+    // 各ステップの丸要素を1つずつ順番に取り出して処理します（idx は 0 から始まるインデックス番号）
     items.forEach((item, idx) => {
+        // 現在のステップ番号（step）より前の丸、または現在地の丸であるか判定します（例: stepが2の時は idx:0 と idx:1 が対象）
         if (idx < step) {
+            // 条件を満たす丸に 'active' クラスを付与して光らせます（色をつけて達成状態にする）
             item.classList.add('active');
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // まだ到達していない先のステップの丸からは 'active' クラスを外して未達成状態（グレー）にします
             item.classList.remove('active');
         }
     });
 
+    // ステップ間をつなぐ各進行ラインを1本ずつ順番に取り出して処理します
     lines.forEach((line, idx) => {
+        // 現在地の手前にあるラインであるか判定します（線は丸の数より1本少ないため idx < step - 1 で判定）
         if (idx < step - 1) {
+            // 到達済みのラインに 'active' クラスを付与して色づけます（実線でつなぐ）
             line.classList.add('active');
+        // 上記の if 条件に当てはまらなかった場合の分岐処理です
         } else {
+            // まだ到達していない先のラインからは 'active' クラスを外して未到達状態にします
             line.classList.remove('active');
         }
     });
