@@ -20,8 +20,6 @@ const AppState = {
     cart: [],
     // 商品詳細ページで現在開いている商品のID番号
     currentDetailId: 1,
-    // 商品詳細ページで選ばれている服のサイズ（初期値は M）
-    selectedSize: "M",
     // ログイン中の会員の過去の注文履歴リスト
     orderHistory: [],
     // ログイン中の会員が持っているクーポン一覧（10%OFFクーポンなど）

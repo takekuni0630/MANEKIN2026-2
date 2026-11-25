@@ -1082,8 +1082,6 @@ async function handleAddToCartFromDetail(productId) {
 
     // 定数 currentImg を宣言し、値（product.image）をセットします
     const currentImg = product.image;
-    // 取扱サイズ展開の文字列表記（例: 'S/M/L' または 'FREE'）を取得します
-    const productSize = (Array.isArray(product.sizes) && product.sizes.length > 0) ? product.sizes.join('/') : 'FREE';
 
     // 定数 existingIndex を宣言し、値（AppState.cart.findIndex(）をセットします
     const existingIndex = AppState.cart.findIndex(
@@ -1105,10 +1103,10 @@ async function handleAddToCartFromDetail(productId) {
             name: product.name,
             // 部位カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
             category: product.category || 'TOPS',
-            // カラー（商品詳細での色指定は不要のため空文字）
+            // カラー（色指定は不要のため空文字）
             color: '',
-            // 取扱サイズ
-            size: productSize,
+            // サイズ（サイズ指定は不要のため空文字）
+            size: '',
             // 単価・価格（円）
             price: product.price,
             // 数量
@@ -1369,7 +1367,7 @@ function renderCheckoutPage() {
                 <img src="${item.image}" alt="${item.name}" class="cart-item-thumb" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22800%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20600%20800%22%3E%3Crect%20fill%3D%22%23f3f4f6%22%20width%3D%22600%22%20height%3D%22800%22%2F%3E%3Cpath%20d%3D%22M250%20320%20L350%20320%20L370%20420%20L230%20420%20Z%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22480%22%20text-anchor%3D%22middle%22%20fill%3D%22%236b7280%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20letter-spacing%3D%222%22%3EMANEKIN%20COLLECTION%3C%2Ftext%3E%3C%2Fsvg%3E'">
                 <div class="cart-item-details">
                     <h4 class="cart-item-name">${item.name}</h4>
-                    <p class="cart-item-meta">カラー: <strong>${item.color}</strong> | サイズ: <strong>${item.size}</strong></p>
+                    ${(item.color || item.size) ? `<p class="cart-item-meta">${item.color ? `カラー: <strong>${item.color}</strong>` : ''}${item.color && item.size ? ' | ' : ''}${item.size ? `サイズ: <strong>${item.size}</strong>` : ''}</p>` : ''}
                     <p class="cart-item-price">¥${item.price.toLocaleString()} (税込)</p>
                 </div>
                 <div class="cart-item-controls">
