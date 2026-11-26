@@ -1452,7 +1452,7 @@ function renderCheckoutPage() {
     // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
         // HTML 要素 #order-name を取得して変数 orderName に格納します
-        // お届け先情報に入力した名前と
+        // お届け先情報に入した名前と
         const orderName = document.getElementById('order-name');
         // HTML 要素 #order-email を取得して変数 orderEmail に格納します
         // お届け先情報に入力したメールアドレス
@@ -1692,19 +1692,19 @@ async function fetchUserCoupons() {
             // ログイン認証用のCookie（セッション情報 manekin_session）をリクエストに一緒に含めて送信する
             credentials: 'include'
         });
-        // サーバーから届いた自分専用のクーポンデータ（JSON）をJavaScriptのオブジェクトに変換して data に入れる
+        // サーバーから届いた自分専用のクーポンデータ（JSON）をJavaScriptのオブジェクトに変換(翻訳)して data に入れる
         // （dataの中身の例: { coupons: [ { name: "【初回限定】1割引クーポン", discount_rate: 0.10 } ] }）
         const data = await resp.json().catch(() => ({}));
         // サーバー通信が成功（resp.ok）し、かつ自分のクーポン一覧（data.coupons）が配列で正しく届いたか確認する
         if (resp.ok && Array.isArray(data.coupons)) {
-            // サーバーから受け取った「自分のクーポン一覧」を、アプリ全体で使える変数（AppState.userCoupons）に保存する
+            // サーバーから受け取った「自分のクーポン情報」を、アプリ全体で使える変数（AppState.userCoupons）に保存する
             AppState.userCoupons = data.coupons;
-        // 通信に失敗した、またはクーポンが1枚もなかった場合の処理
+            // 通信に失敗した、またはクーポンが1枚もなかった場合の処理
         } else {
             // 所持クーポンを空っぽ（[]）にする
             AppState.userCoupons = [];
         }
-    // サーバーが起動していないなど通信例外(エラー)が発生した場合にこのcatchブロックが実行される
+        // サーバーが起動していないなど通信例外(エラー)が発生した場合にこのcatchブロックが実行される
     } catch (e) {
         // ブラウザの開発者ツールのConsole（コンソール）にエラー内容を警告表示する
         console.warn('クーポン取得エラー:', e);
@@ -1725,7 +1725,7 @@ async function fetchUserCoupons() {
         // 使えるクーポンの枚数を計算し、マイページの要素のHTMLを「○ 枚」に書き換えて表示する
         mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
     }
-    // 最終的に取得・更新されたクーポン一覧の配列(AppState.userCoupons)を呼び出し元に返却する
+    // 最終的に取得・更新されたクーポン一覧の配列(AppState.userCoupons)を返す
     return AppState.userCoupons;
 }
 
@@ -1780,7 +1780,7 @@ function renderCheckoutCoupons() {
             // バッジの文字色を緑色（#059669）にして適用中を目立たせる
             badgeEl.style.color = '#059669';
         }
-    // クーポンが適用されていない（未選択）の場合
+        // クーポンが適用されていない（未選択）の場合
     } else {
         // バッジ要素が存在する場合に実行する
         if (badgeEl) {
@@ -1821,7 +1821,7 @@ function renderCheckoutCoupons() {
                 </div>
             </div>
         `;
-    // 配列のHTML文字列をすべて結合して1つのHTMLにする
+        // 配列のHTML文字列をすべて結合して1つのHTMLにする
     }).join('');
 }
 
@@ -1925,6 +1925,7 @@ function updateCheckoutCalculations() {
     const pointMessage = document.getElementById('checkout-point-message');
 
     // カートに入っている各商品の「価格 × 数量」を足し算して商品合計（小計）を計算する
+    // reduce... ひとまとめにする
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     // 商品合計が5,000円以上のときは送料無料（0円）、5,000円未満のときは送料550円にする
     const shipping = subtotal >= 5000 ? 0 : 550;
@@ -1939,18 +1940,24 @@ function updateCheckoutCalculations() {
         couponDiscount = Math.round(subtotal * rate);
     }
     // 商品合計からクーポン割引を引いた「割引後小計」を計算する（マイナスにならないよう max(0, ...) にする）
+    // クーポン適用後のお支払合計を計算している
+    // 商品合計からクーポン割引額を引いた　割引後の合計金額がこれ
     const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
 
     // ログイン中の会員が持っている利用可能ポイント残高を取得する
     const availablePoints = getUserPoints();
-    // 画面の保有ポイント表示要素があれば、3桁区切りの数字（例: 1,000）で表示を更新する
+    // 画面の保有ポイント表示要素(HTMLの骨組み)があれば、3桁区切りの数字（例: 1,000）で表示を更新する
     if (userPointsEl) userPointsEl.textContent = availablePoints.toLocaleString();
 
     // 【仕様】ポイントは商品代金（割引後小計）にのみ使え、配送料には使えないため上限を計算する
+    // 使用できるポイントの上限を保有ポイントから割引後小計額(割引されてない小計額)まで使用可能と範囲を決める
+    // 割引き後小計額までポイントが使えるよ
     const maxUsablePoints = Math.min(availablePoints, discountedSubtotal);
 
     // お客さんが入力した利用ポイントが上限を超えていたら、上限値（maxUsablePoints）に制限する
+    // 使用するポイントが割引後小計金額より大きかったら
     if (checkoutUsedPoints > maxUsablePoints) {
+        // 使用するポイントは割引後小計金額と同じ数しか使えない
         checkoutUsedPoints = maxUsablePoints;
     }
     // 利用ポイントがマイナス値になっていたら0に戻す
@@ -1959,6 +1966,7 @@ function updateCheckoutCalculations() {
     }
 
     // ポイント入力枠があり、かつ現在入力中（フォーカス中）でなければ枠内の数値を最新値に更新する
+    // 今カーソルが当たっていて操作中になっている(入力中)かどうかチェック(document.activeElement != pointInput)
     if (pointInput && document.activeElement !== pointInput) {
         pointInput.value = checkoutUsedPoints > 0 ? checkoutUsedPoints : '';
     }
@@ -1968,6 +1976,7 @@ function updateCheckoutCalculations() {
     // 内税（消費税10%分）を計算する
     const tax = Math.round(netTotal * 10 / 110);
     // お支払い金額の1%を獲得ポイントとして計算する（合計が0円なら0pt）
+    // 0円より大きければお支払合計の1%を獲得できるが1ポイントは確定で獲得できる
     const earnedPoints = netTotal > 0 ? Math.max(1, Math.floor(netTotal * 0.01)) : 0;
 
     // 画面の商品小計を「¥XX」形式で更新する
@@ -1989,7 +1998,7 @@ function updateCheckoutCalculations() {
             if (couponDiscountLabel) couponDiscountLabel.textContent = `クーポン割引 (${currentAppliedCoupon.discount_label || '10% OFF'})`;
             // 値引き額をマイナス表示（例: -¥300）にする
             couponDiscountEl.textContent = `-¥${couponDiscount.toLocaleString()}`;
-        // クーポンを使っていない場合
+            // クーポンを使っていない場合
         } else {
             // クーポン割引行を画面から隠す（非表示）
             couponDiscountRow.style.display = 'none';
@@ -2004,7 +2013,7 @@ function updateCheckoutCalculations() {
             pointDiscountRow.style.display = 'flex';
             // 割引額をマイナス表示（例: -¥500）にする
             pointDiscountEl.textContent = `-¥${checkoutUsedPoints.toLocaleString()}`;
-        // ポイントを使っていない場合
+            // ポイントを使っていない場合
         } else {
             // ポイント割引行を画面から隠す
             pointDiscountRow.style.display = 'none';
@@ -2046,8 +2055,12 @@ function handlePointsInputChange() {
     // HTML 要素 #checkout-use-points を取得して変数 pointInput に格納します
     const pointInput = document.getElementById('checkout-use-points');
     // 定数 val を宣言し、値（parseInt(pointInput ? pointInput.value…）をセットします
+    // parseIntで文字列を整数(少数の無い数値)に変換する
+    // parseIntの中で入力されたポイントを十進数に変換するか、初期値の0を十進数に変換している
+    // または　初期値の0 
     const val = parseInt(pointInput ? pointInput.value : 0, 10) || 0;
     // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
+    // 使用できるポイントは0から入力されたポイント数まで使用可能
     checkoutUsedPoints = Math.max(0, val);
     // 関連処理 updateCheckoutCalculations() を呼び出して処理・画面を更新します
     updateCheckoutCalculations();
@@ -2060,23 +2073,33 @@ function handlePointsInputChange() {
 //   ・持っているポイントを上限いっぱいまで自動入力して、最大割引を適用します
 // ==========================================================================
 function handleUseAllPoints() {
+    // 商品単価×商品の個数(既存商品)の値段をひとまとめにして、商品合計を出す
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // クーポンの割引額を初期値０にする
     let couponDiscount = 0;
+    // 現在クーポンの利用が適用されている　かつ　商品合計が0より大きいとき
     if (currentAppliedCoupon && subtotal > 0) {
+        // クーポンの割引額を　商品合計×(適用したクーポンの割り引く割合または初期値0.10)
         couponDiscount = Math.round(subtotal * (currentAppliedCoupon.discount_rate || 0.10));
     }
+    // 割引後の商品合計金額は　0から商品合計－クーポンの割引額
     const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
+    // 現在使用できる保有ポイントを持ってくる
     const available = getUserPoints();
-
+    // 保有できるポイントが0以下だったら
     if (available <= 0) {
         showToast('現在ご利用可能な保有ポイントはありません（保有ポイント: 0 pt）');
         return;
     }
 
-    // 配送料にはポイントを使えないため、割引後小計を上限とする
+    // 配送料にはポイントを使えないため、割引後小計を上限とする 
+    // 使用できるポイントの上限は、保有ポイント数の内からクーポン割引後の商品合計金額まで
     checkoutUsedPoints = Math.min(available, discountedSubtotal);
+    // HTMLの使用ポイント入力欄の骨組みを持ってきて
     const pointInput = document.getElementById('checkout-use-points');
+    // HTMLの入力欄の骨組みが存在するなら　入力される値をポイントの上限までなら何でもInputできます。
     if (pointInput) pointInput.value = checkoutUsedPoints;
+    // 使用したらポイント減るし、クーポン使えなくなるからそういった画面の更新
     updateCheckoutCalculations();
     showToast(`✨ 保有ポイントから ${checkoutUsedPoints.toLocaleString()} pt（${checkoutUsedPoints.toLocaleString()}円分）を商品代金に適用しました（※配送料はポイント対象外です）`);
 }
