@@ -637,19 +637,6 @@ const SAMPLE_PRODUCTS = [
         material: "レーヨン 60%, ナイロン 40%",
         // 在庫管理・社内識別用の型番コード（SKU: MNK-2026-W24）
         sku: "MNK-2026-W24"
-    },
-    // チャック全開のチェックパディングジャケット（レイヤード対応）
-    {
-        id: 25,
-        gender: "MEN",
-        name: "チェックパディングジャケット (チャック全開)",
-        nameEn: "Check Padded Puffer Jacket (Full Open)",
-        category: "OUTER",
-        price: 12800,
-        image: "assets/images/men/チェックパディングジャケット_チャック開き.png",
-        isNew: true,
-        isFeatured: true,
-        description: "チャックが全開に開いてインナーが全体から美しくのぞくチェック柄パディングジャケット。重ね着コーデに最適です。",        material: "ポリエステル 100%、中綿ポリエステル 100%",
-        sku: "MNK-2026-M25"
     }
+
 ];
