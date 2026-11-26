@@ -1686,27 +1686,25 @@ async function fetchUserCoupons() {
     const apiBase = getApiBaseUrl();
     // サーバーとの通信が失敗したりネットが切れたりしても画面が止まらないよう、try〜catchで通信エラーをキャッチする
     try {
-        // fetchを使い「http://127.0.0.1:8080/api/coupons?user_id=ログイン中のID」へGETリクエストを送信してMySQLのuser_couponsテーブルからクーポン一覧を取得する
-        // user_couponsの中のuser_idの一覧をリクエストして持ってきている
+        // サーバーへ「ログイン中の自分(user_id)が持っているクーポンをください」とリクエストを送信する
+        // （※全ユーザーの一覧ではなく、MySQLから『自分のクーポンデータ（割引内容など）』だけを検索して返してもらいます）
         const resp = await fetch(`${apiBase}/api/coupons?user_id=${AppState.currentUser.id}`, {
             // ログイン認証用のCookie（セッション情報 manekin_session）をリクエストに一緒に含めて送信する
             credentials: 'include'
         });
-        // サーバーから返ってきたJSON形式のテキストデータをJavaScriptのオブジェクト・配列に変換する（失敗した場合は空のオブジェクト{}にする）
-        // クーポンが使用できる状態のユーザーIDの一覧をjson形式でdataに入れている
+        // サーバーから届いた自分専用のクーポンデータ（JSON）をJavaScriptのオブジェクトに変換して data に入れる
+        // （dataの中身の例: { coupons: [ { name: "【初回限定】1割引クーポン", discount_rate: 0.10 } ] }）
         const data = await resp.json().catch(() => ({}));
-        // 通信が成功（resp.okがtrue）かつ、受け取ったデータの中にdata.couponsという配列が存在しているかチェックする
-        // データベースからuser_couponsのuser_idの一覧が持ってこれた　かつ　json形式にした持ってきたuser_idの保存場所が配列になっていたら
+        // サーバー通信が成功（resp.ok）し、かつ自分のクーポン一覧（data.coupons）が配列で正しく届いたか確認する
         if (resp.ok && Array.isArray(data.coupons)) {
-            // サーバーから取得できたクーポンのリスト(data.coupons)をアプリ全体のクーポンの変数(AppState.userCoupons)に格納する
-            // user_couponsのuser_id(クーポンが使用できる人)がログインした際にその人のごと現在のクーポンをjson形式のuser_id一覧から選択する
+            // サーバーから受け取った「自分のクーポン一覧」を、アプリ全体で使える変数（AppState.userCoupons）に保存する
             AppState.userCoupons = data.coupons;
-            // 通信に失敗した、またはクーポンデータが配列でない場合
+        // 通信に失敗した、またはクーポンが1枚もなかった場合の処理
         } else {
-            // クーポンなしとして空配列[]をセットする
+            // 所持クーポンを空っぽ（[]）にする
             AppState.userCoupons = [];
         }
-        // サーバーが起動していないなど通信例外(エラー)が発生した場合にこのcatchブロックが実行される
+    // サーバーが起動していないなど通信例外(エラー)が発生した場合にこのcatchブロックが実行される
     } catch (e) {
         // ブラウザの開発者ツールのConsole（コンソール）にエラー内容を警告表示する
         console.warn('クーポン取得エラー:', e);
