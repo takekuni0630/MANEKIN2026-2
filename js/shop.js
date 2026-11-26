@@ -158,25 +158,14 @@ function getDefaultMobileClosetItems() {
 
 // ==========================================================================
 // 【関数】ensureMobileUserInitialized(user)
-// 【役割】スマホ版で新しく使い始めた人へ、クーポンや初期データを準備してあげるセットアップ係
+// 【役割】スマホ版で新しく使い始めた人へ、初期データを準備してあげるセットアップ係
 // 【具体的な処理内容】
-//   ・初回の「10%OFFクーポン」や「サンプルの手持ち服」をスマホの保存領域に自動セットします
+//   ・「サンプルの手持ち服」やカート・注文履歴をスマホの保存領域に自動セットします
+//   ※ クーポンは新規会員登録したユーザーにのみ付与されます
 // ==========================================================================
 function ensureMobileUserInitialized(user) {
     if (!isMobileLocalStorageMode() || !user || !user.id) return;
     const uid = String(user.id);
-    if (lsGetJson(`manekin_ls_coupons_${uid}`, null) === null) {
-        lsSetJson(`manekin_ls_coupons_${uid}`, [
-            {
-                id: 1,
-                code: 'WELCOME10',
-                name: '【初回限定】1割引クーポン (10% OFF)',
-                discount_rate: 0.10,
-                discount_label: '1割引 (10% OFF)',
-                is_used: 0
-            }
-        ]);
-    }
     if (lsGetJson(`manekin_ls_closet_${uid}`, null) === null) {
         lsSetJson(`manekin_ls_closet_${uid}`, getDefaultMobileClosetItems());
     }
@@ -1573,41 +1562,61 @@ function setUserPoints(points, options = {}) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser) return;
     // アプリ全体状態 AppState.currentUser.points を最新値（Math.max(0, points)）に更新します
+    // ポイントを小数点切り捨てた0~の数字に計算したものをnormalizePtsに格納して、現在のユーザーのポイントを小数以下切り捨てポイントに変更
     const normalizedPts = Math.max(0, Math.floor(Number(points) || 0));
     AppState.currentUser.points = normalizedPts;
 
     // スマホ版の場合は localStorage のユーザー情報にもポイント残高を反映します
     if (isMobileLocalStorageMode()) {
+        // isSetJsonで現在のログインユーザーを画面に表示
         lsSetJson('manekin_ls_current_user', AppState.currentUser);
+        // usersにログインユーザーか未ログイン(ゲスト)の情報を入れる
         const users = lsGetJson('manekin_ls_users', []);
+        // uIdxにlocalStorageに保存されているユーザーのIDと現在のログイン(未ログイン)ユーザーのIDが一致するものを格納
         const uIdx = users.findIndex(u => String(u.id) === String(AppState.currentUser.id));
+        // 未ログイン時も含むログインユーザーがいるなら
         if (uIdx > -1) {
+            // その人のポイントを小数点を切り捨てしたポイントに更新する
             users[uIdx].points = normalizedPts;
+            // ポイントが更新されたユーザーを画面表示
             lsSetJson('manekin_ls_users', users);
         }
+        // MySQLとPythonサーバーが接続されているかつデータベースに現在のログインユーザーのIDが保存されていれば、
     } else if (options.syncToBackend && isServerUserId(AppState.currentUser.id)) {
         // デスクトップ版では MySQL の users.points にも最新残高を同期保存します
+        // APIサーバーのベースURLを取得し、対象のユーザーのURLを作っています。
+        // `{getApiBaseUrl()}/api/users/${AppState.currentUser.id}`
+        // で、MySQLのリンクを取得(fetch)してその中のusersテーブルから現在のユーザーを取得(fetch)
         fetch(`${getApiBaseUrl()}/api/users/${AppState.currentUser.id}`, {
+            // POST送信
             method: 'POST',
+            // これから送るものの形式を決める、今回は(json)
             headers: { 'Content-Type': 'application/json' },
+            // ブラウザからリクエストするときにクッキーも送信する(ログインセッションなどを一緒に)
             credentials: 'include',
+            // 送信するデータをpoints：数値というオブジェクトにし、Json,stringifyで文字列に変換している
             body: JSON.stringify({ points: normalizedPts })
+            // 通信が失敗したら画面処理を止めないようにするための記述
         }).catch(() => { });
     }
 
     // チェックアウト画面の「保有ポイント: XX pt」表示を即時更新します
+    // 購入手続きのポイントの更新
     const checkoutUserPoints = document.getElementById('checkout-user-points');
     if (checkoutUserPoints) {
+        // toLocalStringは3桁ごとに、が入る
         checkoutUserPoints.textContent = normalizedPts.toLocaleString();
     }
 
     // 注文完了画面の「現在の保有ポイント」表示も即時更新します
+    // 注文確定時に表示される現在の保有ポイント(購入確定時にリアルタイム更新)
     const compBalancePoints = document.getElementById('comp-balance-points');
     if (compBalancePoints) {
         compBalancePoints.textContent = `${normalizedPts.toLocaleString()} pt`;
     }
 
     // HTML 要素 #mypage-points を取得して変数 mypagePoints に格納します
+    // マイページで確認できる保有ポイントの更新
     const mypagePoints = document.getElementById('mypage-points');
     // 条件（mypagePoints）が成り立つか判定し、該当する場合の処理を実行します
     if (mypagePoints) {
@@ -1617,6 +1626,7 @@ function setUserPoints(points, options = {}) {
 }
 
 
+// 購入手続きの時に、使用するポイントは初期値が０、クーポンの利用は初期値が使用しない
 // 再代入可能な変数 checkoutUsedPoints を宣言し、値（0）をセットします
 let checkoutUsedPoints = 0;
 // 現在チェックアウトで適用されているクーポンオブジェクト（未適用時は null）
@@ -1626,30 +1636,27 @@ let currentAppliedCoupon = null;
 // 【関数】fetchUserCoupons()
 // 【役割】ログインしている会員が持っているお得なクーポン一覧をサーバーから集めてくるクーポン集め係
 // 【具体的な処理内容】
-//   ・利用可能な割引クーポン（初回10%OFF、誕生月500円引など）のデータをサーバーから読み込みます
+//   ・利用可能な割引クーポン（新規登録時の初回10%OFFなど）のデータをサーバーから読み込みます
+//   ※ クーポンは新規会員登録したユーザーにのみ付与され、未ログイン時には配布・表示されません
 // ==========================================================================
 async function fetchUserCoupons() {
-    const defaultWelcomeCoupon = {
-        id: 1,
-        code: 'WELCOME10',
-        name: '【初回限定】1割引クーポン (10% OFF)',
-        discount_rate: 0.10,
-        discount_label: '1割引 (10% OFF)',
-        is_used: 0
-    };
-
+    // 未ログイン時または有効な会員IDがない場合はクーポンなし（未ログイン配布防止）
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        AppState.userCoupons = [defaultWelcomeCoupon];
+        AppState.userCoupons = [];
+        currentAppliedCoupon = null;
         renderCheckoutCoupons();
+        const mypageCouponCount = document.getElementById('mypage-coupon-count');
+        if (mypageCouponCount) {
+            mypageCouponCount.innerHTML = `0 <span class="stat-unit">枚</span>`;
+        }
         return AppState.userCoupons;
     }
     const uid = AppState.currentUser.id;
 
     // スマホ版の場合は localStorage から所持クーポンを読み込みます
     if (isMobileLocalStorageMode()) {
-        ensureMobileUserInitialized(AppState.currentUser);
         const savedCoupons = lsGetJson(`manekin_ls_coupons_${uid}`, []);
-        AppState.userCoupons = (Array.isArray(savedCoupons) && savedCoupons.length > 0) ? savedCoupons : [defaultWelcomeCoupon];
+        AppState.userCoupons = Array.isArray(savedCoupons) ? savedCoupons : [];
         renderCheckoutCoupons();
         const mypageCouponCount = document.getElementById('mypage-coupon-count');
         if (mypageCouponCount) {
@@ -1665,16 +1672,15 @@ async function fetchUserCoupons() {
             credentials: 'include'
         });
         const data = await resp.json().catch(() => ({}));
-        if (resp.ok && Array.isArray(data.coupons) && data.coupons.length > 0) {
+        if (resp.ok && Array.isArray(data.coupons)) {
             AppState.userCoupons = data.coupons;
-        } else if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
-            // Pythonサーバー再起動前などで /api/coupons が未応答の場合でも、初回1割引クーポンを選択可能にします
-            AppState.userCoupons = [defaultWelcomeCoupon];
+        } else {
+            AppState.userCoupons = [];
         }
     } catch (e) {
         console.warn('クーポン取得エラー:', e);
-        if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
-            AppState.userCoupons = [defaultWelcomeCoupon];
+        if (!Array.isArray(AppState.userCoupons)) {
+            AppState.userCoupons = [];
         }
     }
     renderCheckoutCoupons();
@@ -1692,22 +1698,25 @@ async function fetchUserCoupons() {
 // 【役割】お会計画面に「今使えるクーポン」を並べてポチッと選べるようにするクーポン案内係
 // 【具体的な処理内容】
 //   ・持っているクーポンを並べて表示し、ワンクリックで適用できるようにします
+//   ※ 未ログイン時は会員登録・ログインを案内します
 // ==========================================================================
 function renderCheckoutCoupons() {
     const listEl = document.getElementById('checkout-coupons-list');
     const badgeEl = document.getElementById('checkout-coupon-status-badge');
     if (!listEl) return;
 
-    const coupons = (Array.isArray(AppState.userCoupons) && AppState.userCoupons.length > 0)
-        ? AppState.userCoupons
-        : [{
-            id: 1,
-            code: 'WELCOME10',
-            name: '【初回限定】1割引クーポン (10% OFF)',
-            discount_rate: 0.10,
-            discount_label: '1割引 (10% OFF)',
-            is_used: 0
-        }];
+    // 未ログイン時：クーポン利用にはログインが必要であることを明示し、勝手な配布・利用を防止します
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        currentAppliedCoupon = null;
+        if (badgeEl) {
+            badgeEl.textContent = 'クーポン利用にはログインが必要です';
+            badgeEl.style.color = '#6b7280';
+        }
+        listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">クーポンは新規会員登録した会員様に配布されます。<a href="#login" style="color: #2563eb; text-decoration: underline; margin-left: 6px; font-weight: 600;">ログイン・新規会員登録はこちら</a></div>`;
+        return;
+    }
+
+    const coupons = Array.isArray(AppState.userCoupons) ? AppState.userCoupons : [];
     const availableCoupons = coupons.filter(c => !c.is_used);
 
     // もし適用中のクーポンが使用済みになっていたら解除
@@ -1728,7 +1737,7 @@ function renderCheckoutCoupons() {
     }
 
     if (availableCoupons.length === 0) {
-        listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">現在ご利用可能な未使用クーポンはありません（使用済み）</div>`;
+        listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">現在ご利用可能な未使用クーポンはありません</div>`;
         return;
     }
 
@@ -1763,17 +1772,11 @@ function renderCheckoutCoupons() {
 //     計算して画面に反映します
 // ==========================================================================
 function handleApplyCouponCode(code) {
-    const targetCode = String(code || 'WELCOME10').trim().toUpperCase();
-    if (!Array.isArray(AppState.userCoupons) || AppState.userCoupons.length === 0) {
-        AppState.userCoupons = [{
-            id: 1,
-            code: 'WELCOME10',
-            name: '【初回限定】1割引クーポン (10% OFF)',
-            discount_rate: 0.10,
-            discount_label: '1割引 (10% OFF)',
-            is_used: 0
-        }];
+    if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        showToast('⚠️ クーポンのご利用には新規会員登録またはログインが必要です');
+        return;
     }
+    const targetCode = String(code || '').trim().toUpperCase();
     let coupon = (AppState.userCoupons || []).find(c => c.code === targetCode && !c.is_used);
     if (!coupon) {
         coupon = (AppState.userCoupons || []).find(c => !c.is_used) || null;
@@ -4038,6 +4041,17 @@ async function handleRegister(e) {
                 isLocalStorage: true
             };
             users.push(newUser);
+            // 新規会員登録したユーザーにのみ初回限定1割引クーポンを付与します
+            lsSetJson(`manekin_ls_coupons_${newUser.id}`, [
+                {
+                    id: 1,
+                    code: 'WELCOME10',
+                    name: '【初回限定】1割引クーポン (10% OFF)',
+                    discount_rate: 0.10,
+                    discount_label: '1割引 (10% OFF)',
+                    is_used: 0
+                }
+            ]);
         }
         lsSetJson('manekin_ls_users', users);
         ensureMobileUserInitialized(newUser);

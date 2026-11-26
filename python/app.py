@@ -1032,9 +1032,6 @@ def login_user():
                 # 初期ポイントは 0 からスタートします
                 user['points'] = 0
 
-            # クーポンを未所持（初回ログイン）の場合は初回限定1割引クーポンを自動配布します
-            grant_welcome_coupon(cursor, user['id'])
-
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
@@ -1115,10 +1112,6 @@ def demo_login_user():
             if user and user.get('points') is None:
                 # 初期ポイントは 0 からスタートします
                 user['points'] = 0
-
-            # 既存デモアカウントでクーポンを一度も付与されていない場合は初期クーポンを付与します
-            if grant_welcome_coupon(cursor, user['id']):
-                conn.commit()
 
         # MySQL user_sessions テーブルに保存し Cookie へセットする乱数トークンを発行します
         session_token = create_user_session(conn, user['id'])
@@ -1264,10 +1257,6 @@ def get_user_coupons():
 
     try:
         with conn.cursor() as cursor:
-            # 既存会員でクーポンをまだ1つも受け取っていない場合は初期配布クーポンを付与します
-            if grant_welcome_coupon(cursor, user_id):
-                conn.commit()
-
             # ユーザーの所持クーポン一覧を取得します（未使用を優先表示）
             cursor.execute("SELECT * FROM `user_coupons` WHERE `user_id` = %s ORDER BY `is_used` ASC, `created_at` DESC;", (user_id,))
             coupons = cursor.fetchall()
