@@ -1640,91 +1640,84 @@ let currentAppliedCoupon = null;
 //   ※ クーポンは新規会員登録したユーザーにのみ付与され、未ログイン時には配布・表示されません
 // ==========================================================================
 async function fetchUserCoupons() {
-    // 【判定】未ログイン状態、またはサーバー発行の正式な会員IDを持っていないかチェックします
-    // （購入手続きやマイページで、ログイン・会員登録していない人に勝手にクーポンが配られるのを防ぎます）
+    // ログインしていない場合はクーポンを使えないようにする
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // 所持クーポンの一覧を空っぽ（0枚）に初期化します
+        // クーポンを0枚（空）にする
         AppState.userCoupons = [];
-        // 現在チェックアウト画面で選ばれているクーポンも解除（null＝なし）にします
+        // 選択中のクーポンも解除（なし）にする
         currentAppliedCoupon = null;
-        // お会計画面のクーポン選択欄を再描画して「ログイン・新規登録はこちら」の案内を表示します
+        // お会計画面の表示を更新（ログイン案内を表示）
         renderCheckoutCoupons();
-        // マイページ画面にある「保有クーポンの枚数表示」HTML要素を取得します
+        // マイページのクーポン枚数表示を取得
         const mypageCouponCount = document.getElementById('mypage-coupon-count');
-        // マイページの枚数表示要素が画面に存在する場合にのみ実行します
         if (mypageCouponCount) {
-            // 未ログインなので保有枚数を「0 枚」と表示更新します
+            // マイページに「0枚」と表示する
             mypageCouponCount.innerHTML = `0 <span class="stat-unit">枚</span>`;
         }
-        // クーポンなし（空の配列 []）を呼び出し元へ返して、この関数の処理をここで終了します
+        // 空のクーポン配列を返してここで終わる
         return AppState.userCoupons;
     }
-    // ログイン中の会員ID（数値）を取り出して変数 uid に保存します
+    // ログイン中のユーザーIDを取り出す
     const uid = AppState.currentUser.id;
 
-    // 【スマホ版の分岐】ローカルストレージ（端末内保存）モードで動作中か判定します
+    // スマホ版（端末のlocalStorageに保存するモード）の場合
     if (isMobileLocalStorageMode()) {
-        // 端末のlocalStorageから、このユーザーID専用のクーポン配列を取り出します（未保存なら空配列 []）
+        // 端末に保存されているこのユーザーのクーポンを取り出す
         const savedCoupons = lsGetJson(`manekin_ls_coupons_${uid}`, []);
-        // 取り出したデータが正しい配列ならそれをセットし、それ以外なら空配列 [] をアプリ状態に入れます
+        // クーポンデータをアプリにセットする（なければ空にする）
         AppState.userCoupons = Array.isArray(savedCoupons) ? savedCoupons : [];
-        // お会計画面のクーポン一覧表示を最新のクーポン内容で描き直します
+        // お会計画面のクーポン一覧を描き直す
         renderCheckoutCoupons();
-        // マイページ画面のクーポン枚数表示要素を取得します
+        // マイページの枚数表示を取得
         const mypageCouponCount = document.getElementById('mypage-coupon-count');
-        // 要素が画面に存在する場合に枚数を更新します
         if (mypageCouponCount) {
-            // 保有クーポンの中から「!c.is_used（まだ使っていない未使用のもの）」だけを絞り込んで抽出します
+            // まだ使っていない未使用クーポン（!c.is_used）だけを数える
             const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
-            // 使えるクーポンの枚数を計算してマイページのバッジに「○ 枚」と書き込みます
+            // マイページに使える枚数を表示する
             mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
         }
-        // 読み込んだクーポン配列を返してスマホ版の処理を終了します
+        // クーポンを返して終了
         return AppState.userCoupons;
     }
 
-    // 【PC版/MySQLの処理】バックエンド（Pythonサーバー）の接続先URL（例: http://127.0.0.1:8080）を取得します
+    // PC版：PythonサーバーのURLを取得
     const apiBase = getApiBaseUrl();
-    // 通信エラーやサーバー未起動時でも画面がフリーズしないよう、try〜catchで通信処理を保護します
     try {
-        // Python API「/api/coupons?user_id=会員ID」へ通信を送り、MySQLのuser_couponsテーブルからクーポン一覧を取得します
+        // Pythonサーバーへ通信し、MySQLからこのユーザーのクーポン一覧を取得する
         const resp = await fetch(`${apiBase}/api/coupons?user_id=${AppState.currentUser.id}`, {
-            // ログイン認証用のCookie（セッション情報）をリクエストと一緒に安全に送信します
+            // ログイン状態（Cookie）も一緒に送る
             credentials: 'include'
         });
-        // サーバーから返ってきたJSON形式の応答データをJavaScriptのオブジェクトに変換します（変換失敗時は空オブジェクト）
+        // サーバーから届いたデータをJSON形式で受け取る
         const data = await resp.json().catch(() => ({}));
-        // 通信が成功（HTTPステータス200番台）し、かつクーポン配列が正しく受け取れたかチェックします
+        // データが正しく届いたかチェック
         if (resp.ok && Array.isArray(data.coupons)) {
-            // サーバーから届いた本物のクーポン一覧データをアプリ全体状態（AppState.userCoupons）に保存します
+            // 取得したクーポン一覧をアプリにセット
             AppState.userCoupons = data.coupons;
-        // サーバーからのデータが配列でない、または空だった場合の処理です
         } else {
-            // クーポンなしとして空配列 [] をセットします
+            // クーポンがなければ空にする
             AppState.userCoupons = [];
         }
-    // サーバーが止まっているなど通信中にエラーが発生した場合はcatchブロックで安全に受け止めます
+    // サーバーエラーなどで通信に失敗したときの安全対策
     } catch (e) {
-        // 開発者ツールのコンソール画面に警告ログを出力して原因を確認できるようにします
+        // エラー内容をコンソールに表示
         console.warn('クーポン取得エラー:', e);
-        // 万が一AppState.userCouponsが配列でない状態になっていたら空配列 [] で保護します
+        // 配列でなければ空にする
         if (!Array.isArray(AppState.userCoupons)) {
-            // クーポンを空配列 [] に初期化して画面のエラーを防ぎます
             AppState.userCoupons = [];
         }
     }
-    // お会計画面のクーポン選択欄を最新の所持クーポン一覧で再描画します
+    // お会計画面のクーポン一覧を描き直す
     renderCheckoutCoupons();
-    // マイページ画面のクーポン枚数表示要素を取得します
+    // マイページのクーポン枚数表示を取得
     const mypageCouponCount = document.getElementById('mypage-coupon-count');
-    // 要素が画面に存在する場合に実行します
     if (mypageCouponCount) {
-        // 保有クーポンの中から「!c.is_used（未使用）」のものだけを絞り込んで取り出します
+        // 未使用のクーポンだけを数える
         const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
-        // 未使用クーポンの合計枚数をマイページの画面に「○ 枚」と表示します
+        // マイページに枚数を表示する
         mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
     }
-    // 取得したクーポン一覧データを関数の呼び出し元へ返却します
+    // クーポン一覧を返して終了
     return AppState.userCoupons;
 }
 
