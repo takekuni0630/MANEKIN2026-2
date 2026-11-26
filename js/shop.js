@@ -1737,48 +1737,72 @@ async function fetchUserCoupons() {
 //   ※ 未ログイン時は会員登録・ログインを案内します
 // ==========================================================================
 function renderCheckoutCoupons() {
+    // HTMLの中からクーポン一覧を表示する枠（id="checkout-coupons-list"）を取得する
     const listEl = document.getElementById('checkout-coupons-list');
+    // HTMLの中からクーポンの適用状態を表示するバッジ（id="checkout-coupon-status-badge"）を取得する
     const badgeEl = document.getElementById('checkout-coupon-status-badge');
+    // クーポン表示枠が画面内に存在しない場合はエラー防止のためここで終了する
     if (!listEl) return;
 
     // 未ログイン時：クーポン利用にはログインが必要であることを明示し、勝手な配布・利用を防止します
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        // 適用中のクーポンを解除して未選択（null）にする
         currentAppliedCoupon = null;
+        // バッジ要素が存在する場合に実行する
         if (badgeEl) {
+            // バッジの文字を「クーポン利用にはログインが必要です」に書き換える
             badgeEl.textContent = 'クーポン利用にはログインが必要です';
+            // バッジの文字色をグレー（#6b7280）にする
             badgeEl.style.color = '#6b7280';
         }
+        // クーポン表示枠に「ログイン・新規会員登録はこちら」の案内リンクを表示してここで終了する
         listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">クーポンは新規会員登録した会員様に配布されます。<a href="#login" style="color: #2563eb; text-decoration: underline; margin-left: 6px; font-weight: 600;">ログイン・新規会員登録はこちら</a></div>`;
         return;
     }
 
+    // ユーザーの保有クーポン一覧が配列ならそのまま取得し、未設定なら空配列 [] にする
     const coupons = Array.isArray(AppState.userCoupons) ? AppState.userCoupons : [];
+    // クーポン一覧の中から「まだ使っていない未使用（!c.is_used）」のものだけを絞り込む
     const availableCoupons = coupons.filter(c => !c.is_used);
 
-    // もし適用中のクーポンが使用済みになっていたら解除
+    // もし現在選んでいるクーポンが既に使用済みになっていた場合は適用を解除する
     if (currentAppliedCoupon && !availableCoupons.some(c => c.code === currentAppliedCoupon.code)) {
+        // 適用中クーポンをリセット（null）にする
         currentAppliedCoupon = null;
     }
 
+    // 現在クーポンが適用されている（選択中）の場合
     if (currentAppliedCoupon) {
+        // バッジ要素が存在する場合に実行する
         if (badgeEl) {
+            // バッジに「✓ 適用中のクーポン名」を表示する
             badgeEl.textContent = `現在：✓ ${currentAppliedCoupon.name} を適用中`;
+            // バッジの文字色を緑色（#059669）にして適用中を目立たせる
             badgeEl.style.color = '#059669';
         }
+    // クーポンが適用されていない（未選択）の場合
     } else {
+        // バッジ要素が存在する場合に実行する
         if (badgeEl) {
+            // 使えるクーポンがあれば「現在：利用しない」、0枚なら「利用可能なクーポンなし」と文字を表示する
             badgeEl.textContent = availableCoupons.length > 0 ? '現在：利用しない（未適用）' : '利用可能なクーポンなし（使用済み）';
+            // バッジの文字色を落ち着いたグレー（#6b7280）にする
             badgeEl.style.color = '#6b7280';
         }
     }
 
+    // 使えるクーポンが1枚もない（0枚）の場合
     if (availableCoupons.length === 0) {
+        // クーポン枠に「現在ご利用可能な未使用クーポンはありません」というメッセージを表示して終了する
         listEl.innerHTML = `<div style="padding: 10px 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 6px; font-size: 0.8rem; color: #6b7280;">現在ご利用可能な未使用クーポンはありません</div>`;
         return;
     }
 
+    // 使えるクーポンを1枚ずつループ処理してHTMLカードの形に組み立てる
     listEl.innerHTML = availableCoupons.map(c => {
+        // このクーポンが現在選択中のクーポンと一致しているかを判定する（一致していれば true）
         const isApplied = Boolean(currentAppliedCoupon && currentAppliedCoupon.code === c.code);
+        // クーポン1枚分のHTMLカード文字列を返す（選択中ならオレンジ色の枠線と背景にする）
         return `
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 14px; background: ${isApplied ? '#ffedd5' : '#ffffff'}; border: ${isApplied ? '2px solid #ea580c' : '1px solid #fed7aa'}; border-radius: 8px;">
                 <div>
@@ -1797,6 +1821,7 @@ function renderCheckoutCoupons() {
                 </div>
             </div>
         `;
+    // 配列のHTML文字列をすべて結合して1つのHTMLにする
     }).join('');
 }
 
@@ -1808,24 +1833,37 @@ function renderCheckoutCoupons() {
 //     計算して画面に反映します
 // ==========================================================================
 function handleApplyCouponCode(code) {
+    // ログインしていない場合はクーポンを使えないようにチェックする
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+        // トースト通知で「ログインしてください」と画面にメッセージを出す
         showToast('⚠️ クーポンのご利用には新規会員登録またはログインが必要です');
+        // 処理をここで中断して終了する
         return;
     }
+    // 選択されたクーポンコード（例: 'WELCOME10'）の空白を除去して大文字に揃える
     const targetCode = String(code || '').trim().toUpperCase();
+    // 自分の所持クーポンの中から、コードが一致してかつ未使用のクーポンを探す
     let coupon = (AppState.userCoupons || []).find(c => c.code === targetCode && !c.is_used);
+    // コードが一致するものが見つからなければ、未使用のクーポンを1つ探す
     if (!coupon) {
         coupon = (AppState.userCoupons || []).find(c => !c.is_used) || null;
     }
 
+    // 使えるクーポンが見つからなかった場合
     if (!coupon) {
+        // トースト通知で「利用可能なクーポンがありません」と知らせる
         showToast('⚠️ ご利用可能なクーポンがありません（使用済み）');
+        // 処理をここで中断して終了する
         return;
     }
 
+    // 見つかったクーポンを現在適用中のクーポン変数（currentAppliedCoupon）に代入する
     currentAppliedCoupon = coupon;
+    // お会計画面のクーポン選択ボタンの見た目を「選択中」に更新する
     renderCheckoutCoupons();
+    // 割引額（10%OFFなど）やお支払い合計金額を自動再計算して画面を更新する
     updateCheckoutCalculations();
+    // 画面に「クーポンを適用しました」と割引内容をトースト通知でお知らせする
     showToast(`🎉 クーポン「${coupon.name}」を適用しました！（商品代金から ${coupon.discount_label} 引き）`);
 }
 
@@ -1836,11 +1874,17 @@ function handleApplyCouponCode(code) {
 //   ・クーポンの利用を取り消し、通常のお支払い金額に戻します
 // ==========================================================================
 function handleCancelCoupon() {
+    // 今クーポンが適用されていたかどうかを true / false で記録しておく
     const hadCoupon = Boolean(currentAppliedCoupon);
+    // 適用中のクーポンを未選択（null）にリセットして解除する
     currentAppliedCoupon = null;
+    // お会計画面のクーポン選択ボタンの見た目を「利用しない」選択中に描き直す
     renderCheckoutCoupons();
+    // クーポン割引を0円に戻してお支払い合計金額を再計算する
     updateCheckoutCalculations();
+    // もともとクーポンを使っていた場合のみ通知を出す
     if (hadCoupon) {
+        // 画面に「利用しないに変更しました」とトースト通知を表示する
         showToast('クーポンを「利用しない」に変更しました');
     }
 }
@@ -1853,81 +1897,116 @@ function handleCancelCoupon() {
 //     送料（税込5,000円以上で無料、未満は550円）を足して、最終的な支払合計を計算します
 // ==========================================================================
 function updateCheckoutCalculations() {
-    // HTML 要素の取得
+    // 画面の「商品合計」を表示するHTML要素を取得する
     const subtotalEl = document.getElementById('checkout-subtotal');
+    // 画面の「配送料」を表示するHTML要素を取得する
     const shippingEl = document.getElementById('checkout-shipping');
+    // 画面の「消費税」を表示するHTML要素を取得する
     const taxEl = document.getElementById('checkout-tax');
+    // 画面の「お支払い合計金額」を表示するHTML要素を取得する
     const totalEl = document.getElementById('checkout-total');
+    // 画面の「ポイント割引の行全体」を表示・非表示切り替えするためのHTML要素を取得する
     const pointDiscountRow = document.getElementById('checkout-point-discount-row');
+    // 画面の「ポイント割引額（-¥XX）」を表示するHTML要素を取得する
     const pointDiscountEl = document.getElementById('checkout-point-discount');
+    // 画面の「クーポン割引の行全体」を表示・非表示切り替えするためのHTML要素を取得する
     const couponDiscountRow = document.getElementById('checkout-coupon-discount-row');
+    // 画面の「クーポン割引のラベル（例: クーポン割引 (10% OFF)）」を表示するHTML要素を取得する
     const couponDiscountLabel = document.getElementById('checkout-coupon-discount-label');
+    // 画面の「クーポン割引額（-¥XX）」を表示するHTML要素を取得する
     const couponDiscountEl = document.getElementById('checkout-coupon-discount');
+    // 画面の「今回獲得予定ポイント（+XX pt）」を表示するHTML要素を取得する
     const earnedPointsEl = document.getElementById('checkout-earned-points');
+    // 画面の「保有ポイント（現在使えるポイント残高）」を表示するHTML要素を取得する
     const userPointsEl = document.getElementById('checkout-user-points');
+    // お客さんが使いたいポイント数を入力するテキストボックス（input）を取得する
     const pointInput = document.getElementById('checkout-use-points');
+    // ポイント利用に関する案内メッセージを表示する枠を取得する
     const pointMessage = document.getElementById('checkout-point-message');
 
-    // 商品小計
+    // カートに入っている各商品の「価格 × 数量」を足し算して商品合計（小計）を計算する
     const subtotal = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // 配送料（5,000円以上無料 / 未満550円）
+    // 商品合計が5,000円以上のときは送料無料（0円）、5,000円未満のときは送料550円にする
     const shipping = subtotal >= 5000 ? 0 : 550;
 
-    // クーポン割引（商品小計に対して何割引きかを適用）
+    // クーポン割引額を入れる変数を0円で初期化する
     let couponDiscount = 0;
+    // クーポンが選択されており、かつ商品合計が0円より大きい場合に割引額を計算する
     if (currentAppliedCoupon && subtotal > 0) {
+        // クーポンの割引率（例: 0.10＝10%OFF）を取得する（未設定なら0.10）
         const rate = currentAppliedCoupon.discount_rate || 0.10;
+        // 「商品合計 × 割引率」を計算し、四捨五入して値引き額を算出する
         couponDiscount = Math.round(subtotal * rate);
     }
-    // クーポン適用後の商品小計
+    // 商品合計からクーポン割引を引いた「割引後小計」を計算する（マイナスにならないよう max(0, ...) にする）
     const discountedSubtotal = Math.max(0, subtotal - couponDiscount);
 
-    // ポイント利用計算:
-    // 【仕様】ポイントは配送料には影響せず、確実に配送料は払う必要がある。
-    // そのため、ポイントが充当できる上限は「割引後商品小計（discountedSubtotal）」まで！配送料には一切使えません。
+    // ログイン中の会員が持っている利用可能ポイント残高を取得する
     const availablePoints = getUserPoints();
+    // 画面の保有ポイント表示要素があれば、3桁区切りの数字（例: 1,000）で表示を更新する
     if (userPointsEl) userPointsEl.textContent = availablePoints.toLocaleString();
 
+    // 【仕様】ポイントは商品代金（割引後小計）にのみ使え、配送料には使えないため上限を計算する
     const maxUsablePoints = Math.min(availablePoints, discountedSubtotal);
 
+    // お客さんが入力した利用ポイントが上限を超えていたら、上限値（maxUsablePoints）に制限する
     if (checkoutUsedPoints > maxUsablePoints) {
         checkoutUsedPoints = maxUsablePoints;
     }
+    // 利用ポイントがマイナス値になっていたら0に戻す
     if (checkoutUsedPoints < 0) {
         checkoutUsedPoints = 0;
     }
 
+    // ポイント入力枠があり、かつ現在入力中（フォーカス中）でなければ枠内の数値を最新値に更新する
     if (pointInput && document.activeElement !== pointInput) {
         pointInput.value = checkoutUsedPoints > 0 ? checkoutUsedPoints : '';
     }
 
-    // 最終お支払い金額: (割引後小計 - ポイント) + 配送料（※確実に配送料は加算されます）
+    // 最終お支払い金額を計算する: (割引後小計 - 利用ポイント) + 配送料
     const netTotal = (discountedSubtotal - checkoutUsedPoints) + shipping;
+    // 内税（消費税10%分）を計算する
     const tax = Math.round(netTotal * 10 / 110);
+    // お支払い金額の1%を獲得ポイントとして計算する（合計が0円なら0pt）
     const earnedPoints = netTotal > 0 ? Math.max(1, Math.floor(netTotal * 0.01)) : 0;
 
+    // 画面の商品小計を「¥XX」形式で更新する
     if (subtotalEl) subtotalEl.textContent = `¥${subtotal.toLocaleString()}`;
+    // 画面の配送料を「無料」または「¥550」で更新する
     if (shippingEl) shippingEl.textContent = shipping === 0 ? "無料 (5,000円以上)" : `¥${shipping.toLocaleString()}`;
+    // 画面の消費税を「¥XX」形式で更新する
     if (taxEl) taxEl.textContent = `¥${tax.toLocaleString()}`;
+    // 画面の最終お支払い合計金額を「¥XX」形式で更新する
     if (totalEl) totalEl.textContent = `¥${netTotal.toLocaleString()}`;
 
-    // クーポン割引行の更新
+    // クーポン割引行の表示・非表示と割引額の更新処理
     if (couponDiscountRow && couponDiscountEl) {
+        // クーポン値引きがあり、かつクーポンが選択されている場合
         if (couponDiscount > 0 && currentAppliedCoupon) {
+            // クーポン割引行を画面に表示する（display: flex）
             couponDiscountRow.style.display = 'flex';
+            // クーポン名と割引率のラベル（例: クーポン割引 (10% OFF)）を表示する
             if (couponDiscountLabel) couponDiscountLabel.textContent = `クーポン割引 (${currentAppliedCoupon.discount_label || '10% OFF'})`;
+            // 値引き額をマイナス表示（例: -¥300）にする
             couponDiscountEl.textContent = `-¥${couponDiscount.toLocaleString()}`;
+        // クーポンを使っていない場合
         } else {
+            // クーポン割引行を画面から隠す（非表示）
             couponDiscountRow.style.display = 'none';
         }
     }
 
-    // ポイント割引行の更新
+    // ポイント利用割引行の表示・非表示と割引額の更新処理
     if (pointDiscountRow && pointDiscountEl) {
+        // ポイントを使っている場合
         if (checkoutUsedPoints > 0) {
+            // ポイント割引行を画面に表示する
             pointDiscountRow.style.display = 'flex';
+            // 割引額をマイナス表示（例: -¥500）にする
             pointDiscountEl.textContent = `-¥${checkoutUsedPoints.toLocaleString()}`;
+        // ポイントを使っていない場合
         } else {
+            // ポイント割引行を画面から隠す
             pointDiscountRow.style.display = 'none';
         }
     }
