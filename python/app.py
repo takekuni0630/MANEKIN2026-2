@@ -125,7 +125,7 @@ def ensure_account_tables():
     try:
         # MySQL に SQL 命令を送るためのカーソルを取得します（with ブロック終了時に自動解放されます）
         with conn.cursor() as cursor:
-            # 会員別カートテーブル `cart_items` が無ければ自動作成します（user_id+商品+色+サイズで一意制約）
+            # 会員別カートテーブル `cart_items` が無ければ自動作成します（user_id+商品+サイズで一意制約）
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS `cart_items` (
                   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -133,14 +133,13 @@ def ensure_account_tables():
                   `product_id` int(11) NOT NULL,
                   `name` varchar(255) NOT NULL,
                   `category` varchar(50) NOT NULL DEFAULT 'TOPS',
-                  `color` varchar(50) NOT NULL DEFAULT 'STANDARD',
                   `size` varchar(20) NOT NULL DEFAULT 'M',
                   `price` int(11) NOT NULL DEFAULT 0,
                   `quantity` int(11) NOT NULL DEFAULT 1,
                   `image_url` text DEFAULT NULL,
                   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
                   PRIMARY KEY (`id`),
-                  UNIQUE KEY `uk_user_cart_item` (`user_id`, `product_id`, `color`, `size`),
+                  UNIQUE KEY `uk_user_cart_item` (`user_id`, `product_id`, `size`),
                   KEY `idx_cart_user_id` (`user_id`),
                   CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -284,14 +283,6 @@ def get_all_products():
 
             # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for p in products）
             for p in products:
-                # 色バリエーション管理テーブル product_variants から対象商品の色一覧と色別画像URLを取得します
-                cursor.execute("SELECT `color`, `color_code`, `image_url` FROM `product_variants` WHERE `product_id` = %s;", (p['id'],))
-                # 対象商品の色別画像バリエーション行すべてを配列として取得します
-                variants = cursor.fetchall()
-                # カラーバリエーション一覧配列を作成して商品辞書に追加します（未登録時は STANDARD）
-                p['colors'] = [v['color'] for v in variants] if variants else ["STANDARD"]
-                # カラー名をキー、対応画像URLを値とするマップ辞書を作成して商品辞書に追加します
-                p['colorImages'] = {v['color']: v['image_url'] for v in variants} if variants else {p['colors'][0]: p['image']}
                 # 共通展開サイズ一覧 ['S', 'M', 'L', 'XL'] を商品辞書へセットします
                 p['sizes'] = ["S", "M", "L", "XL"]
 
@@ -333,14 +324,6 @@ def get_product_detail(product_id):
                 # 指定した会員や商品が見つからない旨を HTTP 404 (Not Found) で返します
                 return jsonify({"status": "error", "message": "商品が見つかりません。"}), 404
 
-            # 色バリエーション管理テーブル product_variants から対象商品の色一覧と色別画像URLを取得します
-            cursor.execute("SELECT `color`, `color_code`, `image_url` FROM `product_variants` WHERE `product_id` = %s;", (product_id,))
-            # 対象商品の色別画像バリエーション行すべてを配列として取得します
-            variants = cursor.fetchall()
-            # カラーバリエーション一覧配列を作成して商品辞書に追加します（未登録時は STANDARD）
-            product['colors'] = [v['color'] for v in variants] if variants else ["STANDARD"]
-            # カラー名をキー、対応画像URLを値とするマップ辞書を作成して商品辞書に追加します
-            product['colorImages'] = {v['color']: v['image_url'] for v in variants} if variants else {product['colors'][0]: product['image']}
             # 共通展開サイズ一覧 ['S', 'M', 'L', 'XL'] を商品辞書へセットします
             product['sizes'] = ["S", "M", "L", "XL"]
 
@@ -542,12 +525,12 @@ def create_order():
             # 今 INSERT した orders テーブルの自動採番 ID（PRIMARY KEY）を取得します
             order_id = cursor.lastrowid
 
-            # order_items テーブルへ各注文商品の明細（商品名・色・サイズ・数量・単価・画像URL）を追加します
+            # order_items テーブルへ各注文商品の明細（商品名・サイズ・数量・単価・画像URL）を追加します
             insert_item_sql = """
             INSERT INTO `order_items` (
-                `order_id`, `product_id`, `product_name`, `color`,
+                `order_id`, `product_id`, `product_name`,
                 `size`, `quantity`, `unit_price`, `image_url`
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s);
             """
             # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for item in cart_items）
             for item in cart_items:
@@ -559,8 +542,6 @@ def create_order():
                     item.get('id', item.get('product_id', 0)),
                     # 配列要素または直前の SQL プレースホルダへ渡す値（item.get('name', item.get('product_name', '商品）です
                     item.get('name', item.get('product_name', '商品名未定')),
-                    # 配列要素または直前の SQL プレースホルダへ渡す値（item.get('color', 'STANDARD')）です
-                    item.get('color', 'STANDARD'),
                     # 配列要素または直前の SQL プレースホルダへ渡す値（item.get('size', 'M')）です
                     item.get('size', 'M'),
                     # 配列要素または直前の SQL プレースホルダへ渡す値（int(item.get('quantity', 1))）です
@@ -783,8 +764,6 @@ def get_orders():
                         "id": it['product_id'],
                         # 表示名称
                         "name": it['product_name'],
-                        # カラーバリエーション名
-                        "color": it['color'],
                         # 選択サイズ名（XS / S / M / L / XL 等）
                         "size": it['size'],
                         # 数量（個数）
@@ -797,8 +776,8 @@ def get_orders():
                     # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for it in item）
                     for it in items
                 ]
-                # 右辺の結果（[f"{it['product_name']} ({it['color']} / {it[）を変数 item_summary_list に代入して以降の処理で使います
-                item_summary_list = [f"{it['product_name']} ({it['color']} / {it['size']}) × {it['quantity']}" for it in items]
+                # 右辺の結果（[f"{it['product_name']} ({it['size']}) × {it['quantity']}" for it in items]）を変数 item_summary_list に代入して以降の処理で使います
+                item_summary_list = [f"{it['product_name']} ({it['size']}) × {it['quantity']}" for it in items]
                 # 辞書・配列要素 o['items_summary'] に最新の値をセットします
                 o['items_summary'] = ", ".join(item_summary_list) if item_summary_list else "注文商品"
 
@@ -2064,7 +2043,7 @@ def get_user_cart(user_id):
             # 指定ユーザーの cart_items テーブルからカート内商品を登録順に取り出します
             cursor.execute(
                 """
-                SELECT `product_id`, `name`, `category`, `color`, `size`, `price`, `quantity`, `image_url`
+                SELECT `product_id`, `name`, `category`, `size`, `price`, `quantity`, `image_url`
                 FROM `cart_items`
                 WHERE `user_id` = %s
                 ORDER BY `id` ASC;
@@ -2084,8 +2063,6 @@ def get_user_cart(user_id):
                     "name": r['name'],
                     # 部位・商品カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                     "category": r['category'] or 'TOPS',
-                    # カラーバリエーション名
-                    "color": r['color'] or 'STANDARD',
                     # 選択サイズ名（XS / S / M / L / XL 等）
                     "size": r['size'] or 'M',
                     # 販売価格（円・整数）
@@ -2131,7 +2108,7 @@ def sync_user_cart():
         # 入力パラメータ不足・不正を示すエラー応答（HTTP 400 Bad Request）を JSON で返します
         return jsonify({"status": "error", "message": "itemsは配列である必要があります。"}), 400
 
-    # 同一商品(product_id + color + size)の重複行を数量加算で 1 つにまとめる作業用辞書です
+    # 同一商品(product_id + size)の重複行を数量加算で 1 つにまとめる作業用辞書です
     merged_map = {}
     # 画面上の表示順序を維持するため、初出キーの順番を記録する配列を用意します
     ordered_keys = []
@@ -2157,12 +2134,10 @@ def sync_user_cart():
         if qty <= 0:
             # 不正または数量0の項目だったためこのループ回をスキップして次の要素へ進みます
             continue
-        # 右辺の結果（str(it.get('color') or 'STANDARD')[:50]）を変数 color に代入して以降の処理で使います
-        color = str(it.get('color') or 'STANDARD')[:50]
         # 右辺の結果（str(it.get('size') or 'M')[:20]）を変数 size に代入して以降の処理で使います
         size = str(it.get('size') or 'M')[:20]
-        # 右辺の結果（(pid_int, color, size)）を変数 key に代入して以降の処理で使います
-        key = (pid_int, color, size)
+        # 右辺の結果（(pid_int, size)）を変数 key に代入して以降の処理で使います
+        key = (pid_int, size)
         # 条件式（if key in merged_map）が成り立つかチェックして処理を分岐します
         if key in merged_map:
             # 既存の辞書・配列要素 merged_map[key]['quantity'] に qty を加算合計します
@@ -2179,8 +2154,6 @@ def sync_user_cart():
                 "name": str(it.get('name') or '商品')[:255],
                 # 部位・商品カテゴリ（OUTER / TOPS / BOTTOMS / HAT / SHOES）
                 "category": str(it.get('category') or 'TOPS')[:50],
-                # カラーバリエーション名
-                "color": color,
                 # 選択サイズ名（XS / S / M / L / XL 等）
                 "size": size,
                 # 販売価格（円・整数）
@@ -2219,8 +2192,8 @@ def sync_user_cart():
                 # cart_items テーブルへ正規化したカート内の各商品を 1 行ずつ登録します
                 insert_sql = """
                 INSERT INTO `cart_items` (
-                    `user_id`, `product_id`, `name`, `category`, `color`, `size`, `price`, `quantity`, `image_url`
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    `user_id`, `product_id`, `name`, `category`, `size`, `price`, `quantity`, `image_url`
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
                 """
                 # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for item in normalized_items）
                 for item in normalized_items:
@@ -2228,8 +2201,8 @@ def sync_user_cart():
                     cursor.execute(insert_sql, (
                         # 配列要素または直前の SQL プレースホルダへ渡す値（user_id, item['id'], item['name'], item['cate）です
                         user_id, item['id'], item['name'], item['category'],
-                        # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値（item['color'], item['size'], item['price'], ）です
-                        item['color'], item['size'], item['price'], item['quantity'], item['image']
+                        # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値（item['size'], item['price'], item['quantity'], item['image']）です
+                        item['size'], item['price'], item['quantity'], item['image']
                     ))
         # ここまでの INSERT / UPDATE / DELETE 変更を MySQL へ正式に確定保存（コミット）します
         conn.commit()

@@ -70,10 +70,8 @@ def setup_database():
         # 旧データ仕様で残っていた不要な商品（ID=8）があれば削除します
         cursor.execute("DELETE FROM `products` WHERE `id` = 8;")
 
-        # カラーバリエーションは廃止されたため、古い product_variants レコードをクリアします
-        cursor.execute("SHOW TABLES LIKE 'product_variants';")
-        if cursor.fetchone():
-            cursor.execute("DELETE FROM `product_variants`;")
+        # カラーバリエーションは廃止されたため、古い product_variants テーブルがあれば削除します
+        cursor.execute("DROP TABLE IF EXISTS `product_variants`;")
 
         # 会員別所持クーポン管理テーブル `user_coupons` を作成します（使用したら消滅）
         cursor.execute("""

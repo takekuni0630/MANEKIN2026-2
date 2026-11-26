@@ -2448,8 +2448,8 @@ async function handlePlaceOrder() {
         return;
     }
 
-    // 定数 itemSummaryList を宣言し、値（confirmedOrder.items.map(it => `${it.n…）をセットします
-    const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.color} / ${it.size}) × ${it.quantity}`);
+    // 定数 itemSummaryList を宣言し、値（confirmedOrder.items.map(it => `${it.name} (${it.size}) × ${it.quantity}`)）をセットします
+    const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.size}) × ${it.quantity}`);
     // 変数・配列項目 confirmedOrder.items_summary の値を更新・計算します
     confirmedOrder.items_summary = itemSummaryList.join(", ");
 
