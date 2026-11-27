@@ -2946,80 +2946,90 @@ async function handlePlaceOrder() {
     if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
 
     // クーポン利用情報の表示（クーポン適用時のみ行を表示）
-}
-// 注文完了画面表示用に適用中クーポンのスナップショットを保持します
-// const appliedCouponSnapshot = currentAppliedCoupon ? {
-// クーポン名
-// name: currentAppliedCoupon.name || currentAppliedCoupon.title || '会員優待クーポン',
-// クーポンコード
-//code: currentAppliedCoupon.code || '',
-// 割引額（円）
-// discount: calc.couponDiscount || 0
-// 注文完了画面の「クーポン割引」行（横並びの行ブロック）の要素を取得します
-const compCouponRow = document.getElementById('comp-coupon-row');
-// クーポン名・コード・割引金額を表示するテキスト要素を取得します
-const compCouponInfo = document.getElementById('comp-coupon-info');
-// 両方の要素が画面上に存在するか判定します（存在するときだけ表示処理を実行）
-if (compCouponRow && compCouponInfo) {
-    // 確定注文データまたは保持していたクーポン情報から、実際の割引額（円）を安全に決定します
-    const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
-        // 注文確定データに割引額があればその金額を採用します
-        ? confirmedOrder.coupon_discount
-        // 注文データに無ければスナップショットの割引額（どちらも無ければ0円）を採用します
-        : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
-    // クーポン割引額が1円以上ある場合（クーポンが適用されていた場合）の処理です
-    if (discount > 0) {
-        // クーポン行のスタイルを 'flex' にして画面に表示させます
-        compCouponRow.style.display = 'flex';
-        // 表示用のクーポン名を取得します（未設定時は'クーポン割引'）
-        const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
-        // 表示用のクーポンコードを取得します（未設定時は空文字）
-        const cCode = (appliedCouponSnapshot && appliedCouponSnapshot.code) || confirmedOrder.coupon_code || '';
-        // クーポンコードが存在していれば「 [WELCOME10]」のようなバッジ文字列を作ります
-        const codeBadge = cCode ? ` [${cCode}]` : '';
-        // 「クーポン名 [コード] -¥500」のように整形した文字をセットして画面に表示します
-        compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
-    // クーポンを使っていない（割引額が0円）場合の分岐処理です
-    } else {
-        // クーポンを使っていない時は行ごと非表示（display: none）にして隠します
-        compCouponRow.style.display = 'none';
+
+    // 注文完了画面表示用に適用中クーポンのスナップショットを保持します
+    // const appliedCouponSnapshot = currentAppliedCoupon ? {
+    // クーポン名
+    // name: currentAppliedCoupon.name || currentAppliedCoupon.title || '会員優待クーポン',
+    // クーポンコード
+    //code: currentAppliedCoupon.code || '',
+    // 割引額（円）
+    //discount: calc.couponDiscount || 0
+
+    // 注文完了画面の「クーポン割引」表示行（横並び枠）のHTML要素を取得します
+    const compCouponRow = document.getElementById('comp-coupon-row');
+    // クーポン名・クーポンコード・割引金額を表示するテキストHTML要素を取得します
+    const compCouponInfo = document.getElementById('comp-coupon-info');
+    // クーポン行とテキスト要素の両方が画面上に存在するか判定します（存在時のみ処理実行）
+    if (compCouponRow && compCouponInfo) {
+        // 注文確定データまたは適用中クーポンから、実際の割引額（円）を安全に決定します
+        const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
+            // 確定注文データに割引金額があればその数値をそのまま採用します
+            ? confirmedOrder.coupon_discount
+            // 注文データに無ければスナップショットの割引額（どちらも無ければ0円）を採用します
+            : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
+        // クーポン割引額が1円以上ある場合（クーポンを使った場合）の表示処理です
+        if (discount > 0) {
+            // クーポン行のスタイルを 'flex' に切り替えて画面に表示させます
+            compCouponRow.style.display = 'flex';
+            // 表示用のクーポン名を取得します（未設定時は'クーポン割引'）
+            const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
+            // 表示用のクーポンコードを取得します（未設定時は空文字）
+            const cCode = (appliedCouponSnapshot && appliedCouponSnapshot.code) || confirmedOrder.coupon_code || '';
+            // クーポンコードがある場合は「 [WELCOME10]」のようなバッジ文字列を作成します
+            const codeBadge = cCode ? ` [${cCode}]` : '';
+            // 「クーポン名 [コード] -¥割引額」という形式で文字を組み立てて画面に書き込みます
+            compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
+        // クーポンを使っていない（割引額が0円）場合の処理です
+        } else {
+            // クーポン行のスタイルを 'none' にして画面から非表示にして隠します
+            compCouponRow.style.display = 'none';
+        }
     }
-}
 
-// ポイント利用情報の表示（ポイント利用時のみ行を表示）
-const compUsedPointsRow = document.getElementById('comp-used-points-row');
-const compUsedPoints = document.getElementById('comp-used-points');
-if (compUsedPointsRow && compUsedPoints) {
-    const usedPts = confirmedOrder.used_points || calc.usedPoints || 0;
-    if (usedPts > 0) {
-        compUsedPointsRow.style.display = 'flex';
-        compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
-    } else {
-        compUsedPointsRow.style.display = 'none';
+    // ポイント利用情報の表示（ポイント利用時のみ行を表示）
+    // 注文完了画面の「ポイント利用」表示行（横並び枠）のHTML要素を取得します
+    const compUsedPointsRow = document.getElementById('comp-used-points-row');
+    // 利用したポイント数を表示するテキストHTML要素を取得します
+    const compUsedPoints = document.getElementById('comp-used-points');
+    // ポイント行とテキスト要素の両方が画面上に存在するか判定します（存在時のみ処理実行）
+    if (compUsedPointsRow && compUsedPoints) {
+        // 今回の注文で利用したポイント数を安全に取得します（使っていなければ0ポイント）
+        const usedPts = confirmedOrder.used_points || calc.usedPoints || 0;
+        // ポイントを1pt以上使った場合の表示処理です
+        if (usedPts > 0) {
+            // ポイント行のスタイルを 'flex' に切り替えて画面に表示させます
+            compUsedPointsRow.style.display = 'flex';
+            // 「-500 pt」のようにカンマ区切りで利用ポイント数を画面に書き込みます
+            compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
+        // ポイントを使っていない（0pt）場合の処理です
+        } else {
+            // ポイント行のスタイルを 'none' にして画面から非表示にして隠します
+            compUsedPointsRow.style.display = 'none';
+        }
     }
-}
 
-// HTML 要素 #comp-db-status を取得して変数 compDbStatus に格納します
-const compDbStatus = document.getElementById('comp-db-status');
-// 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
-if (compDbStatus) {
-    // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-    compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ＆デモ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
-    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
-    compDbStatus.style.background = '#dcfce7';
-    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
-    compDbStatus.style.color = '#15803d';
-}
+    // HTML 要素 #comp-db-status を取得して変数 compDbStatus に格納します
+    const compDbStatus = document.getElementById('comp-db-status');
+    // 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
+    if (compDbStatus) {
+        // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+        compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ＆デモ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
+        compDbStatus.style.background = '#dcfce7';
+        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
+        compDbStatus.style.color = '#15803d';
+    }
 
-// 条件（closetBannerMsg && purchasedItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
-if (closetBannerMsg && purchasedItems.length > 0) {
-    // 文字要素 closetBannerMsg の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-    closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をMySQLのマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
-}
+    // 条件（closetBannerMsg && purchasedItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
+    if (closetBannerMsg && purchasedItems.length > 0) {
+        // 文字要素 closetBannerMsg の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+        closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をMySQLのマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
+    }
 
-// 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-const buyerName = confirmedOrder.customer_name || AppState.currentUser?.name || 'お客様';
-showToast(`🎉【${buyerName} 様】ご注文完了！注文番号「${confirmedOrder.order_no}」をご注文履歴に保存しました`);
+    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+    const buyerName = confirmedOrder.customer_name || AppState.currentUser?.name || 'お客様';
+    showToast(`🎉【${buyerName} 様】ご注文完了！注文番号「${confirmedOrder.order_no}」をご注文履歴に保存しました`);
 }
 
 
