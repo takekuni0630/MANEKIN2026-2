@@ -2166,18 +2166,30 @@ async function importOrderToCloset(idx) {
 
     // スマホ版の場合は localStorage のクローゼットに直接追加します
     if (isMobileLocalStorageMode()) {
+        // 注文に含まれる商品を1件ずつループ処理します
         for (let i = 0; i < itemsList.length; i++) {
+            // 現在の注文商品データを取り出します
             const it = itemsList[i];
+            // 商品名を取得します（未設定時は'購入商品'）
             const itName = it.name || it.product_name || '購入商品';
+            // 商品の色を取得します（未設定時は'BLACK'）
             const itColor = it.color || 'BLACK';
+            // 商品のIDを取得します
             const itId = it.id || it.product_id || Date.now();
+            // 全商品マスターから該当商品の情報を検索します
             const productMaster = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.find(p => p.id === itId) : null;
+            // 商品カテゴリ（TOPSなど）を取得します
             const itCategory = it.category || (productMaster ? productMaster.category : 'TOPS');
+            // 商品の画像URLを取得します
             const itImg = it.image || it.image_url || 'assets/images/men/スカイオックスフォードシャツ.png';
+            // 商品の購入単価を取得します
             const itPrice = it.price || it.unit_price || 0;
 
+            // すでに同じ名前と色の服がクローゼットにあるか重複チェックします
             const exists = AppState.myCloset.some(c => c.name === itName && c.color === itColor);
+            // まだクローゼットに存在しない服の場合のみ新しく追加します
             if (!exists) {
+                // クローゼットに追加する手持ち服データを作成します
                 const newItem = {
                     id: 'purchased-' + itId + '-' + (order.order_no || Date.now()) + '-' + i,
                     productId: itId,
@@ -2191,30 +2203,48 @@ async function importOrderToCloset(idx) {
                     price: itPrice,
                     purchaseDate: order.date || ''
                 };
+                // 作成した服をクローゼット配列の先頭に追加します
                 AppState.myCloset.unshift(newItem);
+                // 追加成功数を1増やします
                 added++;
 
-                // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
+                // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除します
                 const fIdx = AppState.favorites.indexOf(Number(itId));
+                // お気に入りリストに含まれていた場合
                 if (fIdx > -1) {
+                    // お気に入り配列から削除します
                     AppState.favorites.splice(fIdx, 1);
+                    // 画面上のハートマークボタンを解除状態（OFF）に同期します
                     syncAllFavoriteButtons(itId, false);
                 }
             }
         }
+        // 1点以上クローゼットに追加された場合
         if (added > 0) {
+            // localStorageのクローゼットデータを最新状態に保存します
             lsSetJson(`manekin_ls_closet_${userId}`, AppState.myCloset);
+            // localStorageのお気に入りデータも最新状態に保存します
             lsSetJson(`manekin_ls_favorites_${userId}`, AppState.favorites);
+            // ナビバーやヘッダーのお気に入りバッジ数を更新します
             updateFavoriteBadges();
+            // スタジオのブランド一覧画面を再描画します
             if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+            // スタジオのアイテム一覧画面を再描画します
             if (typeof renderStudioItems === 'function') renderStudioItems();
+            // スタジオのクローゼット一覧画面を再描画します
             if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
+            // 右サイドパネルのクローゼットグリッドを再描画します
             if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
+            // 現在お気に入り画面を開いている場合はお気に入り一覧を再描画します
             if (window.location.hash === '#favorites') renderFavoriteProducts();
+            // 画面に「マイクローゼットに登録しました」とトースト通知を表示します
             showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
+        // すべてすでにクローゼットに登録済みだった場合
         } else {
+            // 画面に「すでに登録済みです」と案内トーストを表示します
             showToast('この注文の商品はすでにマイクローゼットに登録済みです');
         }
+        // スマホ版の処理をここで終了します
         return;
     }
 
@@ -2514,27 +2544,49 @@ async function handlePlaceOrder() {
 
     // スマホ版の場合は localStorage 上で注文データを生成・保存します
     if (isMobileLocalStorageMode()) {
+        // 現在の日時オブジェクトを作成します
         const now = new Date();
+        // 1000〜9999のランダムな4桁の数字を生成します
         const rand4 = Math.floor(1000 + Math.random() * 9000);
+        // スマホ保存用の注文データオブジェクトを組み立てます
         confirmedOrder = {
+            // 「ORD-年-4桁乱数」の注文番号を発行します
             order_no: `ORD-${now.getFullYear()}-${rand4}`,
+            // 注文した会員のID
             user_id: targetUserId,
+            // 注文者のお名前
             customer_name: orderPayload.customer_name,
+            // 注文者のメールアドレス
             customer_email: orderPayload.customer_email,
+            // 連絡先電話番号
             phone: orderPayload.phone,
+            // 配送先郵便番号
             postal_code: orderPayload.postal_code,
+            // 配送先住所
             address: orderPayload.address,
+            // 支払い方法（クレジットカードなど）
             payment_method: orderPayload.payment_method,
+            // 配達希望時間帯
             delivery_time: orderPayload.delivery_time,
+            // 注文日付（YYYY/MM/DD形式）
             date: now.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+            // 商品合計金額（小計）
             subtotal: orderPayload.subtotal,
+            // 配送料（5,000円以上無料 / 未満550円）
             shipping_fee: orderPayload.shipping_fee,
+            // 適用されたクーポンコード
             coupon_code: orderPayload.coupon_code,
+            // クーポン割引額
             coupon_discount: orderPayload.coupon_discount,
+            // 利用したポイント数
             used_points: orderPayload.used_points,
+            // 最終お支払い合計金額
             total_amount: orderPayload.total_amount,
+            // 今回獲得するポイント数
             earned_points: orderPayload.earned_points,
+            // 注文状況ステータス
             status: '発送準備中',
+            // カート内商品の完全なコピー配列
             items: JSON.parse(JSON.stringify(AppState.cart || []))
         };
     } else {
@@ -2666,14 +2718,21 @@ async function handlePlaceOrder() {
             }
         });
 
-        // ナビバッジ・スタジオ表示・お気に入り画面をすべて即時同期
+        // ナビバッジ・スタジオ表示・お気に入り画面をすべて即時同期します
         updateFavoriteBadges();
+        // スタジオのバッジ表示を更新します
         if (typeof updateStudioBadges === 'function') updateStudioBadges();
+        // スタジオのお気に入りグリッドを再描画します
         if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
+        // スタジオのブランド一覧画面を再描画します
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        // スタジオのアイテム一覧画面を再描画します
         if (typeof renderStudioItems === 'function') renderStudioItems();
+        // お気に入り一覧画面を再描画します
         if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
+        // マイページ画面を再描画します
         if (typeof renderMyPage === 'function') renderMyPage();
+        // スマホ版の場合はlocalStorageのお気に入りデータも最新状態に保存します
         if (isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
         }
@@ -2681,27 +2740,37 @@ async function handlePlaceOrder() {
 
     // 購入者のお名前を注文データに確実に紐付けます（誰が購入したか保存）
     if (!confirmedOrder.customer_name && AppState.currentUser) {
+        // 会員名が注文データになければログイン中の会員名を代入します
         confirmedOrder.customer_name = AppState.currentUser.name;
     }
     // 注文完了画面表示用に適用中クーポンのスナップショットを保持します
     const appliedCouponSnapshot = currentAppliedCoupon ? {
+        // クーポン名
         name: currentAppliedCoupon.name || currentAppliedCoupon.title || '会員優待クーポン',
+        // クーポンコード
         code: currentAppliedCoupon.code || '',
+        // 割引額（円）
         discount: calc.couponDiscount || 0
     } : null;
 
     // 使用したクーポンを消滅（1回限り有効）させます
     if (currentAppliedCoupon) {
+        // クーポン一覧が配列として存在する場合
         if (Array.isArray(AppState.userCoupons)) {
+            // 使ったクーポンとコードが一致するものを探します
             const usedC = AppState.userCoupons.find(c => c.code === currentAppliedCoupon.code);
+            // 見つかったら使用済みフラグ（is_used = 1）を立てます
             if (usedC) {
                 usedC.is_used = 1;
             }
         }
+        // スマホ版の場合は更新されたクーポン一覧をlocalStorageに保存します
         if (isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_coupons_${targetUserId}`, AppState.userCoupons || []);
         }
+        // 適用中クーポンを解除（null）にします
         currentAppliedCoupon = null;
+        // お会計画面のクーポン選択欄を描き直します
         renderCheckoutCoupons();
     }
 
@@ -2869,19 +2938,32 @@ async function syncOrdersFromBackend() {
 
     // スマホ版の場合は localStorage から注文履歴を取得して画面を更新します
     if (isMobileLocalStorageMode()) {
+        // ステータス表示バッジを「スマホ＆デモ版 (localStorage)」の緑色表示に切り替えます
         setMobileLocalStoragePill();
+        // ログインしていない（または正規会員でない）場合は注文履歴を空にしてマイページを描画し終了します
         if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
+            // 注文履歴を空（[]）にします
             AppState.orderHistory = [];
+            // マイページ画面を更新します
             renderMyPage();
+            // お会計画面の計算を更新します
             updateCheckoutCalculations();
+            // 処理を終了します
             return;
         }
+        // localStorageからこの会員専用の注文履歴配列を取り出します
         const savedOrders = lsGetJson(`manekin_ls_orders_${AppState.currentUser.id}`, []);
+        // 正しい配列なら注文履歴にセットし、配列でなければ空配列（[]）にします
         AppState.orderHistory = Array.isArray(savedOrders) ? savedOrders : [];
+        // 過去の注文履歴から実質ポイント残高（獲得−利用）を正確に計算します
         const netPts = calculateNetPointsFromOrders(AppState.orderHistory);
+        // 計算したポイント残高をお客さんの保有ポイントに反映します
         setUserPoints(Math.max(Number(AppState.currentUser.points || 0), netPts));
+        // マイページ画面を最新データで描き直します
         renderMyPage();
+        // お会計画面の計算を更新します
         updateCheckoutCalculations();
+        // スマホ版の処理をここで終了します
         return;
     }
 
@@ -3010,12 +3092,19 @@ async function handleClearOrderHistory() {
 
     // スマホ版の場合は localStorage の注文履歴を初期化します
     if (isMobileLocalStorageMode()) {
+        // localStorageのこの会員の注文履歴を空配列（[]）にして保存します
         lsSetJson(`manekin_ls_orders_${targetUserId}`, []);
+        // アプリ全体の注文履歴配列を空にします
         AppState.orderHistory = [];
+        // 保有ポイントも0にリセットします
         setUserPoints(0);
+        // マイページ画面を初期化状態（0件）で描き直します
         renderMyPage();
+        // お会計画面の計算を更新します
         updateCheckoutCalculations();
+        // 画面に「初期化しました」とトースト通知を表示します
         showToast('このアカウントのご注文履歴を初期化しました（0件）');
+        // スマホ版の処理をここで終了します
         return;
     }
 
@@ -3071,22 +3160,37 @@ async function handleRefreshFromMySQL() {
 
     // スマホ版の場合は localStorage から全データを再読込します
     if (isMobileLocalStorageMode()) {
+        // バックエンド・端末から最新のログイン会員情報を復帰させます
         const refreshedUser = await restoreAuthSessionFromBackend();
+        // 会員情報が取得できた場合
         if (refreshedUser) {
+            // アプリ全体のログイン会員情報を最新化します
             AppState.currentUser = refreshedUser;
+            // ナビバーやヘッダーのログイン状態UIを更新します
             if (typeof updateAuthNavUI === 'function') updateAuthNavUI();
         }
+        // 注文履歴・お気に入り・カート・クーポン・クローゼット・コーデ・スタジオ状態をすべて同時に再読込します
         await Promise.all([
+            // 注文履歴を再取得します
             syncOrdersFromBackend(),
+            // お気に入り商品を再取得します
             syncFavoritesFromBackend(),
+            // カート内の商品を再取得します
             syncCartFromBackend(),
+            // 保有クーポン一覧を再取得します
             fetchUserCoupons(),
+            // クローゼット内の手持ち服を再取得します
             (typeof syncClosetFromBackend === 'function') ? syncClosetFromBackend() : Promise.resolve(),
+            // 保存したコーデ一覧を再取得します
             (typeof syncOutfitsFromBackend === 'function') ? syncOutfitsFromBackend() : Promise.resolve(),
+            // スタジオの試着マネキン状態を再取得します
             (typeof syncStudioStateFromBackend === 'function') ? syncStudioStateFromBackend() : Promise.resolve()
         ]);
+        // マイページ画面を最新データで描き直します
         renderMyPage();
+        // 最新データの件数サマリーをトースト通知で画面に表示します
         showToast(`✨ スマホ＆デモ版(localStorage)から最新データを再読込しました！（注文:${AppState.orderHistory.length}件, 服:${AppState.myCloset.length}点, コーデ:${AppState.savedOutfits.length}件, 保有:${getUserPoints().toLocaleString()}pt）`);
+        // スマホ版の処理をここで終了します
         return;
     }
 
@@ -3250,18 +3354,27 @@ function renderMyPage() {
 
     // 保有クーポン枚数の更新（初期配布クーポンなど）
     const mypageCouponCount = document.getElementById('mypage-coupon-count');
+    // クーポン枚数表示枠がある場合
     if (mypageCouponCount) {
+        // 未使用のクーポン（!c.is_used）だけを絞り込んで数えます
         const activeCoupons = (AppState.userCoupons || []).filter(c => !c.is_used);
+        // マイページ画面に「○ 枚」と書き込みます
         mypageCouponCount.innerHTML = `${activeCoupons.length} <span class="stat-unit">枚</span>`;
     }
 
     // 注文履歴見出し横のアカウント表示バッジ（誰の注文履歴か明示）
     const ordersAccountBadge = document.getElementById('orders-account-badge');
+    // バッジ要素がある場合
     if (ordersAccountBadge) {
+        // ログイン中の場合
         if (AppState.currentUser) {
+            // 「お名前 様（○件）」の文字をセットします
             ordersAccountBadge.textContent = `${AppState.currentUser.name} 様 (${orderCount}件)`;
+            // バッジを表示（inline-block）にします
             ordersAccountBadge.style.display = 'inline-block';
+        // 未ログインの場合
         } else {
+            // バッジを非表示にします
             ordersAccountBadge.style.display = 'none';
         }
     }
@@ -3363,20 +3476,29 @@ let _favoritesMutationSeq = 0;
 //   ・すでに自分が持っている服のIDを調べてリストで返します
 // ==========================================================================
 function getOwnedProductIds() {
+    // 重複のない商品ID一覧を保存するSetオブジェクトを作成します
     const ownedIds = new Set();
+    // クローゼット内の服一覧が配列として存在する場合
     if (Array.isArray(AppState.myCloset)) {
+        // クローゼット内の服を1着ずつループ処理します
         AppState.myCloset.forEach(c => {
+            // 服に元のブランド商品ID（productId）が記録されている場合
             if (c.productId) {
+                // その商品IDを数値としてSetに追加します
                 ownedIds.add(Number(c.productId));
             }
+            // 商品マスターが存在し、服の名前がある場合
             if (typeof SAMPLE_PRODUCTS !== 'undefined' && c.name) {
+                // 商品マスターの中から同じ名前の商品を探します
                 const matched = SAMPLE_PRODUCTS.find(p => p.name === c.name);
+                // 見つかった場合はその商品IDもSetに追加します
                 if (matched) {
                     ownedIds.add(matched.id);
                 }
             }
         });
     }
+    // 集めた手持ち服の商品ID一覧（Set）を返却します
     return ownedIds;
 }
 window.getOwnedProductIds = getOwnedProductIds;
@@ -3388,33 +3510,54 @@ window.getOwnedProductIds = getOwnedProductIds;
 //   ・「もう買った服」はお気に入りに入れておく必要がないため、自動で整理します
 // ==========================================================================
 function cleanPurchasedFavorites(purchasedIds) {
+    // お気に入り一覧が配列でない場合は処理を行わず終了します
     if (!Array.isArray(AppState.favorites)) return false;
+    // 今回削除対象とする商品IDの配列を用意します
     let targetIds = [];
+    // 買った商品のID一覧が配列で渡された場合
     if (Array.isArray(purchasedIds) && purchasedIds.length > 0) {
+        // 有効な正の数値IDだけを抽出して配列にします
         targetIds = purchasedIds.map(id => Number(id)).filter(id => !isNaN(id) && id > 0);
     }
+    // 削除対象の商品IDが1つもなければ何もせず終了します
     if (targetIds.length === 0) return false;
 
+    // 高速検索用に対象ID一覧をSetオブジェクトにします
     const targetSet = new Set(targetIds);
+    // 1件でもお気に入りから削除されたかを記録するフラグです
     let removedAny = false;
+    // 実際に削除された商品IDを記録する配列です
     const removedIds = [];
+    // お気に入り配列から買った商品を除外（filter）します
     AppState.favorites = AppState.favorites.filter(id => {
+        // 数値IDに変換します
         const numId = Number(id);
+        // 今回買った商品IDに含まれている場合
         if (targetSet.has(numId)) {
+            // 削除フラグをtrueにします
             removedAny = true;
+            // 削除リストに追加します
             removedIds.push(numId);
+            // 画面上のハートボタンをOFF（未選択）状態に同期します
             syncAllFavoriteButtons(numId, false);
+            // filterで除外するためfalseを返します
             return false;
         }
+        // 残す商品はtrueを返します
         return true;
     });
 
+    // 1件以上お気に入りから削除された場合
     if (removedAny) {
+        // スマホ版の場合はlocalStorageのお気に入りデータを更新保存します
         if (AppState.currentUser && isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_favorites_${AppState.currentUser.id}`, AppState.favorites);
+        // PC版（MySQL）の場合はサーバーのお気に入りテーブルからも削除します
         } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+            // 削除された商品IDを1件ずつサーバーへ削除リクエスト送信します
             removedIds.forEach(pId => {
                 try {
+                    // APIへ削除リクエストを送ります
                     fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3424,9 +3567,12 @@ function cleanPurchasedFavorites(purchasedIds) {
                 } catch (_) { }
             });
         }
+        // ナビバーやヘッダーのお気に入りバッジ数を最新化します
         updateFavoriteBadges();
+        // スタジオのお気に入りバッジも更新します
         if (typeof updateStudioBadges === 'function') updateStudioBadges();
     }
+    // 削除が行われたかどうか（true/false）を返却します
     return removedAny;
 }
 window.cleanPurchasedFavorites = cleanPurchasedFavorites;
@@ -3442,32 +3588,48 @@ async function syncFavoritesFromBackend() {
     // 未ログイン時はゲスト用ストレージから復元します
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         try {
+            // 端末のlocalStorageからゲスト用のお気に入りJSON文字列を取り出します
             const guestFavs = JSON.parse(localStorage.getItem('manekin_guest_favorites') || '[]');
+            // 配列であれば数値型に変換してお気に入り配列に入れます
             if (Array.isArray(guestFavs)) {
                 AppState.favorites = guestFavs.map(id => Number(id));
             }
         } catch (_) { }
+        // ヘッダーやナビのお気に入りバッジ件数を更新します
         updateFavoriteBadges();
+        // ここで処理を終了します
         return;
     }
-    // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
+    // ログイン中の会員IDを取得します
     const targetUserId = AppState.currentUser.id;
 
     // スマホ版の場合は localStorage からお気に入り一覧を取得します
     if (isMobileLocalStorageMode()) {
+        // localStorageからこの会員専用のお気に入り配列を取り出します
         const savedFavs = lsGetJson(`manekin_ls_favorites_${targetUserId}`, []);
+        // 数値型に変換してお気に入り一覧にセットします
         AppState.favorites = Array.isArray(savedFavs) ? savedFavs.map(id => Number(id)) : [];
+        // お気に入り件数バッジを更新します
         updateFavoriteBadges();
+        // 商品詳細モーダルが開いていれば詳細のハートボタン表示を同期します
         if (AppState.currentDetailId && typeof syncAllFavoriteButtons === 'function') {
             syncAllFavoriteButtons(AppState.currentDetailId, AppState.favorites.includes(AppState.currentDetailId));
         }
+        // スタジオのブランド一覧を再描画します
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        // スタジオのお気に入りグリッドを再描画します
         if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
+        // お気に入り一覧画面を再描画します
         if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
+        // ホーム画面の商品一覧を再描画します
         if (typeof renderHomeProducts === 'function') renderHomeProducts();
+        // カタログ画面の商品一覧を再描画します
         if (typeof renderCatalogProducts === 'function') renderCatalogProducts();
+        // 新着商品一覧を再描画します
         if (typeof renderNewItems === 'function') renderNewItems();
+        // マイページ画面を再描画します
         if (typeof renderMyPage === 'function') renderMyPage();
+        // スマホ版の処理をここで終了します
         return;
     }
 
@@ -3531,9 +3693,12 @@ async function syncFavoritesFromBackend() {
 //     サーバーに保存しハートの見た目を切り替えます
 // ==========================================================================
 async function handleToggleFavorite(productId) {
+    // 引数の商品IDを数値型に変換します
     const numId = Number(productId);
+    // 正しい数値でない場合は処理を中止します
     if (!numId || isNaN(numId)) return;
 
+    // お気に入り一覧が配列でなければ空配列で初期化します
     if (!Array.isArray(AppState.favorites)) {
         AppState.favorites = [];
     }
@@ -3542,64 +3707,96 @@ async function handleToggleFavorite(productId) {
     _favoritesMutationSeq++;
 
     // 1. 即座にUIを楽観的更新（色を即座に反転、バッジ更新）
+    // すでにお気に入り配列に含まれているかを検索します
     const existingIndex = AppState.favorites.findIndex(f => Number(f) === numId);
+    // 追加したか解除したかを保持するフラグ変数です
     let isAdded = false;
+    // まだお気に入りに入っていなかった場合（追加処理）
     if (existingIndex === -1) {
+        // お気に入り配列の末尾に商品IDを追加します
         AppState.favorites.push(numId);
+        // 追加フラグをtrueにします
         isAdded = true;
+    // すでにお気に入りに入っていた場合（解除処理）
     } else {
+        // お気に入り配列からその商品IDを削除します
         AppState.favorites.splice(existingIndex, 1);
+        // 追加フラグをfalse（解除）にします
         isAdded = false;
     }
     console.log(`❤️ [Favorite] トグル実行: productId=${numId}, isAdded=${isAdded}, 現在のお気に入り一覧=`, AppState.favorites);
 
-    // ボタンの見た目（赤ハート・解除）とバッジを即座に同期
+    // ボタンの見た目（赤ハート・解除）とバッジを即座に同期します
     syncAllFavoriteButtons(numId, isAdded);
+    // ヘッダーやナビのお気に入りバッジ数を更新します
     updateFavoriteBadges();
+    // スタジオのお気に入りバッジを更新します
     if (typeof updateStudioBadges === 'function') updateStudioBadges();
+    // スタジオのブランド一覧画面を更新します
     if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+    // お気に入り一覧画面を開いている場合は一覧を再描画します
     if (window.location.hash === '#favorites') renderFavoriteProducts();
+    // マイページ画面を再描画します
     if (typeof renderMyPage === 'function') renderMyPage();
 
     // 2. ログイン状態に応じた永続化処理
+    // 未ログインの場合の処理
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
-        // 未ログイン時：ゲスト用ストレージに保存
         try {
+            // ゲスト用のlocalStorageにお気に入り配列をJSON文字列として保存します
             localStorage.setItem('manekin_guest_favorites', JSON.stringify(AppState.favorites));
         } catch (_) { }
+        // 画面に「お気に入りに追加/解除しました」とトースト通知を表示します
         showToast(isAdded ? 'お気に入りに追加しました（ログインすると会員データに保存されます）' : 'お気に入りから解除しました');
+        // 未ログイン時はここで終了します
         return;
     }
 
+    // ログイン中の会員IDを取得します
     const targetUserId = AppState.currentUser.id;
 
-    // スマホ版 localStorage モード
+    // スマホ版 localStorage モードの場合
     if (isMobileLocalStorageMode()) {
+        // localStorageのこの会員のお気に入りデータを保存します
         lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
+        // 画面にトースト通知を表示します
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
+        // スマホ版の処理をここで終了します
         return;
     }
 
-    // PC版 MySQL モード
+    // PC版 MySQL モード（Pythonサーバーへリクエスト送信）
     try {
+        // バックエンドAPI（/api/favorites/toggle）へPOST送信してお気に入りをMySQLに保存します
         const res = await fetch(`${getApiBaseUrl()}/api/favorites/toggle`, {
+            // POSTメソッドを指定します
             method: 'POST',
+            // 送信形式をJSONに指定します
             headers: { 'Content-Type': 'application/json' },
+            // ログインCookieを一緒に送信します
             credentials: 'include',
+            // 送信ボディに商品ID、会員ID、追加/解除アクションをセットします
             body: JSON.stringify({
                 product_id: numId,
                 user_id: targetUserId,
                 action: isAdded ? 'add' : 'remove'
             })
         });
+        // サーバー通信がエラーなら例外を投げます
         if (!res.ok) throw new Error('Favorite toggle API response not ok');
+        // レスポンスのJSONデータを受け取ります
         const data = await res.json().catch(() => ({}));
+        // 画面にトースト通知を表示します
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
+    // 通信エラー時のフォールバック処理
     } catch (e) {
+        // コンソールにエラー警告を出力します
         console.warn('MySQLお気に入り更新エラー (フォールバック保存):', e);
         try {
+            // サーバーエラー時でも端末のlocalStorageに保存して保護します
             lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
         } catch (_) { }
+        // 画面にトースト通知を表示します
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
     }
 }
@@ -3612,27 +3809,46 @@ async function handleToggleFavorite(productId) {
 //     ズレないよう、すべて同時にON/OFF切り替えます
 // ==========================================================================
 function syncAllFavoriteButtons(productId, isFavorite) {
+    // 比較できるように商品IDを確実に数値（数値型）に変換します
     const numId = Number(productId);
-    // CSS セレクタに一致するすべての商品カード要素を安全に取得
+    // 画面内にあるすべての商品カード要素（.product-card）をまとめて取得します
     const cards = document.querySelectorAll('.product-card');
+    // 取得した商品カードを1枚ずつ順番にチェックして処理します
     cards.forEach(card => {
+        // カードの data-id 属性から商品ID文字列を取得します
         const rawId = card.getAttribute('data-id') || card.getAttribute('data - id');
+        // このカードの商品IDが、今お気に入り変更された商品IDと一致しているか判定します
         if (rawId && Number(rawId) === numId) {
+            // カード内にあるお気に入りボタン（ハートボタン）を取得します
             const btn = card.querySelector('.fav-btn');
+            // ボタンが見つかった場合の処理を行います
             if (btn) {
+                // ボタンの中にあるハートのSVGアイコン画像を取得します
                 const svg = btn.querySelector('svg');
+                // お気に入り状態がON（追加）の場合の処理です
                 if (isFavorite) {
+                    // ボタンに is-favorite クラスを付与して赤色デザインを適用します
                     btn.classList.add('is-favorite');
+                    // 視覚障がい者向け音声読み上げ用ラベルを「お気に入りを解除」に設定します
                     btn.setAttribute('aria-label', 'お気に入りを解除');
+                    // ハートアイコンが存在していれば中身を赤色に塗りつぶします
                     if (svg) {
+                        // SVGの塗りつぶし色を赤色（#e53935）にします
                         svg.setAttribute('fill', '#e53935');
+                        // SVGの枠線色も赤色（#e53935）にします
                         svg.setAttribute('stroke', '#e53935');
                     }
+                // お気に入り状態がOFF（解除）の場合の処理です
                 } else {
+                    // ボタンから is-favorite クラスを外して通常デザインに戻します
                     btn.classList.remove('is-favorite');
+                    // 視覚障がい者向け音声読み上げ用ラベルを「お気に入りに追加」に設定します
                     btn.setAttribute('aria-label', 'お気に入りに追加');
+                    // ハートアイコンが存在していれば白抜き（透明）に戻します
                     if (svg) {
+                        // SVGの塗りつぶし色を透明（none）にします
                         svg.setAttribute('fill', 'none');
+                        // SVGの枠線色を現在の文字色（黒や灰色）に戻します
                         svg.setAttribute('stroke', 'currentColor');
                     }
                 }
@@ -3640,19 +3856,26 @@ function syncAllFavoriteButtons(productId, isFavorite) {
         }
     });
 
-    // 商品詳細画面のお気に入りボタンも即座に同期
+    // 商品詳細モーダル／画面内にある大きなハートボタン要素を取得します
     const detailFavBtn = document.getElementById('detail-fav-btn');
+    // 詳細画面のお気に入りボタンが存在し、かつ現在開いている商品IDと一致するか判定します
     if (detailFavBtn && Number(AppState.currentDetailId) === numId) {
+        // お気に入り状態がON（追加）の場合の処理です
         if (isFavorite) {
+            // 詳細ボタンに is-favorite クラスを付与します
             detailFavBtn.classList.add('is-favorite');
+            // 赤色に塗りつぶしたハートと「お気に入り解除」の文字HTMLをセットします
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#e53935" stroke="#e53935" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 お気に入り解除
             `;
+        // お気に入り状態がOFF（解除）の場合の処理です
         } else {
+            // 詳細ボタンから is-favorite クラスを削除します
             detailFavBtn.classList.remove('is-favorite');
+            // 白抜きのハートと「お気に入りに追加」の文字HTMLをセットします
             detailFavBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -3707,8 +3930,9 @@ function renderFavoriteProducts() {
     // 条件（!favGrid）が成り立つか判定し、該当する場合の処理を実行します
     if (!favGrid) return;
 
-    // お気に入りリストに登録されている商品（型を吸収して数値一致で抽出）
+    // お気に入り配列（AppState.favorites）を安全に配列として取得します
     const favList = Array.isArray(AppState.favorites) ? AppState.favorites : [];
+    // 全商品（SAMPLE_PRODUCTS）の中から、お気に入りに入っている商品IDと一致するものだけを抜き出します
     const favoriteItems = SAMPLE_PRODUCTS.filter(p => favList.some(f => Number(f) === Number(p.id)));
 
     // 対象データが 0 件（空）だった場合の専用メッセージ／空表示ルートを判定します
@@ -3723,7 +3947,7 @@ function renderFavoriteProducts() {
         `;
         // 上記の if 条件に当てはまらなかった場合の分岐処理です
     } else {
-        // 生成・変換した HTML 文字列を要素 favGrid の中身として描画します
+        // 抜き出した商品を1つずつカードHTMLに変換し、まとめてお気に入りグリッドに並べて描画します
         favGrid.innerHTML = favoriteItems.map(p => createProductCardHTML(p)).join('');
     }
 }
@@ -3754,37 +3978,60 @@ function updateAuthNavUI() {
     const mobileRegisterLink = document.getElementById('mobile-register-link');
     // ヘッダーのユーザーアイコン（マイページ遷移）横のステータスドット
     const headerUserOnlineDot = document.getElementById('header-user-online-dot');
+    // ヘッダーのユーザーアイコンボタン要素を取得します
     const headerUserBtn = document.getElementById('header-user-btn');
 
     // 条件（AppState.currentUser）が成り立つか判定し、該当する場合の処理を実行します
     if (AppState.currentUser) {
+        // ログイン中の場合は緑色のオンラインランプ（ドット）を表示します
         if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'block';
+        // ユーザーアイコンにマウスを乗せたときのツールチップに会員名を表示します
         if (headerUserBtn) headerUserBtn.title = `${AppState.currentUser.name || '会員'} 様でログイン中（マイページへ）`;
+        // PC版ナビゲーションのログインボタンを「LOGOUT」に書き換えます
         if (authLink) {
+            // ボタンの文字を「LOGOUT」に変更します
             authLink.textContent = 'LOGOUT';
+            // リンク先をJavaScriptダミーリンクにします
             authLink.href = 'javascript:void(0)';
+            // クリック時にログアウト関数（handleLogout）を実行するよう登録します
             authLink.onclick = handleLogout;
         }
+        // スマホ版引き出しメニューのログインボタンを「LOGOUT」に書き換えます
         if (mobileLoginLink) {
+            // ボタンの文字を「LOGOUT (ログアウト)」に変更します
             mobileLoginLink.textContent = 'LOGOUT (ログアウト)';
+            // リンク先をJavaScriptダミーリンクにします
             mobileLoginLink.href = 'javascript:void(0)';
+            // クリック時にログアウト関数（handleLogout）を実行するよう登録します
             mobileLoginLink.onclick = handleLogout;
         }
+        // ログイン中は新規会員登録リンクを非表示にして隠します
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'none';
         // 上記の if 条件に当てはまらなかった場合の分岐処理です（未ログイン・ゲスト）
     } else {
+        // 未ログイン時は緑色のオンラインランプ（ドット）を非表示にして消します
         if (headerUserOnlineDot) headerUserOnlineDot.style.display = 'none';
+        // ユーザーアイコンのツールチップを「マイページ / ログイン」に戻します
         if (headerUserBtn) headerUserBtn.title = 'マイページ / ログイン';
+        // PC版ナビゲーションのボタンを「LOGIN」に戻します
         if (authLink) {
+            // ボタンの文字を「LOGIN」に変更します
             authLink.textContent = 'LOGIN';
+            // リンク先をログイン画面（#login）に設定します
             authLink.href = '#login';
+            // ログアウト用クリックイベントを解除して通常の画面遷移に戻します
             authLink.onclick = null;
         }
+        // スマホ版引き出しメニューのボタンを「LOGIN」に戻します
         if (mobileLoginLink) {
+            // ボタンの文字を「LOGIN (ログイン)」に変更します
             mobileLoginLink.textContent = 'LOGIN (ログイン)';
+            // リンク先をログイン画面（#login）に設定します
             mobileLoginLink.href = '#login';
+            // ログアウト用クリックイベントを解除して通常の画面遷移に戻します
             mobileLoginLink.onclick = null;
         }
+        // 未ログイン時は新規会員登録リンクを表示します
         if (mobileRegisterLink) mobileRegisterLink.style.display = 'block';
     }
 }
@@ -3801,17 +4048,22 @@ async function handleLogout(e) {
 
     // スマホ版のlocalStorageログインセッションをクリアします
     try {
+        // 端末のlocalStorageから現在のログイン中ユーザーデータを削除します
         window.localStorage.removeItem('manekin_ls_current_user');
     } catch (e) { }
 
     // PC版の場合はバックエンド API（/api/auth/logout）へリクエストを送信します
     if (!isMobileLocalStorageMode()) {
         try {
+            // サーバーのログアウトAPIを呼び出してセッションCookieを無効化します
             await fetch(`${getApiBaseUrl()}/api/auth/logout`, {
+                // POSTメソッドで送信します
                 method: 'POST',
+                // セッションCookieを送信してどの会員か伝えます
                 credentials: 'include'
             });
         } catch (err) {
+            // ログアウト通信エラーをコンソールに警告表示します
             console.warn('ログアウトAPI通信に失敗しました:', err);
         }
     }
@@ -3836,55 +4088,70 @@ async function handleLogout(e) {
 //     ページ最上部へスクロールします
 // ==========================================================================
 async function redirectToHome(user, options = {}) {
-    // 保持していた一時遷移先を完全にクリア
+    // ログイン前に一時保持していたリダイレクト先（購入画面など）を初期化してクリアします
     AppState.pendingAuthTarget = null;
     try {
+        // セッションストレージの一時リダイレクト先を削除します
         sessionStorage.removeItem('manekin_pending_auth_target');
+        // ローカルストレージの一時リダイレクト先を削除します
         localStorage.removeItem('manekin_pending_auth_target');
     } catch (e) { }
 
-    // 1. DOM上の全.page-viewからactiveを外し、確実に#view-homeを表示
+    // 1. 画面上の全ページ要素（.page-view）から active クラスを外して非表示にします
     const allViews = document.querySelectorAll('.page-view');
+    // 全ページ要素を1つずつ巡回して active クラスを削除します
     allViews.forEach(v => v.classList.remove('active'));
+    // トップ画面要素（#view-home）を取得します
     const homeView = document.getElementById('view-home');
+    // トップ画面に active クラスを付与して画面に表示させます
     if (homeView) homeView.classList.add('active');
 
-    // 2. ナビゲーションのハイライトもHOMEに更新
+    // 2. メニューバーの全リンクから active クラスを外します
     const allNavs = document.querySelectorAll('.nav-link, .mobile-nav-link');
+    // 全ナビゲーションリンクを1つずつ巡回して選択状態を解除します
     allNavs.forEach(n => n.classList.remove('active'));
+    // HOMEメニューのリンク要素を取得します
     const homeNav = document.querySelector('.nav-link[data-nav="home"]');
+    // HOMEメニューに active クラスを付けて下線や色を強調します
     if (homeNav) homeNav.classList.add('active');
 
-    // 3. URLハッシュを#homeに更新（ブラウザURLと履歴を同期）
+    // 3. ブラウザのアドレスバーURLを #home に更新して履歴を同期します
     try {
+        // 現在のハッシュが #home 以外なら #home に書き換えます
         if (window.location.hash !== '#home') {
             window.location.hash = '#home';
         }
     } catch (e) { }
 
-    // 4. HOMEのおすすめ商品カードを再描画
+    // 4. HOME画面のおすすめ商品カードを最新データで再描画します
     if (typeof renderHomeProducts === 'function') {
+        // 商品描画関数を実行します（エラー時も安全に握りつぶします）
         try { renderHomeProducts(); } catch (err) { console.error(err); }
     }
 
-    // 5. 画面最上部へ即時スクロール
+    // 5. 画面のスクロール位置を最上部（トップ）へ即座に戻します
     try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 
-    // 6. トースト通知を表示
+    // 6. ログインした会員へのウェルカムトースト通知を表示します
     if (user && !options.silentToast && typeof showToast === 'function') {
+        // ようこそメッセージを画面右下に通知します
         showToast(`🎉 ログインしました！ようこそ、${user.name || '会員'} 様`);
     }
 
-    // 7. handleRoutingも#homeを明示指定して呼んで状態を完全同期
+    // 7. ルーティング関数を呼び出して全体の状態を #home と完全に同期させます
     if (typeof handleRouting === 'function') {
+        // #home のルート処理を実行します
         try { await handleRouting('#home'); } catch (e) { }
     }
 
-    // 8. 念押しで最上部スクロール＆#view-homeアクティブ保証
+    // 8. 念押しで最上部スクロール＆#view-homeアクティブ保証を行います
     if (homeView && !homeView.classList.contains('active')) {
+        // 全ページから active を再度外します
         allViews.forEach(v => v.classList.remove('active'));
+        // トップ画面を確実に active にします
         homeView.classList.add('active');
     }
+    // 念押しでスクロール最上部へ戻します
     try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (e) { }
 }
 
@@ -3897,56 +4164,75 @@ window.redirectToHome = redirectToHome;
 // 【役割】「デモアカウントで簡単お試しログイン」ボタンが押されたときに、ワンクリックで体験ログインさせるお試し係
 // 【具体的な処理内容】
 //   ・メールアドレスやパスワードを入力せずに、ワンクリックでテスト用ゴールド会員としてログインします
-// ==========================================================================
-// 【関数】handleDemoLogin()
-// 【役割】「テストアカウントで簡単ログイン」ボタンが押されたときの案内係
-// 【処理内容】
 //   ・データベース（MySQL / Pythonサーバー）に接続せず、
 //     ローカル環境（localStorage）で即座にテストアカウントとしてログインします！
 //   ・PC版・スマホ版・オフライン問わず、全機能（カート・注文・お気に入り・試着室等）が
 //     データベース接続なしでサクサク快適に動作します。
 // ==========================================================================
 async function handleDemoLogin(e) {
+    // リンクの標準ジャンプ動作をキャンセルします
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    // ログイン前に見ていたページ（購入手続きなど）を取得します
     const target = AppState.pendingAuthTarget || sessionStorage.getItem('manekin_pending_auth_target');
+    // チェックアウト画面からのログインであればゲスト時のかご中身を保持します
     const preserveGuestCart = (target === 'checkout');
 
-    // データベース接続を行わず、ローカルでテストアカウントを発行・復元
+    // データベース接続を行わず、端末のlocalStorageから会員一覧を取得します
     const users = lsGetJsonDirect('manekin_ls_users', []);
+    // 会員一覧の中からデモ用テストアカウントを探します
     let demoUser = users.find(u => u && (u.email === 'demo@manekin.jp' || u.isDemo));
+    // まだテストアカウントが存在していなければ初期作成します
     if (!demoUser) {
+        // テスト用デモユーザーオブジェクトを作成します
         demoUser = {
+            // テスト用の一意なIDです
             id: 99999,
+            // 表示用の会員名です
             name: 'テスト 太郎 (DEMO)',
+            // ログイン用のメールアドレスです
             email: 'demo@manekin.jp',
+            // ログイン用のパスワードです
             password: 'password123',
+            // 会員ランク（ゴールド会員）です
             rank: 'GOLD MEMBER',
+            // 初期所持ポイント（500pt）です
             points: 500,
+            // localStorage管理フラグです
             isLocalStorage: true,
+            // デモユーザー識別フラグです
             isDemo: true
         };
+        // 会員一覧配列にテストアカウントを追加します
         users.push(demoUser);
+        // localStorageに会員一覧を保存します
         lsSetJsonDirect('manekin_ls_users', users);
+    // すでにテストアカウントが存在していた場合です
     } else {
+        // localStorage管理フラグを立てます
         demoUser.isLocalStorage = true;
+        // デモユーザー識別フラグを立てます
         demoUser.isDemo = true;
     }
 
+    // スマホ版用の初期データ（マイクローゼット等）を準備します
     ensureMobileUserInitialized(demoUser);
+    // localStorageに現在ログイン中のユーザーとして保存します
     lsSetJsonDirect('manekin_ls_current_user', demoUser);
 
-    // ログインした瞬間に即座にHOME画面へ切り替える
+    // ログイン中のユーザーとしてAppStateにセットします
     AppState.currentUser = demoUser;
+    // ログインした瞬間に即座にHOME画面へ切り替えます
     await redirectToHome(demoUser);
 
-    // ログイン成功アラートを表示
+    // ログイン成功アラートを表示します
     alert('ログインされました（テストアカウント）\n※データベース接続なしで全機能をご利用いただけます');
 
-    // アラートOK直後にも確実にHOME画面表示を維持
+    // アラートOK直後にも確実にHOME画面表示を維持します
     await redirectToHome(demoUser, { silentToast: true });
 
     // 関連処理 applyAccountSession() を呼び出してデータを復元し、再度HOME画面を保証します
     await applyAccountSession(demoUser, { preserveGuestCart });
+    // 確実にHOME画面を表示した状態にします
     await redirectToHome(demoUser, { silentToast: true });
 }
 
@@ -3995,34 +4281,57 @@ async function handleLogin(e) {
 
     // スマホ版の場合は localStorage で認証・ログインします
     if (isMobileLocalStorageMode()) {
+        // localStorageから登録済み会員一覧配列を取得します
         const users = lsGetJson('manekin_ls_users', []);
+        // 大文字小文字の違いでログイン失敗しないよう入力メールアドレスを小文字化します
         const lowerEmail = email.toLowerCase();
+        // 会員一覧の中からメールアドレスが一致するユーザーを探します
         let matched = users.find(u => u && String(u.email || '').toLowerCase() === lowerEmail);
 
+        // すでに登録されている会員が見つかった場合の処理です
         if (matched) {
+            // パスワードが一致しているか判定し、不一致ならエラーにします
             if (matched.password && matched.password !== password) {
+                // パスワード不一致の警告メッセージを画面に表示します
                 showToast('メールアドレスまたはパスワードが正しくありません');
+                // ログイン失敗のため処理をここで終了します
                 return;
             }
+            // localStorage会員識別フラグを付与します
             matched.isLocalStorage = true;
+            // ログイン成功ユーザーとして変数にセットします
             loggedInUser = matched;
+        // 未登録メールアドレスが入力された場合の自動登録・ログイン処理です
         } else {
-            // スマホ版で未登録メールアドレスが入力された場合も、その場でlocalStorage会員として登録＆ログインできるようにします
+            // 入力メールがデモ用アドレス（demo@manekin.jp）か判定します
             const isDemo = (lowerEmail === 'demo@manekin.jp');
+            // スマホ版用の新規会員データオブジェクトを即座に作成します
             const newMobileUser = {
+                // デモなら99999、通常なら現在時刻のミリ秒をユニークIDとします
                 id: isDemo ? 99999 : Date.now(),
+                // デモならテスト太郎、通常ならメールの@前または会員と命名します
                 name: isDemo ? 'テスト 太郎 (DEMO)' : (email.split('@')[0] || '会員'),
+                // ログイン用メールアドレスを保存します
                 email: email,
+                // 入力されたパスワードを保存します
                 password: password,
+                // 会員ランクを設定します
                 rank: isDemo ? 'GOLD MEMBER' : 'REGULAR MEMBER',
+                // 初期保有ポイント（0ポイント）を設定します
                 points: 0,
+                // localStorage会員フラグをONにします
                 isLocalStorage: true
             };
+            // 作成した新規会員を一覧配列に追加します
             users.push(newMobileUser);
+            // localStorageに最新の会員一覧を保存します
             lsSetJson('manekin_ls_users', users);
+            // ログイン成功ユーザーとして変数にセットします
             loggedInUser = newMobileUser;
         }
+        // スマホ版用の初期データ（マイクローゼット等）を初期化・準備します
         ensureMobileUserInitialized(loggedInUser);
+        // localStorageに現在ログイン中のユーザーとして保存します
         lsSetJson('manekin_ls_current_user', loggedInUser);
     } else {
         // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
@@ -4160,39 +4469,66 @@ async function handleRegister(e) {
 
     // スマホ版の場合は localStorage に新規会員を登録・保存します
     if (isMobileLocalStorageMode()) {
+        // localStorageから登録済み会員一覧配列を取得します
         const users = lsGetJson('manekin_ls_users', []);
+        // 大文字小文字の違いをなくすためメールアドレスを小文字化します
         const lowerEmail = email.toLowerCase();
+        // すでに同じメールアドレスが登録されているかインデックス番号を検索します
         const existingIdx = users.findIndex(u => u && String(u.email || '').toLowerCase() === lowerEmail);
+        // すでに登録されているメールアドレスだった場合の更新処理です
         if (existingIdx > -1) {
+            // お名前を最新の入力値に更新します
             users[existingIdx].name = name;
+            // パスワードを最新の入力値に更新します
             users[existingIdx].password = password;
+            // localStorage会員識別フラグを付与します
             users[existingIdx].isLocalStorage = true;
+            // 更新した会員情報を新規登録ユーザーとしてセットします
             newUser = users[existingIdx];
+        // 完全に新規のメールアドレスだった場合の作成処理です
         } else {
+            // 新規会員データオブジェクトを組み立てます
             newUser = {
+                // 現在時刻のミリ秒を一意なユーザーIDとします
                 id: Date.now(),
+                // 登録された氏名を保存します
                 name: name,
+                // 登録されたメールアドレスを保存します
                 email: email,
+                // 登録されたパスワードを保存します
                 password: password,
+                // レギュラー会員ランクを付与します
                 rank: 'REGULAR MEMBER',
+                // 初期ポイント（0ポイント）を設定します
                 points: 0,
+                // localStorage会員フラグをONにします
                 isLocalStorage: true
             };
+            // 会員一覧配列に新しい会員を追加します
             users.push(newUser);
             // 新規会員登録したユーザーにのみ初回限定1割引クーポンを付与します
             lsSetJson(`manekin_ls_coupons_${newUser.id}`, [
                 {
+                    // クーポンの一意なIDです
                     id: 1,
+                    // クーポンコードです
                     code: 'WELCOME10',
+                    // クーポンのタイトル名称です
                     name: '【初回限定】1割引クーポン (10% OFF)',
+                    // 割引率（10% = 0.10）です
                     discount_rate: 0.10,
+                    // 割引ラベル文字列です
                     discount_label: '1割引 (10% OFF)',
+                    // 使用済みフラグ（0=未使用）です
                     is_used: 0
                 }
             ]);
         }
+        // 最新の会員一覧配列をlocalStorageに保存します
         lsSetJson('manekin_ls_users', users);
+        // スマホ版用の初期データ（マイクローゼット等）を初期化・準備します
         ensureMobileUserInitialized(newUser);
+        // localStorageに現在ログイン中のユーザーとして保存します
         lsSetJson('manekin_ls_current_user', newUser);
     } else {
         // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
@@ -4309,12 +4645,19 @@ function closeManekinModal() {
 //   ・`<` や `>` などの危険な記号を安全な文字コードに変換します
 // ==========================================================================
 function escapeHtml(str) {
+    // 文字列が null または undefined の場合は空文字を返します
     if (str === null || str === undefined) return '';
+    // 文字列型に変換した上で、危険な特殊記号を順番にエスケープ変換して返します
     return String(str)
+        // & を &amp; に置換します
         .replace(/&/g, '&amp;')
+        // < を &lt; に置換します
         .replace(/</g, '&lt;')
+        // > を &gt; に置換します
         .replace(/>/g, '&gt;')
+        // " を &quot; に置換します
         .replace(/"/g, '&quot;')
+        // ' を &#039; に置換します
         .replace(/'/g, '&#039;');
 }
 
@@ -4325,16 +4668,22 @@ function escapeHtml(str) {
 //   ・持っているクーポンの詳細（割引内容や有効期限）をモーダルウィンドウに一覧表示します
 // ==========================================================================
 async function openMyPageCouponsModal() {
-    // 最新の保有クーポン配列を同期します
+    // 最新の保有クーポン配列をサーバーまたはlocalStorageから取得して同期します
     await fetchUserCoupons();
 
+    // クーポン表示モーダルウィンドウ要素を取得します
     const modal = document.getElementById('modal-user-coupons');
+    // クーポン一覧を差し込む親コンテナ要素を取得します
     const listElem = document.getElementById('mypage-coupons-list');
+    // モーダル要素または一覧要素が存在しない場合は処理を終了します
     if (!modal || !listElem) return;
 
+    // 保有クーポン配列を安全に配列型として取得します
     const coupons = Array.isArray(AppState.userCoupons) ? AppState.userCoupons : [];
 
+    // クーポンを1枚も持っていない場合の画面表示処理です
     if (coupons.length === 0) {
+        // クーポンなし用の案内メッセージHTMLを書き込みます
         listElem.innerHTML = `
             <div style="text-align: center; padding: 36px 16px; color: #888; background: #fafafa; border-radius: 8px;">
                 <div style="font-size: 2rem; margin-bottom: 8px;">🎫</div>
@@ -4342,13 +4691,20 @@ async function openMyPageCouponsModal() {
                 <p style="font-size: 0.8rem; margin: 0;">新規会員登録特典やキャンペーン開催時にクーポンが付与されます。</p>
             </div>
         `;
+    // クーポンを1枚以上持っている場合のカード一覧描画処理です
     } else {
+        // 各クーポンのカードHTMLを生成して結合し、一覧要素に流し込みます
         listElem.innerHTML = coupons.map(c => {
+            // 使用済みフラグ（true / false）を判定します
             const isUsed = Boolean(c.is_used);
+            // 割引内容の表示ラベル（例: 10% OFF）を安全に決定します
             const discountLabel = c.discount_label || (c.discount_rate ? `${Math.round(c.discount_rate * 100)}% OFF` : (c.discount_amount ? `¥${c.discount_amount} 割引` : '1割引 (10% OFF)'));
+            // クーポンコード（例: WELCOME10）を取得します
             const code = c.code || c.coupon_code || 'WELCOME10';
+            // クーポン名（例: 【初回限定】1割引クーポン）を取得します
             const name = c.name || c.title || '【初回限定】1割引クーポン (10% OFF)';
 
+            // すでに使い終わったクーポン（使用済み）のカードHTMLです
             if (isUsed) {
                 return `
                     <div class="coupon-item-card is-used" style="border: 1px dashed #d1d5db; border-radius: 10px; padding: 14px 16px; background: #f9fafb; opacity: 0.65; position: relative;">
@@ -4368,6 +4724,7 @@ async function openMyPageCouponsModal() {
                         </div>
                     </div>
                 `;
+            // まだ使えるクーポン（利用可能）のカードHTMLです
             } else {
                 return `
                     <div class="coupon-item-card" style="border: 2px solid #22c55e; border-radius: 10px; padding: 14px 16px; background: #f0fdf4; box-shadow: 0 3px 10px rgba(34,197,94,0.08); position: relative;">
@@ -4395,8 +4752,11 @@ async function openMyPageCouponsModal() {
         }).join('');
     }
 
+    // モーダル要素に open クラスを追加して表示状態にします
     modal.classList.add('open');
+    // モーダル要素に active クラスを追加してフェードインさせます
     modal.classList.add('active');
+    // モバイルメニューが開いている場合は邪魔にならないよう閉じます
     if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
 }
 
@@ -4407,9 +4767,13 @@ async function openMyPageCouponsModal() {
 //   ・クーポンのモーダルを非表示にします
 // ==========================================================================
 function closeMyPageCouponsModal() {
+    // クーポン表示モーダルウィンドウ要素を取得します
     const modal = document.getElementById('modal-user-coupons');
+    // モーダル要素が存在していれば非表示にします
     if (modal) {
+        // open クラスを外してモーダルを閉じます
         modal.classList.remove('open');
+        // active クラスを外して非表示状態に戻します
         modal.classList.remove('active');
     }
 }
