@@ -2138,6 +2138,7 @@ function handleResetPoints() {
 // 【具体的な処理内容】
 //   ・過去に注文した服を、試着マネキンで着せ替えられる手持ち服としてクローゼットに追加登録します
 // ==========================================================================
+// 引数のidxは購入された商品が購入履歴の配列に入る時の番地
 async function importOrderToCloset(idx) {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
@@ -2162,6 +2163,7 @@ async function importOrderToCloset(idx) {
     // 再代入可能な変数 failed を宣言し、値（0）をセットします
     let failed = 0;
     // 条件（typeof bumpClosetMutationSeq === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+    // この関数は、マイクローゼットの登録・削除時に最新操作を保証する連番
     if (typeof bumpClosetMutationSeq === 'function') bumpClosetMutationSeq();
 
     // スマホ版の場合は localStorage のクローゼットに直接追加します
@@ -2239,7 +2241,7 @@ async function importOrderToCloset(idx) {
             if (window.location.hash === '#favorites') renderFavoriteProducts();
             // 画面に「マイクローゼットに登録しました」とトースト通知を表示します
             showToast(`👗 注文商品をマイクローゼットに登録しました（${added}点）`);
-        // すべてすでにクローゼットに登録済みだった場合
+            // すべてすでにクローゼットに登録済みだった場合
         } else {
             // 画面に「すでに登録済みです」と案内トーストを表示します
             showToast('この注文の商品はすでにマイクローゼットに登録済みです');
@@ -2300,6 +2302,7 @@ async function importOrderToCloset(idx) {
             // 通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
             try {
                 // Flask バックエンド API（/api/closet/add）へ非同期リクエストを送信し、応答を待ち受けます
+                // データベースの中のclosetにadd(追加したいですよ)リクエストをPOST送信で送ります
                 const res = await fetch(`${apiBase}/api/closet/add`, {
                     // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
                     method: 'POST',
@@ -2343,21 +2346,32 @@ async function importOrderToCloset(idx) {
                 if (data.status === 'success') {
                     // 条件（AppState.currentUser && String(AppState.currentUser.…）が成り立つか判定し、該当する場合の処理を実行します
                     if (AppState.currentUser && String(AppState.currentUser.id) === String(userId)) {
-                        // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入して即画面反映します
+                        // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入(unshift)して即画面反映します
+                        // 新しく追加する衣服の情報が先頭に来るよ
                         AppState.myCloset.unshift(newItem);
                         // 変数・配列項目 added の値を更新・計算します
+                        // 新しく追加することに成功したら成功したアイテムの数を数えるもの
                         added++;
 
                         // 購入商品がお気に入りに登録されていた場合、クローゼット入りに伴いお気に入りから自動解除
                         const fIdx = AppState.favorites.indexOf(Number(itId));
                         if (fIdx > -1) {
+                            // 現在のお気に入り商品の一覧から指定したお気に入り番地の商品を1つ削除
                             AppState.favorites.splice(fIdx, 1);
+                            // お気に入り一覧で表示する商品とデフォで表示している商品は、すべてにハートがついていて
+                            // お気に入り一覧で表示するときは、赤色のハートでそろえるよ
+                            // 画面上にある同じ服のハートボタンの見た目（赤色／白抜き）をぜんぶ一斉に揃えるハート合わせ係
+                            // お気に入り一覧から削除したいからハートの色を白に戻すつまり(false)
                             syncAllFavoriteButtons(itId, false);
                             try {
+                                // データベースのfavoritesテーブルのハートの赤白切替についてのデータをくださいよってPOST送信でリクエスト
                                 fetch(`${apiBase}/api/favorites/toggle`, {
                                     method: 'POST',
+                                    // JSON形式でリクエスト
                                     headers: { 'Content-Type': 'application/json' },
+                                    // ひとまとめで
                                     credentials: 'include',
+                                    // 持ってきたいデータの中身は、商品のIDをitIDとして使いたい　また　user_idをUserIDとして使いたい
                                     body: JSON.stringify({ product_id: itId, user_id: userId })
                                 }).catch(() => { });
                             } catch (_) { }
@@ -2366,29 +2380,40 @@ async function importOrderToCloset(idx) {
                     // 上記の if 条件に当てはまらなかった場合の分岐処理です
                 } else {
                     // 変数・配列項目 failed の値を更新・計算します
+                    // 新しく商品を登録するときに、失敗した数を数えます
                     failed++;
                 }
                 // try ブロック内で通信エラーや例外が発生したときに受け止めて安全に処理する catch ブロックです
             } catch (e) {
                 // 変数・配列項目 failed の値を更新・計算します
+                // エラーでも失敗したときと同じく数える
                 failed++;
             }
         }
     }
 
     // 条件（added > 0）が成り立つか判定し、該当する場合の処理を実行します
+    // 追加が成功したアイテムの数が0より大きいとき
     if (added > 0) {
+        // お気に入り商品のハートのバッジの数を更新します
         updateFavoriteBadges();
+        // スタジオのコーデ作成の右側で確認できるお気に入り一覧に保存できるかチェック
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
+        // 試着スタジオの試着室やアイテム全般の更新ができるかチェック
+        // 例：来ている服をステージに反映など
         if (typeof renderStudioItems === 'function') renderStudioItems();
+        // お気に入り商品一覧の更新ができるかチェック　
         if (window.location.hash === '#favorites') renderFavoriteProducts();
         // 条件（typeof renderStudioClosetList === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        // PC版スタジオのコーデ作成の左側で確認できる手持ちの服一覧に保存できるかチェック
         if (typeof renderStudioClosetList === 'function') renderStudioClosetList();
         // 条件（typeof renderPaneClosetGrid === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+        // スマホ版のクローゼットは表示のされ方が違うのでそれぞれ表示できるかチェック
         if (typeof renderPaneClosetGrid === 'function') renderPaneClosetGrid();
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast(`👗 注文商品をMySQLのマイクローゼットに登録しました（${added}点）`);
         // 前の if が偽で、かつ（failed > 0）を満たす場合の別条件分岐です
+        // 失敗した数が1つでもあればこれが出る
     } else if (failed > 0) {
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ MySQLへのマイクローゼット登録に失敗しました（サーバー接続を確認してください）');
@@ -2419,29 +2444,40 @@ async function handlePlaceOrder() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || !isServerUserId(AppState.currentUser.id)) {
         // アプリ全体状態 AppState.pendingAuthTarget を最新値（'checkout'）に更新します
+        //pendingAuthTarget ログインが終わったら購入手続きにとぶようにしている
         AppState.pendingAuthTarget = 'checkout';
+        // ログイン後の処理として購入手続き画面に飛ぶよって言ってます
         sessionStorage.setItem('manekin_pending_auth_target', 'checkout');
         // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
         showToast('⚠️ ご購入には会員登録またはログインが必要です');
         // 変数・配列項目 window.location.hash の値を更新・計算します
+        // ログイン画面に飛ぶ
         window.location.hash = '#login';
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
     // HTML 要素 #order-name を取得して変数 nameInput に格納します
+    // お名前
     const nameInput = document.getElementById('order-name');
     // HTML 要素 #order-phone を取得して変数 phoneInput に格納します
+    // 電話番号
     const phoneInput = document.getElementById('order-phone');
     // HTML 要素 #order-email を取得して変数 emailInput に格納します
+    // メールアドレス
     const emailInput = document.getElementById('order-email');
     // HTML 要素 #order-postal を取得して変数 postalInput に格納します
+    // 郵便番号
     const postalInput = document.getElementById('order-postal');
     // HTML 要素 #order-address を取得して変数 addressInput に格納します
+    // 住所
     const addressInput = document.getElementById('order-address');
     // HTML 要素 #order-delivery-time を取得して変数 deliveryTimeInput に格納します
+    // 配送希望時間帯
     const deliveryTimeInput = document.getElementById('order-delivery-time');
     // CSS セレクタに最初に一致した HTML 要素を取得して変数 paymentRadio に入れます
+    // 購入手続き画面のお支払方法の選択部分で、この領域にある特定のボタン(クレジットカード)が既に押されている状態にしてね
+    // タグまるごと持ってくるときはquerySelectorで指定
     const paymentRadio = document.querySelector('input[name="payment_method"]:checked');
 
     // 定数 customerName を宣言し、値（nameInput ? nameInput.value.trim() : "…）をセットします
@@ -2468,31 +2504,29 @@ async function handlePlaceOrder() {
     }
 
     // HTML 要素 #btn-place-order を取得して変数 placeBtn に格納します
+    // 注文確定ボタンの骨組みをIDから取得
     const placeBtn = document.getElementById('btn-place-order');
     // 定数 restorePlaceBtn を宣言し、値（() => {）をセットします
     const restorePlaceBtn = () => {
         // 条件（placeBtn）が成り立つか判定し、該当する場合の処理を実行します
+        // 注文確定ボタンの骨組みが存在している
         if (placeBtn) {
             // 変数・配列項目 placeBtn.disabled の値を更新・計算します
+            // 念のためボタンを押したときに判定されない時が無いように解除しておく
             placeBtn.disabled = false;
             // 生成・変換した HTML 文字列を要素 placeBtn の中身として描画します
             placeBtn.innerHTML = '<span class="order-btn-text">注文を確定する</span><span class="order-btn-sub">（Python &amp; MySQLへ保存されます）</span>';
         }
     };
-    // 条件（placeBtn）が成り立つか判定し、該当する場合の処理を実行します
-    if (placeBtn) {
-        // 変数・配列項目 placeBtn.disabled の値を更新・計算します
-        placeBtn.disabled = true;
-        // 生成・変換した HTML 文字列を要素 placeBtn の中身として描画します
-        placeBtn.innerHTML = '<span class="order-btn-text">注文を確定中... (MySQLへ保存)</span>';
-    }
 
     // 定数 calc を宣言し、値（updateCheckoutCalculations()）をセットします
+    // 購入手続き画面の数値をすべて計算する関数
     const calc = updateCheckoutCalculations();
 
     // 定数 targetUserId を宣言し、値（AppState.currentUser.id）をセットします
     const targetUserId = AppState.currentUser.id;
     // 定数 orderPayload を宣言し、値（{）をセットします
+    // お届け先情報、クーポン・ポイントの利用、支払い方法、請求内容など購入に必要な情報を書いて置く
     const orderPayload = {
         // 注文者氏名データをセットします（誰が購入したか保存）
         customer_name: customerName || AppState.currentUser.name || '会員様',
@@ -2536,10 +2570,13 @@ async function handlePlaceOrder() {
     let backendUpdatedPoints = null;
 
     // 専用ヘルパー関数 bumpCartUserSeq() を実行して状態や表示ラベルを更新します
+    // 買い物カゴの通信番号をカチッと +1 進めて最新の通信合図を出すカウント係
     bumpCartUserSeq(targetUserId);
     // 変数・配列項目 _ordersMutationSeq の値を更新・計算します
+    // 注文データを更新、変更した回数を数える変数を＋1
     _ordersMutationSeq++;
     // 先行する非同期通信の完了を待機します（万一失敗してもエラーで止まらず続行）
+    // カートに入れた商品の情報をデータベースに保存できるようにしている
     try { await _cartSyncPromise; } catch (e) { }
 
     // スマホ版の場合は localStorage 上で注文データを生成・保存します
@@ -2592,6 +2629,7 @@ async function handlePlaceOrder() {
     } else {
         // PC版：通信失敗や処理エラーで画面が止まらないよう try ブロックで監視開始します
         try {
+            // 購入確定時に、購入手続きで入力した情報が何だったかをデータベースからもってこれるのかリクエストしている
             // Flask バックエンド API（/api/orders）へ非同期リクエストを送信し、応答を待ち受けます
             const response = await fetch(`${apiBase}/api/orders`, {
                 // HTTP 通信メソッド（GET=取得 / POST=送信作成 / DELETE=削除）を指定します
@@ -2627,6 +2665,7 @@ async function handlePlaceOrder() {
             // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
             showToast('⚠️ PythonサーバーまたはMySQLに接続できないため注文を確定できませんでした（app.pyとMySQLの起動を確認してください）');
             // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
+            // ｴﾗｰは起きるけど　別に注文確定ボタンは押せます
             restorePlaceBtn();
             // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
             return;
@@ -3372,7 +3411,7 @@ function renderMyPage() {
             ordersAccountBadge.textContent = `${AppState.currentUser.name} 様 (${orderCount}件)`;
             // バッジを表示（inline-block）にします
             ordersAccountBadge.style.display = 'inline-block';
-        // 未ログインの場合
+            // 未ログインの場合
         } else {
             // バッジを非表示にします
             ordersAccountBadge.style.display = 'none';
@@ -3552,7 +3591,7 @@ function cleanPurchasedFavorites(purchasedIds) {
         // スマホ版の場合はlocalStorageのお気に入りデータを更新保存します
         if (AppState.currentUser && isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_favorites_${AppState.currentUser.id}`, AppState.favorites);
-        // PC版（MySQL）の場合はサーバーのお気に入りテーブルからも削除します
+            // PC版（MySQL）の場合はサーバーのお気に入りテーブルからも削除します
         } else if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
             // 削除された商品IDを1件ずつサーバーへ削除リクエスト送信します
             removedIds.forEach(pId => {
@@ -3717,7 +3756,7 @@ async function handleToggleFavorite(productId) {
         AppState.favorites.push(numId);
         // 追加フラグをtrueにします
         isAdded = true;
-    // すでにお気に入りに入っていた場合（解除処理）
+        // すでにお気に入りに入っていた場合（解除処理）
     } else {
         // お気に入り配列からその商品IDを削除します
         AppState.favorites.splice(existingIndex, 1);
@@ -3788,7 +3827,7 @@ async function handleToggleFavorite(productId) {
         const data = await res.json().catch(() => ({}));
         // 画面にトースト通知を表示します
         showToast(isAdded ? 'お気に入りに追加しました' : 'お気に入りから解除しました');
-    // 通信エラー時のフォールバック処理
+        // 通信エラー時のフォールバック処理
     } catch (e) {
         // コンソールにエラー警告を出力します
         console.warn('MySQLお気に入り更新エラー (フォールバック保存):', e);
@@ -3838,7 +3877,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
                         // SVGの枠線色も赤色（#e53935）にします
                         svg.setAttribute('stroke', '#e53935');
                     }
-                // お気に入り状態がOFF（解除）の場合の処理です
+                    // お気に入り状態がOFF（解除）の場合の処理です
                 } else {
                     // ボタンから is-favorite クラスを外して通常デザインに戻します
                     btn.classList.remove('is-favorite');
@@ -3871,7 +3910,7 @@ function syncAllFavoriteButtons(productId, isFavorite) {
                 </svg>
                 お気に入り解除
             `;
-        // お気に入り状態がOFF（解除）の場合の処理です
+            // お気に入り状態がOFF（解除）の場合の処理です
         } else {
             // 詳細ボタンから is-favorite クラスを削除します
             detailFavBtn.classList.remove('is-favorite');
@@ -4206,7 +4245,7 @@ async function handleDemoLogin(e) {
         users.push(demoUser);
         // localStorageに会員一覧を保存します
         lsSetJsonDirect('manekin_ls_users', users);
-    // すでにテストアカウントが存在していた場合です
+        // すでにテストアカウントが存在していた場合です
     } else {
         // localStorage管理フラグを立てます
         demoUser.isLocalStorage = true;
@@ -4301,7 +4340,7 @@ async function handleLogin(e) {
             matched.isLocalStorage = true;
             // ログイン成功ユーザーとして変数にセットします
             loggedInUser = matched;
-        // 未登録メールアドレスが入力された場合の自動登録・ログイン処理です
+            // 未登録メールアドレスが入力された場合の自動登録・ログイン処理です
         } else {
             // 入力メールがデモ用アドレス（demo@manekin.jp）か判定します
             const isDemo = (lowerEmail === 'demo@manekin.jp');
@@ -4485,7 +4524,7 @@ async function handleRegister(e) {
             users[existingIdx].isLocalStorage = true;
             // 更新した会員情報を新規登録ユーザーとしてセットします
             newUser = users[existingIdx];
-        // 完全に新規のメールアドレスだった場合の作成処理です
+            // 完全に新規のメールアドレスだった場合の作成処理です
         } else {
             // 新規会員データオブジェクトを組み立てます
             newUser = {
@@ -4691,7 +4730,7 @@ async function openMyPageCouponsModal() {
                 <p style="font-size: 0.8rem; margin: 0;">新規会員登録特典やキャンペーン開催時にクーポンが付与されます。</p>
             </div>
         `;
-    // クーポンを1枚以上持っている場合のカード一覧描画処理です
+        // クーポンを1枚以上持っている場合のカード一覧描画処理です
     } else {
         // 各クーポンのカードHTMLを生成して結合し、一覧要素に流し込みます
         listElem.innerHTML = coupons.map(c => {
@@ -4724,7 +4763,7 @@ async function openMyPageCouponsModal() {
                         </div>
                     </div>
                 `;
-            // まだ使えるクーポン（利用可能）のカードHTMLです
+                // まだ使えるクーポン（利用可能）のカードHTMLです
             } else {
                 return `
                     <div class="coupon-item-card" style="border: 2px solid #22c55e; border-radius: 10px; padding: 14px 16px; background: #f0fdf4; box-shadow: 0 3px 10px rgba(34,197,94,0.08); position: relative;">
