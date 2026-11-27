@@ -2675,38 +2675,53 @@ async function handlePlaceOrder() {
     // まだログインしていない（またはサーバー発行会員IDでない）状態かを安全チェックします
     if (!AppState.currentUser || String(AppState.currentUser.id) !== String(targetUserId)) {
         // 専用ヘルパー関数 restorePlaceBtn() を実行して状態や表示ラベルを更新します
+        // ログインして無くてもボタンは押せるよ　押したらログイン画面に飛ぶよ
         restorePlaceBtn();
         // 条件を満たさないため、以降の処理を行わずここで関数を早期終了します
         return;
     }
 
     // 定数 itemSummaryList を宣言し、値（confirmedOrder.items.map(it => `${it.name} (${it.size}) × ${it.quantity}`)）をセットします
+    // 注文した商品リスト(confirmedOrder)を一つずつ取り出して商品名×個数という配列を作り出している
+    // 例：オーバーシャツ(L)×2
     const itemSummaryList = confirmedOrder.items.map(it => `${it.name} (${it.size}) × ${it.quantity}`);
     // 変数・配列項目 confirmedOrder.items_summary の値を更新・計算します
+    // 上で作った配列の要素をjoin(",")でつなげて一個にしている
+    // 例：Tシャツ×１、デニム×１
     confirmedOrder.items_summary = itemSummaryList.join(", ");
 
     // 定数 currentPts を宣言し、値（getUserPoints()）をセットします
+    // 今の所持ポイントをまずは取得
     const currentPts = getUserPoints();
+    // サーバーから帰ってきた獲得ポイント(backendUpdatedPoints)があるかどうかをチェック
     // 定数 updatedPts を宣言し、値（backendUpdatedPoints !== null ? backen…）をセットします
+    // 現在のポイントから使ったポイントを引いて獲得したポイントを足す、その答えがマイナスにならないように最大0から計算結果にしている
     const updatedPts = backendUpdatedPoints !== null ? backendUpdatedPoints : (Math.max(0, currentPts - calc.usedPoints) + calc.earnedPoints);
     // 専用ヘルパー関数 setUserPoints() を実行して状態や表示ラベルを更新します
+    // 最終的なポイント数をsetUserPointsに渡して、ポイント表示を更新している
     setUserPoints(updatedPts);
 
     // 条件（typeof bumpClosetMutationSeq === 'function'）が成り立つか判定し、該当する場合の処理を実行します
+    // クローゼットの登録・削除時に最新操作を保証する連番を進めます
     if (typeof bumpClosetMutationSeq === 'function') bumpClosetMutationSeq();
     // 定数 purchasedItems を宣言し、値（[...confirmedOrder.items]）をセットします
     const purchasedItems = [...confirmedOrder.items];
     // 配列の中の要素を 1 件ずつ取り出して順番にコールバック処理を実行します
     purchasedItems.forEach((it, idx) => {
         // 全商品マスター SAMPLE_PRODUCTS から条件に合う商品を検索・抽出して productMaster に入れます
+        // 商品一覧から購入した商品なのかをIDでチェックしている
         const productMaster = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.find(p => p.id === (it.id || it.product_id)) : null;
         // 定数 cat を宣言し、値（it.category || (productMaster ? produc…）をセットします
+        // 購入した商品のカテゴリ　又は　商品一覧から購入した商品のカテゴリをcatに入れる
         const cat = it.category || (productMaster ? productMaster.category : 'TOPS');
         // 定数 exists を宣言し、値（AppState.myCloset.some(c => c.name ===…）をセットします
+        // 購入した商品をクローゼットに入れた結果、
+        // 現在のクローゼットに保存された商品の名前と色が　購入した商品と一緒かどうかを見て同じだったらexistsに入れる
         const exists = AppState.myCloset.some(c => c.name === it.name && c.color === it.color);
         // 条件（!exists）が成り立つか判定し、該当する場合の処理を実行します
+        // 買ってないものかつ色が違うものがマイクローゼットに入っていたら
         if (!exists) {
-            // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入して即画面反映します
+            // 新規追加された最新データを配列 AppState.myCloset の先頭へ挿入(unshift)して即画面反映します
             AppState.myCloset.unshift({
                 // レコード・商品・コーデを識別する ID プロパティをセットします
                 id: 'purchased-' + (it.id || it.product_id || 0) + '-' + confirmedOrder.order_no + '-' + idx,
@@ -2735,24 +2750,36 @@ async function handlePlaceOrder() {
     });
 
     // 購入した商品がお気に入りに登録されていた場合、お気に入り一覧から即座に削除・解除します
+    // 今回購入した商品一覧から商品IDを取り出し、有効な正の数値（ID）のみを配列として抽出します
     const purchasedIds = purchasedItems.map(it => Number(it.id || it.product_id)).filter(id => !isNaN(id) && id > 0);
+    // 購入商品が1件以上あり、かつお気に入りリストが配列として存在する場合に解除処理を実行します
     if (purchasedIds.length > 0 && Array.isArray(AppState.favorites)) {
+        // 購入された商品IDを1件ずつ順番に取り出してループ処理します
         purchasedIds.forEach(pId => {
-            // 型に依存せず数値一致で配列から完全に削除
+            // 型に依存せず数値一致で配列から完全に削除します（購入した商品は手持ち服になるためお気に入りから除外）
             AppState.favorites = AppState.favorites.filter(favId => Number(favId) !== pId);
-            // ハートボタンの表示を解除状態に更新
+            // ハートボタンの表示を解除状態に更新するため、同期関数が存在するか確認します
             if (typeof syncAllFavoriteButtons === 'function') {
+                // 画面上にある該当商品のハートマークボタンをすべて解除（OFF / 白抜き）に同期します
                 syncAllFavoriteButtons(pId, false);
             }
-            // MySQL データベースのお気に入りテーブルからも即座に削除
+            // MySQL データベースを利用しているログイン会員かどうかを判定します
             if (AppState.currentUser && isServerUserId(AppState.currentUser.id)) {
+                // 通信エラーで注文処理が中断しないよう try ブロックで安全に実行します
                 try {
+                    // PythonバックエンドAPI（/api/favorites/remove）へ非同期でお気に入り削除リクエストを送信します
                     fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
+                        // POSTメソッドで送信します
                         method: 'POST',
+                        // 送信形式が JSON であることを指定します
                         headers: { 'Content-Type': 'application/json' },
+                        // ログインセッション用の Cookie を一緒に送信します
                         credentials: 'include',
+                        // 削除対象の商品IDと会員IDを JSON 文字列に変換して送信ボディにセットします
                         body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
+                    // 通信失敗時も注文完了処理を止めないよう安全に空関数でキャッチします
                     }).catch(() => { });
+                // 万が一の例外発生時も画面を止めずに安全にスルーします
                 } catch (_) { }
             }
         });
