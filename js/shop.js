@@ -2963,6 +2963,9 @@ async function handlePlaceOrder() {
     // クーポン行とテキスト要素の両方が画面上に存在するか判定します（存在時のみ処理実行）
     if (compCouponRow && compCouponInfo) {
         // 注文確定データまたは適用中クーポンから、実際の割引額（円）を安全に決定します
+        // confirmedOrderの中には購入手続き時の情報がすべて入っていて、
+        // その中から購入時のクーポンの割引金額をもってきています。
+        // 条件としては、購入手続き時にクーポンの割引額が算出されている　かつ　算出されたクーポンの割引額が0より大きかったら
         const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
             // 確定注文データに割引金額があればその数値をそのまま採用します
             ? confirmedOrder.coupon_discount
@@ -2970,7 +2973,7 @@ async function handlePlaceOrder() {
             : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
         // クーポン割引額が1円以上ある場合（クーポンを使った場合）の表示処理です
         if (discount > 0) {
-            // クーポン行のスタイルを 'flex' に切り替えて画面に表示させます
+            // クーポン行のスタイルを 'flex' に切り替えて画面　に表示させます
             compCouponRow.style.display = 'flex';
             // 表示用のクーポン名を取得します（未設定時は'クーポン割引'）
             const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
@@ -2980,7 +2983,7 @@ async function handlePlaceOrder() {
             const codeBadge = cCode ? ` [${cCode}]` : '';
             // 「クーポン名 [コード] -¥割引額」という形式で文字を組み立てて画面に書き込みます
             compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
-        // クーポンを使っていない（割引額が0円）場合の処理です
+            // クーポンを使っていない（割引額が0円）場合の処理です
         } else {
             // クーポン行のスタイルを 'none' にして画面から非表示にして隠します
             compCouponRow.style.display = 'none';
@@ -3002,7 +3005,7 @@ async function handlePlaceOrder() {
             compUsedPointsRow.style.display = 'flex';
             // 「-500 pt」のようにカンマ区切りで利用ポイント数を画面に書き込みます
             compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
-        // ポイントを使っていない（0pt）場合の処理です
+            // ポイントを使っていない（0pt）場合の処理です
         } else {
             // ポイント行のスタイルを 'none' にして画面から非表示にして隠します
             compUsedPointsRow.style.display = 'none';
