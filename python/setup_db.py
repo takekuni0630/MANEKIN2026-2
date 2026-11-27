@@ -92,23 +92,32 @@ def setup_database():
         """)
 
         # orders テーブルに customer_name / coupon_code / coupon_discount カラムを追加します
+        # orders テーブルに customer_name カラムが存在するか確認します
         cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'customer_name';")
+        # まだカラムが存在しない場合に追加処理を行います
         if not cursor.fetchone():
             try:
+                # 注文者のお名前を保存する customer_name 列を追加します
                 cursor.execute("ALTER TABLE `orders` ADD COLUMN `customer_name` varchar(255) DEFAULT NULL AFTER `user_id`;")
             except Exception:
                 pass
 
+        # orders テーブルに coupon_code カラムが存在するか確認します
         cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_code';")
+        # まだカラムが存在しない場合に追加処理を行います
         if not cursor.fetchone():
             try:
+                # 使用されたクーポンコードを保存する coupon_code 列を追加します
                 cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_code` varchar(50) DEFAULT NULL AFTER `earned_points`;")
             except Exception:
                 pass
 
+        # orders テーブルに coupon_discount カラムが存在するか確認します
         cursor.execute("SHOW COLUMNS FROM `orders` LIKE 'coupon_discount';")
+        # まだカラムが存在しない場合に追加処理を行います
         if not cursor.fetchone():
             try:
+                # クーポンによる割引額（円）を保存する coupon_discount 列を追加します
                 cursor.execute("ALTER TABLE `orders` ADD COLUMN `coupon_discount` int(11) NOT NULL DEFAULT 0 AFTER `coupon_code`;")
             except Exception:
                 pass

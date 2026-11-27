@@ -231,31 +231,47 @@ def ensure_account_tables():
 
 # すべてのリクエスト受信前にテーブル作成が確実に完了しているか自動チェックするフック
 @app.before_request
+# クライアントからの通信を受け取る直前に自動実行される初期化確認関数です
 def auto_ensure_tables():
+    # グローバル変数 _tables_ensured を関数内で参照・更新できるように宣言します
     global _tables_ensured
+    # まだテーブル作成確認が一度も完了していない場合のみチェックを実行します
     if not _tables_ensured:
+        # テーブル作成・列追加関数を呼び出してデータベースを最新状態にします
         ensure_account_tables()
 
 
 # 会員に初回限定1割引クーポンを安全に付与する共通ヘルパー（SQL内の%プレースホルダ衝突を防止）
 def grant_welcome_coupon(cursor, user_id):
+    # 会員IDが指定されていない（未ログインなど）の場合は何もせず終了します
     if not user_id:
+        # 付与失敗を表す False を返します
         return False
+    # データベース操作エラーを受け止める try ブロックを開始します
     try:
+        # すでにこの会員がクーポンを持っているか件数を問い合わせます
         cursor.execute("SELECT count(*) as cnt FROM `user_coupons` WHERE `user_id` = %s;", (user_id,))
+        # 件数の結果レコードを1行受け取ります
         c_cnt = cursor.fetchone()
+        # まだ1枚もクーポンを持っていない（新規登録）場合のみ付与します
         if not c_cnt or c_cnt['cnt'] == 0:
+            # user_coupons テーブルへ新規登録特典の1割引クーポンを登録します
             cursor.execute("""
                 INSERT INTO `user_coupons` (`user_id`, `code`, `name`, `discount_rate`, `discount_label`, `is_used`, `created_at`)
                 VALUES (%s, %s, %s, %s, %s, 0, NOW());
             """, (user_id, 'WELCOME10', '【初回限定】1割引クーポン (10% OFF)', 0.10, '1割引 (10% OFF)'))
+            # 付与成功を表す True を返します
             return True
+    # 万が一のエラー時はログを出力して安全にスルーします
     except Exception as e:
+        # コンソールにエラー内容を出力します
         print(f"[!] クーポン付与スキップ: {e}")
         try:
+            # テーブルが存在しない可能性に備えてテーブル作成を試みます
             ensure_account_tables()
         except Exception:
             pass
+    # 付与が行われなかった場合は False を返します
     return False
 
 # ==============================================================================
@@ -520,6 +536,7 @@ def create_order():
                 delivery_time, subtotal, shipping_fee, total_amount,
                 # SQL プレースホルダ(%s)や関数引数へ順番どおりに渡すデータ値です
                 used_points, earned_points,
+                # クーポンコード（使用時のみ）、クーポン割引額、注文初期ステータスです
                 coupon_code if coupon_id else None, coupon_discount, "注文受付済み"
             ))
             # 今 INSERT した orders テーブルの自動採番 ID（PRIMARY KEY）を取得します
@@ -527,9 +544,13 @@ def create_order():
 
             # order_items テーブルへ各注文商品の明細（商品名・サイズ・数量・単価・画像URL）を追加します
             insert_item_sql = """
+            # 注文に含まれる商品の詳細情報を1行ずつ注文明細テーブルへ保存するSQLです
             INSERT INTO `order_items` (
+                # 注文ID、商品ID、商品名カラムです
                 `order_id`, `product_id`, `product_name`,
+                # サイズ、数量、購入時単価、商品画像URLカラムです
                 `size`, `quantity`, `unit_price`, `image_url`
+            # プレースホルダ経由で安全に値を流し込みます
             ) VALUES (%s, %s, %s, %s, %s, %s, %s);
             """
             # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for item in cart_items）
@@ -599,8 +620,11 @@ def create_order():
                 ))
                 # 購入した商品がお気に入りに登録されていた場合、クローゼット登録（購入済み）に伴いお気に入りから自動解除します
                 try:
+                    # お気に入りテーブル（favorites）から該当会員・該当商品のレコードを削除します
                     cursor.execute("DELETE FROM `favorites` WHERE `user_id` = %s AND `product_id` = %s;", (user_id, p_id))
+                # 未登録時やエラー時でも注文完了処理を止めないよう安全に例外を受け止めます
                 except Exception as e_fav:
+                    # エラー時は何もしないでスキップします
                     pass
 
             # 注文後の残高ポイント数（フロントへ返す最新値）の変数を初期化します
@@ -712,7 +736,9 @@ def get_orders():
         with conn.cursor() as cursor:
             # 注文者ユーザーの名前を users テーブルから取得します
             cursor.execute("SELECT `name` FROM `users` WHERE `id` = %s;", (user_id,))
+            # 検索結果からユーザー情報の行を取り出します
             u_row = cursor.fetchone()
+            # 取得できたユーザー名、もしくは初期値「会員様」を設定します
             current_user_name = u_row['name'] if u_row and u_row.get('name') else '会員様'
 
             # orders テーブルから該当ユーザー・注文番号の注文レコードを検索します
@@ -720,25 +746,36 @@ def get_orders():
             # ユーザーIDに一致する注文レコード一覧を新しい順で取得します
             orders = cursor.fetchall()
 
-            # リスト・配列から要素を 1 件ずつ順番に取り出してループ処理します（for o in orders）
+            # 獲得累計ポイントの集計用変数を0で初期化します
             total_earned_pts = 0
+            # 利用累計ポイントの集計用変数を0で初期化します
             total_used_pts = 0
+            # 取得した注文レコードを1件ずつ順番にループ処理します
             for o in orders:
                 # 注文者の名前を確実にセット（誰が購入したか保存・表示用）
                 if not o.get('customer_name'):
+                    # 注文データにお名前を格納します
                     o['customer_name'] = current_user_name
                 # 過去注文で earned_points が 0 の場合はお支払い金額の 1% を補完して DB も更新します
                 t_amt = int(o.get('total_amount') or o.get('subtotal') or 0)
+                # 注文データから獲得ポイントを数値として取得します
                 e_pts = int(o.get('earned_points') or 0)
+                # もし獲得ポイントが未設定（0以下）でお支払い金額がある場合は自動計算します
                 if e_pts <= 0 and t_amt > 0:
+                    # お支払い合計額の1%（最低1ポイント）を獲得ポイントとして算出します
                     e_pts = max(1, int(t_amt * 0.01))
+                    # 注文オブジェクトの獲得ポイントを更新します
                     o['earned_points'] = e_pts
                     try:
+                        # データベース側の orders テーブルの earned_points も更新保存します
                         cursor.execute("UPDATE `orders` SET `earned_points` = %s WHERE `id` = %s;", (e_pts, o['id']))
                     except Exception:
                         pass
+                # 利用ポイントを数値として安全に取得します
                 u_pts = max(0, int(o.get('used_points') or 0))
+                # 累計獲得ポイントにこの注文のポイントを加算します
                 total_earned_pts += e_pts
+                # 累計利用ポイントにこの注文で使ったポイントを加算します
                 total_used_pts += u_pts
 
                 # 条件式（if isinstance(o['created_at'], datetime)）が成り立つかチェックして処理を分岐します
@@ -783,9 +820,12 @@ def get_orders():
 
             # 購入で加算されたポイント合計（−利用ポイント）を users.points にも同期します
             net_user_points = max(0, total_earned_pts - total_used_pts)
+            # 注文が1件以上存在する場合に会員テーブルへ最新ポイントを書き込みます
             if orders:
                 try:
+                    # users テーブルの points 列を計算後の最新ポイントに更新します
                     cursor.execute("UPDATE `users` SET `points` = %s WHERE `id` = %s;", (net_user_points, user_id))
+                    # データベースへの変更を確定（コミット）します
                     conn.commit()
                 except Exception:
                     pass
@@ -1247,33 +1287,56 @@ def logout_user():
 @app.route('/api/coupons', methods=['GET'])
 # ログイン中のユーザーの保有クーポン一覧（未使用・使用済み）を取得して返す API です
 def get_user_coupons():
+    # URLクエリパラメータから user_id を取得し、数値型に変換・検証します
     user_id = parse_user_id(request.args.get('user_id', None))
+    # 会員IDが指定されていない（未ログインなど）の場合は空のクーポン一覧を返します
     if not user_id:
+        # クーポン0件の成功レスポンスを返します
         return jsonify({"status": "success", "coupons": []}), 200
 
+    # データベースへの接続を取得します
     conn = get_db_connection()
+    # データベースに接続できなかった場合はエラーを返します
     if not conn:
+        # 接続失敗エラー（HTTP 500）を返します
         return jsonify({"status": "error", "message": "データベースに接続できませんでした。"}), 500
 
+    # データベース操作の例外エラーを監視する try ブロックです
     try:
+        # SQL操作用カーソルを開きます
         with conn.cursor() as cursor:
             # ユーザーの所持クーポン一覧を取得します（未使用を優先表示）
             cursor.execute("SELECT * FROM `user_coupons` WHERE `user_id` = %s ORDER BY `is_used` ASC, `created_at` DESC;", (user_id,))
+            # 取得結果の全レコードをリストで受け取ります
             coupons = cursor.fetchall()
+            # 各クーポンの日付型や数値をJSONで送れる形式に1件ずつ整形します
             for c in coupons:
+                # 作成日時（created_at）が datetime オブジェクトなら読みやすい文字列に変換します
                 if isinstance(c.get('created_at'), datetime):
+                    # 年/月/日 時:分 の書式文字列に変換します
                     c['created_at'] = c['created_at'].strftime('%Y/%m/%d %H:%M')
+                # 使用日時（used_at）が datetime オブジェクトなら読みやすい文字列に変換します
                 if isinstance(c.get('used_at'), datetime):
+                    # 年/月/日 時:分 の書式文字列に変換します
                     c['used_at'] = c['used_at'].strftime('%Y/%m/%d %H:%M')
+                # 割引率（discount_rate）が存在する場合は小数の数値型（float）に変換します
                 if c.get('discount_rate') is not None:
+                    # 浮動小数点数（float）に変換して格納します
                     c['discount_rate'] = float(c['discount_rate'])
 
+        # 整形済みのクーポン一覧をJSONで返します
         return jsonify({"status": "success", "coupons": coupons}), 200
+    # 通信やSQLのエラーを受け止める catch ブロックです
     except Exception as e:
+        # コンソールにエラー内容を出力します
         print(f"[!] クーポン取得エラー: {e}")
+        # テーブルが存在しない可能性に備えてテーブル作成を試みます
         ensure_account_tables()
+        # 画面が止まらないよう空リストで安全に成功応答を返します
         return jsonify({"status": "success", "coupons": []}), 200
+    # 接続の後始末を必ず実行する finally ブロックです
     finally:
+        # MySQLデータベース接続を閉じます
         conn.close()
 
 # URL パス「/api/user/sync」（HTTP メソッド: POST）へのリクエストを下の関数へ割り当てます
