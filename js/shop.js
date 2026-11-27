@@ -2757,10 +2757,18 @@ async function handlePlaceOrder() {
         // 購入された商品IDを1件ずつ順番に取り出してループ処理します
         purchasedIds.forEach(pId => {
             // 型に依存せず数値一致で配列から完全に削除します（購入した商品は手持ち服になるためお気に入りから除外）
+
+            // pIdが購入した商品　お気に入り商品のIDがfavIdで
+            // 購入前のお気に入り一覧があって購入した商品(元々お気に入りに登録されていた商品)を除外して削除している
+            // お気に入り一覧の中から購入した商品をもうお気に入り商品とは見なさないとして
+            // お気に入り一覧から購入された商品を除外して購入されていないお気に入り商品だけの配列に絞り込んでいる
+            // それを現在のお気に入り一覧として使う
             AppState.favorites = AppState.favorites.filter(favId => Number(favId) !== pId);
             // ハートボタンの表示を解除状態に更新するため、同期関数が存在するか確認します
+            // お気に入り一覧を表示するときに、全ハートボタンを赤色にする処理が書かれている
             if (typeof syncAllFavoriteButtons === 'function') {
                 // 画面上にある該当商品のハートマークボタンをすべて解除（OFF / 白抜き）に同期します
+                // お気に入り一覧から購入された商品のIDを見てその商品のハートを白に変える
                 syncAllFavoriteButtons(pId, false);
             }
             // MySQL データベースを利用しているログイン会員かどうかを判定します
@@ -2768,6 +2776,9 @@ async function handlePlaceOrder() {
                 // 通信エラーで注文処理が中断しないよう try ブロックで安全に実行します
                 try {
                     // PythonバックエンドAPI（/api/favorites/remove）へ非同期でお気に入り削除リクエストを送信します
+                    // データベースのfavoritesの何かしらを消したい(remove)したいですってPOST送信でリクエスト送信している
+                    // 削除したい具体的な中身(body)として、
+                    // pIdとして扱っているproduct_idとAppState.currentUser.idとして扱っているuser_idを消したいよって言ってます
                     fetch(`${getApiBaseUrl()}/api/favorites/remove`, {
                         // POSTメソッドで送信します
                         method: 'POST',
@@ -2777,36 +2788,45 @@ async function handlePlaceOrder() {
                         credentials: 'include',
                         // 削除対象の商品IDと会員IDを JSON 文字列に変換して送信ボディにセットします
                         body: JSON.stringify({ product_id: pId, user_id: AppState.currentUser.id })
-                    // 通信失敗時も注文完了処理を止めないよう安全に空関数でキャッチします
+                        // 通信失敗時も注文完了処理を止めないよう安全に空関数でキャッチします
                     }).catch(() => { });
-                // 万が一の例外発生時も画面を止めずに安全にスルーします
+                    // 万が一の例外発生時も画面を止めずに安全にスルーします
                 } catch (_) { }
             }
         });
 
         // ナビバッジ・スタジオ表示・お気に入り画面をすべて即時同期します
+        // お気に入り削除するから数が減る更新がされるハートマークのバッジから
         updateFavoriteBadges();
         // スタジオのバッジ表示を更新します
+        // MANEKIN AIのお気に入り商品のバッジ
         if (typeof updateStudioBadges === 'function') updateStudioBadges();
         // スタジオのお気に入りグリッドを再描画します
+        // MANEKIN AIのお気に入り商品のタブを開いた時の画面の一覧表示の個数を更新
         if (typeof renderStudioFavoritesGrid === 'function') renderStudioFavoritesGrid();
         // スタジオのブランド一覧画面を再描画します
+        // コーデ作成の右側のお気に入りブランドリスト
         if (typeof renderStudioBrandList === 'function') renderStudioBrandList();
         // スタジオのアイテム一覧画面を再描画します
+        // MANEKINで見る事が出来るすべてのITEMを更新
         if (typeof renderStudioItems === 'function') renderStudioItems();
         // お気に入り一覧画面を再描画します
+        // MANEKIN関係なく開けるお気に入り一覧の更新
         if (typeof renderFavoriteProducts === 'function') renderFavoriteProducts();
         // マイページ画面を再描画します
         if (typeof renderMyPage === 'function') renderMyPage();
         // スマホ版の場合はlocalStorageのお気に入りデータも最新状態に保存します
+        // スマホ版の時、アカウントのIDごとに最新のお気に入り一覧データをlocalStorageに保存する
         if (isMobileLocalStorageMode()) {
             lsSetJson(`manekin_ls_favorites_${targetUserId}`, AppState.favorites);
         }
     }
 
     // 購入者のお名前を注文データに確実に紐付けます（誰が購入したか保存）
+    // 購入者の名前が無かったら　かつ　ログインユーザーがいたら
     if (!confirmedOrder.customer_name && AppState.currentUser) {
         // 会員名が注文データになければログイン中の会員名を代入します
+        // 購入者の名前が無いので、現在ログインしている人の名前を購入者の名前にします
         confirmedOrder.customer_name = AppState.currentUser.name;
     }
     // 注文完了画面表示用に適用中クーポンのスナップショットを保持します
@@ -2820,6 +2840,7 @@ async function handlePlaceOrder() {
     } : null;
 
     // 使用したクーポンを消滅（1回限り有効）させます
+    // 注文を確定するときにクーポンが存在していたら
     if (currentAppliedCoupon) {
         // クーポン一覧が配列として存在する場合
         if (Array.isArray(AppState.userCoupons)) {
@@ -2835,23 +2856,34 @@ async function handlePlaceOrder() {
             lsSetJson(`manekin_ls_coupons_${targetUserId}`, AppState.userCoupons || []);
         }
         // 適用中クーポンを解除（null）にします
+        // nullにしないと一生適用されたままになる次の商品を購入するときも
+        // いちいち購入をし終わったらクーポンの効力を解除しないと次の買い物にも引き継いでしまう
         currentAppliedCoupon = null;
         // お会計画面のクーポン選択欄を描き直します
+        // クーポンを適用して購入画面に進むともうクーポンの適用状態から利用しないなどを選べなくなるから
+        // 上の文でクーポンの効力を無くして、もう既に使用されましたよの表示に変更する
         renderCheckoutCoupons();
     }
 
-    // 新規追加された最新データを配列 AppState.orderHistory の先頭へ挿入して即画面反映します
+    // 新規追加された最新データを配列 AppState.orderHistory の先頭へ挿入(unshift)して即画面反映します
+    // 購入者が入力したお届け先情報や使用クーポン・ポイントやお支払方法、請求内容(商品合計、内税価格、配送料、お支払合計金額)をもってきます
     AppState.orderHistory.unshift(confirmedOrder);
 
     // アプリ全体状態 AppState.cart を最新値（[]）に更新します
+    // 購入後はカートを空にする
     AppState.cart = [];
     // 関連処理 updateCartBadge() を呼び出して処理・画面を更新します
+    // カートのバッジも最新の状態(0)にする
     updateCartBadge();
     // 変数・配列項目 checkoutUsedPoints の値を更新・計算します
+    // 使用するポイントは会計時に使用し終わっているので、デフォルト表示の0に戻す
     checkoutUsedPoints = 0;
 
     // スマホ版の場合は注文履歴・クローゼット・空になったカートを localStorage に保存します
     if (isMobileLocalStorageMode()) {
+        // その人の最新の購入履歴を再読み込みする(履歴の追加)
+        // その人の最新のクローゼットの中身を再読み込みする(購入した商品をクローゼットに追加)
+        // その人の最新のカートの中身を再読み込みする(カートの中身を0に戻す)
         lsSetJson(`manekin_ls_orders_${targetUserId}`, AppState.orderHistory);
         lsSetJson(`manekin_ls_closet_${targetUserId}`, AppState.myCloset);
         lsSetJson(`manekin_ls_cart_${targetUserId}`, []);
@@ -2861,31 +2893,43 @@ async function handlePlaceOrder() {
     restorePlaceBtn();
 
     // HTML 要素 #checkout-layout-main を取得して変数 mainLayout に格納します
+    // 注文確定画面のデザイン含む骨組み
     const mainLayout = document.getElementById('checkout-layout-main');
     // HTML 要素 #order-completed-view を取得して変数 completedView に格納します
+    // 画面切り替えのactiveをつけて画面表示するところ(注文画面全体に指定されているのでそこのdisplayがnoneかblockかで表示を切り替え)
     const completedView = document.getElementById('order-completed-view');
     // HTML 要素 #comp-order-no を取得して変数 compOrderNo に格納します
+    // 注文管理番号
     const compOrderNo = document.getElementById('comp-order-no');
     // HTML 要素 #comp-order-date を取得して変数 compOrderDate に格納します
+    // ご注文日時
     const compOrderDate = document.getElementById('comp-order-date');
     // HTML 要素 #comp-order-address を取得して変数 compOrderAddress に格納します
+    // お届け先
     const compOrderAddress = document.getElementById('comp-order-address');
     // HTML 要素 #comp-order-total を取得して変数 compOrderTotal に格納します
+    // お支払合計金額
     const compOrderTotal = document.getElementById('comp-order-total');
     // HTML 要素 #comp-earned-points を取得して変数 compEarnedPoints に格納します
+    // 今回の獲得ポイント
     const compEarnedPoints = document.getElementById('comp-earned-points');
     // HTML 要素 #comp-balance-points を取得して変数 compBalancePoints に格納します
+    // 購入後に現在の保有しているポイント
     const compBalancePoints = document.getElementById('comp-balance-points');
     // HTML 要素 #completed-closet-msg を取得して変数 closetBannerMsg に格納します
+    // 購入した商品をマイクローゼットに保存できたかどうか表示するとこ
     const closetBannerMsg = document.getElementById('completed-closet-msg');
 
     // 条件（mainLayout）が成り立つか判定し、該当する場合の処理を実行します
+    // 購入確定画面全体は、普段はdisplay: none;で隠れている状態
     if (mainLayout) mainLayout.style.display = 'none';
     // 条件（completedView）が成り立つか判定し、該当する場合の処理を実行します
+    // 注文画面全体を領域ごとに縦ならべ(block)で表示
     if (completedView) completedView.style.display = 'block';
 
     // 注文完了に合わせてステップバーを「3: 注文確定（黒丸・黒線）」へ更新します
     updateCheckoutStepper(3);
+    // 注文画面全体の一番上(top: 0)まで滑らかな(smooth)動き(behavior)でスクロール(scrollTo)する
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // 条件（compOrderNo）が成り立つか判定し、該当する場合の処理を実行します
@@ -2902,57 +2946,80 @@ async function handlePlaceOrder() {
     if (compBalancePoints) compBalancePoints.textContent = `${updatedPts.toLocaleString()} pt`;
 
     // クーポン利用情報の表示（クーポン適用時のみ行を表示）
-    const compCouponRow = document.getElementById('comp-coupon-row');
-    const compCouponInfo = document.getElementById('comp-coupon-info');
-    if (compCouponRow && compCouponInfo) {
-        const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
-            ? confirmedOrder.coupon_discount
-            : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
-        if (discount > 0) {
-            compCouponRow.style.display = 'flex';
-            const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
-            const cCode = (appliedCouponSnapshot && appliedCouponSnapshot.code) || confirmedOrder.coupon_code || '';
-            const codeBadge = cCode ? ` [${cCode}]` : '';
-            compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
-        } else {
-            compCouponRow.style.display = 'none';
-        }
+}
+// 注文完了画面表示用に適用中クーポンのスナップショットを保持します
+// const appliedCouponSnapshot = currentAppliedCoupon ? {
+// クーポン名
+// name: currentAppliedCoupon.name || currentAppliedCoupon.title || '会員優待クーポン',
+// クーポンコード
+//code: currentAppliedCoupon.code || '',
+// 割引額（円）
+// discount: calc.couponDiscount || 0
+// 注文完了画面の「クーポン割引」行（横並びの行ブロック）の要素を取得します
+const compCouponRow = document.getElementById('comp-coupon-row');
+// クーポン名・コード・割引金額を表示するテキスト要素を取得します
+const compCouponInfo = document.getElementById('comp-coupon-info');
+// 両方の要素が画面上に存在するか判定します（存在するときだけ表示処理を実行）
+if (compCouponRow && compCouponInfo) {
+    // 確定注文データまたは保持していたクーポン情報から、実際の割引額（円）を安全に決定します
+    const discount = (confirmedOrder.coupon_discount && confirmedOrder.coupon_discount > 0)
+        // 注文確定データに割引額があればその金額を採用します
+        ? confirmedOrder.coupon_discount
+        // 注文データに無ければスナップショットの割引額（どちらも無ければ0円）を採用します
+        : (appliedCouponSnapshot ? appliedCouponSnapshot.discount : 0);
+    // クーポン割引額が1円以上ある場合（クーポンが適用されていた場合）の処理です
+    if (discount > 0) {
+        // クーポン行のスタイルを 'flex' にして画面に表示させます
+        compCouponRow.style.display = 'flex';
+        // 表示用のクーポン名を取得します（未設定時は'クーポン割引'）
+        const cName = (appliedCouponSnapshot && appliedCouponSnapshot.name) || confirmedOrder.coupon_name || 'クーポン割引';
+        // 表示用のクーポンコードを取得します（未設定時は空文字）
+        const cCode = (appliedCouponSnapshot && appliedCouponSnapshot.code) || confirmedOrder.coupon_code || '';
+        // クーポンコードが存在していれば「 [WELCOME10]」のようなバッジ文字列を作ります
+        const codeBadge = cCode ? ` [${cCode}]` : '';
+        // 「クーポン名 [コード] -¥500」のように整形した文字をセットして画面に表示します
+        compCouponInfo.textContent = `${cName}${codeBadge} -¥${discount.toLocaleString()}`;
+    // クーポンを使っていない（割引額が0円）場合の分岐処理です
+    } else {
+        // クーポンを使っていない時は行ごと非表示（display: none）にして隠します
+        compCouponRow.style.display = 'none';
     }
+}
 
-    // ポイント利用情報の表示（ポイント利用時のみ行を表示）
-    const compUsedPointsRow = document.getElementById('comp-used-points-row');
-    const compUsedPoints = document.getElementById('comp-used-points');
-    if (compUsedPointsRow && compUsedPoints) {
-        const usedPts = confirmedOrder.used_points || calc.usedPoints || 0;
-        if (usedPts > 0) {
-            compUsedPointsRow.style.display = 'flex';
-            compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
-        } else {
-            compUsedPointsRow.style.display = 'none';
-        }
+// ポイント利用情報の表示（ポイント利用時のみ行を表示）
+const compUsedPointsRow = document.getElementById('comp-used-points-row');
+const compUsedPoints = document.getElementById('comp-used-points');
+if (compUsedPointsRow && compUsedPoints) {
+    const usedPts = confirmedOrder.used_points || calc.usedPoints || 0;
+    if (usedPts > 0) {
+        compUsedPointsRow.style.display = 'flex';
+        compUsedPoints.textContent = `-${usedPts.toLocaleString()} pt`;
+    } else {
+        compUsedPointsRow.style.display = 'none';
     }
+}
 
-    // HTML 要素 #comp-db-status を取得して変数 compDbStatus に格納します
-    const compDbStatus = document.getElementById('comp-db-status');
-    // 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
-    if (compDbStatus) {
-        // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-        compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ＆デモ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
-        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
-        compDbStatus.style.background = '#dcfce7';
-        // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
-        compDbStatus.style.color = '#15803d';
-    }
+// HTML 要素 #comp-db-status を取得して変数 compDbStatus に格納します
+const compDbStatus = document.getElementById('comp-db-status');
+// 条件（compDbStatus）が成り立つか判定し、該当する場合の処理を実行します
+if (compDbStatus) {
+    // 文字要素 compDbStatus の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+    compDbStatus.textContent = isMobileLocalStorageMode() ? '🟢 スマホ＆デモ版 (localStorage) 保存完了' : '🟢 MySQL (manekin_db) 保存完了';
+    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.background = '#dcfce7';）
+    compDbStatus.style.background = '#dcfce7';
+    // JavaScript から直接 CSS インラインスタイルを変更して見た目を更新します（compDbStatus.style.color = '#15803d';）
+    compDbStatus.style.color = '#15803d';
+}
 
-    // 条件（closetBannerMsg && purchasedItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
-    if (closetBannerMsg && purchasedItems.length > 0) {
-        // 文字要素 closetBannerMsg の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
-        closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をMySQLのマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
-    }
+// 条件（closetBannerMsg && purchasedItems.length > 0）が成り立つか判定し、該当する場合の処理を実行します
+if (closetBannerMsg && purchasedItems.length > 0) {
+    // 文字要素 closetBannerMsg の表示テキストを新しい値へ書き換えます（HTML解釈なし・XSS安全）
+    closetBannerMsg.textContent = `購入された「${purchasedItems[0].name}」など ${purchasedItems.length} 点をMySQLのマイクローゼットに自動登録しました！スタジオで手持ち服との組み合わせや着せ替え比較をすぐにお試しいただけます。`;
+}
 
-    // 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
-    const buyerName = confirmedOrder.customer_name || AppState.currentUser?.name || 'お客様';
-    showToast(`🎉【${buyerName} 様】ご注文完了！注文番号「${confirmedOrder.order_no}」をご注文履歴に保存しました`);
+// 画面右下のトースト通知バナーで操作結果や案内メッセージをユーザーへ知らせます
+const buyerName = confirmedOrder.customer_name || AppState.currentUser?.name || 'お客様';
+showToast(`🎉【${buyerName} 様】ご注文完了！注文番号「${confirmedOrder.order_no}」をご注文履歴に保存しました`);
 }
 
 
